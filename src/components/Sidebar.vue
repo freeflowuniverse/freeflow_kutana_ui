@@ -7,13 +7,17 @@
       </v-tabs>
     </v-card-title>
     <v-card-text>
-
+      <Chat>
     </v-card-text>
   </v-card>
 </template>
 
 <script type="javascript">
+import Chat from './Chat'
 export default {
+  components: {
+    Chat
+  },
   mounted() {
   }
 };
