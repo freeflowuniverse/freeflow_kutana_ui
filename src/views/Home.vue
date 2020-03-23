@@ -1,12 +1,12 @@
 <template>
   <v-row class="px-2">
-    <v-col cols="7">
+    <v-col cols="7"  class="pr-0">
       <TheSelectedStream />
     </v-col>
-    <v-col cols="2" class="px-0">
+    <v-col cols="2">
       <UsersList />
     </v-col>
-    <v-col>
+    <v-col class="pa-0">
       <TheSidebar />
     </v-col>
   </v-row>

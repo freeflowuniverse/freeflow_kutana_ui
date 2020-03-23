@@ -25,7 +25,6 @@ export default {
   }
 }
 .UsersListItemControls {
-  background: red;
   position: absolute;
   bottom: 0;
   right: 0;
