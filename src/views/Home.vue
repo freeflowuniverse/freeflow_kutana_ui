@@ -1,20 +1,22 @@
 <template>
-  <v-container>
-    <p>Home</p>
-    <ExampleCard></ExampleCard>
-  </v-container>
+  <v-row class="px-2">
+    <v-col cols="8" class="red">
+      <Stream />
+    </v-col>
+    <v-col class="blue">
+      <Sidebar />
+    </v-col>
+  </v-row>
 </template>
 
 <script>
-import { Janus } from "janus-gateway";
-import ExampleCard from "../components/ExampleCard.vue";
+import Stream from "../components/Stream.vue";
+import Sidebar from "../components/Sidebar.vue";
 
 export default {
   components: {
-    ExampleCard
-  },
-  mounted() {
-    console.log("Janus: ", Janus);
+    Stream,
+    Sidebar
   }
 };
 </script>
