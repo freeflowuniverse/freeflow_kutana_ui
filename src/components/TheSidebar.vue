@@ -1,24 +1,20 @@
 <template>
   <v-card class="fill-height ma-0">
     <v-card-title>
-      <v-tabs grow>
-        <v-tab>chat</v-tab>
-        <v-tab>members</v-tab>
-      </v-tabs>
+      <v-row justify="center">Chat</v-row>
     </v-card-title>
     <v-card-text>
-      <Chat>
+      <TheChat />
     </v-card-text>
   </v-card>
 </template>
 
 <script type="javascript">
-import Chat from './Chat'
+import TheChat from "./TheChat";
 export default {
   components: {
-    Chat
+    TheChat
   },
-  mounted() {
-  }
+  mounted() {}
 };
 </script>

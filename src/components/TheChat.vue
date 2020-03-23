@@ -1,13 +1,13 @@
 <template>
   <section>
-    <Message v-for="(message, index) in messages" :key="index"/>
+    <TheChatMessage v-for="(message, index) in messages" :key="index"/>
   </section>
 </template>
 <script type="javascript">
-import Message from "./Message";
+import TheChatMessage from "./TheChatMessage";
 export default {
   components:{
-    Message
+    TheChatMessage
   },
   data() {
     return {

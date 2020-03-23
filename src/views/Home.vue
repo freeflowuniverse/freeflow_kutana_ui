@@ -1,22 +1,27 @@
 <template>
   <v-row class="px-2">
-    <v-col cols="8" class="red">
-      <Stream />
+    <v-col cols="7">
+      <TheSelectedStream />
     </v-col>
-    <v-col class="blue">
-      <Sidebar />
+    <v-col cols="2" class="px-0">
+      <UsersList />
+    </v-col>
+    <v-col>
+      <TheSidebar />
     </v-col>
   </v-row>
 </template>
 
 <script>
-import Stream from "../components/Stream.vue";
-import Sidebar from "../components/Sidebar.vue";
+import TheSelectedStream from "../components/TheSelectedStream";
+import UsersList from "../components/UsersList";
+import TheSidebar from "../components/TheSidebar";
 
 export default {
   components: {
-    Stream,
-    Sidebar
+    TheSelectedStream,
+    TheSidebar,
+    UsersList
   }
 };
 </script>
