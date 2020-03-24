@@ -3,7 +3,7 @@
       <div class="messages">
         <div v-for="(message, index) in 100" :key="index" > {{index}} </div>
       </div>
-      <TheChatInput/>
+      <TheChatInput class=""/>
   </v-row>
 </template>
 <script type="javascript">
@@ -31,7 +31,7 @@ export default {
 }
 .messages {
   position: absolute;
-  height: calc(100% - 100px);
+  height: calc(100% - 110px);
   top: 0;
   width: 100%;
   overflow-y: auto;

@@ -1,7 +1,7 @@
 <template>
-<section class="theChatInput ">
+<section class="theChatInput grey lighten-3">
   <v-divider class="py-2" horizontal></v-divider>
-  <v-text-field hide-details  outlined clearable label="Message" prepend-icon="attach_file" append-icon="insert_emoticon" append-outer-icon="send" >
+  <v-text-field outlined clearable label="Message" prepend-icon="attach_file" append-icon="insert_emoticon" append-outer-icon="send" >
   </v-text-field>
 </section>
 </template>
@@ -17,6 +17,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .theChatInput{
-  width: 100%;
+    margin-left: -8px;
+    padding: 0 8px;
+    width: calc(100% + 8px);
 }
 </style>

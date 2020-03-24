@@ -1,9 +1,14 @@
 <template>
   <v-card class="ma-0 sideBar">
-    <v-card-title class="primary" dark>
-      <v-row justify="center">Chat</v-row>
+    <v-card-title class="primary">
+      <v-row justify="center" class="white--text px-2">
+        <v-col align="center" class="py-0" offset="1">Chat</v-col>
+          <v-btn icon>
+            <v-icon color="white">close</v-icon>
+          </v-btn>
+      </v-row>
     </v-card-title>
-    <v-card-text class="inner">
+    <v-card-text class="inner pb-0">
       <TheChat class="chat" />
     </v-card-text>
   </v-card>
@@ -21,8 +26,9 @@ export default {
 
 <style lang="scss" scoped>
 .sideBar {
-  position:relative;
+  position: relative;
   height: 100%;
+  overflow: hidden;
 }
 .inner {
   height: calc(100% - 64px);

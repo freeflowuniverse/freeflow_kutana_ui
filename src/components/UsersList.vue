@@ -11,7 +11,7 @@ export default {
   },
   data() {
     return {
-      members: [1,2,3]
+      members: [1,2,3,4,5,6]
     };
   },
   mounted() {
