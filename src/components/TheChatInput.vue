@@ -1,17 +1,32 @@
 <template>
 <section class="theChatInput grey lighten-3">
   <v-divider class="py-2" horizontal></v-divider>
-  <v-text-field outlined clearable label="Message" prepend-icon="attach_file" append-icon="insert_emoticon" append-outer-icon="send" >
-  </v-text-field>
+  <v-text-field v-model="message" outlined clearable label="Message" prepend-icon="attach_file" append-icon="insert_emoticon" append-outer-icon="send" @click:append-outer="forwardMessage" />
 </section>
 </template>
 <script type="javascript">
+import { mapActions } from 'vuex';
+import moment from 'moment';
 export default {
   data() {
-    return {};
+    return {
+      message: ''
+    };
   },
   mounted() {
     // TODO: get chat
+  },
+  methods: {
+    ...mapActions(['sendMessage']),
+    forwardMessage() {
+      if (this.message !== '') {
+        this.sendMessage({ sender: "Bert", createdAt: moment(),content: this.message});
+        this.clearMessage();
+      }
+    },
+    clearMessage() {
+      this.message = '';
+    }
   }
 };
 </script>

@@ -5,6 +5,8 @@ import vuetify from './plugins/vuetify';
 import router from './plugins/router';
 import store from './plugins/vuex';
 
+import './filters'
+
 Vue.config.productionTip = false
 
 new Vue({
