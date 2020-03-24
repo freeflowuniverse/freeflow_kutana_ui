@@ -6,6 +6,7 @@
     </v-card>
   </section>
 </template>
+
 <script>
 import UsersListItemControls from "../components/UsersListItemControls.vue";
 

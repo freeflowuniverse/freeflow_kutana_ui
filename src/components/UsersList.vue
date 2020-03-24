@@ -1,20 +1,20 @@
 <template>
   <section>
-    <UsersListItem v-for="(member, index) in members" :key="index" class="mb-3"/>
+    <UsersListItem v-for="(member, index) in members" :key="index" class="mb-3" />
   </section>
 </template>
+
 <script type="javascript">
 import UsersListItem from "./UsersListItem";
 export default {
-  components:{
+  components: {
     UsersListItem
   },
   data() {
     return {
-      members: [1,2,3,4,5,6]
+      members: [1, 2, 3, 4, 5, 6]
     };
   },
-  mounted() {
-  }
+  mounted() {}
 };
 </script>

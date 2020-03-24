@@ -7,7 +7,7 @@
       <div class="inner">
         <UsersList />
       </div>
-        <TheMainUser />
+      <TheMainUser />
     </v-col>
     <v-col class="pa-0">
       <TheSidebar />

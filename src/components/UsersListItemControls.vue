@@ -8,9 +8,10 @@
     </v-btn>
   </v-card>
 </template>
+
 <style lang="scss" scoped>
-    .miniControls{
-        border-radius: 15px !important;
-        overflow: hidden;
-    }
+.miniControls {
+  border-radius: 15px !important;
+  overflow: hidden;
+}
 </style>

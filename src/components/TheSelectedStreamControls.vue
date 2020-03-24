@@ -23,12 +23,13 @@
     </v-btn>
   </v-card>
 </template>
+
 <style lang="scss" scoped>
-    .mainControls{
-        border-radius: 15px !important;
-        overflow: hidden;
-        .endCall {
-            position: relative;
-        }
-    }
+.mainControls {
+  border-radius: 15px !important;
+  overflow: hidden;
+  .endCall {
+    position: relative;
+  }
+}
 </style>
