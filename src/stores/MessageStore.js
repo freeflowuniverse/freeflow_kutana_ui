@@ -1,24 +1,30 @@
-import messages from './messages.json'
-
+import socketService from '../services/socketService'
 export default {
   state: {
     messages: []
   },
   mutations: {
-    getMessages(state) {
+    setMessages(state, messages) {
       state.messages = messages
     },
-    sendMessage(state, message) {
+    addMessage(state, message) {
       console.log(message)
       state.messages.push(message)
     }
   },
   actions: {
     getMessages(context) {
-      context.commit("getMessages")
+      // TODO: get messages
+      let messages = []
+      context.commit("setMessages", messages)
     },
     sendMessage(context, message) {
-      context.commit("sendMessage", message)
+      socketService.sendMessage(message)
+      // context.commit("addMessage", message)
+    },
+    SOCKET_message(context, message) {
+      console.log(`dddd`)
+      context.commit("addMessage", message)
     }
   },
   getters: {

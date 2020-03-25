@@ -15,7 +15,7 @@
 </template>
 
 <script type="javascript">
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
 export default {
   data() {
@@ -26,12 +26,15 @@ export default {
   mounted() {
     // TODO: get chat
   },
+  computed: {
+    ...mapGetters(['account'])
+  },
   methods: {
     ...mapActions(["sendMessage"]),
     forwardMessage() {
       if (this.message !== "") {
         this.sendMessage({
-          sender: "Bert",
+          sender: this.account.name,
           createdAt: moment(),
           content: this.message
         });

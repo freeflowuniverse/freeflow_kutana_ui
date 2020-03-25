@@ -3,7 +3,8 @@
     <v-col cols="7" class="pr-0">
       <TheSelectedStream />
     </v-col>
-    <v-col cols="2" class="userList">
+    <v-col cols="2" class="userList" :id="`user${user,id}`"
+>
       <div class="inner">
         <UsersList />
       </div>
