@@ -7,7 +7,7 @@
       <div class="inner">
         <UsersList />
       </div>
-        <TheMainUser />
+      <TheMainUser />
     </v-col>
     <v-col cols="3" class="pa-0">
       <TheSidebar />
@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
 import TheMainUser from "../components/TheMainUser";
 import TheSelectedStream from "../components/TheSelectedStream";
 import UsersList from "../components/UsersList";
@@ -27,6 +28,20 @@ export default {
     TheSelectedStream,
     TheSidebar,
     UsersList
+  },
+  mounted() {
+    console.log('Checking if janus has been initialized: ', this.isJanusInitialized);
+    
+    if(!this.isJanusInitialized) {
+      console.log('Attempting to initialize janus ...');
+      this.initializeJanus();
+    }
+  },
+  methods: {
+    ...mapActions(['initializeJanus'])
+  },
+  computed: {
+    ...mapGetters(['isJanusInitialized'])
   }
 };
 </script>

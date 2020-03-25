@@ -3,10 +3,11 @@
     <UsersListItem v-for="(member, index) in members" :user="member" :key="index" class="ma-2 mt-0" :selected="index === selectedMemberId" @click="changeSelection(index)"/>
   </section>
 </template>
+
 <script type="javascript">
 import UsersListItem from "./UsersListItem";
 export default {
-  components:{
+  components: {
     UsersListItem
   },
   data() {

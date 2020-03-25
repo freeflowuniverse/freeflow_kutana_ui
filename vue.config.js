@@ -21,6 +21,9 @@ module.exports = {
           use: 'exports-loader?Janus=Janus'
         }
       ]
+    },
+    devServer: {
+      disableHostCheck: true
     }
   }
 }

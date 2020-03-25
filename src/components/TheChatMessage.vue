@@ -5,20 +5,15 @@
         <span class="font-weight-bold">{{ message.sender }}</span>
       </v-row>
     </v-card-subtitle>
-    <v-card-text class="font-weight-medium">
-      {{  message.content }}
-    </v-card-text>
+    <v-card-text class="font-weight-medium">{{ message.content }}</v-card-text>
   </v-card>
 </template>
 
 <script type="javascript">
 export default {
-  props: ['message'],
-  mounted() {
-  },
-  methods: {
-    
-  }
+  props: ["message"],
+  mounted() {},
+  methods: {}
 };
 </script>
 

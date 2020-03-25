@@ -1,4 +1,5 @@
 import messages from './messages.json'
+
 export default {
   state: {
     messages: []
