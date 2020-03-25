@@ -3,13 +3,13 @@
     <v-col cols="7" class="pr-0">
       <TheSelectedStream />
     </v-col>
-    <v-col cols="2" class="userList mx-2">
+    <v-col cols="2" class="userList">
       <div class="inner">
         <UsersList />
       </div>
         <TheMainUser />
     </v-col>
-    <v-col class="pa-0">
+    <v-col cols="3" class="pa-0">
       <TheSidebar />
     </v-col>
   </v-row>

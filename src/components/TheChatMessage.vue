@@ -1,5 +1,5 @@
 <template>
-  <v-card :class="message.sender === 'Bert' ? 'ml-12 mr-2' : 'mr-12 ml-1'" elevation="0" color="primary" dark>
+  <v-card :class="message.sender === 'Bert' ? 'ml-6 mr-2' : 'mr-12 ml-1'" elevation="0" color="primary" dark>
     <v-card-subtitle>
       <v-row class="pr-3 pl-3">
         <span class="font-weight-bold">{{ message.sender }}</span>

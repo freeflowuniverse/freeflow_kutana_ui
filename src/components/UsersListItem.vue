@@ -1,8 +1,8 @@
 <template>
   <section class="stream">
-    <v-card>
+    <v-card @click.stop="$emit('click')">
       <UsersListItemControls class="UsersListItemControls" />
-      <v-img class="inner elevation-2" src="https://source.unsplash.com/1600x900/?person"></v-img>
+      <v-img :class="`inner elevation-2 ${selected ? 'selected': ''}`" src="https://source.unsplash.com/1600x900/?person"></v-img>
     </v-card>
   </section>
 </template>
@@ -10,6 +10,10 @@
 import UsersListItemControls from "../components/UsersListItemControls.vue";
 
 export default {
+  props: {
+    selected: Boolean,
+    user: Object
+  },
   components: {
     UsersListItemControls
   }
@@ -29,5 +33,8 @@ export default {
   bottom: 0;
   right: 0;
   z-index: 2;
+}
+.selected {
+  border: 5px solid var(--primary-color);
 }
 </style>
