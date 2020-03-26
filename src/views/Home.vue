@@ -1,16 +1,15 @@
 <template>
   <v-row class="px-2 home">
-    <v-col cols="7" class="pr-0">
+    <v-col :cols="showSidebar ? 7 : 10" class="pr-0">
       <TheSelectedStream />
     </v-col>
-    <v-col cols="2" class="userList" :id="`user${user,id}`"
->
+    <v-col cols="2" class="userList">
       <div class="inner">
         <UsersList />
       </div>
       <TheMainUser />
     </v-col>
-    <v-col cols="3" class="pa-0">
+    <v-col cols="3" class="pa-0" v-if="showSidebar">
       <TheSidebar />
     </v-col>
   </v-row>
@@ -30,19 +29,30 @@ export default {
     TheSidebar,
     UsersList
   },
+  data() {
+    return {
+      showSidebar: true
+    }
+  },
   mounted() {
-    console.log('Checking if janus has been initialized: ', this.isJanusInitialized);
-    
-    if(!this.isJanusInitialized) {
-      console.log('Attempting to initialize janus ...');
+    this.$root.$on('toggleSidebar', () => {
+      this.showSidebar = !this.showSidebar
+    })
+    console.log(
+      "Checking if janus has been initialized: ",
+      this.isJanusInitialized
+    );
+
+    if (!this.isJanusInitialized) {
+      console.log("Attempting to initialize janus ...");
       this.initializeJanus();
     }
   },
   methods: {
-    ...mapActions(['initializeJanus'])
+    ...mapActions(["initializeJanus"])
   },
   computed: {
-    ...mapGetters(['isJanusInitialized'])
+    ...mapGetters(["isJanusInitialized"])
   }
 };
 </script>

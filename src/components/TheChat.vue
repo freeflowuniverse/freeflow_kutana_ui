@@ -1,6 +1,6 @@
 <template>
   <v-row align="end" class="chat">
-    <div class="messages">
+    <div class="messages" v-autoScroll>
       <template v-for="(message, index) in messages">
         <div v-if="showDivider(message, index)" :key="`${index}_divider`" class="text-center px-4">
           <span
@@ -22,7 +22,12 @@ import moment from "moment";
 import TheChatMessage from "./TheChatMessage";
 import TheChatInput from "./TheChatInput";
 import { mapGetters, mapActions } from "vuex";
+import autoScroll from "../directives/autoScroll"
+
 export default {
+  directives: {
+    autoScroll
+  },
   components: {
     TheChatMessage,
     TheChatInput
