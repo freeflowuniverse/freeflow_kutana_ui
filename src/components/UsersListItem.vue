@@ -1,33 +1,54 @@
 <template>
-  <section class="stream">
-    <v-card @click.stop="$emit('click')">
+  <section>
+    <v-card class="stream">
+      <span :id="`user${userIndex}`"></span>
       <UsersListItemControls class="UsersListItemControls" />
-      <v-img :class="`inner elevation-2 ${selected ? 'selected': ''}`" src="https://source.unsplash.com/1600x900/?person"></v-img>
     </v-card>
   </section>
 </template>
 
 <script>
+import { Janus } from "janus-gateway";
 import UsersListItemControls from "../components/UsersListItemControls.vue";
 
 export default {
-  props: {
-    selected: Boolean,
-    user: Object
-  },
+  // props: {
+  //   selected: Boolean,
+  //   user: Object
+  // },
   components: {
     UsersListItemControls
+  },
+  props: ["user", "userIndex"],
+  mounted() {},
+  watch: {
+    user: {
+      handler(newUser) {
+        if (
+          this.userIndex != 0 &&
+          newUser.stream != null &&
+          newUser.stream != undefined &&
+          document.getElementById(this.user.id) === null
+        ) {
+          var video = document.createElement("video");
+          video.id = newUser.id;
+          video.height = 250;
+          video.setAttribute("autoplay", "true");
+          document.getElementById(`user${this.userIndex}`).prepend(video);
+          Janus.attachMediaStream(video, newUser.stream);
+        }
+      },
+      deep: true
+    }
   }
 };
 </script>
 
 <style lang="scss" scoped>
 .stream {
-  position: relative;
-  height: 100%;
-  .inner {
-    height: 100%;
-  }
+  border: 1px solid black;
+  height: 250px;
+  width: 400px;
 }
 .UsersListItemControls {
   position: absolute;
