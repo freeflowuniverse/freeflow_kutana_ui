@@ -1,0 +1,24 @@
+staging_deploy:
+    stage: deploy
+    only:
+        - /^v(\d+\.)?(\d+\.)?(\*|\d+)-rc\d*$/
+    tags:
+        - builder
+    script:
+        - echo "Building and deploying ffc staging."
+        - docker rm -f ffc; true
+        - docker-compose build
+        - docker-compose up -d
+    
+deploy:
+    stage: deploy
+    only:
+        - /^(\d+\.)?(\d+\.)?(\*|\d+)$/
+    tags:
+        - builder
+    script:
+        - echo "Building and deploying ffc production."
+        - docker rm -f ffc; true
+        - docker build -t 3bot_app_jimber/ffc:$CI_COMMIT_TAG
+        - docker run -d -it --name=ffc --network=3proxynet 3bot_app_jimber/ffc:$CI_COMMIT_TAG
+    
