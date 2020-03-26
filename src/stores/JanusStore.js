@@ -9,7 +9,7 @@ export default {
         myId: null,
         myPrivateId: null,
         myStream: null,
-        myRoom: 1234,
+        myRoom: 1337,
         feeds: [],
         opaqueId: 'videoroom-' + Janus.randomString(12),
         selectedUser: null,
