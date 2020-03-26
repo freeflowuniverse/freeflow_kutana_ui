@@ -20,7 +20,7 @@ export default {
   watch: {
     users: {
       handler(newUsers) {
-        if (newUsers[0].stream != null && newUsers[0].stream != undefined && document.getElementById(newUsers[0].stream.id) === null) {
+        if (newUsers[0].stream != null && newUsers[0].stream != undefined && newUsers[0].stream.active &&  document.getElementById(newUsers[0].stream.id) === null) {
           var video = document.createElement("video");
           video.muted = true;
           video.id = newUsers[0].stream.id;
