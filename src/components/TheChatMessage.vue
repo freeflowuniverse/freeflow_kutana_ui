@@ -54,14 +54,7 @@ export default {
         // The magic numbers from this function come from https://stackoverflow.com/a/49750491/2349421
         let file = this.message.content.file;
         let lengthOfHeader = file.indexOf("base64,") + "base64,".length;
-        console.log(
-          `lengthOfHeader of ${this.message.content.name}`,
-          lengthOfHeader
-        );
-        console.log(
-          `header should be`,
-          this.message.content.file.substring(0, lengthOfHeader)
-        );
+        
         let stringLength = file.length - lengthOfHeader;
         let sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.5624896334383812;
         return `${Math.round((sizeInBytes / 1000) * 100) / 100} KB`;

@@ -33,7 +33,6 @@ export default {
       let items = (event.clipboardData || event.originalEvent.clipboardData).items;
       for (let index in items) {
         let item = items[index];
-        console.log(`kind`, item.kind)
         if (item.kind === "file") {
           let blob = item.getAsFile();
           let reader = new FileReader();
@@ -77,7 +76,6 @@ export default {
       }
     },
     async fileUploaded(e) {
-      console.log(e)
       this.sendIt({
         name: e.srcElement.files[0].name,
         file: await this.toBase64(e.srcElement.files[0])
