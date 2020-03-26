@@ -29,23 +29,24 @@ export default {
     };
   },
   mounted() {
-    // window.addEventListener("paste", e => {
-    //   console.log(`PASTE`)
-    //   console.log(e)
-    //   this.$refs['fileUpper'].files = e.clipboardData.files;
-    // });
     document.onpaste = (event) => {
       let items = (event.clipboardData || event.originalEvent.clipboardData).items;
-      console.log(JSON.stringify(items)); // will give you the mime types
       for (let index in items) {
         let item = items[index];
+        console.log(`kind`, item.kind)
         if (item.kind === "file") {
           let blob = item.getAsFile();
           let reader = new FileReader();
           reader.onload = (event) => {
-            this.sendIt(event.target.result, 'file')
+            this.sendIt({
+              file: event.target.result
+            }, 'file')
           }; // data url!
-          reader.readAsDataURL(blob);
+          if(blob) {
+            reader.readAsDataURL(blob);
+          } else {
+            this.setSnackbarMessage(`Can't paste file, only images. Please use the upload button`)
+          }
         }
       }
     };
@@ -54,7 +55,7 @@ export default {
     ...mapGetters(["account"])
   },
   methods: {
-    ...mapActions(["sendMessage"]),
+    ...mapActions(["sendMessage", "setSnackbarMessage"]),
     showFileUploader() {
       this.$refs.fileUpper.click();
     },
@@ -76,7 +77,11 @@ export default {
       }
     },
     async fileUploaded(e) {
-      this.sendIt(await this.toBase64(e.srcElement.files[0]), 'file')
+      console.log(e)
+      this.sendIt({
+        name: e.srcElement.files[0].name,
+        file: await this.toBase64(e.srcElement.files[0])
+      }, 'file')
     },
     toBase64(file) {
       return new Promise((resolve, reject) => {
