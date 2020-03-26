@@ -5,6 +5,7 @@ import ExampleStore from '../stores/ExampleStore'
 import MessageStore from '../stores/MessageStore'
 import JanusStore from '../stores/JanusStore'
 import AuthStore from '../stores/AuthStore'
+import MainStore from '../stores/MainStore'
 
 Vue.use(Vuex)
 
@@ -13,6 +14,7 @@ export default new Vuex.Store({
         ExampleStore,
         MessageStore,
         JanusStore,
-        AuthStore
+        AuthStore,
+        MainStore
     }
 })
