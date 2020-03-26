@@ -8,7 +8,6 @@ export default {
       state.messages = messages
     },
     addMessage(state, message) {
-      console.log(message)
       state.messages.push(message)
     }
   },
@@ -23,7 +22,6 @@ export default {
       // context.commit("addMessage", message)
     },
     SOCKET_message(context, message) {
-      console.log(`dddd`)
       context.commit("addMessage", message)
     }
   },
