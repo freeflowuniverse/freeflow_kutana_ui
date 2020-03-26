@@ -18,7 +18,7 @@
     <v-btn icon class="ml-1">
       <v-icon>person_add</v-icon>
     </v-btn>
-    <v-btn icon class="mx-1">
+    <v-btn icon class="mx-1" @click="$root.$emit('toggleSidebar')">
       <v-icon>chat_bubble</v-icon>
     </v-btn>
   </v-card>
