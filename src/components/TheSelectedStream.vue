@@ -3,7 +3,6 @@
     <v-card class="wrapper">
       <span style="display: block; width: 100%; height: 100%;" id="selectedUser">
       </span>
-      <TheSelectedStreamControls class="TheSelectedStreamControls mb-4" />
     </v-card>
   </section>
 </template>
@@ -12,12 +11,7 @@
 import { Janus } from "janus-gateway";
 import { mapGetters } from "vuex";
 
-import TheSelectedStreamControls from "../components/TheSelectedStreamControls.vue";
-
 export default {
-  components: {
-    TheSelectedStreamControls
-  },
   computed: {
     ...mapGetters(["selectedUser"])
   },
@@ -47,13 +41,6 @@ export default {
   .inner {
     height: 100%;
   }
-}
-.TheSelectedStreamControls {
-  position: absolute;
-  bottom: 0px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
 }
 
 .scaleUp {

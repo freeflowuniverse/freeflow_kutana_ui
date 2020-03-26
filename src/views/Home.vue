@@ -3,8 +3,7 @@
     <v-col cols="7" class="pr-0">
       <TheSelectedStream />
     </v-col>
-    <v-col cols="2" class="userList" :id="`user${user,id}`"
->
+    <v-col cols="2" class="userList">
       <div class="inner">
         <UsersList />
       </div>
@@ -31,18 +30,21 @@ export default {
     UsersList
   },
   mounted() {
-    console.log('Checking if janus has been initialized: ', this.isJanusInitialized);
-    
-    if(!this.isJanusInitialized) {
-      console.log('Attempting to initialize janus ...');
+    console.log(
+      "Checking if janus has been initialized: ",
+      this.isJanusInitialized
+    );
+
+    if (!this.isJanusInitialized) {
+      console.log("Attempting to initialize janus ...");
       this.initializeJanus();
     }
   },
   methods: {
-    ...mapActions(['initializeJanus'])
+    ...mapActions(["initializeJanus"])
   },
   computed: {
-    ...mapGetters(['isJanusInitialized'])
+    ...mapGetters(["isJanusInitialized"])
   }
 };
 </script>

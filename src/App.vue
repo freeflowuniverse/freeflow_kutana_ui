@@ -16,3 +16,9 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+video {
+  width: 100%;
+  height: auto;
+}
+</style>
