@@ -9,7 +9,9 @@ export default {
       ? JSON.parse(window.localStorage.getItem("tempKeys"))
       : null,
     loginUrl: null,
-    account: window.localStorage.getItem("account") || null
+    account: window.localStorage.getItem("account")
+    ? JSON.parse(window.localStorage.getItem("account"))
+    : null,
   },
   actions: {
     logout(context) {
