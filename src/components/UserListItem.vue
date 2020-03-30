@@ -2,14 +2,14 @@
   <section>
     <v-card class="stream">
       <span :id="`user${userIndex}`"></span>
-      <UsersListItemControls class="UsersListItemControls" />
+      <UserListItemControls class="UserListItemControls" />
     </v-card>
   </section>
 </template>
 
 <script>
 import { Janus } from "janus-gateway";
-import UsersListItemControls from "../components/UsersListItemControls.vue";
+import UserListItemControls from "../components/UserListItemControls.vue";
 
 export default {
   // props: {
@@ -17,7 +17,7 @@ export default {
   //   user: Object
   // },
   components: {
-    UsersListItemControls
+    UserListItemControls
   },
   props: ["user", "userIndex"],
   mounted() {},
@@ -50,7 +50,7 @@ export default {
   height: 250px;
   width: 400px;
 }
-.UsersListItemControls {
+.UserListItemControls {
   position: absolute;
   bottom: 0;
   right: 0;

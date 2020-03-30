@@ -1,7 +1,7 @@
 <template>
   <section>
     <template v-for="(user, index) in users">
-      <UsersListItem @click.native="selectStream(user)" v-if="index" :user=user :userIndex=index :key="index" class="mb-3" />
+      <UserListItem @click.native="selectStream(user)" v-if="index" :user=user :userIndex=index :key="index" class="mb-3" />
     </template>
   </section>
 </template>
@@ -9,11 +9,11 @@
 <script type="javascript">
 import { mapGetters, mapActions } from "vuex";
 
-import UsersListItem from "./UsersListItem";
+import UserListItem from "./UserListItem";
 
 export default {
   components: {
-    UsersListItem
+    UserListItem
   },
   mounted() {
 
