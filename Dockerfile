@@ -1,10 +1,12 @@
 FROM node:alpine as builder
 WORKDIR /app
+RUN apk add --no-cache  git
 COPY package.json package.json
 COPY yarn.lock yarn.lock
 RUN yarn install
 COPY . .
 RUN yarn build
+
 
 FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
