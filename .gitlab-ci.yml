@@ -9,7 +9,7 @@ stages:
     - test
     - deploy
   
-test:
+.test:
     stage: test
     tags:
         - testserver
