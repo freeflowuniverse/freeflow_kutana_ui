@@ -23,9 +23,9 @@
       <v-icon>call_end</v-icon>
     </v-btn>
 
-    <!-- <v-btn @click="screenShare" icon class="ml-1">
+    <v-btn @click="screenShare" icon class="ml-1">
       <v-icon>screen_share</v-icon>
-    </v-btn>-->
+    </v-btn>
 
     <v-btn icon class="ml-1">
       <v-icon>person_add</v-icon>
