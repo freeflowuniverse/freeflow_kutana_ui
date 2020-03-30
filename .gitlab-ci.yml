@@ -27,9 +27,9 @@ staging_deploy:
         - testserver
     script:
         - echo "Building and deploying ffc staging."
-        - docker rm -f ffc || true
+        - docker rm -f ffc_frontend || true
         - docker build -t 3bot_app_jimber/freeflowconnect:staging .
-        - docker run -d -it --name=ffc_frontend --network=ffc_frontend 3bot_app_jimber/ffc_frontend:staging
+        - docker run -d -it --name=ffc_frontend --network=ffc_frontend 3bot_app_jimber/freeflowconnect:staging
     
 deploy:
     stage: deploy
@@ -39,7 +39,7 @@ deploy:
         - testserver
     script:
         - echo "Building and deploying ffc production."
-        - docker rm -f ffc || true
+        - docker rm -f ffc_frontend || true
         - docker build -t 3bot_app_jimber/freeflowconnect:$CI_COMMIT_TAG .
-        - docker run -d -it --name=ffc_frontend --network=ffc_frontend 3bot_app_jimber/ffc_frontend:$CI_COMMIT_TAG
+        - docker run -d -it --name=ffc_frontend --network=ffc_frontend 3bot_app_jimber/freeflowconnect:$CI_COMMIT_TAG
     
