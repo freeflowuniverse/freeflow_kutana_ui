@@ -24,7 +24,7 @@ staging_deploy:
     only:
         - /^v(\d+\.)?(\d+\.)?(\*|\d+)-rc\d*$/
     tags:
-        - testserver
+        - buildDocker
     script:
         - echo "Building and deploying ffc staging."
         - docker rm -f ffc || true
@@ -36,7 +36,7 @@ deploy:
     only:
         - /^(\d+\.)?(\d+\.)?(\*|\d+)$/
     tags:
-        - testserver
+        - buildDocker
     script:
         - echo "Building and deploying ffc production."
         - docker rm -f ffc || true
