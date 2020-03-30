@@ -1,3 +1,24 @@
+#caching modules
+cache:
+    paths:
+      - node_modules/
+      - .yarn
+  
+
+stages:
+    - test
+    - deploy
+  
+test:
+    stage: test
+    tags:
+        - testserver
+    script:
+        - echo "testing docker build"
+        - docker build -t ffc-test -f Dockerfile.test .
+        - docker run --rm ffc-test
+  
+
 staging_deploy:
     stage: deploy
     only:
@@ -6,9 +27,9 @@ staging_deploy:
         - testserver
     script:
         - echo "Building and deploying ffc staging."
-        - docker rm -f ffc; true
-        - docker-compose build
-        - docker-compose up -d
+        - docker rm -f ffc || true
+        - docker build -t 3bot_app_jimber/ffc:staging
+        - docker run -d -it --name=ffc --network=3proxynet 3bot_app_jimber/ffc:staging
     
 deploy:
     stage: deploy
@@ -18,7 +39,7 @@ deploy:
         - testserver
     script:
         - echo "Building and deploying ffc production."
-        - docker rm -f ffc; true
+        - docker rm -f ffc || true
         - docker build -t 3bot_app_jimber/ffc:$CI_COMMIT_TAG
         - docker run -d -it --name=ffc --network=3proxynet 3bot_app_jimber/ffc:$CI_COMMIT_TAG
     
