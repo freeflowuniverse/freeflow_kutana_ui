@@ -47,7 +47,7 @@
 
 <script>
 import { Janus } from "janus-gateway";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   data: function() {
@@ -60,6 +60,7 @@ export default {
     ...mapGetters(["users"])
   },
   methods: {
+    ...mapActions(["shareScreen"]),
     toggleMute: function() {
       this.muted = this.users[0].pluginHandle.isAudioMuted();
       Janus.log((this.muted ? "Unmuting" : "Muting") + " local stream...");
@@ -117,6 +118,11 @@ export default {
 
     hangUp: function() {
       this.users[0].pluginHandle.hangup();
+    },
+    
+    screenShare: function() {
+      console.log("Sharing screen ...")
+      this.shareScreen();
     }
   }
 };

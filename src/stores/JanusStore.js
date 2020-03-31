@@ -5,11 +5,11 @@ const logLayoutString = 'color: #00600f';
 export default {
     state: {
         janus: null,
-        pluginHandle: null,
         myId: null,
         screenShareMyId: null,
         screenShareRole: null,
         screenShareCapture: null,
+        screenShareUsername: null,
         screenShareSource: null,
         screenShareRoom: null,
         myPrivateId: null,
@@ -64,6 +64,13 @@ export default {
         selectUser(state, user) {
             console.log('selectUser Mutation');
             state.selectedUser = user
+        },
+        shareScreen(state) {
+            janusHelpers.screenShare.shareAndPublishScreen(state);
+        },
+        joinScreen(state, id) {
+            console.log('Joining stream ... ', state);
+            janusHelpers.screenShare.joinScreen(state, id);
         }
     },
     actions: {
@@ -74,9 +81,13 @@ export default {
             context.commit('addUser');
         },
         selectUser(context, user) {
-            console.log('selectUser Action');
-
             context.commit('selectUser', user);
+        },
+        shareScreen(context) {
+            context.commit('shareScreen');
+        },
+        joinScreen(context, id) {
+            context.commit('joinScreen', id);
         }
     },
     getters: {
@@ -98,7 +109,7 @@ const janusHelpers = {
                     success: function (pluginHandle) {
                         console.log('%c Janus success janus.plugin.videoroom callback', logLayoutString);
                         state.users[0].pluginHandle = pluginHandle;
-                        Janus.log("Plugin attached! (" + state.users[0].pluginHandle.getPlugin() + ", id=" + state.users[0].pluginHandle.getId() + ")");
+                        Janus.log("Plugin attached!(videoRoom) (" + state.users[0].pluginHandle.getPlugin() + ", id=" + state.users[0].pluginHandle.getId() + ")");
                         Janus.log("  -- This is a publisher/manager");
 
                         // Ask the users name / check if they are logged in.
@@ -271,97 +282,39 @@ const janusHelpers = {
                     plugin: "janus.plugin.videoroom",
                     opaqueId: state.opaqueId,
                     success: function (pluginHandle) {
-                        // $('#details').remove();
                         state.users[0].screenSharePluginHandle = pluginHandle;
-                        Janus.log("screenShare Plugin attached! (" + state.users[0].screenSharePluginHandle.getPlugin() + ", id=" + state.users[0].screenSharePluginHandle.getId() + ")");
-                        state.screenShareCapture = "screen";
-
-
-                        // Create a new room
-                        // var desc = $('#desc').val();
-                        state.screenShareRole = "publisher";
-                        var create = { "request": "create", "description": "screenshare", "bitrate": 500000, "publishers": 1 };
-                        state.users[0].screenSharePluginHandle.send({
-                            "message": create, success: function (result) {
-                                var event = result["videoroom"];
-                                Janus.debug("Event: " + event);
-                                if (event != undefined && event != null) {
-                                    // Our own screen sharing session has been created, join it
-                                    state.myRoom = result["room"];
-                                    Janus.log("Screen sharing session created: " + state.myRoom);
-
-                                    var register = { "request": "join", "room": state.myRoom, "ptype": "publisher", "display": state.users[0].username };
-                                    console.log('Sending register for screenshare');
-                                    state.users[0].screenSharePluginHandle.send({ "message": register });
-                                }
-                            }
-                        });
-
-                        // Prepare the username registration
-                        // $('#screenmenu').removeClass('hide').show();
-                        // $('#createnow').removeClass('hide').show();
-                        // $('#create').click(preShareScreen);
-                        // $('#joinnow').removeClass('hide').show();
-                        // $('#join').click(joinScreen);
-                        // $('#desc').focus();
-                        // $('#start').removeAttr('disabled').html("Stop")
-                        //     .click(function () {
-                        //         $(this).attr('disabled', true);
-                        //         janus.destroy();
-                        //     });
+                        Janus.log("screenShare Plugin attached!(Screenshare) (" + state.users[0].screenSharePluginHandle.getPlugin() + ", id=" + state.users[0].screenSharePluginHandle.getId() + ")");
                     },
                     error: function (error) {
                         Janus.error("  -- Error attaching plugin...", error);
-                        // bootbox.alert("Error attaching plugin... " + error);
                     },
                     consentDialog: function (on) {
                         Janus.debug("Consent dialog should be " + (on ? "on" : "off") + " now");
-                        // if (on) {
-                        //     // Darken screen
-                        //     $.blockUI({
-                        //         message: '',
-                        //         css: {
-                        //             border: 'none',
-                        //             padding: '15px',
-                        //             backgroundColor: 'transparent',
-                        //             color: '#aaa'
-                        //         }
-                        //     });
-                        // } else {
-                        //     // Restore screen
-                        //     $.unblockUI();
-                        // }
                     },
                     webrtcState: function (on) {
                         Janus.log("Janus says our WebRTC PeerConnection is " + (on ? "up" : "down") + " now");
-                        // $("#screencapture").parent().unblock();
-                        // if (on) {
-                        //     bootbox.alert("Your screen sharing session just started: pass the <b>" + room + "</b> session identifier to those who want to attend.");
-                        // } else {
-                        //     bootbox.alert("Your screen sharing session just stopped.", function () {
-                        //         janus.destroy();
-                        //         window.location.reload();
-                        //     });
-                        // }
+                        if (on) {
+                            console.log("Your screen sharing session just started: pass the <b>" + state.screenShareRoom + "</b> session identifier to those who want to attend.");
+                        } else {
+                            console.log("Your screen sharing session just stopped.");
+                        }
                     },
                     onmessage: function (msg, jsep) {
                         Janus.debug(" ::: Got a message (publisher) :::");
                         Janus.debug(msg);
+                        console.log("Debugging entire Message: ", msg)
                         var event = msg["videoroom"];
                         Janus.debug("Event: " + event);
                         if (event != undefined && event != null) {
                             if (event === "joined") {
                                 state.screenShareMyId = msg["id"];
-                                // $('#session').html(room);
-                                // $('#title').html(msg["description"]);
                                 Janus.log("Successfully joined room " + msg["room"] + " with ID " + state.screenShareMyId);
 
                                 if (state.screenShareRole === "publisher") {
-                                    // This is our session, publish our stream
                                     Janus.debug("Negotiating WebRTC stream for our screen (capture " + state.screenShareCapture + ")");
                                     state.users[0].screenSharePluginHandle.createOffer(
                                         {
-                                            media: { video: state.screenShareCapture, audioSend: true, videoRecv: false },	// Screen sharing Publishers are sendonly
+                                            media: { video: state.screenShareCapture, audioSend: true, videoRecv: false },
                                             success: function (jsep) {
                                                 Janus.debug("Got publisher SDP!");
                                                 Janus.debug(jsep);
@@ -370,11 +323,9 @@ const janusHelpers = {
                                             },
                                             error: function (error) {
                                                 Janus.error("WebRTC error:", error);
-                                                // bootbox.alert("WebRTC error... " + JSON.stringify(error));
                                             }
                                         });
                                 } else {
-                                    // We're just watching a session, any feed to attach to?
                                     if (msg["publishers"] !== undefined && msg["publishers"] !== null) {
                                         let list = msg["publishers"];
                                         Janus.debug("Got a list of available publishers/feeds:");
@@ -382,13 +333,14 @@ const janusHelpers = {
                                         for (let f in list) {
                                             let id = list[f]["id"];
                                             let display = list[f]["display"];
+                                            // console.log("DESC: desc");
+                                            // console.log(list[f]);
                                             Janus.debug("  >> [" + id + "] " + display);
                                             janusHelpers.screenSharingNewRemoteFeed(state, id, display)
                                         }
                                     }
                                 }
                             } else if (event === "event") {
-                                // Any feed to attach to?
                                 if (state.screenShareRole === "listener" && msg["publishers"] !== undefined && msg["publishers"] !== null) {
                                     let list = msg["publishers"];
                                     Janus.debug("Got a list of available publishers/feeds:");
@@ -396,11 +348,12 @@ const janusHelpers = {
                                     for (let f in list) {
                                         let id = list[f]["id"];
                                         let display = list[f]["display"];
+                                        console.log("DESC: desc");
+                                        console.log(list[f]);
                                         Janus.debug("  >> [" + id + "] " + display);
                                         janusHelpers.screenSharingNewRemoteFeed(state, id, display)
                                     }
                                 } else if (msg["leaving"] !== undefined && msg["leaving"] !== null) {
-                                    // One of the publishers has gone away?
                                     let leaving = msg["leaving"];
                                     Janus.log("Publisher left: " + leaving);
                                     if (state.screenShareRole === "listener" && msg["leaving"] === state.screenShareSource) {
@@ -414,47 +367,63 @@ const janusHelpers = {
                             }
                         }
                         if (jsep !== undefined && jsep !== null) {
+                            console.log("Handling SDP as well...")
                             Janus.debug("Handling SDP as well...");
                             Janus.debug(jsep);
                             state.users[0].screenSharePluginHandle.handleRemoteJsep({ jsep: jsep });
                         }
                     },
                     onlocalstream: function (stream) {
+                        console.log(" ::: Got a local stream :::")
                         Janus.debug(" ::: Got a local stream :::");
                         Janus.debug(stream);
 
-                        // $('#screenmenu').hide();
-                        // $('#room').removeClass('hide').show();
-                        // if ($('#screenvideo').length === 0) {
-                        //     $('#screencapture').append('<video class="rounded centered" id="screenvideo" width="100%" height="100%" autoplay playsinline muted="muted"/>');
-                        // }
-
-                        // Janus.attachMediaStream($('#screenvideo').get(0), stream);
                         state.users[0].screenShareStream = stream;
-
-                        // if (state.users[0].screenSharePluginHandle.webrtcStuff.pc.iceConnectionState !== "completed" &&
-                        //     state.users[0].screenSharePluginHandle.webrtcStuff.pc.iceConnectionState !== "connected") {
-                        //     $("#screencapture").parent().block({
-                        //         message: '<b>Publishing...</b>',
-                        //         css: {
-                        //             border: 'none',
-                        //             backgroundColor: 'transparent',
-                        //             color: 'white'
-                        //         }
-                        //     });
-                        // }
                     },
                     onremotestream: function (stream) {
                         console.log("stream: ", stream)
-                        // The publisher stream is sendonly, we don't expect anything here
                     },
                     oncleanup: function () {
                         Janus.log(" ::: Got a cleanup notification :::");
-                        // $('#screencapture').empty();
-                        // $("#screencapture").parent().unblock();
-                        // $('#room').hide();
                     }
                 });
+        },
+        shareAndPublishScreen(state) {
+            state.screenShareCapture = "screen";
+            state.screenShareRole = "publisher";
+
+            var create = { "request": "create", "description": "screenshare", "bitrate": 0, "publishers": 1 };
+            state.users[0].screenSharePluginHandle.send({
+                "message": create,
+                success: function (result) {
+                    var event = result["videoroom"];
+                    Janus.debug("Event: " + event);
+                    if (event != undefined && event != null) {
+                        // Our own screen sharing session has been created, join it
+                        state.screenShareRoom = result["room"];
+                        Janus.log("Screen sharing session created: " + state.screenShareRoom);
+                        console.log('result ', result);
+                        // state.screenShareUsername = Janus.randomString(12);
+                        var register = { "request": "join", "room": state.screenShareRoom, "ptype": "publisher", "display": state.users[0].username, };
+                        console.log('Sending register for screenshare');
+                        state.users[0].screenSharePluginHandle.send({ "message": register });
+                    }
+                }
+            });
+        },
+        joinScreen(state, id) {
+            console.log('Joining screen session ...');
+
+            var roomid = id
+
+            state.screenShareRoom = parseInt(roomid);
+            state.screenShareRole = "listener";
+            // state.screenShareUsername = Janus.randomString(12);
+
+            var register = { "request": "join", "room": state.screenShareRoom, "ptype": "publisher", "display": state.users[0].username }; //TODO This is wrong, fix it later 
+
+            console.log('register ', register);
+            state.users[0].screenSharePluginHandle.send({ "message": register });
         }
     },
     publishOwnFeed(state, useAudio) {
@@ -507,7 +476,7 @@ const janusHelpers = {
                 success: function (pluginHandle) {
                     remoteFeed = pluginHandle;
                     remoteFeed.simulcastStarted = false;
-                    Janus.log("Plugin attached! (" + remoteFeed.getPlugin() + ", id=" + remoteFeed.getId() + ")");
+                    Janus.log("Plugin attached!(videoroom) (" + remoteFeed.getPlugin() + ", id=" + remoteFeed.getId() + ")");
                     Janus.log("  -- This is a subscriber");
                     // We wait for the plugin to send us an offer
                     var subscribe = { "request": "join", "room": state.myRoom, "ptype": "subscriber", "feed": id, "private_id": state.myPrivateId };
@@ -541,7 +510,7 @@ const janusHelpers = {
                     } else if (event != undefined && event != null) {
                         if (event === "attached") {
                             // Subscriber created and attached
-                            for (var i = 1; i < 6; i++) {
+                            for (var i = 1; i < 16; i++) {
                                 if (state.feeds[i] === undefined || state.feeds[i] === null) {
                                     state.feeds[i] = remoteFeed;
                                     remoteFeed.rfindex = i;
@@ -616,7 +585,8 @@ const janusHelpers = {
                                 id: id,
                                 username: remoteFeed.rfdisplay,
                                 stream: stream,
-                                pluginHandle: remoteFeed
+                                pluginHandle: remoteFeed,
+                                screenShareStream: null
                             }
                         )
                         console.log(state.users)
@@ -695,10 +665,10 @@ const janusHelpers = {
                 opaqueId: state.opaqueId,
                 success: function (pluginHandle) {
                     remoteFeed = pluginHandle;
-                    Janus.log("Plugin attached! (" + remoteFeed.getPlugin() + ", id=" + remoteFeed.getId() + ")");
+                    Janus.log("Plugin attached!(Screenshare) (" + remoteFeed.getPlugin() + ", id=" + remoteFeed.getId() + ")");
                     Janus.log("  -- This is a subscriber");
                     // We wait for the plugin to send us an offer
-                    var listen = { "request": "join", "room": state.screenShareRoom.room, "ptype": "listener", "feed": id };
+                    var listen = { "request": "join", "room": state.screenShareRoom, "ptype": "listener", "feed": id };
                     remoteFeed.send({ "message": listen });
                 },
                 error: function (error) {
@@ -709,6 +679,9 @@ const janusHelpers = {
                     Janus.debug(" ::: Got a message (listener) :::");
                     Janus.debug(msg);
                     var event = msg["videoroom"];
+                    console.log("!! Special message: ", msg['specialMessage'])
+                    console.log({ msg })
+                    console.log({ jsep })
                     Janus.debug("Event: " + event);
                     if (event != undefined && event != null) {
                         if (event === "attached") {
@@ -719,6 +692,7 @@ const janusHelpers = {
                             // } else {
                             //     spinner.spin();
                             // }
+                            remoteFeed.rfdisplay = display;
                             Janus.log("Successfully attached to feed " + id + " (" + display + ") in room " + msg["room"]);
                             // $('#screenmenu').hide();
                             // $('#room').removeClass('hide').show();
@@ -737,7 +711,7 @@ const janusHelpers = {
                                 success: function (jsep) {
                                     Janus.debug("Got SDP!");
                                     Janus.debug(jsep);
-                                    var body = { "request": "start", "room": state.screenShareRoom.room };
+                                    var body = { "request": "start", "room": state.screenShareRoom };
                                     remoteFeed.send({ "message": body, "jsep": jsep });
                                 },
                                 error: function (error) {
@@ -766,13 +740,20 @@ const janusHelpers = {
                     //     });
                     // }
 
+                    console.log("onremotestream screenshare !!!!");
+                    console.log(stream);
+                    console.log(remoteFeed);
+                    console.log(remoteFeed.rfdisplay);
+                    console.log("onremotestream screenshare !!!!");
 
                     let userIndex = state.users.findIndex(user => user.username === remoteFeed.rfdisplay);
 
-                    if (state.users[userIndex] != null) {
-                        console.log("Added screen sharing handle")
+                    console.log("BEFORE: ", state.users);
+                    if (state.users[userIndex] != null && state.users[userIndex].screenShareStream === null) {
+                        console.log("Added screen sharing handle ", userIndex)
                         state.users[userIndex].screenShareStream = stream;
                     }
+                    console.log("AFTER: ", state.users);
 
                     // Janus.attachMediaStream($('#screenvideo').get(0), stream);
                 },
@@ -786,7 +767,6 @@ const janusHelpers = {
                 }
             });
     },
-
     registerUsername(state) {
         console.log('Registering username ...');
 
