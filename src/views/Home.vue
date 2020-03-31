@@ -47,12 +47,22 @@ export default {
       console.log("Attempting to initialize janus ...");
       this.initializeJanus();
     }
+    this.getTeamInfo()
+    // TODO: Check if theree are members in room
+    // TODO: IF there are members, request access to admin(s)
+    // TODO: IF there aren't, check if user is owner of this room
   },
   methods: {
-    ...mapActions(["initializeJanus"])
+    ...mapActions([
+      "initializeJanus",
+      "getTeamInfo"
+    ])
   },
   computed: {
-    ...mapGetters(["isJanusInitialized"])
+    ...mapGetters([
+      "isJanusInitialized",
+      "teamMembers"
+    ])
   }
 };
 </script>

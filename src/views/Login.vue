@@ -20,7 +20,7 @@ export default {
     if(this.$route.query.callback) {
       this.checkResponse(window.location.href)
     } else {
-      this.generateLoginUrl()
+      this.generateLoginUrl(this.$route.query)
     }
   },
   methods: {
@@ -43,7 +43,11 @@ export default {
     },
     account(val) {
       if(val) {
-        this.$router.push({name: 'home'})
+        if(this.$route.query.redirect) {
+          this.$router.push(this.$route.query.redirect)
+        } else {
+          this.$router.push({name: 'home'})
+        }
       }
     }
   }

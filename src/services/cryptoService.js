@@ -12,7 +12,6 @@ export default ({
       publicKey = decodeBase64(publicKey)
       signature = decodeBase64(signature)
       var result = sodium.crypto_sign_open(signature, publicKey)
-      console.log(result)
       resolve(result)
     })
   },

@@ -1,7 +1,7 @@
 import threeBotService from "../services/3botService";
 import cryptoService from "../services/cryptoService";
 import config from "../../public/config";
-
+import random from "../plugins/random"
 export default {
   state: {
     state: window.localStorage.getItem("state") || null,
@@ -15,22 +15,21 @@ export default {
   },
   actions: {
     logout(context) {
-      context.commit("setAccount", null);
+      context.commit("(setAccount", null);
     },
-    async generateLoginUrl(context) {
+    async generateLoginUrl(context, queryParams) {
       context.dispatch("clearStorage");
-      let state = "";
-      let characters =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      let charactersLength = characters.length;
-      for (let i = 0; i < 20; i++) {
-        state += characters.charAt(
-          Math.floor(Math.random() * charactersLength)
-        );
-      }
+      let state = random.stringGenerator()
 
       let keys = await cryptoService.generateKeys();
       let appId = config.appId;
+
+      let redirectUrl
+      if(queryParams) {
+        redirectUrl = `${config.redirect_url}&${Object.entries(queryParams).map(([key, val]) => `${key}=${val}`).join('&')}`
+      } else {
+        redirectUrl = `${config.redirect_url}`
+      }
       // let scope = config.scope;
       context.commit("setKeys", keys)
       context.commit("setState", state)
@@ -40,11 +39,10 @@ export default {
           config.botFrontEnd
         }?state=${state}&appid=${appId}&publickey=${encodeURIComponent(
           cryptoService.getEdPkInCurve(keys.publicKey)
-        )}&redirecturl=${encodeURIComponent(config.redirect_url)}`
+        )}&redirecturl=${encodeURIComponent(redirectUrl)}`
       );
     },
     async checkResponse(context, responseUrl) {
-      console.log(`CHECKING RESPONSE `, responseUrl);
       responseUrl = new URL(responseUrl);
       let url = new URL(window.location.href);
       let error = url.searchParams.get("error");
@@ -127,8 +125,6 @@ export default {
           });
           return;
         }
-        console.log(`signed`, verifiedSignedAttempt["signedState"])
-        console.log(`state`, state)
         if (verifiedSignedAttempt["signedState"] !== state) {
           context.commit("setSnackbarMessage", {
             type: "error",

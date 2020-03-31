@@ -6,6 +6,8 @@ import MessageStore from '../stores/MessageStore'
 import JanusStore from '../stores/JanusStore'
 import AuthStore from '../stores/AuthStore'
 import MainStore from '../stores/MainStore'
+import TeamStore from '../stores/TeamStore'
+import SocketStore from '../stores/SocketStore'
 
 Vue.use(Vuex)
 
@@ -15,6 +17,8 @@ export default new Vuex.Store({
         MessageStore,
         JanusStore,
         AuthStore,
-        MainStore
+        MainStore,
+        TeamStore,
+        SocketStore
     }
 })

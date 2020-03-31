@@ -25,7 +25,6 @@ export default {
     ...mapActions(["selectUser"]),
 
     selectStream: function(user) {
-      console.log("Clicked: ", user)
       this.selectUser(user);
     }
   }
