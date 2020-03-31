@@ -1,5 +1,14 @@
+import socketService from "../services/socketService";
+
 export default {
   actions: {
+    SOCKET_connect(context) {
+      if (context.getters.account) {
+        socketService.emit("join", {
+          username: context.getters.account.name
+        });
+      }
+    },
     SOCKET_message(context, message) {
       context.commit("addMessage", message);
     },

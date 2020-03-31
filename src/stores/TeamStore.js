@@ -67,6 +67,11 @@ export default {
     },
     accessGranted(context) {
       context.commit("setAccepted", true);
+      if (context.getters.account) {
+        socketService.emit("join", {
+          username: context.getters.account.name
+        });
+      }
     }
   },
   getters: {
