@@ -5,7 +5,7 @@
     </v-col>
     <v-col cols="2" class="userList">
       <div class="inner">
-        <UsersList />
+        <UserList />
       </div>
       <TheMainUser />
     </v-col>
@@ -19,7 +19,7 @@
 import { mapGetters, mapActions } from "vuex";
 import TheMainUser from "../components/TheMainUser";
 import TheSelectedStream from "../components/TheSelectedStream";
-import UsersList from "../components/UsersList";
+import UserList from "../components/UserList";
 import TheSidebar from "../components/TheSidebar";
 
 export default {
@@ -27,7 +27,7 @@ export default {
     TheMainUser,
     TheSelectedStream,
     TheSidebar,
-    UsersList
+    UserList
   },
   data() {
     return {
@@ -47,12 +47,22 @@ export default {
       console.log("Attempting to initialize janus ...");
       this.initializeJanus();
     }
+    this.getTeamInfo()
+    // TODO: Check if theree are members in room
+    // TODO: IF there are members, request access to admin(s)
+    // TODO: IF there aren't, check if user is owner of this room
   },
   methods: {
-    ...mapActions(["initializeJanus"])
+    ...mapActions([
+      "initializeJanus",
+      "getTeamInfo"
+    ])
   },
   computed: {
-    ...mapGetters(["isJanusInitialized"])
+    ...mapGetters([
+      "isJanusInitialized",
+      "teamMembers"
+    ])
   }
 };
 </script>

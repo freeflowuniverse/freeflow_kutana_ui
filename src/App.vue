@@ -1,8 +1,8 @@
 <template>
   <v-app id="app" :style="cssProps">
     <router-view></router-view>
-    <v-snackbar v-model="showSnackbar">
-      {{snackbarMessage}}
+    <v-snackbar v-model="showSnackbar" :color="snackbarMessage.type">
+      {{snackbarMessage.text}}
     </v-snackbar>
   </v-app>
 </template>
@@ -38,3 +38,9 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+video {
+  width: 100%;
+  height: auto;
+}
+</style>

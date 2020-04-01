@@ -1,5 +1,5 @@
 import { Janus } from "janus-gateway";
-
+import config from '../../public/config'
 const logLayoutString = 'color: #00600f';
 
 export default {
@@ -30,6 +30,7 @@ export default {
     },
     mutations: {
         initializeJanus(state) {
+            // TODO: show snackbar on error
             Janus.init({
                 debug: "all", callback: function () {
                     if (!Janus.isWebrtcSupported()) {
@@ -39,7 +40,7 @@ export default {
 
                     state.janus = new Janus(
                         {
-                            server: "https://janus.staging.jimber.org/janus",
+                            server: config.janusServer,
                             success: function () {
                                 console.log('%c Janus success callback', logLayoutString);
                                 janusHelpers.videoRoom.onJanusCreateSuccess(state);
