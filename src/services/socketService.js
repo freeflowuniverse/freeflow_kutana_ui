@@ -8,6 +8,14 @@ export default {
     this.emit('signal', message)
   },
   emit (type, message) {
-    vm.$socket.emit(type, message)
+    message.channel = 'ROOMNAME'
+    if (vm && vm.$socket) {
+      vm.$socket.emit(type, message);
+    } else {
+      setTimeout(()=>{
+        this.emit(type, message)
+      }, 500);
+    }
   }
 }
+

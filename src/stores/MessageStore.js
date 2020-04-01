@@ -20,9 +20,6 @@ export default {
     sendMessage(context, message) {
       socketService.sendMessage(message)
       // context.commit("addMessage", message)
-    },
-    SOCKET_message(context, message) {
-      context.commit("addMessage", message)
     }
   },
   getters: {

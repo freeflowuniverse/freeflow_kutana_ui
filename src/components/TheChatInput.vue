@@ -44,7 +44,10 @@ export default {
           if(blob) {
             reader.readAsDataURL(blob);
           } else {
-            this.setSnackbarMessage(`Can't paste file, only images. Please use the upload button`)
+            this.setSnackbarMessage({
+              type: "warning",
+              text: `Can't paste file, only images. Please use the upload button`
+            })
           }
         }
       }

@@ -5,7 +5,7 @@ import vuetify from './plugins/vuetify';
 import router from './plugins/router';
 import store from './plugins/vuex';
 import './plugins/socketio';
-
+import './middleware/auth'
 import './filters'
 
 Vue.config.productionTip = false

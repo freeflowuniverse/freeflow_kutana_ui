@@ -6,7 +6,7 @@
         <v-text-field v-model="streamId" label="Stream id"></v-text-field>
         <v-btn @click="joinStream" small color="primary">Connect</v-btn>
       </span>
-      <UsersListItemControls class="UsersListItemControls" />
+      <UserListItemControls class="UserListItemControls" />
     </v-card>
   </section>
 </template>
@@ -14,7 +14,7 @@
 <script>
 import { Janus } from "janus-gateway";
 import { mapActions } from "vuex";
-import UsersListItemControls from "../components/UsersListItemControls.vue";
+import UserListItemControls from "../components/UserListItemControls.vue";
 
 export default {
   // props: {
@@ -27,7 +27,7 @@ export default {
     };
   },
   components: {
-    UsersListItemControls
+    UserListItemControls
   },
   props: ["user", "userIndex"],
   methods: {
@@ -99,7 +99,7 @@ export default {
   height: 250px;
   width: 400px;
 }
-.UsersListItemControls {
+.UserListItemControls {
   position: absolute;
   bottom: 0;
   right: 0;

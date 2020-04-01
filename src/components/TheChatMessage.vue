@@ -11,10 +11,10 @@
       </v-row>
     </v-card-subtitle>
     <v-card-text v-if="message.type === 'text'" class="font-weight-medium">{{ message.content }}</v-card-text>
-    <v-card-text v-else-if="mimeType === 'image/png'">
+    <v-card-text v-else-if="message.type === 'file' && mimeType === 'image/png'">
       <v-img :src="message.content.file"></v-img>
     </v-card-text>
-    <v-card-text v-else>
+    <v-card-text v-else-if="message.type === 'file' ">
       <v-sheet color="primary lighten-2">
         <v-row class="mx-0 pa-3" align="center">
           <v-icon large>attachment</v-icon>

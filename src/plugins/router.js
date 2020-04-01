@@ -1,15 +1,17 @@
-import VueRouter from 'vue-router'
-import Vue from 'vue'
+import VueRouter from "vue-router";
+import Vue from "vue";
 
-import Home from '../views/Home.vue'
-import Login from '../views/Login.vue'
+import Home from "../views/Home.vue";
+import Login from "../views/Login.vue";
+import WaitingRoom from "../views/WaitingRoom.vue";
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 export default new VueRouter({
-  mode: 'history',
+  mode: "history",
   routes: [
-    { path: '/', component: Home },
-    { path: '/login', component: Login }
+    { path: "/", name: 'home', component: Home, meta: { requiresAuth: true } },
+    { path: "/login", name: 'login', component: Login, meta: { requiresAuth: false } },
+    { path: "/invite/:token", name: 'waitingRoom', component: WaitingRoom, meta: { requiresAuth: true } },
   ]
-})
+});
