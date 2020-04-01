@@ -2,6 +2,10 @@
   <section>
     <v-card class="stream">
       <span :id="`user${userIndex}`"></span>
+      <span :id="`screenShareUser${userIndex}`">
+        <v-text-field v-model="streamId" label="Stream id"></v-text-field>
+        <v-btn @click="joinStream" small color="primary">Connect</v-btn>
+      </span>
       <UsersListItemControls class="UsersListItemControls" />
     </v-card>
   </section>
@@ -9,6 +13,7 @@
 
 <script>
 import { Janus } from "janus-gateway";
+import { mapActions } from "vuex";
 import UsersListItemControls from "../components/UsersListItemControls.vue";
 
 export default {
@@ -16,14 +21,34 @@ export default {
   //   selected: Boolean,
   //   user: Object
   // },
+  data: function() {
+    return {
+      streamId: null
+    };
+  },
   components: {
     UsersListItemControls
   },
   props: ["user", "userIndex"],
-  mounted() {},
+  methods: {
+    ...mapActions(["joinScreen"]),
+    joinStream() {
+      console.log("Attempting to join ", this.streamId);
+      console.log(this.user);
+      console.log(this.userIndex);
+      console.log("Attempting to join ", this.streamId);
+      this.joinScreen(this.streamId);
+    }
+  },
+  computed: {
+    screenShareStream() {
+      return this.user.screenShareStream;
+    }
+  },
   watch: {
     user: {
       handler(newUser) {
+        console.log("user WATCHER");
         if (
           this.userIndex != 0 &&
           newUser.stream != null &&
@@ -34,11 +59,35 @@ export default {
           video.id = newUser.id;
           video.height = 250;
           video.setAttribute("autoplay", "true");
+
           document.getElementById(`user${this.userIndex}`).prepend(video);
           Janus.attachMediaStream(video, newUser.stream);
+          console.log("VIDEO SHARE NOW");
         }
       },
       deep: true
+    },
+    screenShareStream(newScreenShareStream) {
+      console.log("screenShareStream WATCHER");
+      if (
+        this.userIndex != 0 &&
+        newScreenShareStream != null &&
+        newScreenShareStream.active &&
+        document.getElementById(newScreenShareStream.id) === null
+      ) {
+        let video = document.createElement("video");
+        video.muted = true;
+        video.id = newScreenShareStream.id;
+        video.height = 250;
+        video.setAttribute("autoplay", "true");
+
+        document
+          .getElementById(`screenShareUser${this.userIndex}`)
+          .prepend(video);
+        Janus.attachMediaStream(video, newScreenShareStream);
+
+        console.log("SCREEN SHARE NOW");
+      }
     }
   }
 };
