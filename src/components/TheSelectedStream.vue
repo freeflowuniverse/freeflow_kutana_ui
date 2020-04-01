@@ -16,8 +16,16 @@ export default {
     ...mapGetters(["selectedUser"])
   },
   watch: {
-    selectedUser: {/*  */
+    selectedUser: {
       handler(newSelectedUser) {
+        console.log('newSelectedUser', newSelectedUser);
+        
+        if (newSelectedUser === null || newSelectedUser === undefined || !newSelectedUser.stream.active) {
+          console.log("Clearing selected user area ... ")
+          document.getElementById("selectedUser").innerHTML = ''
+          return;
+        }
+
         var video = document.createElement("video");
         video.muted = true;
         video.id = newSelectedUser.id;

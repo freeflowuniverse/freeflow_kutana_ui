@@ -1,0 +1,45 @@
+#caching modules
+cache:
+    paths:
+      - node_modules/
+      - .yarn
+  
+
+stages:
+    - test
+    - deploy
+  
+.test:
+    stage: test
+    tags:
+        - testserver
+    script:
+        - echo "testing docker build"
+        - docker build -t ffc-test -f Dockerfile.test .
+        - docker run --rm ffc-test
+  
+
+staging_deploy:
+    stage: deploy
+    only:
+        - /^v(\d+\.)?(\d+\.)?(\*|\d+)-rc\d*$/
+    tags:
+        - testserver
+    script:
+        - echo "Building and deploying ffc staging."
+        - docker rm -f ffc_frontend || true
+        - docker build -t 3bot_app_jimber/freeflowconnect:staging .
+        - docker run -d -it --name=ffc_frontend --network=ffc_frontend -p 8080:80 3bot_app_jimber/freeflowconnect:staging
+    
+deploy:
+    stage: deploy
+    only:
+        - /^(\d+\.)?(\d+\.)?(\*|\d+)$/
+    tags:
+        - testserver
+    script:
+        - echo "Building and deploying ffc production."
+        - docker rm -f ffc_frontend || true
+        - docker build -t 3bot_app_jimber/freeflowconnect:$CI_COMMIT_TAG .
+        - docker run -d -it --name=ffc_frontend --network=ffc_frontend 3bot_app_jimber/freeflowconnect:$CI_COMMIT_TAG
+    
