@@ -1,3 +1,4 @@
+// TODO Set selected user as soon as there is a user
 import { Janus } from "janus-gateway";
 import config from '../../public/config'
 const logLayoutString = 'color: #00600f';

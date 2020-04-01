@@ -43,4 +43,12 @@ video {
   width: 100%;
   height: auto;
 }
+.userListItem .stream {
+  height: auto;
+  width: 400px;
+  overflow: hidden;
+  video {
+    margin-bottom: -6px;
+  }
+}
 </style>

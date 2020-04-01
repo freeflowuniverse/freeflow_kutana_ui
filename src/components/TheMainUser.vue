@@ -1,4 +1,5 @@
 <template>
+  <!-- TODO Fix background of main user (corner is showing) -->
   <section class="stream grey lighten-2">
     <v-card class="wrapper">
       <span id="mainUser">

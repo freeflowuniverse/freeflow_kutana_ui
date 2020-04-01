@@ -6,7 +6,7 @@ import config from '../../public/config'
 Vue.use(new VueSocketIO({
   debug: true,
   secure: true,
-  connection: config.chatServer,
+  connection: config.ffcBackend,
   vuex: {
     store,
     actionPrefix: 'SOCKET_'

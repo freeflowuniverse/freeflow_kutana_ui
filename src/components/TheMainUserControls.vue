@@ -28,7 +28,7 @@
         <v-icon>screen_share</v-icon>
       </v-btn>
 
-      <v-btn icon class="ml-1">
+      <v-btn icon class="ml-1" @click="showAddUserDialog">
         <v-icon>person_add</v-icon>
       </v-btn>
       <v-btn icon class="mx-1" @click="$root.$emit('toggleSidebar')">

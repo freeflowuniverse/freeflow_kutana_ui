@@ -1,10 +1,11 @@
 <template>
-  <v-row class="px-2 home">
+  <v-row class="home px-4">
     <v-col :cols="showSidebar ? 7 : 10" class="pr-0">
-      <TheSelectedStream />
+      <TheSelectedStream/>
     </v-col>
     <v-col cols="2" class="userList">
       <div class="inner">
+        <!-- TODO Hide user-list if users.length < 3 (yourself included) -->
         <UserList />
       </div>
       <TheMainUser />
@@ -31,8 +32,11 @@ export default {
   },
   data() {
     return {
-      showSidebar: true
+      showSidebar: false
     }
+  },
+  beforeMount() {
+    this.getTeamInfo()
   },
   mounted() {
     this.$root.$on('toggleSidebar', () => {
@@ -47,7 +51,6 @@ export default {
       console.log("Attempting to initialize janus ...");
       this.initializeJanus();
     }
-    this.getTeamInfo()
     // TODO: Check if theree are members in room
     // TODO: IF there are members, request access to admin(s)
     // TODO: IF there aren't, check if user is owner of this room

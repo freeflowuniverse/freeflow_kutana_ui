@@ -8,7 +8,7 @@ export default {
     this.emit('signal', message)
   },
   emit (type, message) {
-    message.channel = 'ROOMNAME'
+    message.channel = 'test'
     if (vm && vm.$socket) {
       vm.$socket.emit(type, message);
     } else {

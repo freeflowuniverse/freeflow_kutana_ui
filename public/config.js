@@ -1,5 +1,5 @@
 export default {
-    chatServer: 'http://localhost:5000',
+    ffcBackend: 'http://localhost:5000/',
     appId: window.location.host,
     scope: JSON.stringify({ doubleName : true }),
     redirect_url: `/login?callback=true`,

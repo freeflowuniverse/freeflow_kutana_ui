@@ -1,8 +1,7 @@
 <template>
   <section>
     <template v-for="(user, index) in users">
-      <!-- <UserListItem @click.native="selectStream(user)" v-if="index" :user=user :userIndex=index :key="index" class="mb-3" /> -->
-      <UserListItem v-if="index" :user=user :userIndex=index :key="index" class="mb-3" />
+      <UserListItem @click.native="selectStream(user)" v-if="index" :user=user :userIndex=index :key="index" class="mb-3 mx-3" />
     </template>
   </section>
 </template>
