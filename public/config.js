@@ -1,3 +1,3 @@
 export default {
-    chatServer: 'http://localhost:3000'
+    chatServer: 'http://localhost:5000'
 }
