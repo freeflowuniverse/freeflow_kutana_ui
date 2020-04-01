@@ -1,4 +1,4 @@
-# vue-test
+# FreeFlowConnect frontend
 
 ## Project setup
 ```
