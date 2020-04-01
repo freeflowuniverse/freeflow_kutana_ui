@@ -39,7 +39,7 @@ export default {
 
                     state.janus = new Janus(
                         {
-                            server: "https://janus.singlecore.be/janus",
+                            server: "https://janus.staging.jimber.org/",
                             success: function () {
                                 console.log('%c Janus success callback', logLayoutString);
                                 janusHelpers.videoRoom.onJanusCreateSuccess(state);

@@ -1,3 +1,3 @@
 export default {
-    chatServer: 'http://localhost:5000'
+    chatServer: 'https://ffc-api.staging.jimber.org/'
 }
