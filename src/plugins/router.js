@@ -12,6 +12,6 @@ export default new VueRouter({
   routes: [
     { path: "/", name: 'home', component: Home, meta: { requiresAuth: true } },
     { path: "/login", name: 'login', component: Login, meta: { requiresAuth: false } },
-    { path: "/invite/:token", name: 'waitingRoom', component: WaitingRoom, meta: { requiresAuth: true } },
+    { path: "/room/invite/:token", name: 'waitingRoom', component: WaitingRoom, meta: { requiresAuth: true } },
   ]
 });

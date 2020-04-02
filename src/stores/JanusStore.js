@@ -15,7 +15,8 @@ export default {
         screenShareRoom: null,
         myPrivateId: null,
         myStream: null,
-        myRoom: 1337,
+        // myRoom: 1337,
+        roomId: null,
         feeds: [],
         opaqueId: 'videoroom-' + Janus.randomString(12),
         selectedUser: null,
@@ -73,6 +74,10 @@ export default {
         joinScreen(state, id) {
             console.log('Joining stream ... ', state);
             janusHelpers.screenShare.joinScreen(state, id);
+        },
+        setRoomId(state, roomId) {
+            console.log("Roomid, ", roomId)
+            state.roomId = roomId;
         }
     },
     actions: {
@@ -90,6 +95,9 @@ export default {
         },
         joinScreen(context, id) {
             context.commit('joinScreen', id);
+        },
+        setRoomId(context, roomId) {
+            context.commit('setRoomId', roomId);
         }
     },
     getters: {
@@ -481,7 +489,7 @@ const janusHelpers = {
                     Janus.log("Plugin attached!(videoroom) (" + remoteFeed.getPlugin() + ", id=" + remoteFeed.getId() + ")");
                     Janus.log("  -- This is a subscriber");
                     // We wait for the plugin to send us an offer
-                    var subscribe = { "request": "join", "room": state.myRoom, "ptype": "subscriber", "feed": id, "private_id": state.myPrivateId };
+                    var subscribe = { "request": "join", "room": state.roomId, "ptype": "subscriber", "feed": id, "private_id": state.myPrivateId };
                     // In case you don't want to receive audio, video or data, even if the
                     // publisher is sending them, set the 'offer_audio', 'offer_video' or
                     // 'offer_data' properties to false (they're true by default), e.g.:
@@ -559,7 +567,7 @@ const janusHelpers = {
                                 success: function (jsep) {
                                     Janus.debug("Got SDP!");
                                     Janus.debug(jsep);
-                                    var body = { "request": "start", "room": state.myRoom };
+                                    var body = { "request": "start", "room": state.roomId };
                                     remoteFeed.send({ "message": body, "jsep": jsep });
                                 },
                                 error: function (error) {
@@ -769,11 +777,32 @@ const janusHelpers = {
                 }
             });
     },
-    registerUsername(state) {
-        console.log('Registering username ...');
+    createRoom(state) {
+        var create = {
+            "request": "create",
+            "room": state.roomId,
+            "permanent": false,
+            "description": state.users[0].username,
+            "is_private": true,
+            "bitrate": 0,
+            "publishers": 16,
+        };
 
-        var register = { "request": "join", "room": state.myRoom, "ptype": "publisher", "display": state.users[0].username };
-        state.users[0].pluginHandle.send({ "message": register });
+        console.log("Attempting to create room: ", create)
+        let response = state.users[0].pluginHandle.send({ "message": create });
+        console.log("resp: ", response)
+    },
+    joinRoom(state) {
+        var register = { "request": "join", "room": state.roomId, "ptype": "publisher", "display": state.users[0].username };
+
+        console.log("Attempting to join room: ", register)
+        let response = state.users[0].pluginHandle.send({ "message": register });
+        console.log("resp: ", response)
+    },
+    registerUsername(state) {
+        console.log("Registerting username ... ")
+        janusHelpers.createRoom(state);
+        janusHelpers.joinRoom(state);
     }
 
 };
