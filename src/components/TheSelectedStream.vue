@@ -1,8 +1,7 @@
 <template>
   <section class="stream">
     <v-card class="wrapper">
-      <span style="display: block; width: 100%; height: 100%;" id="selectedUser">
-      </span>
+      <span id="selectedUser"></span>
     </v-card>
   </section>
 </template>
@@ -18,11 +17,15 @@ export default {
   watch: {
     selectedUser: {
       handler(newSelectedUser) {
-        console.log('newSelectedUser', newSelectedUser);
-        
-        if (newSelectedUser === null || newSelectedUser === undefined || !newSelectedUser.stream.active) {
-          console.log("Clearing selected user area ... ")
-          document.getElementById("selectedUser").innerHTML = ''
+        console.log("newSelectedUser", newSelectedUser);
+
+        if (
+          newSelectedUser === null ||
+          newSelectedUser === undefined ||
+          !newSelectedUser.stream.active
+        ) {
+          console.log("Clearing selected user area ... ");
+          document.getElementById("selectedUser").innerHTML = "";
           return;
         }
 
@@ -31,7 +34,7 @@ export default {
         video.id = newSelectedUser.id;
         video.style = "display: block; width: 100%; height: 100%;";
         video.setAttribute("autoplay", "true");
-        document.getElementById("selectedUser").innerHTML = ''
+        document.getElementById("selectedUser").innerHTML = "";
         document.getElementById("selectedUser").prepend(video);
         Janus.attachMediaStream(video, newSelectedUser.stream);
       },
@@ -42,17 +45,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.stream,
-.wrapper {
+.stream {
   position: relative;
   height: 100%;
-  .inner {
+  .wrapper {
+    position: absolute;
+    width: 100%;
     height: 100%;
+    overflow: hidden;
+    #selectedUser {
+      position: absolute;
+      display: block;
+      width: 100%;
+    }
   }
-}
-
-.scaleUp {
-  width: 1200px !important;
-  height: 800px !important;
 }
 </style>

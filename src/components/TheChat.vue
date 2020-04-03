@@ -21,7 +21,7 @@
 import moment from "moment";
 import TheChatMessage from "./TheChatMessage";
 import TheChatInput from "./TheChatInput";
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters } from "vuex";
 import autoScroll from "../directives/autoScroll"
 
 export default {
@@ -36,13 +36,11 @@ export default {
     return {};
   },
   mounted() {
-    this.getMessages();
   },
   computed: {
     ...mapGetters(["messages"])
   },
   methods: {
-    ...mapActions(["getMessages"]),
     showDivider(message, index) {
       const previousMessage = this.messages[index - 1];
       if (!previousMessage) {

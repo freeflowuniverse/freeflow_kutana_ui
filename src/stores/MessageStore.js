@@ -12,11 +12,6 @@ export default {
     }
   },
   actions: {
-    getMessages(context) {
-      // TODO: get messages
-      let messages = []
-      context.commit("setMessages", messages)
-    },
     sendMessage(context, message) {
       socketService.sendMessage(message)
       // context.commit("addMessage", message)

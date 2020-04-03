@@ -1,6 +1,7 @@
 import random from "../plugins/random";
 import socketService from "../services/socketService";
 import moment from 'moment'
+import ffcService from "../services/ffcService";
 export default {
   state: {
     teamMembers: null,
@@ -26,12 +27,17 @@ export default {
     getTeamInfo(context) {
       context.commit("setIsGeneratingInvite", true);
       // TODO: GET ../api/teaminfo
-      let members = [];
-      let inviteToken = random.stringGenerator(5);
-
-      context.commit("setInviteToken", inviteToken);
-      context.commit("setMembers", members);
-      context.commit("setIsGeneratingInvite", false);
+      ffcService.getTeamInfo().then(result => {
+        let data = result.data
+        if(data.invites && data.invites[0] && data.invites[0].token) {
+          context.commit("setInviteToken", data.invites[0].token);
+        } else {
+          context.dispatch('generateInviteToken')
+        }
+        context.commit("setMembers", data.members);
+        context.commit("setMessages", data.messages)
+        context.commit("setIsGeneratingInvite", false);
+      })
     },
     generateInviteToken(context) {
       context.commit("setIsGeneratingInvite", true);
@@ -50,28 +56,10 @@ export default {
         type: "access_requested"
       });
     },
-    accessRequested(context, message) {
-      if(message.content === context.getters.inviteToken) {
-        socketService.sendSignal({
-          sender: context.getters.account.name,
-          createdAt: moment(),
-          content: "sup",
-          type: "access_granted"
-        })
-      } else {
-        context.commit('addMessage', {
-          type: 'system',
-          content: `${message.from} tried to access with token ${message.content}`
-        })
-      }
-    },
+    
     accessGranted(context) {
       context.commit("setAccepted", true);
-      if (context.getters.account) {
-        socketService.emit("join", {
-          username: context.getters.account.name
-        });
-      }
+      context.dispatch('join')
     }
   },
   getters: {

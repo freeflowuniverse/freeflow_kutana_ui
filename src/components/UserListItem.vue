@@ -1,11 +1,12 @@
 <template>
-  <section>
+  <!-- TODO Fix borders of selected users -->
+  <section :class="`userListItem ${selectedUser === user ? 'selected' : ''}`">
     <v-card class="stream">
-      <span :id="`user${userIndex}`"></span>
-      <span :id="`screenShareUser${userIndex}`">
+      <div :id="`user${userIndex}`"></div>
+      <!-- <span :id="`screenShareUser${userIndex}`">
         <v-text-field v-model="streamId" label="Stream id"></v-text-field>
         <v-btn @click="joinStream" small color="primary">Connect</v-btn>
-      </span>
+      </span> -->
       <UserListItemControls class="UserListItemControls" />
     </v-card>
   </section>
@@ -13,14 +14,10 @@
 
 <script>
 import { Janus } from "janus-gateway";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import UserListItemControls from "../components/UserListItemControls.vue";
 
 export default {
-  // props: {
-  //   selected: Boolean,
-  //   user: Object
-  // },
   data: function() {
     return {
       streamId: null
@@ -33,14 +30,11 @@ export default {
   methods: {
     ...mapActions(["joinScreen"]),
     joinStream() {
-      console.log("Attempting to join ", this.streamId);
-      console.log(this.user);
-      console.log(this.userIndex);
-      console.log("Attempting to join ", this.streamId);
       this.joinScreen(this.streamId);
     }
   },
   computed: {
+    ...mapGetters(["selectedUser"]),
     screenShareStream() {
       return this.user.screenShareStream;
     }
@@ -48,7 +42,6 @@ export default {
   watch: {
     user: {
       handler(newUser) {
-        console.log("user WATCHER");
         if (
           this.userIndex != 0 &&
           newUser.stream != null &&
@@ -95,9 +88,9 @@ export default {
 
 <style lang="scss" scoped>
 .stream {
-  border: 1px solid black;
-  height: 250px;
+  height: auto;
   width: 400px;
+  overflow: hidden;
 }
 .UserListItemControls {
   position: absolute;
