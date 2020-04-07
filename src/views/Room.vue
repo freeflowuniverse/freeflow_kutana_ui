@@ -36,7 +36,7 @@ export default {
     }
   },
   beforeMount() {
-    this.getTeamInfo()
+    // this.getTeamInfo() #Internal server error
   },
   mounted() {
     this.$root.$on('toggleSidebar', () => {

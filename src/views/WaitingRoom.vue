@@ -11,12 +11,19 @@
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-  mounted() {
-    this.requestAccess(this.$route.params.token);
-  },
   methods: {
-    ...mapActions(["requestAccess"])
+    ...mapActions(["requestAccess", "setRoomId"])
   },
+  mounted() {
+    let token = this.$route.params.token;
+    let token2 = Math.abs(hashString(token));
+
+    this.requestAccess(token);
+    this.setRoomId(token2);
+    
+    this.$router.push({ name: "home" });
+  },
+
   computed: {
     ...mapGetters(["isAccepted"])
   },
@@ -26,4 +33,14 @@ export default {
     }
   }
 };
+
+
+function hashString(str){
+	let hash = 0;
+	for (let i = 0; i < str.length; i++) {
+		hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
+		hash = hash & hash; // Convert to 32bit integer
+	}
+	return hash;
+}
 </script>
