@@ -1,4 +1,5 @@
 <template>
+<!-- TODO Don't show all the buttons (hide them somewhere) -->
   <section class="mainControls">
     <v-card class="primary pa-1" dark>
       <v-btn icon class="mx-1">
@@ -35,13 +36,13 @@
         <v-icon>chat_bubble</v-icon>
       </v-btn>
 
-      <v-btn @click="toggleLowQuality" icon class="mx-1">
+      <!-- <v-btn @click="toggleLowQuality" icon class="mx-1">
         <v-icon>signal_cellular_connected_no_internet_4_bar</v-icon>
       </v-btn>
 
       <v-btn @click="toggleHighQuality" icon class="mx-1">
         <v-icon>high_quality</v-icon>
-      </v-btn>
+      </v-btn> -->
     </v-card>
 
     <v-dialog width="500" v-model="addUserDialog">
@@ -66,10 +67,7 @@
             :value="inviteLink"
           >
             <template v-slot:append>
-              <v-btn small icon text @click="generateNewInviteToken">
-                <v-icon>refresh</v-icon>
-              </v-btn>
-              <v-btn small icon text @click="copyInviteToken">
+              <v-btn small icon text @click="copyUrl">
                 <v-icon>file_copy</v-icon>
               </v-btn>
             </template>
@@ -93,16 +91,20 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["users", "inviteToken", "isGeneratingInvite"]),
+    ...mapGetters(["users", "teamName", "isGeneratingInvite"]),
     inviteLink() {
-      return `${window.location.href}invite/${this.inviteToken}`;
+      let baseUrl = window.location.href
+      if (baseUrl.charAt(baseUrl.length - 1) != "/") {
+        baseUrl += "/"
+      }
+      return `${baseUrl}invite/${this.teamName}`;
     }
   },
   mounted() {
     // TODO: if members.length === 1 => this.addUserDialog = true
   },
   methods: {
-    ...mapActions(["shareScreen", "setSnackbarMessage", "generateInviteToken"]),
+    ...mapActions(["shareScreen", "setSnackbarMessage"]),
     toggleMute: function() {
       this.muted = this.users[0].pluginHandle.isAudioMuted();
       Janus.log((this.muted ? "Unmuting" : "Muting") + " local stream...");
@@ -173,15 +175,7 @@ export default {
     closeAddUserDialog() {
       this.addUserDialog = false;
     },
-    generateNewInviteToken() {
-      this.generateInviteToken();
-      this.setSnackbarMessage({
-        type: "",
-        text: `Regenerating invite link`
-      });
-    },
-    copyInviteToken() {
-      // var data = new Blob(["Text data"], { type: "text/plain" });
+    copyUrl() {
       navigator.clipboard
         .writeText(this.inviteLink)
         .then(() => {

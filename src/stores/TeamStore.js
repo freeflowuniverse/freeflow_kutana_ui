@@ -1,13 +1,12 @@
 import random from "../plugins/random";
-import socketService from "../services/socketService";
-import moment from 'moment'
+import moment from "moment";
 import ffcService from "../services/ffcService";
 export default {
   state: {
     teamMembers: null,
-    inviteToken: null,
     isGeneratingInvite: true,
-    isAccepted: false
+    isAccepted: false,
+    teamName: window.localStorage.getItem("teamName") || null,
   },
   mutations: {
     setIsGeneratingInvite(state, loading) {
@@ -16,64 +15,66 @@ export default {
     setMembers(state, members) {
       state.teamMembers = members;
     },
-    setInviteToken(state, inviteToken) {
-      state.inviteToken = inviteToken;
-    },
     setAccepted(state, accepted) {
       state.isAccepted = accepted;
-    }
+    },
+    setTeamName(state, teamName) {
+      window.localStorage.setItem("teamName", teamName);
+      state.teamName = teamName;
+    },
   },
   actions: {
+    createTeam(context) {
+      context.commit("setTeamName", random.stringGenerator(15));
+    },
     getTeamInfo(context) {
       context.commit("setIsGeneratingInvite", true);
-      // TODO: GET ../api/teaminfo
-      ffcService.getTeamInfo().then(result => {
-        let data = result.data
-        if(data.invites && data.invites[0] && data.invites[0].token) {
-          context.commit("setInviteToken", data.invites[0].token);
-        } else {
-          context.dispatch('generateInviteToken')
-        }
+      console.log(`context.getters.teamName`, context.getters.teamName)
+      ffcService.getTeamInfo(context.getters.teamName).then((result) => {
+        let data = result.data;
+
         context.commit("setMembers", data.members);
-        context.commit("setMessages", data.messages)
+        context.commit("setMessages", data.messages);
         context.commit("setIsGeneratingInvite", false);
-      })
-    },
-    generateInviteToken(context) {
-      context.commit("setIsGeneratingInvite", true);
-      let inviteToken = random.stringGenerator(5);
-      // TODO: send new token to backend
-      // POST ../api/inviteToken {token}
-      context.commit("setInviteToken", inviteToken);
-      context.commit("setIsGeneratingInvite", false);
+      });
     },
     requestAccess(context, token) {
-      // TODO: send only to admin
-      socketService.sendSignal({
+      context.commit("setTeamName", token);
+      context.dispatch("sendSignal", {
         sender: context.getters.account.name,
         createdAt: moment(),
         content: token,
-        type: "access_requested"
+        type: "access_requested",
       });
     },
-    
     accessGranted(context) {
       context.commit("setAccepted", true);
-      context.dispatch('join')
-    }
+      context.dispatch("join");
+    },
+    joinScreenShare(context, message) {
+      context.commit("setSnackbarMessage", {
+        text: `Screenshare started`,
+      });
+
+      context.commit("selectUser", {
+        type: "screenshare",
+        user: message.sender,
+        streamId: message.content.streamId,
+      });
+    },
   },
   getters: {
-    teamMembers: state => {
+    teamName: (state) => {
+      return state.teamName;
+    },
+    teamMembers: (state) => {
       return state.teamMembers;
     },
-    inviteToken: state => {
-      return state.inviteToken;
-    },
-    isGeneratingInvite: state => {
+    isGeneratingInvite: (state) => {
       return state.isGeneratingInvite;
     },
-    isAccepted: state => {
+    isAccepted: (state) => {
       return state.isAccepted;
-    }
-  }
+    },
+  },
 };

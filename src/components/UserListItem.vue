@@ -3,11 +3,11 @@
   <section :class="`userListItem ${selectedUser === user ? 'selected' : ''}`">
     <v-card class="stream">
       <div :id="`user${userIndex}`"></div>
-      <!-- <span :id="`screenShareUser${userIndex}`">
+      <!-- <span :id="`screenShareUser`">
         <v-text-field v-model="streamId" label="Stream id"></v-text-field>
         <v-btn @click="joinStream" small color="primary">Connect</v-btn>
       </span> -->
-      <UserListItemControls class="UserListItemControls" />
+      <!-- <UserListItemControls class="UserListItemControls" /> -->
     </v-card>
   </section>
 </template>
@@ -15,7 +15,7 @@
 <script>
 import { Janus } from "janus-gateway";
 import { mapActions, mapGetters } from "vuex";
-import UserListItemControls from "../components/UserListItemControls.vue";
+// import UserListItemControls from "../components/UserListItemControls.vue";
 
 export default {
   data: function() {
@@ -24,7 +24,7 @@ export default {
     };
   },
   components: {
-    UserListItemControls
+    // UserListItemControls
   },
   props: ["user", "userIndex"],
   methods: {
@@ -75,7 +75,7 @@ export default {
         video.setAttribute("autoplay", "true");
 
         document
-          .getElementById(`screenShareUser${this.userIndex}`)
+          .getElementById(`screenShareUser`)
           .prepend(video);
         Janus.attachMediaStream(video, newScreenShareStream);
 

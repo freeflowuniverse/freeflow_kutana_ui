@@ -1,4 +1,3 @@
-import socketService from '../services/socketService'
 export default {
   state: {
     messages: []
@@ -8,13 +7,10 @@ export default {
       state.messages = messages
     },
     addMessage(state, message) {
+      if (!state.messages) {
+        state.messages = []
+      }
       state.messages.push(message)
-    }
-  },
-  actions: {
-    sendMessage(context, message) {
-      socketService.sendMessage(message)
-      // context.commit("addMessage", message)
     }
   },
   getters: {

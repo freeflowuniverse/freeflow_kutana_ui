@@ -22,7 +22,7 @@ export default {
   },
   watch: {
     isAccepted() {
-      this.$router.push({ name: "home" });
+      this.$router.push({ name: "room" });
     }
   }
 };

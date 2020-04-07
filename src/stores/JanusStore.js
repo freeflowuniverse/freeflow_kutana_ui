@@ -297,6 +297,12 @@ const janusHelpers = {
                         Janus.log("Janus says our WebRTC PeerConnection is " + (on ? "up" : "down") + " now");
                         if (on) {
                             console.log("Your screen sharing session just started: pass the <b>" + state.screenShareRoom + "</b> session identifier to those who want to attend.");
+                            // context.commit('sendSignal',{
+                            //     type: 'screenshare_started',
+                            //     content: {
+                            //         streamId: state.screenShareRoom
+                            //     }
+                            // })
                         } else {
                             console.log("Your screen sharing session just stopped.");
                         }

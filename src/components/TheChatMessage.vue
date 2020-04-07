@@ -4,6 +4,7 @@
     elevation="0"
     color="primary"
     dark
+    v-if="message.type"
   >
     <v-card-subtitle>
       <v-row class="pr-3 pl-3">
