@@ -34,21 +34,6 @@ export default {
     },
     selectedUser: {
       handler(newSelectedUser) {
-        if (
-          newSelectedUser === null ||
-          newSelectedUser === undefined ||
-          !newSelectedUser.stream.active
-        ) {
-          console.log("Clearing selected user area ... ");
-          var video = document.createElement("video");
-          video.muted = true;
-          video.id = newSelectedUser.id;
-          video.style = "display: block; width: 100%; height: 100%;";
-          video.setAttribute("autoplay", "true");
-          video.setAttribute("playsinline", "true");
-          document.getElementById("selectedUser").innerHTML = "";
-          return;
-        }
         var video = document.createElement("video");
         video.muted = true;
         video.id = newSelectedUser.id;
@@ -61,7 +46,6 @@ export default {
     }
   }
 };
-
 </script>
 
 <style lang="scss" scoped>
