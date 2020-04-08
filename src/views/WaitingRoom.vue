@@ -16,10 +16,10 @@ export default {
   },
   mounted() {
     let token = this.$route.params.token;
-    let token2 = Math.abs(hashString(window.localStorage.getItem('teamName')));
+    // let token2 = Math.abs(hashString(window.localStorage.getItem('teamName')));
 
     this.requestAccess(token);
-    this.setRoomId(token2);
+    // this.setRoomId(token2);
   },
 
   computed: {
