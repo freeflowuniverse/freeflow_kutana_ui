@@ -495,7 +495,9 @@ const janusHelpers = {
                     Janus.log("Plugin attached!(videoroom) (" + remoteFeed.getPlugin() + ", id=" + remoteFeed.getId() + ")");
                     Janus.log("  -- This is a subscriber");
                     // We wait for the plugin to send us an offer
-                    var subscribe = { "request": "join", "room": state.roomId, "ptype": "subscriber", "feed": id, "private_id": state.myPrivateId };
+                    let room = Math.abs(hashString(window.localStorage.getItem('teamName')));
+                    
+                    var subscribe = { "request": "join", "room": room, "ptype": "subscriber", "feed": id, "private_id": state.myPrivateId };
                     // In case you don't want to receive audio, video or data, even if the
                     // publisher is sending them, set the 'offer_audio', 'offer_video' or
                     // 'offer_data' properties to false (they're true by default), e.g.:
