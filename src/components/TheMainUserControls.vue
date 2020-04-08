@@ -1,17 +1,43 @@
 <template>
-<!-- TODO Don't show all the buttons (hide them somewhere) -->
   <section class="mainControls">
-    <v-card class="primary pa-1" dark>
-      <v-btn icon class="mx-1">
+    <v-card class="primary px-5" dark v-if="showExtraSettings">
+      <v-col style="width:250px">
+        <v-row  align="center" justify="space-between" class="mx-0">
+          <v-col cols="2" class="ma-0 pa-0">
+            <v-btn text icon @click="toggleSettings">
+              <v-icon>arrow_left</v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="8" class="ma-0 pa-0" align="center">
+            <p class="mb-0">Quality</p>
+          </v-col>
+          <v-col class="ma-0 pa-0"></v-col>
+        </v-row>
+        <v-row class="mx-0">
+          <v-slider
+            :tick-labels="qualityOptions"
+            :max="2"
+            step="1"
+            ticks="always"
+            :tick-size="3"
+            v-model="quality"
+            @change="saveQualityOption"
+          >
+          </v-slider>
+        </v-row>
+      </v-col>
+    </v-card>
+    <v-card class="primary pa-1" dark v-else>
+      <v-btn icon class="mx-1" @click="toggleSettings">
         <v-icon>settings</v-icon>
       </v-btn>
 
       <v-btn v-if="published" @click="unpublishOwnFeed" icon class="mr-1">
-        <v-icon>videocam_off</v-icon>
+        <v-icon>videocam</v-icon>
       </v-btn>
 
       <v-btn v-else @click="publishOwnFeed" icon class="mr-1">
-        <v-icon>videocam</v-icon>
+        <v-icon>videocam_off</v-icon>
       </v-btn>
 
       <v-btn v-if="muted" @click="toggleMute" icon class="mr-0">
@@ -35,14 +61,6 @@
       <v-btn icon class="mx-1" @click="$root.$emit('toggleSidebar')">
         <v-icon>chat_bubble</v-icon>
       </v-btn>
-
-      <!-- <v-btn @click="toggleLowQuality" icon class="mx-1">
-        <v-icon>signal_cellular_connected_no_internet_4_bar</v-icon>
-      </v-btn>
-
-      <v-btn @click="toggleHighQuality" icon class="mx-1">
-        <v-icon>high_quality</v-icon>
-      </v-btn> -->
     </v-card>
 
     <v-dialog width="500" v-model="addUserDialog">
@@ -87,21 +105,27 @@ export default {
     return {
       muted: false,
       published: true,
-      addUserDialog: false
+      addUserDialog: false,
+      showExtraSettings: false,
+      quality: 1,
+      qualityOptions: ["Low", "Normal", "high"]
     };
   },
   computed: {
     ...mapGetters(["users", "teamName", "isGeneratingInvite", "teamMembers"]),
     inviteLink() {
-      let baseUrl = window.location.href
+      let baseUrl = window.location.href;
       if (baseUrl.charAt(baseUrl.length - 1) != "/") {
-        baseUrl += "/"
+        baseUrl += "/";
       }
       return `${baseUrl}invite/${this.teamName}`;
     }
   },
   methods: {
     ...mapActions(["shareScreen", "setSnackbarMessage"]),
+    toggleSettings() {
+      this.showExtraSettings = !this.showExtraSettings;
+    },
     toggleMute: function() {
       this.muted = this.users[0].pluginHandle.isAudioMuted();
       Janus.log((this.muted ? "Unmuting" : "Muting") + " local stream...");
@@ -114,17 +138,10 @@ export default {
       console.log(this.muted);
     },
 
-    toggleLowQuality: function() {
-      console.log("Set quality to max");
+    saveQualityOption() {
+      console.log(`Set quality to ${this.quality} = ${32000 * this.quality}`);
       this.users[0].pluginHandle.send({
-        message: { request: "configure", bitrate: 64000 }
-      });
-    },
-
-    toggleHighQuality: function() {
-      console.log("Set quality to max");
-      this.users[0].pluginHandle.send({
-        message: { request: "configure", bitrate: 0 }
+        message: { request: "configure", bitrate: 32000 * this.quality }
       });
     },
 
@@ -159,6 +176,7 @@ export default {
 
     hangUp: function() {
       this.users[0].pluginHandle.hangup();
+      this.$router.push({name: 'home'})
     },
 
     screenShare: function() {
@@ -193,6 +211,7 @@ export default {
 .mainControls {
   border-radius: 15px !important;
   overflow: hidden;
+  widows: 100%;
   > div {
     display: flex;
   }
