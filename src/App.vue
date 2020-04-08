@@ -48,7 +48,7 @@ video {
   overflow: hidden;
   video {
     position: absolute;
-    min-width: 100%;
+    min-width: calc(100% + 2px);
     left: 50%;
     min-height: 120%;
     top: 50%;
