@@ -3,7 +3,7 @@
     <v-card-title class="primary">
       <v-row justify="center" class="white--text px-2">
         <v-col align="center" class="py-0" offset="1">Chat</v-col>
-        <v-btn icon>
+        <v-btn icon @click="$root.$emit('toggleSidebar')">
           <v-icon color="white">close</v-icon>
         </v-btn>
       </v-row>

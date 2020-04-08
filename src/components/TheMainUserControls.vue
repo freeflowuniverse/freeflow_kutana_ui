@@ -91,7 +91,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["users", "teamName", "isGeneratingInvite"]),
+    ...mapGetters(["users", "teamName", "isGeneratingInvite", "teamMembers"]),
     inviteLink() {
       let baseUrl = window.location.href
       if (baseUrl.charAt(baseUrl.length - 1) != "/") {
@@ -99,9 +99,6 @@ export default {
       }
       return `${baseUrl}invite/${this.teamName}`;
     }
-  },
-  mounted() {
-    // TODO: if members.length === 1 => this.addUserDialog = true
   },
   methods: {
     ...mapActions(["shareScreen", "setSnackbarMessage"]),

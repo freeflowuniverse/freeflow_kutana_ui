@@ -13,6 +13,7 @@
     <v-col cols="3" class="pa-0" v-if="showSidebar">
       <TheSidebar />
     </v-col>
+
   </v-row>
 </template>
 
@@ -36,9 +37,12 @@ export default {
     }
   },
   beforeMount() {
-    // this.getTeamInfo() #Internal server error
+    this.getTeamInfo()
   },
   mounted() {
+    if (this.account && this.account.name && this.teamName) {
+      this.join()
+    }
     this.$root.$on('toggleSidebar', () => {
       this.showSidebar = !this.showSidebar
     })
@@ -51,20 +55,20 @@ export default {
       console.log("Attempting to initialize janus ...");
       this.initializeJanus();
     }
-    // TODO: Check if theree are members in room
-    // TODO: IF there are members, request access to admin(s)
-    // TODO: IF there aren't, check if user is owner of this room
   },
   methods: {
     ...mapActions([
       "initializeJanus",
-      "getTeamInfo"
+      "getTeamInfo",
+      "join"
     ])
   },
   computed: {
     ...mapGetters([
       "isJanusInitialized",
-      "teamMembers"
+      "teamMembers",
+      "teamName",
+      "account"
     ])
   }
 };

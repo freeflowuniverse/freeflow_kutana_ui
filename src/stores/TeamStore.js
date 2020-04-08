@@ -32,7 +32,6 @@ export default {
       console.log(`context.getters.teamName`, context.getters.teamName)
       ffcService.getTeamInfo(context.getters.teamName).then((result) => {
         let data = result.data;
-
         context.commit("setMembers", data.members);
         context.commit("setMessages", data.messages);
         context.commit("setIsGeneratingInvite", false);

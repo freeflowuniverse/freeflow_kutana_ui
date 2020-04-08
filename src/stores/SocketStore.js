@@ -2,11 +2,6 @@ import socketService from "../services/socketService";
 
 export default {
   actions: {
-    SOCKET_connect(context) {
-      if (context.getters.account) {
-        context.dispatch("join");
-      }
-    },
     join(context) {
       socketService.emit("join", {
         username: context.getters.account.name,

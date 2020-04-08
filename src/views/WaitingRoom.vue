@@ -20,8 +20,6 @@ export default {
 
     this.requestAccess(token);
     this.setRoomId(token2);
-    
-    this.$router.push({ name: "home" });
   },
 
   computed: {
