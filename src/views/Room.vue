@@ -1,7 +1,7 @@
 <template>
   <v-row class="home px-4">
     <v-col :cols="showSidebar ? 7 : 10" class="pr-0">
-      <TheSelectedStream/>
+      <TheSelectedStream />
     </v-col>
     <v-col cols="2" class="userList">
       <div class="inner">
@@ -13,7 +13,6 @@
     <v-col cols="3" class="pa-0" v-if="showSidebar">
       <TheSidebar />
     </v-col>
-
   </v-row>
 </template>
 
@@ -34,18 +33,19 @@ export default {
   data() {
     return {
       showSidebar: false
-    }
+    };
   },
   beforeMount() {
-    this.getTeamInfo()
+    this.getTeamInfo();
   },
   mounted() {
     if (this.account && this.account.name && this.teamName) {
-      this.join()
+      this.join();
+      this.setRoomId(Math.abs(this.hashString(this.teamName)));
     }
-    this.$root.$on('toggleSidebar', () => {
-      this.showSidebar = !this.showSidebar
-    })
+    this.$root.$on("toggleSidebar", () => {
+      this.showSidebar = !this.showSidebar;
+    });
     console.log(
       "Checking if janus has been initialized: ",
       this.isJanusInitialized
@@ -57,19 +57,18 @@ export default {
     }
   },
   methods: {
-    ...mapActions([
-      "initializeJanus",
-      "getTeamInfo",
-      "join"
-    ])
+    ...mapActions(["initializeJanus", "getTeamInfo", "join", "setRoomId"]),
+    hashString(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
+        hash = hash & hash; // Convert to 32bit integer
+      }
+      return hash;
+    }
   },
   computed: {
-    ...mapGetters([
-      "isJanusInitialized",
-      "teamMembers",
-      "teamName",
-      "account"
-    ])
+    ...mapGetters(["isJanusInitialized", "teamMembers", "teamName", "account"])
   }
 };
 </script>

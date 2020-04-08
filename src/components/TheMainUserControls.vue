@@ -141,7 +141,7 @@ export default {
     saveQualityOption() {
       console.log(`Set quality to ${this.quality} = ${32000 * this.quality}`);
       this.users[0].pluginHandle.send({
-        message: { request: "configure", bitrate: 32000 * this.quality }
+        message: { request: "configure", bitrate: 32000 * this.quality + 1}
       });
     },
 

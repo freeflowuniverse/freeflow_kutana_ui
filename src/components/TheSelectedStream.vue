@@ -14,39 +14,43 @@ import { mapActions, mapGetters } from "vuex";
 
 export default {
   computed: {
-    ...mapGetters(["selectedUser"]),
+    ...mapGetters(["selectedUser", "screenShare"])
   },
   methods: {
-    ...mapActions(["joinScreen"]),
-    
+    ...mapActions(["joinScreen"])
   },
   watch: {
+    screenShare(val) {
+      var video = document.createElement("video");
+
+      video.muted = true;
+      video.id = val.streamId;
+      video.style = "display: block; width: 100%; height: 100%;";
+      video.setAttribute("autoplay", "true");
+      document.getElementById("selectedUser").innerHTML = "";
+      document.getElementById("selectedUser").prepend(video);
+
+      Janus.attachMediaStream(video, val);
+    },
     selectedUser: {
       handler(newSelectedUser) {
-        if (newSelectedUser.type && newSelectedUser.type == "screenshare") {
-          this.joinScreen(newSelectedUser.streamId);
-        } else {
-          console.log("newSelectedUser", newSelectedUser);
-
-          if (
-            newSelectedUser === null ||
-            newSelectedUser === undefined ||
-            !newSelectedUser.stream.active
-          ) {
-            console.log("Clearing selected user area ... ");
-            document.getElementById("selectedUser").innerHTML = "";
-            return;
-          }
-
-          var video = document.createElement("video");
-          video.muted = true;
-          video.id = newSelectedUser.id;
-          video.style = "display: block; width: 100%; height: 100%;";
-          video.setAttribute("autoplay", "true");
+        if (
+          newSelectedUser === null ||
+          newSelectedUser === undefined ||
+          !newSelectedUser.stream.active
+        ) {
+          console.log("Clearing selected user area ... ");
           document.getElementById("selectedUser").innerHTML = "";
-          document.getElementById("selectedUser").prepend(video);
-          Janus.attachMediaStream(video, newSelectedUser.stream);
+          return;
         }
+        var video = document.createElement("video");
+        video.muted = true;
+        video.id = newSelectedUser.id;
+        video.setAttribute("autoplay", "true");
+        document.getElementById("selectedUser").innerHTML = "";
+        document.getElementById("selectedUser").prepend(video);
+        Janus.attachMediaStream(video, newSelectedUser.stream);
+        // }
       },
       deep: true
     }

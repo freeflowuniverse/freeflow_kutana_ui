@@ -1,6 +1,8 @@
 // TODO Set selected user as soon as there is a user
 import { Janus } from "janus-gateway";
 import config from '../../public/config'
+// import socketService from "../services/socketService";
+
 const logLayoutString = 'color: #00600f';
 
 export default {
@@ -28,7 +30,8 @@ export default {
                 pluginHandle: null,
                 screenSharePluginHandle: null
             },
-        ]
+        ],
+        screenShare: null
     },
     mutations: {
         initializeJanus(state) {
@@ -104,7 +107,8 @@ export default {
         users: state => state.users,
         janus: state => state.janus,
         isJanusInitialized: state => state.janus !== null,
-        selectedUser: state => state.selectedUser
+        selectedUser: state => state.selectedUser,
+        screenShare: state => state.screenShare
     },
 }
 
@@ -305,12 +309,6 @@ const janusHelpers = {
                         Janus.log("Janus says our WebRTC PeerConnection is " + (on ? "up" : "down") + " now");
                         if (on) {
                             console.log("Your screen sharing session just started: pass the <b>" + state.screenShareRoom + "</b> session identifier to those who want to attend.");
-                            // context.commit('sendSignal',{
-                            //     type: 'screenshare_started',
-                            //     content: {
-                            //         streamId: state.screenShareRoom
-                            //     }
-                            // })
                         } else {
                             console.log("Your screen sharing session just stopped.");
                         }
@@ -770,7 +768,7 @@ const janusHelpers = {
                         state.users[userIndex].screenShareStream = stream;
                     }
                     console.log("AFTER: ", state.users);
-
+                    state.screenShare = stream
                     // Janus.attachMediaStream($('#screenvideo').get(0), stream);
                 },
                 oncleanup: function () {

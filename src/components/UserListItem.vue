@@ -2,11 +2,7 @@
   <!-- TODO Fix borders of selected users -->
   <section :class="`userListItem ${selectedUser === user ? 'selected' : ''}`">
     <v-card class="stream">
-      <div :id="`user${userIndex}`"></div>
-      <!-- <span :id="`screenShareUser`">
-        <v-text-field v-model="streamId" label="Stream id"></v-text-field>
-        <v-btn @click="joinStream" small color="primary">Connect</v-btn>
-      </span> -->
+      <div :id="`user${userIndex}`" style="min-height:200px"></div>
       <!-- <UserListItemControls class="UserListItemControls" /> -->
     </v-card>
   </section>
@@ -35,9 +31,7 @@ export default {
   },
   computed: {
     ...mapGetters(["selectedUser"]),
-    screenShareStream() {
-      return this.user.screenShareStream;
-    }
+    
   },
   watch: {
     user: {
@@ -60,45 +54,23 @@ export default {
       },
       deep: true
     },
-    screenShareStream(newScreenShareStream) {
-      console.log("screenShareStream WATCHER");
-      if (
-        this.userIndex != 0 &&
-        newScreenShareStream != null &&
-        newScreenShareStream.active &&
-        document.getElementById(newScreenShareStream.id) === null
-      ) {
-        let video = document.createElement("video");
-        video.muted = true;
-        video.id = newScreenShareStream.id;
-        video.height = 250;
-        video.setAttribute("autoplay", "true");
-
-        document
-          .getElementById(`screenShareUser`)
-          .prepend(video);
-        Janus.attachMediaStream(video, newScreenShareStream);
-
-        console.log("SCREEN SHARE NOW");
-      }
-    }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.stream {
-  height: auto;
-  width: 400px;
-  overflow: hidden;
-}
+// .stream {
+//   height: auto;
+//   width: 400px;
+//   overflow: hidden;
+// }
 .UserListItemControls {
   position: absolute;
   bottom: 0;
   right: 0;
   z-index: 2;
 }
-.selected {
+.selected .stream>div{
   border: 5px solid var(--primary-color);
 }
 </style>
