@@ -784,9 +784,11 @@ const janusHelpers = {
             });
     },
     createRoom(state) {
+        let room = Math.abs(hashString(window.localStorage.getItem('teamName')));
+
         var create = {
             "request": "create",
-            "room": state.roomId,
+            "room": room,
             "permanent": false,
             "description": state.users[0].username,
             "is_private": true,
@@ -799,7 +801,9 @@ const janusHelpers = {
         console.log("resp: ", response)
     },
     joinRoom(state) {
-        var register = { "request": "join", "room": state.roomId, "ptype": "publisher", "display": state.users[0].username };
+        let room = Math.abs(hashString(window.localStorage.getItem('teamName')));
+
+        var register = { "request": "join", "room": room, "ptype": "publisher", "display": state.users[0].username };
 
         console.log("Attempting to join room: ", register)
         let response = state.users[0].pluginHandle.send({ "message": register });
@@ -812,3 +816,13 @@ const janusHelpers = {
     }
 
 };
+
+
+function hashString(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+}
