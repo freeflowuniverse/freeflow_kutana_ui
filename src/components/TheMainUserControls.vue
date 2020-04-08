@@ -16,10 +16,10 @@
         <v-row class="mx-0">
           <v-slider
             :tick-labels="qualityOptions"
-            :max="2"
+            :max="3"
             step="1"
             ticks="always"
-            :tick-size="3"
+            :tick-size="4"
             v-model="quality"
             @change="saveQualityOption"
           >
@@ -107,8 +107,8 @@ export default {
       published: true,
       addUserDialog: false,
       showExtraSettings: false,
-      quality: 1,
-      qualityOptions: ["Low", "Normal", "high"]
+      quality: 0,
+      qualityOptions: ["Auto", "Low", "Normal", "High"]
     };
   },
   computed: {
@@ -139,9 +139,9 @@ export default {
     },
 
     saveQualityOption() {
-      console.log(`Set quality to ${this.quality} = ${32000 * this.quality}`);
+      console.log(`Set quality to ${this.quality} = ${20000 * this.quality}`);
       this.users[0].pluginHandle.send({
-        message: { request: "configure", bitrate: 32000 * this.quality + 1}
+        message: { request: "configure", bitrate: 20000 * this.quality}
       });
     },
 
