@@ -16,7 +16,7 @@ export default {
   },
   mounted() {
     let token = this.$route.params.token;
-    let token2 = Math.abs(hashString(token));
+    let token2 = Math.abs(hashString(window.localStorage.getItem('teamName')));
 
     this.requestAccess(token);
     this.setRoomId(token2);
