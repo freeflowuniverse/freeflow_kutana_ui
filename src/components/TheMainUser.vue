@@ -32,8 +32,10 @@ export default {
           let video = document.createElement("video");
           video.muted = true;
           video.id = newUsers[0].stream.id;
-          video.height = 250;
+          video.width = "100%";
+          video.height = "100%";
           video.setAttribute("autoplay", "true");
+          video.setAttribute("playsinline", "true");
 
           document.getElementById("mainUser").prepend(video);
           Janus.attachMediaStream(video, newUsers[0].stream);
@@ -45,8 +47,10 @@ export default {
           let video = document.createElement("video");
           video.muted = true;
           video.id = newUsers[0].screenShareStream.id;
-          video.height = 250;
+          video.width = "100%";
+          video.height = "100%";
           video.setAttribute("autoplay", "true");
+          video.setAttribute("playsinline", "true");
 
           document.getElementById("mainUserScreen").prepend(video);
           Janus.attachMediaStream(video, newUsers[0].screenShareStream);

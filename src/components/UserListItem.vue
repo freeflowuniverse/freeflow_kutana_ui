@@ -6,7 +6,7 @@
       <!-- <span :id="`screenShareUser`">
         <v-text-field v-model="streamId" label="Stream id"></v-text-field>
         <v-btn @click="joinStream" small color="primary">Connect</v-btn>
-      </span> -->
+      </span>-->
       <!-- <UserListItemControls class="UserListItemControls" /> -->
     </v-card>
   </section>
@@ -50,8 +50,10 @@ export default {
         ) {
           var video = document.createElement("video");
           video.id = newUser.id;
-          video.height = 250;
+          video.width = "100%";
+          video.height = "100%";
           video.setAttribute("autoplay", "true");
+          video.setAttribute("playsinline", "true");
 
           document.getElementById(`user${this.userIndex}`).prepend(video);
           Janus.attachMediaStream(video, newUser.stream);
@@ -71,12 +73,12 @@ export default {
         let video = document.createElement("video");
         video.muted = true;
         video.id = newScreenShareStream.id;
-        video.height = 250;
+        video.width = "100%";
+        video.height = "100%";
         video.setAttribute("autoplay", "true");
+        video.setAttribute("playsinline", "true");
 
-        document
-          .getElementById(`screenShareUser`)
-          .prepend(video);
+        document.getElementById(`screenShareUser`).prepend(video);
         Janus.attachMediaStream(video, newScreenShareStream);
 
         console.log("SCREEN SHARE NOW");
