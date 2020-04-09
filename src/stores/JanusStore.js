@@ -1,7 +1,7 @@
 // TODO Set selected user as soon as there is a user
 import { Janus } from "janus-gateway";
 import config from '../../public/config'
-// import socketService from "../services/socketService";
+import socketService from "../services/socketService";
 
 const logLayoutString = 'color: #00600f';
 
@@ -308,6 +308,15 @@ const janusHelpers = {
                         Janus.log("Janus says our WebRTC PeerConnection is " + (on ? "up" : "down") + " now");
                         if (on) {
                             console.log("Your screen sharing session just started: pass the <b>" + state.screenShareRoom + "</b> session identifier to those who want to attend.");
+                            let teamName = window.localStorage.getItem('teamName')
+                            let user = JSON.parse(window.localStorage.getItem('account'))
+                            
+                            socketService.emit('SIGNAL', {
+                                channel: teamName,
+                                sender: user.name,
+                                type: 'screenshare_started',
+                                content: state.screenShareRoom
+                            })
                         } else {
                             console.log("Your screen sharing session just stopped.");
                         }
