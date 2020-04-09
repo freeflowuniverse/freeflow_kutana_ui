@@ -29,25 +29,29 @@ export default {
     };
   },
   mounted() {
-    document.onpaste = (event) => {
-      let items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    document.onpaste = event => {
+      let items = (event.clipboardData || event.originalEvent.clipboardData)
+        .items;
       for (let index in items) {
         let item = items[index];
         if (item.kind === "file") {
           let blob = item.getAsFile();
           let reader = new FileReader();
-          reader.onload = (event) => {
-            this.sendIt({
-              file: event.target.result
-            }, 'file')
+          reader.onload = event => {
+            this.sendIt(
+              {
+                file: event.target.result
+              },
+              "file"
+            );
           }; // data url!
-          if(blob) {
+          if (blob) {
             reader.readAsDataURL(blob);
           } else {
             this.setSnackbarMessage({
               type: "warning",
               text: `Can't paste file, only images. Please use the upload button`
-            })
+            });
           }
         }
       }
@@ -62,13 +66,13 @@ export default {
       this.$refs.fileUpper.click();
     },
     forwardMessage() {
-      this.sendIt(this.message)
+      this.sendIt(this.message);
     },
     clearMessage() {
       this.message = "";
     },
-    sendIt(content, type="text") {
-       if (content !== "") {
+    sendIt(content, type = "text") {
+      if (content !== "") {
         this.sendMessage({
           sender: this.account.name,
           createdAt: moment(),
@@ -79,10 +83,20 @@ export default {
       }
     },
     async fileUploaded(e) {
-      this.sendIt({
-        name: e.srcElement.files[0].name,
-        file: await this.toBase64(e.srcElement.files[0])
-      }, 'file')
+      if (e.srcElement.files[0].size > 1048576) {
+        this.setSnackbarMessage({
+          type: "error",
+          text: `Can't send files bigger than 1MB`
+        });
+      } else {
+        this.sendIt(
+          {
+            name: e.srcElement.files[0].name,
+            file: await this.toBase64(e.srcElement.files[0])
+          },
+          "file"
+        );
+      }
     },
     toBase64(file) {
       return new Promise((resolve, reject) => {
