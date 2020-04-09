@@ -68,7 +68,6 @@ export default {
             state.count++;
         },
         selectUser(state, user) {
-            console.log('selectUser Mutation');
             state.selectedUser = user
         },
         shareScreen(state) {
@@ -599,15 +598,16 @@ const janusHelpers = {
 
                     if (state.users.filter(user => user.username === remoteFeed.rfdisplay).length === 0) {
                         console.log("ADDED USER: ", remoteFeed.rfdisplay)
-                        state.users.push(
-                            {
-                                id: id,
-                                username: remoteFeed.rfdisplay,
-                                stream: stream,
-                                pluginHandle: remoteFeed,
-                                screenShareStream: null
-                            }
-                        )
+                        let newUser = {
+                            id: id,
+                            username: remoteFeed.rfdisplay,
+                            stream: stream,
+                            pluginHandle: remoteFeed,
+                            screenShareStream: null
+                        }
+                        state.users.push(newUser)
+                        state.selectedUser = newUser
+                        
                         console.log(state.users)
 
                     } else {

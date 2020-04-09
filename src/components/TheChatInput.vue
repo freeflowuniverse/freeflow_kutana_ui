@@ -40,6 +40,7 @@ export default {
           reader.onload = event => {
             this.sendIt(
               {
+                name: 'Clipboard',
                 file: event.target.result
               },
               "file"
