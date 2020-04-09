@@ -33,7 +33,9 @@ export default {
     TheChatInput
   },
   data() {
-    return {};
+    return {
+      chatKey: 0
+    };
   },
   mounted() {
   },
