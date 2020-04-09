@@ -58,7 +58,7 @@ export default {
       context.commit("selectUser", {
         type: "screenshare",
         user: message.sender,
-        streamId: message.content.streamId,
+        streamId: message.content, // StreamId here
       });
     },
   },

@@ -74,7 +74,7 @@ export default {
             janusHelpers.screenShare.shareAndPublishScreen(state);
         },
         joinScreen(state, id) {
-            console.log('Joining stream ... ', state);
+            console.log('Joining stream ... ', state, id);
             janusHelpers.screenShare.joinScreen(state, id);
         },
         setRoomId(state, roomId) {

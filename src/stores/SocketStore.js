@@ -31,6 +31,7 @@ export default {
           context.dispatch("accessGranted");
           break;
         case "screenshare_started":
+          console.log("Joining screen share ... ")
           context.dispatch("joinScreenShare", message);
           break;
         default:
