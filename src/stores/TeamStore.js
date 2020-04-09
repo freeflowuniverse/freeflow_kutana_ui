@@ -55,11 +55,13 @@ export default {
         text: `Screenshare started`,
       });
 
-      context.commit("selectUser", {
-        type: "screenshare",
-        user: message.sender,
-        streamId: message.content, // StreamId here
-      });
+      context.commit("joinScreen", message.content)
+
+      // context.commit("selectUser", {
+      //   type: "screenshare",
+      //   user: message.sender,
+      //   streamId: message.content, // StreamId here
+      // });
     },
   },
   getters: {

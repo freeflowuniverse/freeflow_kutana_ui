@@ -23,6 +23,7 @@ export default {
   watch: {
     screenShare(val) {
       var video = document.createElement("video");
+      console.log("Scr SHARE: ", val)
 
       video.muted = true;
       video.id = val.streamId;
@@ -38,9 +39,11 @@ export default {
         var video = document.createElement("video");
         video.muted = true;
         video.id = newSelectedUser.id;
+        video.style = "display: block; width: 100%; height: 100%;";
         video.setAttribute("autoplay", "true");
         document.getElementById("selectedUser").innerHTML = "";
         document.getElementById("selectedUser").prepend(video);
+
         Janus.attachMediaStream(video, newSelectedUser.stream);
       },
       deep: true

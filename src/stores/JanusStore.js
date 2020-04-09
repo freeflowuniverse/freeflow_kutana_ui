@@ -300,6 +300,7 @@ const janusHelpers = {
                     },
                     error: function (error) {
                         Janus.error("  -- Error attaching plugin...", error);
+                        console.log("We got an Error??? ")
                     },
                     consentDialog: function (on) {
                         Janus.debug("Consent dialog should be " + (on ? "on" : "off") + " now");
@@ -400,13 +401,15 @@ const janusHelpers = {
                         Janus.debug(" ::: Got a local stream :::");
                         Janus.debug(stream);
 
-                        state.users[0].screenShareStream = stream;
+                        // state.users[0].screenShareStream = stream;
+                        state.screenShare = stream;
                     },
                     onremotestream: function (stream) {
                         console.log("stream: ", stream)
                     },
                     oncleanup: function () {
                         Janus.log(" ::: Got a cleanup notification :::");
+                        console.log("We SHOULD CLEAN IT UP")
                     }
                 });
         },
@@ -779,12 +782,13 @@ const janusHelpers = {
                     let userIndex = state.users.findIndex(user => user.username === remoteFeed.rfdisplay);
 
                     console.log("BEFORE: ", state.users);
-                    if (state.users[userIndex] != null && state.users[userIndex].screenShareStream === null) {
+                    if (state.users[userIndex] != null && state.screenShare  === null) {
                         console.log("Added screen sharing handle ", userIndex)
-                        state.users[userIndex].screenShareStream = stream;
+                        // state.users[userIndex].screenShareStream = stream;
+                        state.screenShare = stream;
                     }
                     console.log("AFTER: ", state.users);
-                    state.screenShare = stream
+                    // state.screenShare = stream
                     // Janus.attachMediaStream($('#screenvideo').get(0), stream);
                 },
                 oncleanup: function () {

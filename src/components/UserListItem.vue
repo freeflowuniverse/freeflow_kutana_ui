@@ -9,7 +9,7 @@
           </v-row>
         </div>
       </div>
-      <!-- <UserListItemControls class="UserListItemControls" /> -->
+      <UserListItemControls v-bind:video="video" class="UserListItemControls" />
     </v-card>
   </section>
 </template>
@@ -17,17 +17,18 @@
 <script>
 import { Janus } from "janus-gateway";
 import { mapActions, mapGetters } from "vuex";
-// import UserListItemControls from "../components/UserListItemControls.vue";
+import UserListItemControls from "../components/UserListItemControls.vue";
 
 export default {
   data: function() {
     return {
       streamId: null,
-      showWarning: true
+      showWarning: true,
+      video: null,
     };
   },
   components: {
-    // UserListItemControls
+    UserListItemControls
   },
   mounted() {},
   props: ["user", "userIndex"],
@@ -49,15 +50,15 @@ export default {
           newUser.stream != undefined &&
           document.getElementById(this.user.id) === null
         ) {
-          var video = document.createElement("video");
-          video.id = newUser.id;
-          video.width = "100%";
-          video.height = "100%";
-          video.setAttribute("autoplay", "true");
-          video.setAttribute("playsinline", "true");
+          this.video = document.createElement("video");
+          this.video.id = newUser.id;
+          this.video.width = "100%";
+          this.video.height = "100%";
+          this.video.setAttribute("autoplay", "true");
+          this.video.setAttribute("playsinline", "true");
 
-          document.getElementById(`user${this.userIndex}`).prepend(video);
-          Janus.attachMediaStream(video, newUser.stream);
+          document.getElementById(`user${this.userIndex}`).prepend(this.video);
+          Janus.attachMediaStream(this.video, newUser.stream);
           this.showWarning = false;
           console.log("VIDEO SHARE NOW");
         }
