@@ -606,7 +606,9 @@ const janusHelpers = {
                             screenShareStream: null
                         }
                         state.users.push(newUser)
-                        state.selectedUser = newUser
+                        setTimeout(() => {
+                            state.selectedUser = newUser
+                        }, 500);
                         
                         console.log(state.users)
 
