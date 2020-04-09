@@ -1,6 +1,6 @@
 <template>
   <v-row align="end" class="chat">
-    <div class="messages" v-autoScroll>
+    <div ref="chat" class="messages" v-autoScroll>
       <template v-for="(message, index) in messages">
         <div v-if="showDivider(message, index)" :key="`${index}_divider`" class="text-center px-4">
           <span
@@ -38,6 +38,9 @@ export default {
     };
   },
   mounted() {
+    this.$nextTick(() => {
+      this.$refs.chat.scrollTop = this.$refs.chat.clientHeight;
+    });
   },
   computed: {
     ...mapGetters(["messages"])
