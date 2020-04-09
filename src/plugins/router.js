@@ -11,7 +11,7 @@ Vue.use(VueRouter);
 export default new VueRouter({
   mode: "history",
   routes: [
-    { path: "/", name: 'landing', component: Landing, meta: { requiresAuth: false } },
+    { path: "/", name: 'home', component: Landing, meta: { requiresAuth: false } },
     { path: "/room", name: 'room', component: Room, meta: { requiresAuth: true } },
     { path: "/login", name: 'login', component: Login, meta: { requiresAuth: false } },
     { path: "/room/invite/:token", name: 'waitingRoom', component: WaitingRoom, meta: { requiresAuth: true } },
