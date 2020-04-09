@@ -71,6 +71,7 @@ export default {
   right: 16px;
   height: 250px;
   width: 400px;
+  z-index: 3;
 }
 .wrapper {
   position: relative;

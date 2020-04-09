@@ -418,7 +418,9 @@ const janusHelpers = {
                         Janus.log("Screen sharing session created: " + state.screenShareRoom);
                         console.log('result ', result);
                         // state.screenShareUsername = Janus.randomString(12);
-                        var register = { "request": "join", "room": state.screenShareRoom, "ptype": "publisher", "display": state.users[0].username, };
+
+                        let me =   JSON.parse(window.localStorage.getItem("account"))
+                        var register = { "request": "join", "room": state.screenShareRoom, "ptype": "publisher", "display": me.name, };
                         console.log('Sending register for screenshare');
                         state.users[0].screenSharePluginHandle.send({ "message": register });
                     }
@@ -433,8 +435,9 @@ const janusHelpers = {
             state.screenShareRoom = parseInt(roomid);
             state.screenShareRole = "listener";
             // state.screenShareUsername = Janus.randomString(12);
-
-            var register = { "request": "join", "room": state.screenShareRoom, "ptype": "publisher", "display": state.users[0].username }; //TODO This is wrong, fix it later 
+            let me =   JSON.parse(window.localStorage.getItem("account"))
+                        
+            var register = { "request": "join", "room": state.screenShareRoom, "ptype": "publisher", "display": me.name }; //TODO This is wrong, fix it later 
 
             console.log('register ', register);
             state.users[0].screenSharePluginHandle.send({ "message": register });
@@ -785,12 +788,13 @@ const janusHelpers = {
     },
     createRoom(state) {
         let room = Math.abs(hashString(window.localStorage.getItem('teamName')));
-
+        let me =   JSON.parse(window.localStorage.getItem("account"))
+                        
         var create = {
             "request": "create",
             "room": room,
             "permanent": false,
-            "description": state.users[0].username,
+            "description": me.name,
             "is_private": true,
             "bitrate": 0,
             "publishers": 16,
@@ -801,9 +805,10 @@ const janusHelpers = {
         console.log("resp: ", response)
     },
     joinRoom(state) {
+        let me =   JSON.parse(window.localStorage.getItem("account"))
         let room = Math.abs(hashString(window.localStorage.getItem('teamName')));
 
-        var register = { "request": "join", "room": room, "ptype": "publisher", "display": state.users[0].username };
+        var register = { "request": "join", "room": room, "ptype": "publisher", "display": me.name };
 
         console.log("Attempting to join room: ", register)
         let response = state.users[0].pluginHandle.send({ "message": register });

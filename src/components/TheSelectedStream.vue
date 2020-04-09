@@ -2,6 +2,7 @@
   <section class="stream fill-height">
     <v-card class="wrapper fill-height">
       <v-row align="center" justify="center" class="fill-height mx-0">
+        <div v-if="selectedUser && selectedUser.username" class="name primary pa-2 white--text">{{selectedUser.username}}</div>  
         <div id="selectedUser" class="relative"></div>
       </v-row>
     </v-card>
@@ -49,6 +50,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+}
 .stream {
   .relative {
     position: relative;

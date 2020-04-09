@@ -1,7 +1,7 @@
 <template>
-  <!-- TODO Fix borders of selected users -->
   <section :class="`userListItem ${selectedUser === user ? 'selected' : ''}`">
     <v-card class="stream">
+      <div class="name py-1 primary white--text">{{user.username}}</div>
       <div :id="`user${userIndex}`" style="min-height:200px"></div>
       <!-- <UserListItemControls class="UserListItemControls" /> -->
     </v-card>
@@ -21,6 +21,8 @@ export default {
   },
   components: {
     // UserListItemControls
+  },
+  mounted() {
   },
   props: ["user", "userIndex"],
   methods: {
@@ -66,6 +68,13 @@ export default {
 //   width: 400px;
 //   overflow: hidden;
 // }
+.name {
+  text-align: center;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+}
 .UserListItemControls {
   position: absolute;
   bottom: 0;
