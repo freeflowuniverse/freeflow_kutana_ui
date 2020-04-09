@@ -9,10 +9,10 @@
         clearable
         label="Message"
         prepend-icon="attach_file"
-        append-icon="insert_emoticon"
         append-outer-icon="send"
         @click:prepend="showFileUploader"
         @click:append-outer="forwardMessage"
+        autocomplete="none"
       />
     </v-form>
   </section>
