@@ -311,7 +311,7 @@ const janusHelpers = {
                             let teamName = window.localStorage.getItem('teamName')
                             let user = JSON.parse(window.localStorage.getItem('account'))
                             
-                            socketService.emit('SIGNAL', {
+                            socketService.emit('signal', {
                                 channel: teamName,
                                 sender: user.name,
                                 type: 'screenshare_started',
