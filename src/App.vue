@@ -41,4 +41,8 @@ video {
   min-height: 100%;
   min-width: 100%;
 }
+.chatMessage .content a {
+  color: white;
+  text-decoration: none;
+}
 </style>

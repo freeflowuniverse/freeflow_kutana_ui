@@ -3,14 +3,20 @@
     <v-divider class="py-2" horizontal></v-divider>
     <v-form @submit.prevent="forwardMessage">
       <input type="file" ref="fileUpper" @change="fileUploaded" style="display:none" />
-      <v-text-field
+      <v-textarea
+        class="mx-4"
         v-model="message"
         outlined
         clearable
         label="Message"
         append-outer-icon="send"
         @click:append-outer="forwardMessage"
+        @keydown.enter.prevent
+        @keyup.enter.exact="forwardMessage"
+        @keydown.enter.shift.exact="message += '\n'"
         autocomplete="none"
+        rows="1"
+        auto-grow
       />
     </v-form>
   </section>

@@ -1,8 +1,8 @@
 <template>
   <v-card
-    :class="message.sender === account.name ? 'ml-6 mr-2' : 'mr-12 ml-1'"
+    :class="`chatMessage ${message.sender === account.name ? 'ml-6 mr-2' : 'mr-12 ml-1'}`"
     elevation="0"
-    color="primary"
+    :color="`primary ${message.sender === account.name ? 'lighten-2' : 'lighten-3' }`"
     dark
     v-if="message.type"
   >
@@ -11,7 +11,9 @@
         <span class="font-weight-bold">{{ message.sender }}</span>
       </v-row>
     </v-card-subtitle>
-    <v-card-text v-if="message.type === 'text'" class="font-weight-medium">{{ message.content }}</v-card-text>
+    <v-card-text v-if="message.type === 'text'" class="font-weight-medium content">
+      <vueMarkdown>{{message.content}}</vueMarkdown>
+    </v-card-text>
     <v-card-text v-else-if="message.type === 'file' && mimeType === 'image/png'">
       <v-img :src="message.content.file"></v-img>
     </v-card-text>
@@ -40,8 +42,13 @@
 
 <script type="javascript">
 import { mapGetters } from "vuex";
+import vueMarkdown from "vue-markdown";
+
 export default {
   props: ["message"],
+  components: {
+    vueMarkdown
+  },
   computed: {
     ...mapGetters(["account"]),
     mimeType() {
@@ -55,12 +62,19 @@ export default {
         // The magic numbers from this function come from https://stackoverflow.com/a/49750491/2349421
         let file = this.message.content.file;
         let lengthOfHeader = file.indexOf("base64,") + "base64,".length;
-        
+
         let stringLength = file.length - lengthOfHeader;
         let sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.5624896334383812;
         return `${Math.round((sizeInBytes / 1000) * 100) / 100} KB`;
       }
       return false;
+    },
+    parsedMessage() {
+      var urlRegex = /(https?:\/\/[^\s]+)/g;
+      return this.message.content.replace(
+        urlRegex,
+        '<a target="_blank" href="$1">$1</a>'
+      );
     }
   },
   methods: {

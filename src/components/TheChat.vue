@@ -13,7 +13,7 @@
         </div>
       </template>
     </div>
-    <TheChatInput class />
+    <TheChatInput class="theChatInput" />
   </v-row>
 </template>
 
@@ -70,5 +70,8 @@ export default {
   top: 0;
   width: 100%;
   overflow-y: auto;
+}
+.theChatInput {
+  z-index: 3;
 }
 </style>
