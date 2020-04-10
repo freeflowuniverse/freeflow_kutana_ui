@@ -13,19 +13,20 @@
 // import { Janus } from "janus-gateway";
 
 export default {
-  props: ['video'],
+  props: [],
   data: function() {
     return {
-      muted: false,
       published: true,
+      muted: false
     };
   },
-  computed: {
+  mounted() {
+    console.log(`======`)
   },
   methods: { 
     toggleMute () {
-      this.muted = !this.video.muted
-      this.video.muted = !this.video.muted
+      this.muted = !this.muted
+      this.$emit('setMute', this.muted)
     }
   }
 };

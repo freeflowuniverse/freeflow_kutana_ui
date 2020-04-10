@@ -4,27 +4,24 @@
       <v-card-title class="primary white--text body-1 mb-0 py-1">
         <div class="text-center" style="width:100%">{{user.username}}</div>
       </v-card-title>
-      <v-card-text>
-        <div :id="`user${userIndex}`" style="min-height:200px">
-          <v-row v-if="showWarning" align="center" justify="center" class="fill mx-0">
+      <div :id="`user${userIndex}`" style="min-height:200px">
+        <v-row v-if="showWarning" align="center" justify="center" class="fill">
             <v-icon color="white">videocam_off</v-icon>
-          </v-row>
-        </div>
-        <UserListItemControls :video="video" class="UserListItemControls" />
-      </v-card-text>
+        </v-row>
+      </div>
+      <UserListItemControls @setMute="setMute" class="UserListItemControls" />
     </v-card>
   </section>
 </template>
 
 <script>
 import { Janus } from "janus-gateway";
-import { mapActions, mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 import UserListItemControls from "../components/UserListItemControls.vue";
 
 export default {
   data: function() {
     return {
-      streamId: null,
       showWarning: true,
       video: null
     };
@@ -35,9 +32,8 @@ export default {
   mounted() {},
   props: ["user", "userIndex"],
   methods: {
-    ...mapActions(["joinScreen"]),
-    joinStream() {
-      this.joinScreen(this.streamId);
+    setMute(muted) {
+      this.video.muted = muted;
     }
   },
   computed: {
@@ -52,17 +48,17 @@ export default {
           newUser.stream != undefined &&
           document.getElementById(this.user.id) === null
         ) {
-          var video = document.createElement("video");
-          video.id = `user${this.userIndex}`;
-          video.width = "100%";
-          video.height = "100%";
-          video.setAttribute("autoplay", "true");
-          video.setAttribute("playsinline", "true");
+          this.video = document.createElement("video");
+          this.video.id = newUser.id;
+          this.video.width = "100%";
+          this.video.height = "100%";
+          this.video.setAttribute("autoplay", "true");
+          this.video.setAttribute("playsinline", "true");
+          this.video.setAttribute("style", "margin-bottom: -6px");
 
           document.getElementById(`user${this.userIndex}`).prepend(this.video);
           Janus.attachMediaStream(this.video, newUser.stream);
           this.showWarning = false;
-          console.log("VIDEO SHARE NOW");
         }
       },
       deep: true
@@ -72,34 +68,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// .stream {
-//   height: auto;
-//   width: 400px;
-//   overflow: hidden;
-// }
 .fill {
   height: 100%;
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-}
-.name {
-  text-align: center;
-  // position: absolute;
-  z-index: 2;
   width: 100%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 .UserListItemControls {
   position: absolute;
   bottom: 0;
   right: 0;
   z-index: 2;
-}
-.stream > div {
-  position: relative;
-  width: 100%;
-  height: 100%;
 }
 .selected .stream > div {
   border: 5px solid var(--primary-color);
