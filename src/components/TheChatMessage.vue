@@ -12,7 +12,7 @@
       </v-row>
     </v-card-subtitle>
     <v-card-text v-if="message.type === 'text'" class="font-weight-medium content">
-      <vueMarkdown :anchorAttributes="anchorAttributes">{{message.content}}</vueMarkdown>
+      <vueMarkdown :anchorAttributes="anchorAttributes" :html="false">{{message.content}}</vueMarkdown>
     </v-card-text>
     <v-card-text v-else-if="message.type === 'file' && mimeType === 'image/png'">
       <v-img :src="message.content.file"></v-img>
