@@ -1,15 +1,17 @@
 <template>
   <section :class="`userListItem ${selectedUser === user ? 'selected' : ''}`">
-    <v-card class="stream">
-      <div>
-        <div class="name py-1 primary white--text">{{user.username}}</div>
-        <div :id="`user${userIndex}`" style="min-height:200px" class="primary lighten-2">
-          <v-row v-if="showWarning" align="center" justify="center" class="fill">
+    <v-card class="stream black">
+      <v-card-title class="primary white--text body-1 mb-0 py-1">
+        <div class="text-center" style="width:100%">{{user.username}}</div>
+      </v-card-title>
+      <v-card-text>
+        <div :id="`user${userIndex}`" style="min-height:200px">
+          <v-row v-if="showWarning" align="center" justify="center" class="fill mx-0">
             <v-icon color="white">videocam_off</v-icon>
           </v-row>
         </div>
-      </div>
-      <UserListItemControls v-bind:video="video" class="UserListItemControls" />
+        <UserListItemControls :video="video" class="UserListItemControls" />
+      </v-card-text>
     </v-card>
   </section>
 </template>
@@ -24,7 +26,7 @@ export default {
     return {
       streamId: null,
       showWarning: true,
-      video: null,
+      video: null
     };
   },
   components: {
@@ -50,12 +52,12 @@ export default {
           newUser.stream != undefined &&
           document.getElementById(this.user.id) === null
         ) {
-          this.video = document.createElement("video");
-          this.video.id = newUser.id;
-          this.video.width = "100%";
-          this.video.height = "100%";
-          this.video.setAttribute("autoplay", "true");
-          this.video.setAttribute("playsinline", "true");
+          var video = document.createElement("video");
+          video.id = `user${this.userIndex}`;
+          video.width = "100%";
+          video.height = "100%";
+          video.setAttribute("autoplay", "true");
+          video.setAttribute("playsinline", "true");
 
           document.getElementById(`user${this.userIndex}`).prepend(this.video);
           Janus.attachMediaStream(this.video, newUser.stream);
@@ -84,7 +86,7 @@ export default {
 }
 .name {
   text-align: center;
-  position: absolute;
+  // position: absolute;
   z-index: 2;
   width: 100%;
 }

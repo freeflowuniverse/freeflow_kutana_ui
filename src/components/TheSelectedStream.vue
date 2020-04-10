@@ -1,6 +1,6 @@
 <template>
   <section class="stream fill-height">
-    <v-card class="wrapper fill-height">
+    <v-card class="wrapper fill-height black">
       <v-row align="center" justify="center" class="fill-height mx-0">
         <div v-if="selectedUser && selectedUser.username" class="name primary pa-2 white--text">{{selectedUser.username}}</div>  
         <div id="selectedUser" class="relative"></div>

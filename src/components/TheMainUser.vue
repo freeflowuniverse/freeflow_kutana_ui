@@ -1,12 +1,10 @@
 <template>
-  <!-- TODO Fix background of main user (corner is showing) -->
-  <section class="stream grey lighten-2">
-    <v-card class="wrapper">
+  <section class="stream">
+    <v-card class="wrapper black">
       <span id="mainUser">
         <!-- <p>Username: {{users[0].username}}</p> -->
       </span>
       <span id="mainUserScreen">
-
       </span>
       <TheMainUserControls class="TheMainUserControls"/>
     </v-card>
@@ -70,19 +68,13 @@ export default {
   bottom: 18px;
   right: 16px;
   height: 250px;
-  width: 400px;
+  width: 333px;
   z-index: 3;
 }
 .wrapper {
   position: relative;
   height: 100%;
   width: 100%;
-}
-#mainUser {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
 }
 .TheMainUserControls {
   display: flex;

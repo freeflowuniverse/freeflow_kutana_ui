@@ -39,20 +39,4 @@ video {
   min-height: 100%;
   min-width: 100%;
 }
-#selectedUser,
-#mainUser,
-.userListItem .stream>div {
-  position: relative;
-  min-width: 100%;
-  min-height: 100%;
-  overflow: hidden;
-  video {
-    position: absolute;
-    min-width: calc(100% + 2px);
-    left: 50%;
-    min-height: 120%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
 </style>

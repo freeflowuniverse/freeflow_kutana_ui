@@ -1,5 +1,5 @@
 <template>
-  <v-row class="home px-4">
+  <v-row class="home pl-2">
     <v-col :cols="showSidebar ? 7 : 10" class="pr-0">
       <TheSelectedStream />
     </v-col>
