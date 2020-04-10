@@ -4,7 +4,7 @@
       <v-card-title class="primary white--text body-1 mb-0 py-1">
         <div class="text-center" style="width:100%">{{user.username}}</div>
       </v-card-title>
-      <div :id="`user${userIndex}`" style="min-height:200px">
+      <div :id="`user${userIndex}`">
         <v-row v-if="showWarning" align="center" justify="center" class="fill">
             <v-icon color="white">videocam_off</v-icon>
         </v-row>
@@ -81,6 +81,9 @@ export default {
   bottom: 0;
   right: 0;
   z-index: 2;
+}
+.selected .stream > div {
+  border: 5px solid transparent;
 }
 .selected .stream > div {
   border: 5px solid var(--primary-color);
