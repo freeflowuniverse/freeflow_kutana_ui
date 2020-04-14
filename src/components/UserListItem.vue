@@ -5,6 +5,7 @@
         <div class="text-center" style="width:100%">{{user.username}}</div>
       </v-card-title>
       <div :id="`user${userIndex}`">
+        <JanusVideo v-if="userVideoStream" :stream="userVideoStream"></JanusVideo>
         <v-row v-if="showWarning" align="center" justify="center" class="content">
             <v-icon color="white">videocam_off</v-icon>
         </v-row>
@@ -15,9 +16,9 @@
 </template>
 
 <script>
-import { Janus } from "janus-gateway";
 import { mapGetters } from "vuex";
 import UserListItemControls from "../components/UserListItemControls.vue";
+import JanusVideo from "./JanusVideo";
 
 export default {
   data: function() {
@@ -27,7 +28,8 @@ export default {
     };
   },
   components: {
-    UserListItemControls
+    UserListItemControls,
+    JanusVideo
   },
   mounted() {},
   props: ["user", "userIndex"],
@@ -37,32 +39,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedUser"])
-  },
-  watch: {
-    user: {
-      handler(newUser) {
-        if (
-          this.userIndex != 0 &&
-          newUser.stream != null &&
-          newUser.stream != undefined &&
-          document.getElementById(this.user.id) === null
-        ) {
-          this.video = document.createElement("video");
-          this.video.id = newUser.id;
-          this.video.width = "100%";
-          this.video.height = "100%";
-          this.video.setAttribute("autoplay", "true");
-          this.video.setAttribute("playsinline", "true");
-          this.video.setAttribute("style", "margin-bottom: -6px");
-
-          document.getElementById(`user${this.userIndex}`).prepend(this.video);
-          Janus.attachMediaStream(this.video, newUser.stream);
-          this.showWarning = false;
-        }
-      },
-      deep: true
-    }
+    ...mapGetters(["selectedUser"]),
+    userVideoStream() {
+      return this.selectedUser.stream;
+    },
   }
 };
 </script>

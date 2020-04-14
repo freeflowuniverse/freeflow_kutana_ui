@@ -2,61 +2,36 @@
   <section class="stream">
     <v-card class="wrapper black">
       <span id="mainUser">
-        <!-- <p>Username: {{users[0].username}}</p> -->
+        <JanusVideo v-if="userVideoStream" :stream="userVideoStream"></JanusVideo>
       </span>
       <span id="mainUserScreen">
+        <JanusVideo v-if="userScreenshareStream" :stream="userScreenshareStream"></JanusVideo>
       </span>
-      <TheMainUserControls class="TheMainUserControls"/>
+      <TheMainUserControls class="TheMainUserControls" />
     </v-card>
   </section>
 </template>
 
 <script>
-import { Janus } from "janus-gateway";
 import { mapGetters } from "vuex";
-import TheMainUserControls from "./TheMainUserControls"
+import TheMainUserControls from "./TheMainUserControls";
+import JanusVideo from "./JanusVideo";
+
 export default {
   components: {
-    TheMainUserControls
+    TheMainUserControls,
+    JanusVideo
   },
   mounted() {},
   computed: {
-    ...mapGetters(["users"])
-  },
-  watch: {
-    users: {
-      handler(newUsers) {
-        if (newUsers[0].stream != null && newUsers[0].stream != undefined && newUsers[0].stream.active && document.getElementById(newUsers[0].stream.id) === null) {
-          let video = document.createElement("video");
-          video.muted = true;
-          video.id = newUsers[0].stream.id;
-          video.width = "100%";
-          video.height = "100%";
-          video.setAttribute("autoplay", "true");
-          video.setAttribute("playsinline", "true");
+    ...mapGetters(["users"]),
 
-          document.getElementById("mainUser").prepend(video);
-          Janus.attachMediaStream(video, newUsers[0].stream);
+    userVideoStream() {
+      return this.users[0].stream;
+    },
 
-          console.log("newUsers[0].stream ", newUsers[0].stream)
-        }
-
-        if(newUsers[0].screenShareStream != null && newUsers[0].screenShareStream.active && document.getElementById(newUsers[0].screenShareStream.id) === null) {
-          let video = document.createElement("video");
-          video.muted = true;
-          video.id = newUsers[0].screenShareStream.id;
-          video.width = "100%";
-          video.height = "100%";
-          video.setAttribute("autoplay", "true");
-          video.setAttribute("playsinline", "true");
-
-          document.getElementById("mainUserScreen").prepend(video);
-          Janus.attachMediaStream(video, newUsers[0].screenShareStream);
-
-          console.log("newUsers[0].screenShareStream ", newUsers[0].screenShareStream)
-        }
-      },
-      deep: true
+    userScreenshareStream() {
+      return this.users[0].screenShareStream;
     }
   }
 };
