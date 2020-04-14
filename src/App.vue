@@ -36,7 +36,7 @@ export default {
 </script>
 <style lang="scss">
 #app {
-  min-height: 100vh;
+  max-height: 100vh;
 }
 .chatMessage .content a {
   color: white;

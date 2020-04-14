@@ -5,11 +5,14 @@
         <div class="text-center" style="width:100%">{{user.username}}</div>
       </v-card-title>
       <div :id="`user${userIndex}`">
-        <JanusVideo v-if="userVideoStream && userVideoStream.active" :stream="userVideoStream" :muted="muted"></JanusVideo>
+        <JanusVideo
+          v-if="userVideoStream && userVideoStream.active"
+          :stream="userVideoStream"
+          :muted="muted"
+        ></JanusVideo>
         <v-row v-else align="center" justify="center" class="content">
-            <v-icon color="white">videocam_off</v-icon>
+          <v-icon color="white">videocam_off</v-icon>
         </v-row>
-        
       </div>
       <UserListItemControls @setMute="setMute" class="UserListItemControls" />
     </v-card>
@@ -37,18 +40,18 @@ export default {
   props: ["user", "userIndex"],
   methods: {
     setMute(muted) {
-      this.muted = muted
+      this.muted = muted;
     }
   },
   computed: {
     ...mapGetters(["selectedUser"]),
     userVideoStream() {
-      if(!this.$props.user || !this.$props.user.stream) {
+      if (!this.$props.user || !this.$props.user.stream) {
         return false;
       }
       
       return this.$props.user.stream;
-    },
+    }
   }
 };
 </script>

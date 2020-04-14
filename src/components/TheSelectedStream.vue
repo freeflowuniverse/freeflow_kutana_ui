@@ -1,13 +1,11 @@
 <template>
-  <section class="stream fill-height">
-    <v-card class="wrapper fill-height black">
-      <v-row align="center" justify="center" class="fill-height mx-0">
+  <section class="stream fill-height black">
+    <v-card class="wrapper">
         <div v-if="selectedUser && selectedUser.username" class="name primary pa-2 white--text">{{selectedUser.username}}</div>  
-        <div id="selectedUser" class="relative">
+        <div id="selectedStream" class="relative">
           <JanusVideo v-if="userVideoStream" :stream="userVideoStream"></JanusVideo>
           <JanusVideo v-else-if="userScreenshareStream" :stream="userScreenshareStream"></JanusVideo>
         </div>
-      </v-row>
     </v-card>
   </section>
 </template>
@@ -23,18 +21,17 @@ export default {
   computed: {
     ...mapGetters(["selectedUser", "screenShare"]),
     userVideoStream() {
-      if(!this.selectedUser) {
+      if (!this.selectedUser) {
         return false;
       }
 
       return this.selectedUser.stream;
     },
-
     userScreenshareStream() {
-      if(!this.selectedUser) {
+      if (!this.selectedUser) {
         return false;
       }
-      
+
       return this.selectedUser.screenShareStream;
     }
   },
@@ -51,14 +48,12 @@ export default {
   left: 0;
   z-index: 1;
 }
-.stream {
-  .relative {
-    position: relative;
-  }
-  #selectedUser {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
+
+#selectedStream {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: black;
 }
 </style>
