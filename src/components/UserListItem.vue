@@ -41,6 +41,10 @@ export default {
   computed: {
     ...mapGetters(["selectedUser"]),
     userVideoStream() {
+      if(!this.selectedUser) {
+        return false;
+      }
+      
       return this.selectedUser.stream;
     },
   }
