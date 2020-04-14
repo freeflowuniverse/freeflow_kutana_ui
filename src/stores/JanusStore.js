@@ -417,7 +417,14 @@ const janusHelpers = {
             state.screenShareCapture = "screen";
             state.screenShareRole = "publisher";
 
-            var create = { "request": "create", "description": "screenshare", "bitrate": 0, "publishers": 1 };
+            var create = {
+                "request": "create",
+                "description": "screenshare",
+                "bitrate": 4096000,
+                "bitrate_cap": true,
+                "publishers": 1
+            };
+            
             state.users[0].screenSharePluginHandle.send({
                 "message": create,
                 success: function (result) {
@@ -811,8 +818,9 @@ const janusHelpers = {
             "permanent": false,
             "description": me.name,
             "is_private": true,
-            "bitrate": 0,
-            "publishers": 16,
+            "bitrate": 2048000,
+            "bitrate_cap": true,
+            "publishers": 16
         };
 
         console.log("Attempting to create room: ", create)
