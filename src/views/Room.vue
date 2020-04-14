@@ -77,6 +77,7 @@ export default {
 .home {
   position: relative;
   height: 100%;
+  max-height: 100%;
 }
 .inner {
   position: absolute;

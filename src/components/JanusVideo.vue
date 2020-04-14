@@ -1,6 +1,6 @@
 <template>
   <div class="janus-video">
-    <video :src-object.prop.camel="stream" autoplay="autoplay"></video>
+    <video :src-object.prop.camel="stream" autoplay="autoplay" :muted="muted"></video>
   </div>
 </template>
 
@@ -11,6 +11,10 @@ export default {
     stream: {
       type: MediaStream,
       required: true
+    },
+    muted: {
+      type: Boolean,
+      required: false
     }
   },
   mounted() {},
@@ -37,5 +41,8 @@ export default {
     left: 0;
     bottom: 0;
     right: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
 }
 </style>

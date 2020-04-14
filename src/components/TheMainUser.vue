@@ -2,10 +2,10 @@
   <section class="stream">
     <v-card class="wrapper black">
       <span id="mainUser">
-        <JanusVideo v-if="userVideoStream" :stream="userVideoStream"></JanusVideo>
+        <JanusVideo v-if="userVideoStream" :stream="userVideoStream" muted></JanusVideo>
       </span>
       <span id="mainUserScreen">
-        <JanusVideo v-if="userScreenshareStream" :stream="userScreenshareStream"></JanusVideo>
+        <JanusVideo v-if="userScreenshareStream" :stream="userScreenshareStream" muted></JanusVideo>
       </span>
       <TheMainUserControls class="TheMainUserControls" />
     </v-card>
@@ -27,7 +27,7 @@ export default {
     ...mapGetters(["users"]),
 
     userVideoStream() {
-      if(!this.users[0].stream) {
+      if(!this.users) {
         return false;
       }
 
@@ -35,7 +35,7 @@ export default {
     },
 
     userScreenshareStream() {
-      if(!this.users[0].screenShareStream) {
+      if(!this.users) {
         return false;
       }
       

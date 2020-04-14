@@ -35,11 +35,8 @@ export default {
 };
 </script>
 <style lang="scss">
-video {
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
-  min-width: 100%;
+#app {
+  min-height: 100vh;
 }
 .chatMessage .content a {
   color: white;
@@ -48,4 +45,5 @@ video {
 .contains-task-list {
   list-style: none;
 }
+
 </style>
