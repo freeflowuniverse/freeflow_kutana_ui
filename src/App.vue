@@ -45,4 +45,7 @@ video {
   color: white;
   text-decoration: none;
 }
+.contains-task-list {
+  list-style: none;
+}
 </style>

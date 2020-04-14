@@ -1,11 +1,11 @@
 <template>
-  <section :class="`userListItem ${selectedUser === user ? 'selected' : ''}`">
+  <section :class="`userListItem ${selectedUser.username === user.username ? 'selected' : ''}`">
     <v-card class="stream black">
       <v-card-title class="primary white--text body-1 mb-0 py-1">
         <div class="text-center" style="width:100%">{{user.username}}</div>
       </v-card-title>
       <div :id="`user${userIndex}`">
-        <v-row v-if="showWarning" align="center" justify="center" class="fill">
+        <v-row v-if="showWarning" align="center" justify="center" class="content">
             <v-icon color="white">videocam_off</v-icon>
         </v-row>
       </div>
@@ -82,8 +82,8 @@ export default {
   right: 0;
   z-index: 2;
 }
-.selected .stream > div {
-  border: 5px solid transparent;
+.stream .content {
+  min-height: 200px;
 }
 .selected .stream > div {
   border: 5px solid var(--primary-color);
