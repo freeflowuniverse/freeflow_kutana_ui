@@ -111,6 +111,9 @@ export default {
       qualityOptions: ["Auto", "Low", "Normal", "High"]
     };
   },
+  mounted() {
+    this.$root.$on('showInviteUser', this.showAddUserDialog)
+  },
   computed: {
     ...mapGetters(["users", "teamName", "isGeneratingInvite", "teamMembers"]),
     inviteLink() {
