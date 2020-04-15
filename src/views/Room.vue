@@ -1,10 +1,19 @@
 <template>
   <v-row class="home pl-2">
     <template v-if="!showSidebar || !isMobile">
-      <v-col :cols="showSidebar ? 7 : 10" class="pr-0">
+      <v-col :cols="showSidebar ? 9 : 12" v-if="users.length == 1" class="home">
+        <v-row align="center" class="fill-height">
+          <v-col align="center">
+            <h1 class="grey--text">There is no one here!</h1>
+            <v-btn color="primary" class="my-2" @click="$root.$emit('showInviteUser')">Invite them now!</v-btn>
+          </v-col>
+        </v-row>
+        <TheMainUser />
+      </v-col>
+      <v-col v-if="users.length > 1" :cols="showSidebar ? 7 : 10" class="pr-0">
         <TheSelectedStream />
       </v-col>
-      <v-col cols="2" class="userList">
+      <v-col v-if="users.length > 1" cols="2" class="userList">
         <div class="inner">
           <!-- TODO Hide user-list if users.length < 3 (yourself included) -->
           <UserList />
@@ -73,7 +82,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["isJanusInitialized", "teamMembers", "teamName", "account"]),
+    ...mapGetters(["isJanusInitialized", "users", "teamName", "account"]),
     isMobile() {
       return this.$vuetify.breakpoint.name == 'xs' || 
         this.$vuetify.breakpoint.name == 'sm';
