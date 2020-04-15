@@ -30,7 +30,7 @@ export default {
     },
     computed: {
         componentStyle() {
-            return this.width ? {width: this.width} : {}
+            return this.width ? {width: this.width} : {maxWidth: `calc(${(this.w / this.h) * 100}vh - 31px)`}
         },
         innerStyle() {
             return {
