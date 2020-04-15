@@ -1,6 +1,6 @@
 <template>
   <v-row class="home">
-    <template v-if="!showSidebar || !isMobile">
+    <template v-if="!isMobile">
       <v-col :cols="showSidebar ? 9 : 12" v-if="users.length == 1" class="home">
         <v-row align="center" class="fill-height">
           <v-col align="center">
@@ -24,9 +24,29 @@
         <TheSidebar />
       </v-col>
     </template>
-    <v-col cols="12" class="pa-0" v-if="showSidebar && isMobile">
-      <TheSidebar />
-    </v-col>
+    <!-- Mobile part -->
+    <template v-else>
+      <v-col cols="12" v-if="users.length == 1 && !showSidebar" class="home">
+        <v-row align="center" class="fill-height">
+          <v-col align="center">
+            <h1 class="grey--text">There is no one here!</h1>
+            <v-btn color="primary" class="my-2" @click="$root.$emit('showInviteUser')">Invite them now!</v-btn>
+          </v-col>
+        </v-row>
+        <TheMainUser />
+      </v-col>
+      <v-col v-if="users.length > 1 && !showSidebar" cols="12">
+        <v-row align="center" class="fill-height">
+          <v-col align="center">
+            <TheSelectedStream />
+          </v-col>
+        </v-row>
+        <TheMainUser />
+      </v-col>
+      <v-col cols="12" class="pa-0" v-if="showSidebar && isMobile">
+        <TheSidebar />
+      </v-col>
+    </template>
   </v-row>
 </template>
 
@@ -36,8 +56,10 @@ import TheMainUser from "../components/TheMainUser";
 import TheSelectedStream from "../components/TheSelectedStream";
 import UserList from "../components/UserList";
 import TheSidebar from "../components/TheSidebar";
+import mobile from '../mixin/mobile'
 
 export default {
+  mixins: [mobile],
   components: {
     TheMainUser,
     TheSelectedStream,
@@ -46,7 +68,7 @@ export default {
   },
   data() {
     return {
-      showSidebar: true
+      showSidebar: false
     };
   },
   beforeMount() {
@@ -82,11 +104,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["isJanusInitialized", "users", "teamName", "account"]),
-    isMobile() {
-      return this.$vuetify.breakpoint.name == 'xs' || 
-        this.$vuetify.breakpoint.name == 'sm';
-    }
+    ...mapGetters(["isJanusInitialized", "users", "teamName", "account"])
   }
 };
 </script>

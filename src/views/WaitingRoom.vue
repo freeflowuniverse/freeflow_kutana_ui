@@ -1,6 +1,6 @@
 <template>
   <v-row align="center" justify="center">
-    <v-card loading width="500">
+    <v-card loading :width="isMobile ? 250: 500">
       <v-card-title>Joining team</v-card-title>
       <v-card-text>Waiting for approval...</v-card-text>
     </v-card>
@@ -9,8 +9,10 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import mobile from '../mixin/mobile';
 
 export default {
+  mixins: [mobile],
   methods: {
     ...mapActions(["requestAccess"])
   },
