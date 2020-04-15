@@ -1,6 +1,6 @@
 <template>
   <AspectRatio ar="4:3">
-    <video :src-object.prop.camel="stream" autoplay="autoplay" :muted="muted"></video>
+    <video ref="video" :src-object.prop.camel="stream"></video>
   </AspectRatio>
 </template>
 
@@ -21,9 +21,18 @@ export default {
       required: false
     }
   },
-  mounted() {},
+  mounted() {
+    this.$refs.video.muted = this.$props.muted;
+    this.$refs.video.play();
+  },
   computed: {},
-  methods: {}
+  methods: {},
+  watch: {
+    muted: function(newVal) {
+      this.$refs.video.muted = newVal;
+      console.log("this.$refs.video.muted, ", this.$refs.video.muted)
+    }
+  }
 };
 </script>
 

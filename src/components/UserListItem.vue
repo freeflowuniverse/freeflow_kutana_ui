@@ -39,8 +39,9 @@ export default {
   mounted() {},
   props: ["user", "userIndex"],
   methods: {
-    setMute(muted) {
-      this.muted = muted;
+    setMute() {
+      this.muted = !this.muted;
+      console.log("Muted ", this.muted)
     }
   },
   computed: {
