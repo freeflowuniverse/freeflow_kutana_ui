@@ -8,16 +8,18 @@
         <v-card-text>
           <v-row align="center">
             <v-col align="center">
-              <v-form @submit.prevent="joinRoom">
+              <v-form @submit.prevent="joinRoom" v-model="valid">
                 <v-text-field
                   filled
                   label="Invite url"
                   persistent-hint
                   v-model="inviteUrl"
                   hint="Paste the url you received"
+                  :rules="inviteUrlRules"
+                  required
                 >
                   <template v-slot:append>
-                    <v-btn small text type="submit">Join room</v-btn>
+                    <v-btn :disabled="!valid" small text type="submit">Join room</v-btn>
                   </template>
                 </v-text-field>
               </v-form>
@@ -37,29 +39,28 @@
 export default {
   data() {
     return {
+      valid: false,
+      inviteUrlRules: [
+        url => !!url || 'Invite url is required',
+        url => new RegExp(`${window.location.href}room/invite/(.*)`).test(url) || 'Invalid invite url'
+      ],
       inviteUrl: null
     };
   },
   methods: {
     ...mapActions(['createTeam']),
     create() {
-      this.createTeam(),
+      this.createTeam()
       this.$router.push({name: 'room'})
     },
     joinRoom() {
-      let baseUrl = window.location.href;
-      if (baseUrl.charAt(baseUrl.length - 1) != "/") {
-        baseUrl += "/";
-      }
-      let reg = new RegExp(`${baseUrl}room/invite/(.*)`);
-      if (this.inviteUrl.match(reg) && this.inviteUrl.match(reg)[1]) {
-        this.$router.push({
-          name: "waitingRoom",
-          params: {
-            token: this.inviteUrl.match(reg)[1]
-          }
-        });
-      }
+      const reg = new RegExp(`${window.location.href}room/invite/(.*)`)
+      this.$router.push({
+        name: "waitingRoom",
+        params: {
+          token: this.inviteUrl.match(reg)[1]
+        }
+      });
     }
   }
 };

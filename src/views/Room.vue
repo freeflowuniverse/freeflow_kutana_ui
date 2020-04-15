@@ -1,16 +1,21 @@
 <template>
   <v-row class="home pl-2">
-    <v-col :cols="showSidebar ? 7 : 10" class="pr-0">
-      <TheSelectedStream />
-    </v-col>
-    <v-col cols="2" class="userList">
-      <div class="inner">
-        <!-- TODO Hide user-list if users.length < 3 (yourself included) -->
-        <UserList />
-      </div>
-      <TheMainUser />
-    </v-col>
-    <v-col cols="3" class="pa-0" v-if="showSidebar">
+    <template v-if="!showSidebar || !isMobile">
+      <v-col :cols="showSidebar ? 7 : 10" class="pr-0">
+        <TheSelectedStream />
+      </v-col>
+      <v-col cols="2" class="userList">
+        <div class="inner">
+          <!-- TODO Hide user-list if users.length < 3 (yourself included) -->
+          <UserList />
+        </div>
+        <TheMainUser />
+      </v-col>
+      <v-col cols="3" class="pa-0" v-if="showSidebar">
+        <TheSidebar />
+      </v-col>
+    </template>
+    <v-col cols="12" class="pa-0" v-if="showSidebar && isMobile">
       <TheSidebar />
     </v-col>
   </v-row>
@@ -68,7 +73,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["isJanusInitialized", "teamMembers", "teamName", "account"])
+    ...mapGetters(["isJanusInitialized", "teamMembers", "teamName", "account"]),
+    isMobile() {
+      return this.$vuetify.breakpoint.name == 'xs' || 
+        this.$vuetify.breakpoint.name == 'sm';
+    }
   }
 };
 </script>
