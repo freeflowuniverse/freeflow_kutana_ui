@@ -65,6 +65,7 @@ export default {
   top: 50%;
   transform: translate(-50%, -50%);
 }
+
 .UserListItemControls {
   position: absolute;
   bottom: 0;
@@ -74,6 +75,11 @@ export default {
 .stream .content {
   min-height: 200px;
 }
+
+.stream > div {
+  border: 5px solid transparent;
+}
+
 .selected .stream > div {
   border: 5px solid var(--primary-color);
 }

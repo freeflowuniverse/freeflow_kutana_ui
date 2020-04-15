@@ -1,5 +1,5 @@
 <template>
-  <JanusVideo v-if="userVideoStream" :stream="userVideoStream"></JanusVideo>
+    <JanusVideo v-if="userVideoStream" :stream="userVideoStream"></JanusVideo>
 </template>
 
 <script>
