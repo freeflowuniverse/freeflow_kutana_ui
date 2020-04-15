@@ -1,16 +1,5 @@
 <template>
-  <section class="stream fill-height black">
-    <v-card class="wrapper">
-      <div
-        v-if="selectedUser && selectedUser.username"
-        class="name primary pa-2 white--text"
-      >{{selectedUser.username}}</div>
-      <div id="selectedStream" class="relative">
-        <JanusVideo v-if="userVideoStream" :stream="userVideoStream"></JanusVideo>
-        <JanusVideo v-else-if="userScreenshareStream" :stream="userScreenshareStream"></JanusVideo>
-      </div>
-    </v-card>
-  </section>
+  <JanusVideo v-if="userVideoStream" :stream="userVideoStream"></JanusVideo>
 </template>
 
 <script>
@@ -43,20 +32,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.name {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  z-index: 1;
-}
-
-#selectedStream {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: black;
-}
-</style>
