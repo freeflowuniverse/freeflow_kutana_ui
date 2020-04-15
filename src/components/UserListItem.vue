@@ -41,7 +41,6 @@ export default {
   methods: {
     setMute() {
       this.muted = !this.muted;
-      console.log("Muted ", this.muted)
     }
   },
   computed: {
@@ -50,7 +49,7 @@ export default {
       if (!this.$props.user || !this.$props.user.stream) {
         return false;
       }
-      
+
       return this.$props.user.stream;
     }
   }

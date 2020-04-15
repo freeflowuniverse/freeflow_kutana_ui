@@ -22,7 +22,7 @@ import moment from "moment";
 import TheChatMessage from "./TheChatMessage";
 import TheChatInput from "./TheChatInput";
 import { mapGetters } from "vuex";
-import autoScroll from "../directives/autoScroll"
+import autoScroll from "../directives/autoScroll";
 
 export default {
   directives: {
@@ -63,6 +63,7 @@ export default {
 .chat {
   height: 100%;
   position: relative;
+  padding: 5px;
 }
 .messages {
   position: absolute;

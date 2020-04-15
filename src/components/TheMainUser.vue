@@ -27,7 +27,7 @@ export default {
     ...mapGetters(["users"]),
 
     userVideoStream() {
-      if(!this.users) {
+      if (!this.users) {
         return false;
       }
 
@@ -35,10 +35,10 @@ export default {
     },
 
     userScreenshareStream() {
-      if(!this.users) {
+      if (!this.users) {
         return false;
       }
-      
+
       return this.users[0].screenShareStream;
     }
   }

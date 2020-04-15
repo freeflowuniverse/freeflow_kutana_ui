@@ -1,6 +1,13 @@
 <template>
   <AspectRatio ar="4:3">
-    <video ref="video" :src-object.prop.camel="stream"></video>
+    <div
+      :class="this.$props.stream.getVideoTracks().length ? 'video-present janus-video' : 'video-not-present janus-video'"
+    >
+      <video ref="video" :src-object.prop.camel="stream"></video>
+      <v-row align="center" justify="center" class="video-cam-off">
+        <v-icon color="white">videocam_off</v-icon>
+      </v-row>
+    </div>
   </AspectRatio>
 </template>
 
@@ -30,16 +37,26 @@ export default {
   watch: {
     muted: function(newVal) {
       this.$refs.video.muted = newVal;
-      console.log("this.$refs.video.muted, ", this.$refs.video.muted)
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+
 video {
   width: 100%;
   height: 100%;
   object-fit: fill;
+  background-color: black;
+}
+
+.video-not-present {
+  background-color: lightslategrey;
+}
+
+.video-not-present video,
+.video-present .video-cam-off {
+  display: none;
 }
 </style>

@@ -28,7 +28,6 @@ export default {
 .sideBar {
   position: relative;
   height: 100%;
-  overflow: hidden;
 }
 .inner {
   height: calc(100% - 64px);

@@ -1,5 +1,5 @@
 <template>
-  <v-row class="home pl-2">
+  <v-row class="home">
     <template v-if="!showSidebar || !isMobile">
       <v-col :cols="showSidebar ? 9 : 12" v-if="users.length == 1" class="home">
         <v-row align="center" class="fill-height">
@@ -10,7 +10,7 @@
         </v-row>
         <TheMainUser />
       </v-col>
-      <v-col v-if="users.length > 1" :cols="showSidebar ? 7 : 10" class="pr-0">
+      <v-col class="selected-stream-wrapper" v-if="users.length > 1" :cols="showSidebar ? 7 : 10">
         <TheSelectedStream />
       </v-col>
       <v-col v-if="users.length > 1" cols="2" class="userList">
@@ -97,17 +97,25 @@ export default {
   height: 100%;
   max-height: 100%;
 }
+
 .inner {
   position: absolute;
   height: calc(100% - 270px);
   width: 100%;
   overflow-y: auto;
   right: 0;
-  // top: 0;
 }
+
 .userList {
   position: relative;
   width: 100%;
   height: 100%;
+}
+
+.selected-stream-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
 }
 </style>
