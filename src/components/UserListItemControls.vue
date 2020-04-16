@@ -21,7 +21,6 @@ export default {
     };
   },
   mounted() {
-    console.log(`======`)
   },
   methods: { 
     toggleMute () {

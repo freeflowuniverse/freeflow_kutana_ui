@@ -1,5 +1,5 @@
 <template>
-  <section :class="`userListItem ${selectedUser.username === user.username ? 'selected' : ''}`">
+  <section :class="`userListItem ${selectedUser !== null && selectedUser.username === user.username ? 'selected' : ''}`">
     <v-card class="stream black">
       <v-card-title class="primary white--text body-1 mb-0 py-1">
         <div class="text-center" style="width:100%">{{user.username}}</div>
@@ -36,7 +36,8 @@ export default {
     UserListItemControls,
     JanusVideo
   },
-  mounted() {},
+  mounted() {
+  },
   props: ["user", "userIndex"],
   methods: {
     setMute() {
@@ -64,6 +65,10 @@ export default {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+}
+
+.userListItem {
+  padding: 5px;
 }
 
 .UserListItemControls {

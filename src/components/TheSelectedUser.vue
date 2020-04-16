@@ -20,7 +20,6 @@ export default {
     ...mapGetters(["selectedUser", "screenShare"]),
 
     stream() {
-      console.log("STREAM HERE !!! ", this.userScreenshareStream)
       return this.userScreenshareStream
         ? this.userScreenshareStream
         : this.userVideoStream;
