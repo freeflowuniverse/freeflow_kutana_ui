@@ -1,10 +1,10 @@
 <template>
-  <div class="stream-wrapper">
+  <div class="stream-wrapper black">
     <div
       v-if="selectedUser && selectedUser.username"
       class="name primary pa-2 white--text"
     >{{selectedUser.username}}</div>
-    <JanusVideo v-if="stream" :stream="stream" :muted="true" :show-controls="this.userScreenshareStream"></JanusVideo>
+    <JanusVideo id="selectedStream" v-if="stream" :stream="stream" :muted="true" :show-controls="this.userScreenshareStream"></JanusVideo>
   </div>
 </template>
 
@@ -47,6 +47,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+#selectedStream {
+  position: relative;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .name {
   position: absolute;
   bottom: 0;
@@ -57,5 +64,6 @@ export default {
 .stream-wrapper {
   position: relative;
   flex: 1;
+  height: 100%;
 }
 </style>

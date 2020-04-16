@@ -112,7 +112,7 @@ export default {
       width: 100%;
       max-width: 550px;
       right: 0;
-      bottom: 25px;
+      bottom: 0;
     }
   }
 
