@@ -1,9 +1,29 @@
 <template>
   <AspectRatio ar="4:3">
     <div
+      ref="videoAndMore"
+      @fullscreenchange="fullScreenChanged"
       :class="this.$props.stream.getVideoTracks().length ? 'video-present janus-video' : 'video-not-present janus-video'"
     >
-      <video ref="video" :src-object.prop.camel="stream"></video>
+      <v-btn
+        v-if="showControls"
+        fab
+        small
+        :absolute="!isFullScreen"
+        :fixed="isFullScreen"
+        text
+        right
+        class="semiBlack mt-3"
+        @click="toggleFullscreen"
+      >
+        <v-icon color="white" v-if="!isFullScreen">fullscreen</v-icon>
+        <v-icon color="white" v-else>fullscreen_exit</v-icon>
+      </v-btn>
+      <video
+        ref="video"
+        :src-object.prop.camel="stream"
+        :class="isFullScreen? 'fullScreeen' : ''"
+      ></video>
       <v-row align="center" justify="center" class="video-cam-off">
         <v-icon color="white">videocam_off</v-icon>
       </v-row>
@@ -19,6 +39,10 @@ export default {
     AspectRatio
   },
   props: {
+    showControls: {
+      type: Boolean,
+      required: false
+    },
     stream: {
       type: MediaStream,
       required: true
@@ -32,8 +56,35 @@ export default {
     this.$refs.video.muted = this.$props.muted;
     this.$refs.video.play();
   },
-  computed: {},
-  methods: {},
+  data() {
+    return {
+      isFullScreen: false
+    };
+  },
+  methods: {
+    fullScreenChanged() {
+      this.isFullScreen = !this.isFullScreen;
+    },
+    toggleFullscreen() {
+      if (this.isFullScreen) {
+        document.exitFullscreen();
+      } else {
+        var elem = this.$refs.videoAndMore;
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+          /* Firefox */
+          elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+          /* Chrome, Safari & Opera */
+          elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+          /* IE/Edge */
+          elem.msRequestFullscreen();
+        }
+      }
+    }
+  },
   watch: {
     muted: function(newVal) {
       this.$refs.video.muted = newVal;
@@ -43,7 +94,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.semiBlack {
+  background: rgba(0, 0, 0, 0.5);
+}
+video.fullScreeen {
+  object-fit: contain;
+}
 video {
   width: 100%;
   height: 100%;
@@ -57,6 +113,9 @@ video {
 
 .video-not-present video,
 .video-present .video-cam-off {
+  display: none;
+}
+::-webkit-media-controls {
   display: none;
 }
 </style>
