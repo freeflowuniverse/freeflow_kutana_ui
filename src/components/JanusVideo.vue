@@ -43,7 +43,8 @@ export default {
   props: {
     isScreenShare: {
       type: Boolean,
-      required: false
+      required: false,
+      default: false
     },
     showControls: {
       type: Boolean,

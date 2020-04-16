@@ -9,7 +9,7 @@
       v-if="stream"
       :stream="stream"
       :muted="true"
-      :isScreenShare="this.userScreenshareStream !== null"
+      :isScreenShare="this.userScreenshareStream !== false"
       :show-controls="this.userScreenshareStream"
     ></JanusVideo>
   </div>

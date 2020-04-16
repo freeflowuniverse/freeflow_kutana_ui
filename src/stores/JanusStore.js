@@ -497,7 +497,7 @@ const janusHelpers = {
       var create = {
         request: "create",
         description: "screenshare",
-        bitrate: 4096000,
+        bitrate: 1024000,
         bitrate_cap: true,
         publishers: 1
       };
@@ -852,7 +852,7 @@ const janusHelpers = {
       permanent: false,
       description: me.name,
       is_private: true,
-      bitrate: 2048000,
+      bitrate: 1024000,
       bitrate_cap: true,
       publishers: 16
     };
