@@ -1,5 +1,5 @@
 <template>
-  <section :class="`userListItem ${selectedUser.username === user.username ? 'selected' : ''}`">
+  <section :class="`userListItem ma-3 ${selectedUser.username === user.username ? 'selected' : ''}`">
     <v-card class="stream black">
       <v-card-title class="primary white--text body-1 mb-0 py-1">
         <div class="text-center" style="width:100%">{{user.username}}</div>

@@ -34,16 +34,3 @@ export default {
   }
 };
 </script>
-<style lang="scss">
-#app {
-  max-height: 100vh;
-}
-.chatMessage .content a {
-  color: white;
-  text-decoration: none;
-}
-.contains-task-list {
-  list-style: none;
-}
-
-</style>
