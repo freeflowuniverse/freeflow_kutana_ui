@@ -3,7 +3,6 @@ import moment from "moment";
 import ffcService from "../services/ffcService";
 export default {
   state: {
-    teamMembers: null,
     isGeneratingInvite: true,
     isAccepted: false,
     teamName: window.localStorage.getItem("teamName") || null,
@@ -12,9 +11,7 @@ export default {
     setIsGeneratingInvite(state, loading) {
       state.isGeneratingInvite = loading;
     },
-    setMembers(state, members) {
-      state.teamMembers = members;
-    },
+    
     setAccepted(state, accepted) {
       state.isAccepted = accepted;
     },
@@ -32,7 +29,6 @@ export default {
       console.log(`context.getters.teamName`, context.getters.teamName)
       ffcService.getTeamInfo(context.getters.teamName).then((result) => {
         let data = result.data;
-        context.commit("setMembers", data.members);
         context.commit("setMessages", data.messages);
         context.commit("setIsGeneratingInvite", false);
       });
@@ -61,9 +57,6 @@ export default {
   getters: {
     teamName: (state) => {
       return state.teamName;
-    },
-    teamMembers: (state) => {
-      return state.teamMembers;
     },
     isGeneratingInvite: (state) => {
       return state.isGeneratingInvite;

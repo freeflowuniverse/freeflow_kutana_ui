@@ -115,7 +115,7 @@ export default {
     this.$root.$on('showInviteUser', this.showAddUserDialog)
   },
   computed: {
-    ...mapGetters(["users", "teamName", "isGeneratingInvite", "teamMembers"]),
+    ...mapGetters(["users", "teamName", "isGeneratingInvite"]),
     inviteLink() {
       let baseUrl = window.location.href;
       if (baseUrl.charAt(baseUrl.length - 1) != "/") {
