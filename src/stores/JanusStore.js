@@ -2,6 +2,7 @@
 import { Janus } from "janus-gateway";
 import config from "../../public/config";
 import socketService from "../services/socketService";
+import router from "../plugins/router"
 import vm from "../main";
 const logLayoutString = "color: #00600f";
 
@@ -34,34 +35,8 @@ export default {
     screenShare: null
   },
   mutations: {
-    initializeJanus(state) {
-      // TODO: show snackbar on error
-      Janus.init({
-        debug: "all",
-        callback: function() {
-          if (!Janus.isWebrtcSupported()) {
-            console.error("No WebRTC support... ");
-            return;
-          }
-
-          state.janus = new Janus({
-            server: config.janusServer,
-            success: function() {
-              console.log("%c Janus success callback", logLayoutString);
-              janusHelpers.videoRoom.onJanusCreateSuccess(state);
-              janusHelpers.screenShare.onJanusCreateSuccess(state);
-            },
-            error: function(error) {
-              console.error("Janus error callback");
-              janusHelpers.videoRoom.onJanusCreateError(state, error);
-            },
-            destroyed: function() {
-              console.error("Janus destroyed callback");
-              janusHelpers.videoRoom.onJanusCreateDestroyed(state);
-            }
-          });
-        }
-      });
+    initializeJanus(state, janus) {
+      state.janus = janus
     },
     addUser(state) {
       state.count++;
@@ -83,7 +58,35 @@ export default {
   },
   actions: {
     initializeJanus(context) {
-      context.commit("initializeJanus");
+      // TODO: show snackbar on error
+      Janus.init({
+        debug: "all",
+        callback: function () {
+          if (!Janus.isWebrtcSupported()) {
+            console.error("No WebRTC support... ");
+            return;
+          }
+
+          const janus = new Janus({
+            server: config.janusServer,
+            success: function () {
+              console.log("%c Janus success callback", logLayoutString);
+              janusHelpers.videoRoom.onJanusCreateSuccess(context.state);
+              janusHelpers.screenShare.onJanusCreateSuccess(context.state);
+            },
+            error: function (error) {
+              console.error("Janus error callback");
+              janusHelpers.videoRoom.onJanusCreateError(context, error);
+            },
+            destroyed: function () {
+              console.error("Janus destroyed callback");
+              janusHelpers.videoRoom.onJanusCreateDestroyed(context.state);
+            }
+          });
+
+          context.commit("initializeJanus", janus);
+        }
+      });
     },
     addUser(context) {
       context.commit("addUser");
@@ -116,7 +119,7 @@ const janusHelpers = {
       state.janus.attach({
         plugin: "janus.plugin.videoroom",
         opaqueId: state.opaqueId,
-        success: function(pluginHandle) {
+        success: function (pluginHandle) {
           console.log(
             "%c Janus success janus.plugin.videoroom callback",
             logLayoutString
@@ -124,40 +127,40 @@ const janusHelpers = {
           state.users[0].pluginHandle = pluginHandle;
           Janus.log(
             "Plugin attached!(videoRoom) (" +
-              state.users[0].pluginHandle.getPlugin() +
-              ", id=" +
-              state.users[0].pluginHandle.getId() +
-              ")"
+            state.users[0].pluginHandle.getPlugin() +
+            ", id=" +
+            state.users[0].pluginHandle.getId() +
+            ")"
           );
           Janus.log("  -- This is a publisher/manager");
 
           // Ask the users name / check if they are logged in.
           janusHelpers.registerUsername(state);
         },
-        error: function(error) {
+        error: function (error) {
           Janus.error("  -- Error attaching plugin...", error);
         },
-        consentDialog: function(on) {
+        consentDialog: function (on) {
           Janus.debug(
             "Consent dialog should be " + (on ? "on" : "off") + " now"
           );
         },
-        mediaState: function(medium, on) {
+        mediaState: function (medium, on) {
           console.log("mediaState");
           Janus.log(
             "Janus " + (on ? "started" : "stopped") + " receiving our " + medium
           );
         },
-        webrtcState: function(on) {
+        webrtcState: function (on) {
           console.log("webrtcState");
           Janus.log(
             "Janus says our WebRTC PeerConnection is " +
-              (on ? "up" : "down") +
-              " now"
+            (on ? "up" : "down") +
+            " now"
           );
           // state.users[0].pluginHandle.send({ "message": { "request": "configure", "bitrate": 0 } });
         },
-        onmessage: function(msg, jsep) {
+        onmessage: function (msg, jsep) {
           console.log("jsep: ", jsep);
 
           Janus.debug(" ::: Got a message (publisher) :::");
@@ -174,9 +177,9 @@ const janusHelpers = {
               state.myPrivateId = msg["private_id"];
               Janus.log(
                 "Successfully joined room " +
-                  msg["room"] +
-                  " with ID " +
-                  state.myId
+                msg["room"] +
+                " with ID " +
+                state.myId
               );
               janusHelpers.publishOwnFeed(state, true);
               // Any new feed to attach to?
@@ -194,14 +197,14 @@ const janusHelpers = {
                   let video = list[f]["video_codec"];
                   Janus.debug(
                     "  >> [" +
-                      id +
-                      "] " +
-                      display +
-                      " (audio: " +
-                      audio +
-                      ", video: " +
-                      video +
-                      ")"
+                    id +
+                    "] " +
+                    display +
+                    " (audio: " +
+                    audio +
+                    ", video: " +
+                    video +
+                    ")"
                   );
                   janusHelpers.newRemoteFeed(state, id, display, audio, video);
                 }
@@ -226,14 +229,14 @@ const janusHelpers = {
                   let video = list[f]["video_codec"];
                   Janus.debug(
                     "  >> [" +
-                      id +
-                      "] " +
-                      display +
-                      " (audio: " +
-                      audio +
-                      ", video: " +
-                      video +
-                      ")"
+                    id +
+                    "] " +
+                    display +
+                    " (audio: " +
+                    audio +
+                    ", video: " +
+                    video +
+                    ")"
                   );
                   janusHelpers.newRemoteFeed(state, id, display, audio, video);
                 }
@@ -258,10 +261,10 @@ const janusHelpers = {
                 if (remoteFeed != null) {
                   Janus.debug(
                     "Feed " +
-                      remoteFeed.rfid +
-                      " (" +
-                      remoteFeed.rfdisplay +
-                      ") has left the room, detaching"
+                    remoteFeed.rfid +
+                    " (" +
+                    remoteFeed.rfdisplay +
+                    ") has left the room, detaching"
                   );
                   // $('#remote' + remoteFeed.rfindex).empty().hide();
                   // $('#videoremote' + remoteFeed.rfindex).empty();
@@ -294,10 +297,10 @@ const janusHelpers = {
                 if (remoteFeed != null) {
                   Janus.debug(
                     "Feed " +
-                      remoteFeed.rfid +
-                      " (" +
-                      remoteFeed.rfdisplay +
-                      ") has left the room, detaching"
+                    remoteFeed.rfid +
+                    " (" +
+                    remoteFeed.rfdisplay +
+                    ") has left the room, detaching"
                   );
                   // $('#remote' + remoteFeed.rfindex).empty().hide();
                   // $('#videoremote' + remoteFeed.rfindex).empty();
@@ -349,7 +352,7 @@ const janusHelpers = {
             }
           }
         },
-        onlocalstream: function(stream) {
+        onlocalstream: function (stream) {
           console.log("!!onlocalstream");
           state.users[0].stream = stream;
           Janus.debug(stream);
@@ -357,9 +360,15 @@ const janusHelpers = {
       });
     },
 
-    onJanusCreateError(state, error) {
+    onJanusCreateError(context, error) {
       Janus.error(error);
-      console.log("onJanusCreateError: ", state, error);
+
+      router.push({ name: 'home' }).then(() => {
+        context.commit("setSnackbarMessage", {
+          type: "error",
+          text: "Oops, our server seems to have a problem."
+        });
+      })
     },
 
     onJanusCreateDestroyed(state) {
@@ -371,36 +380,36 @@ const janusHelpers = {
       state.janus.attach({
         plugin: "janus.plugin.videoroom",
         opaqueId: state.opaqueId,
-        success: function(pluginHandle) {
+        success: function (pluginHandle) {
           state.users[0].screenSharePluginHandle = pluginHandle;
           Janus.log(
             "screenShare Plugin attached!(Screenshare) (" +
-              state.users[0].screenSharePluginHandle.getPlugin() +
-              ", id=" +
-              state.users[0].screenSharePluginHandle.getId() +
-              ")"
+            state.users[0].screenSharePluginHandle.getPlugin() +
+            ", id=" +
+            state.users[0].screenSharePluginHandle.getId() +
+            ")"
           );
         },
-        error: function(error) {
+        error: function (error) {
           Janus.error("  -- Error attaching plugin...", error);
           console.log("We got an Error??? ");
         },
-        consentDialog: function(on) {
+        consentDialog: function (on) {
           Janus.debug(
             "Consent dialog should be " + (on ? "on" : "off") + " now"
           );
         },
-        webrtcState: function(on) {
+        webrtcState: function (on) {
           Janus.log(
             "Janus says our WebRTC PeerConnection is " +
-              (on ? "up" : "down") +
-              " now"
+            (on ? "up" : "down") +
+            " now"
           );
           if (on) {
             console.log(
               "Your screen sharing session just started: pass the <b>" +
-                state.screenShareRoom +
-                "</b> session identifier to those who want to attend."
+              state.screenShareRoom +
+              "</b> session identifier to those who want to attend."
             );
             let teamName = window.localStorage.getItem("teamName");
             let user = JSON.parse(window.localStorage.getItem("account"));
@@ -415,7 +424,7 @@ const janusHelpers = {
             console.log("Your screen sharing session just stopped.");
           }
         },
-        onmessage: function(msg, jsep) {
+        onmessage: function (msg, jsep) {
           Janus.debug(" ::: Got a message (publisher) :::");
           Janus.debug(msg);
           console.log("Debugging entire Message: ", msg);
@@ -426,16 +435,16 @@ const janusHelpers = {
               state.screenShareMyId = msg["id"];
               Janus.log(
                 "Successfully joined room " +
-                  msg["room"] +
-                  " with ID " +
-                  state.screenShareMyId
+                msg["room"] +
+                " with ID " +
+                state.screenShareMyId
               );
 
               if (state.screenShareRole === "publisher") {
                 Janus.debug(
                   "Negotiating WebRTC stream for our screen (capture " +
-                    state.screenShareCapture +
-                    ")"
+                  state.screenShareCapture +
+                  ")"
                 );
                 state.users[0].screenSharePluginHandle.createOffer({
                   media: {
@@ -443,7 +452,7 @@ const janusHelpers = {
                     audioSend: true,
                     videoRecv: false
                   },
-                  success: function(jsep) {
+                  success: function (jsep) {
                     Janus.debug("Got publisher SDP!");
                     Janus.debug(jsep);
                     let publish = {
@@ -456,7 +465,7 @@ const janusHelpers = {
                       jsep: jsep
                     });
                   },
-                  error: function(error) {
+                  error: function (error) {
                     Janus.error("WebRTC error:", error);
                   }
                 });
@@ -523,7 +532,7 @@ const janusHelpers = {
             });
           }
         },
-        onlocalstream: function(stream) {
+        onlocalstream: function (stream) {
           console.log(" ::: Got a local stream :::");
           Janus.debug(" ::: Got a local stream :::");
           Janus.debug(stream);
@@ -531,10 +540,10 @@ const janusHelpers = {
           // state.users[0].screenShareStream = stream;
           state.screenShare = stream;
         },
-        onremotestream: function(stream) {
+        onremotestream: function (stream) {
           console.log("stream: ", stream);
         },
-        oncleanup: function() {
+        oncleanup: function () {
           Janus.log(" ::: Got a cleanup notification :::");
           console.log("We SHOULD CLEAN IT UP");
         }
@@ -554,7 +563,7 @@ const janusHelpers = {
 
       state.users[0].screenSharePluginHandle.send({
         message: create,
-        success: function(result) {
+        success: function (result) {
           var event = result["videoroom"];
           Janus.debug("Event: " + event);
           if (event != undefined && event != null) {
@@ -615,7 +624,7 @@ const janusHelpers = {
       // the following 'simulcast' property to pass to janus.js to true
       simulcast: false,
       simulcast2: false,
-      success: function(jsep) {
+      success: function (jsep) {
         Janus.debug("Got publisher SDP!");
         Janus.debug(jsep);
         var publish = { request: "configure", audio: useAudio, video: true };
@@ -631,7 +640,7 @@ const janusHelpers = {
         // refer to the text in janus.plugin.videoroom.jcfg for more details
         state.users[0].pluginHandle.send({ message: publish, jsep: jsep });
       },
-      error: function(error) {
+      error: function (error) {
         Janus.error("WebRTC error:", error);
         if (useAudio) {
           janusHelpers.publishOwnFeed(false);
@@ -650,15 +659,15 @@ const janusHelpers = {
     state.janus.attach({
       plugin: "janus.plugin.videoroom",
       opaqueId: state.opaqueId,
-      success: function(pluginHandle) {
+      success: function (pluginHandle) {
         remoteFeed = pluginHandle;
         remoteFeed.simulcastStarted = false;
         Janus.log(
           "Plugin attached!(videoroom) (" +
-            remoteFeed.getPlugin() +
-            ", id=" +
-            remoteFeed.getId() +
-            ")"
+          remoteFeed.getPlugin() +
+          ", id=" +
+          remoteFeed.getId() +
+          ")"
         );
         Janus.log("  -- This is a subscriber");
         // We wait for the plugin to send us an offer
@@ -689,11 +698,11 @@ const janusHelpers = {
         remoteFeed.videoCodec = video;
         remoteFeed.send({ message: subscribe });
       },
-      error: function(error) {
+      error: function (error) {
         Janus.error("  -- Error attaching plugin...", error);
         // bootbox.alert("Error attaching plugin... " + error);
       },
-      onmessage: function(msg, jsep) {
+      onmessage: function (msg, jsep) {
         Janus.debug(" ::: Got a message (subscriber) :::");
         Janus.debug(msg);
         var event = msg["videoroom"];
@@ -721,11 +730,11 @@ const janusHelpers = {
             // }
             Janus.log(
               "Successfully attached to feed " +
-                remoteFeed.rfid +
-                " (" +
-                remoteFeed.rfdisplay +
-                ") in room " +
-                msg["room"]
+              remoteFeed.rfid +
+              " (" +
+              remoteFeed.rfdisplay +
+              ") in room " +
+              msg["room"]
             );
             // $('#remote' + remoteFeed.rfindex).removeClass('hide').html(remoteFeed.rfdisplay).show();
           } else if (event === "event") {
@@ -757,33 +766,33 @@ const janusHelpers = {
             // Add data:true here if you want to subscribe to datachannels as well
             // (obviously only works if the publisher offered them in the first place)
             media: { audioSend: false, videoSend: false }, // We want recvonly audio/video
-            success: function(jsep) {
+            success: function (jsep) {
               Janus.debug("Got SDP!");
               Janus.debug(jsep);
               var body = { request: "start", room: state.roomId };
               remoteFeed.send({ message: body, jsep: jsep });
             },
-            error: function(error) {
+            error: function (error) {
               Janus.error("WebRTC error:", error);
               // bootbox.alert("WebRTC error... " + JSON.stringify(error));
             }
           });
         }
       },
-      webrtcState: function(on) {
+      webrtcState: function (on) {
         Janus.log(
           "Janus says this WebRTC PeerConnection (feed #" +
-            remoteFeed.rfindex +
-            ") is " +
-            (on ? "up" : "down") +
-            " now"
+          remoteFeed.rfindex +
+          ") is " +
+          (on ? "up" : "down") +
+          " now"
         );
       },
-      onlocalstream: function(stream) {
+      onlocalstream: function (stream) {
         // The subscriber stream is recvonly, we don't expect anything here
         console.log("We shouldnt be here: ", stream);
       },
-      onremotestream: function(stream) {
+      onremotestream: function (stream) {
         Janus.debug("Remote feed #" + remoteFeed.rfindex);
         // hier
         var AudioContext =
@@ -800,7 +809,7 @@ const janusHelpers = {
           microphone.connect(analyser);
           analyser.connect(javascriptNode);
           javascriptNode.connect(audioContext.destination);
-          javascriptNode.onaudioprocess = function() {
+          javascriptNode.onaudioprocess = function () {
             var array = new Uint8Array(analyser.frequencyBinCount);
             analyser.getByteFrequencyData(array);
             var values = 0;
@@ -894,7 +903,7 @@ const janusHelpers = {
         //     }, 1000);
         // }
       },
-      oncleanup: function() {
+      oncleanup: function () {
         Janus.log(
           " ::: Got a cleanup notification (remote feed " + id + ") :::"
         );
@@ -925,14 +934,14 @@ const janusHelpers = {
     state.janus.attach({
       plugin: "janus.plugin.videoroom",
       opaqueId: state.opaqueId,
-      success: function(pluginHandle) {
+      success: function (pluginHandle) {
         remoteFeed = pluginHandle;
         Janus.log(
           "Plugin attached!(Screenshare) (" +
-            remoteFeed.getPlugin() +
-            ", id=" +
-            remoteFeed.getId() +
-            ")"
+          remoteFeed.getPlugin() +
+          ", id=" +
+          remoteFeed.getId() +
+          ")"
         );
         Janus.log("  -- This is a subscriber");
         // We wait for the plugin to send us an offer
@@ -944,11 +953,11 @@ const janusHelpers = {
         };
         remoteFeed.send({ message: listen });
       },
-      error: function(error) {
+      error: function (error) {
         Janus.error("  -- Error attaching plugin...", error);
         // bootbox.alert("Error attaching plugin... " + error);
       },
-      onmessage: function(msg, jsep) {
+      onmessage: function (msg, jsep) {
         Janus.debug(" ::: Got a message (listener) :::");
         Janus.debug(msg);
         var event = msg["videoroom"];
@@ -968,11 +977,11 @@ const janusHelpers = {
             remoteFeed.rfdisplay = display;
             Janus.log(
               "Successfully attached to feed " +
-                id +
-                " (" +
-                display +
-                ") in room " +
-                msg["room"]
+              id +
+              " (" +
+              display +
+              ") in room " +
+              msg["room"]
             );
             // $('#screenmenu').hide();
             // $('#room').removeClass('hide').show();
@@ -987,24 +996,24 @@ const janusHelpers = {
           remoteFeed.createAnswer({
             jsep: jsep,
             media: { audioSend: false, videoSend: false }, // We want recvonly audio/video
-            success: function(jsep) {
+            success: function (jsep) {
               Janus.debug("Got SDP!");
               Janus.debug(jsep);
               var body = { request: "start", room: state.screenShareRoom };
               remoteFeed.send({ message: body, jsep: jsep });
             },
-            error: function(error) {
+            error: function (error) {
               Janus.error("WebRTC error:", error);
               // bootbox.alert("WebRTC error... " + error);
             }
           });
         }
       },
-      onlocalstream: function(stream) {
+      onlocalstream: function (stream) {
         console.log(stream);
         // The subscriber stream is recvonly, we don't expect anything here
       },
-      onremotestream: function(stream) {
+      onremotestream: function (stream) {
         // if ($('#screenvideo').length === 0) {
         //     // No remote video yet
         //     $('#screencapture').append('<video class="rounded centered" id="waitingvideo" width="100%" height="100%" />');
@@ -1039,7 +1048,7 @@ const janusHelpers = {
         // state.screenShare = stream
         // Janus.attachMediaStream($('#screenvideo').get(0), stream);
       },
-      oncleanup: function() {
+      oncleanup: function () {
         Janus.log(
           " ::: Got a cleanup notification (remote feed " + id + ") :::"
         );

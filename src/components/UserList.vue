@@ -1,8 +1,12 @@
 <template>
   <section>
-    <template v-for="(user, index) in users">
-      <UserListItem @click.native="selectStream(user)" v-if="index" :user=user :userIndex=index :key="index" class="mb-3 mx-3" />
-    </template>
+    <UserListItem
+      v-for="(user, index) in otherUsers"
+      @click.native="selectStream(user)"
+      :user="user"
+      :userIndex="index"
+      :key="index"
+    />
   </section>
 </template>
 
@@ -15,11 +19,13 @@ export default {
   components: {
     UserListItem
   },
-  mounted() {
-
-  },
+  mounted() {},
   computed: {
-    ...mapGetters(["users"])
+    ...mapGetters(["users"]),
+
+    otherUsers() {
+      return this.users.slice(1);
+    }
   },
   methods: {
     ...mapActions(["selectUser"]),

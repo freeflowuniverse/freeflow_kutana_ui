@@ -2,7 +2,7 @@
     <div class="vue-aspect-ratio" :style="componentStyle">
         <div class="vue-aspect-ratio__inner" :style="innerStyle">
             <div class="vue-aspect-ratio__content">
-                <slot />
+                <slot class="vue-aspect-ratio-slot" />
             </div>
         </div>
     </div>
@@ -47,6 +47,12 @@ export default {
 </script>
 
 <style scoped>
+
+.vue-aspect-ratio-slot {
+    width: 100%;
+    height: 100%;
+}
+
 .vue-aspect-ratio__inner {
     position: relative;
 }

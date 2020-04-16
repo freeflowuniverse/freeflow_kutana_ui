@@ -1,12 +1,11 @@
 <template>
-  <v-card class="stream-wrapper">
+  <div class="stream-wrapper">
     <div
       v-if="selectedUser && selectedUser.username"
       class="name primary pa-2 white--text"
     >{{selectedUser.username}}</div>
-      <JanusVideo v-if="userVideoStream" :stream="userVideoStream" :muted="true"></JanusVideo>
-      <JanusVideo v-else-if="userScreenshareStream" :stream="userScreenshareStream" :muted="true"></JanusVideo>
-  </v-card>
+    <JanusVideo v-if="stream" :stream="stream" :muted="true"></JanusVideo>
+  </div>
 </template>
 
 <script>
@@ -19,6 +18,14 @@ export default {
   },
   computed: {
     ...mapGetters(["selectedUser", "screenShare"]),
+
+    stream() {
+      console.log("STREAM HERE !!! ", this.userScreenshareStream)
+      return this.userScreenshareStream
+        ? this.userScreenshareStream
+        : this.userVideoStream;
+    },
+
     userVideoStream() {
       if (!this.selectedUser) {
         return false;
@@ -27,11 +34,11 @@ export default {
       return this.selectedUser.stream;
     },
     userScreenshareStream() {
-      if (!this.selectedUser) {
+      if (!this.screenShare) {
         return false;
       }
 
-      return this.selectedUser.screenShareStream;
+      return this.screenShare;
     }
   },
   methods: {
@@ -49,6 +56,7 @@ export default {
 }
 
 .stream-wrapper {
+  position: relative;
   flex: 1;
 }
 </style>

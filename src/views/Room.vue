@@ -1,46 +1,36 @@
 <template>
-  <v-row class="home">
-    <template v-if="!showSidebar || !isMobile">
-      <v-col :cols="showSidebar ? 9 : 12" v-if="users.length == 1" class="home">
-        <v-row align="center" class="fill-height">
-          <v-col align="center">
-            <h1 class="grey--text">There is no one here!</h1>
-            <v-btn color="primary" class="my-2" @click="$root.$emit('showInviteUser')">Invite them now!</v-btn>
-          </v-col>
-        </v-row>
-        <TheMainUser />
-      </v-col>
-      <v-col class="selected-stream-wrapper" v-if="users.length > 1" :cols="showSidebar ? 7 : 10">
-        <TheSelectedStream />
-      </v-col>
-      <v-col v-if="users.length > 1" cols="2" class="userList">
-        <div class="inner">
-          <!-- TODO Hide user-list if users.length < 3 (yourself included) -->
-          <UserList />
-        </div>
-        <TheMainUser />
-      </v-col>
-      <v-col cols="3" class="pa-0" v-if="showSidebar">
-        <TheSidebar />
-      </v-col>
-    </template>
-    <v-col cols="12" class="pa-0" v-if="showSidebar && isMobile">
-      <TheSidebar />
-    </v-col>
-  </v-row>
+  <div class="room-grid" :class="showSidebar ? '' : 'hide-sidebar'">
+    <div class="video-selected">
+      <TheSelectedUser></TheSelectedUser>
+    </div>
+
+    <div class="video-list">
+      <UserList></UserList>
+    </div>
+
+    <div class="video-main">
+      <div class="video-main__container">
+        <TheMainUser></TheMainUser>
+      </div>
+    </div>
+
+    <div class="chat">
+      <TheSidebar></TheSidebar>
+    </div>
+  </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
 import TheMainUser from "../components/TheMainUser";
-import TheSelectedStream from "../components/TheSelectedStream";
+import TheSelectedUser from "../components/TheSelectedUser";
 import UserList from "../components/UserList";
 import TheSidebar from "../components/TheSidebar";
 
 export default {
   components: {
     TheMainUser,
-    TheSelectedStream,
+    TheSelectedUser,
     TheSidebar,
     UserList
   },
@@ -60,13 +50,8 @@ export default {
     this.$root.$on("toggleSidebar", () => {
       this.showSidebar = !this.showSidebar;
     });
-    console.log(
-      "Checking if janus has been initialized: ",
-      this.isJanusInitialized
-    );
 
     if (!this.isJanusInitialized) {
-      console.log("Attempting to initialize janus ...");
       this.initializeJanus();
     }
   },
@@ -76,46 +61,61 @@ export default {
       let hash = 0;
       for (let i = 0; i < str.length; i++) {
         hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
-        hash = hash & hash; // Convert to 32bit integer
+        hash = hash & hash;
       }
       return hash;
     }
   },
   computed: {
-    ...mapGetters(["isJanusInitialized", "users", "teamName", "account"]),
-    isMobile() {
-      return this.$vuetify.breakpoint.name == 'xs' || 
-        this.$vuetify.breakpoint.name == 'sm';
-    }
+    ...mapGetters(["isJanusInitialized", "users", "teamName", "account"])
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.home {
-  position: relative;
-  height: 100%;
-  max-height: 100%;
-}
+.room-grid {
+  width: 100vw;
+  height: 100vh;
 
-.inner {
-  position: absolute;
-  height: calc(100% - 270px);
-  width: 100%;
-  overflow-y: auto;
-  right: 0;
-}
+  display: grid;
+  grid-template-columns: 1fr 400px 450px;
+  grid-template-rows: 1fr 300px;
+  gap: 8px 8px;
+  grid-template-areas: "selected list chat" "selected main chat";
 
-.userList {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
+  &.hide-sidebar {
+    grid-template-columns: 1fr 400px;
+    grid-template-areas: "selected list" "selected main";
 
-.selected-stream-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: black;
+    .chat {
+      display: none;
+    }
+  }
+
+  .video-selected {
+    grid-area: selected;
+  }
+
+  .video-list {
+    grid-area: list;
+    overflow-y: scroll;
+  }
+
+  .video-main {
+    position: relative;
+    grid-area: main;
+
+    .video-main__container {
+      position: absolute;
+      width: 100%;
+      max-width: 550px;
+      right: 0;
+      bottom: 25px;
+    }
+  }
+
+  .chat {
+    grid-area: chat;
+  }
 }
 </style>

@@ -1,14 +1,7 @@
 <template>
   <section class="stream">
-    <v-card class="wrapper black">
-      <span id="mainUser">
-        <JanusVideo v-if="userVideoStream" :stream="userVideoStream" muted></JanusVideo>
-      </span>
-      <span id="mainUserScreen">
-        <JanusVideo v-if="userScreenshareStream" :stream="userScreenshareStream" muted></JanusVideo>
-      </span>
-      <TheMainUserControls class="TheMainUserControls" />
-    </v-card>
+    <JanusVideo v-if="stream" :stream="stream" muted></JanusVideo>
+    <TheMainUserControls class="TheMainUserControls" />
   </section>
 </template>
 
@@ -25,6 +18,10 @@ export default {
   mounted() {},
   computed: {
     ...mapGetters(["users"]),
+
+    stream() {
+      return this.userScreenshareStream ? this.userScreenshareStream : this.userVideoStream;
+    },
 
     userVideoStream() {
       if (!this.users) {
@@ -47,25 +44,16 @@ export default {
 
 <style lang="scss" scoped>
 .stream {
-  position: absolute;
-  bottom: 18px;
-  right: 16px;
-  height: 250px;
-  width: 333px;
-  z-index: 3;
-}
-.wrapper {
   position: relative;
-  height: 100%;
-  width: 100%;
 }
+
 .TheMainUserControls {
   display: flex;
   position: absolute;
   width: auto;
   left: 50%;
   transform: translateX(-50%);
-  bottom: -16px;
+  bottom: 5px;
   z-index: 2;
 }
 </style>
