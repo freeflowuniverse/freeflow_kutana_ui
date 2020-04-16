@@ -571,7 +571,7 @@ const janusHelpers = {
   },
   newRemoteFeed(state, id, display, audio, video) {
     var remoteFeed = null;
-    var timeout = false;
+    var timeout = null;
     state.janus.attach({
       plugin: "janus.plugin.videoroom",
       opaqueId: state.opaqueId,
@@ -713,7 +713,7 @@ const janusHelpers = {
               !state.selectedUser ||
               (average > 20 && state.selectedUser && remoteFeed.rfdisplay != state.selectedUser.username)
             ) {
-              if (!timeout) clearTimeout(timeout);
+              if (timeout != null) clearTimeout(timeout);
               timeout = setTimeout(() => {
                 vm.$store.dispatch("selectUser", {
                   id: id,
