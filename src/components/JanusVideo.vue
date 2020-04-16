@@ -102,9 +102,11 @@ export default {
 .semiBlack {
   background: rgba(0, 0, 0, 0.5);
 }
+
 video.fullScreen {
   object-fit: fill;
 }
+
 .janus-video {
   height: 100%;
 }
@@ -128,6 +130,7 @@ video.screenshare {
 .video-present .video-cam-off {
   display: none;
 }
+
 ::-webkit-media-controls {
   display: none;
 }
