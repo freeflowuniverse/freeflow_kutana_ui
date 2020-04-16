@@ -19,7 +19,13 @@
         <v-icon color="white" v-if="!isFullScreen">fullscreen</v-icon>
         <v-icon color="white" v-else>fullscreen_exit</v-icon>
       </v-btn>
-      <video ref="video" :src-object.prop.camel="stream" :class="isFullScreen? 'fullScreeen' : ''" autoplay></video>
+      <video
+        ref="video"
+        :src-object.prop.camel="stream"
+        :class="[isFullScreen ? 'fullScreen' : '',
+                 isScreenShare ? 'screenshare' : '']"
+        autoplay
+      ></video>
       <v-row align="center" justify="center" class="video-cam-off">
         <v-icon color="white">videocam_off</v-icon>
       </v-row>
@@ -35,6 +41,10 @@ export default {
     AspectRatio
   },
   props: {
+    isScreenShare: {
+      type: Boolean,
+      required: false
+    },
     showControls: {
       type: Boolean,
       required: false
@@ -92,9 +102,11 @@ export default {
 .semiBlack {
   background: rgba(0, 0, 0, 0.5);
 }
-video.fullScreeen {
-  object-fit: contain;
+
+video.fullScreen {
+  object-fit: fill;
 }
+
 .janus-video {
   height: 100%;
 }
@@ -106,6 +118,10 @@ video {
   background-color: black;
 }
 
+video.screenshare {
+  object-fit: contain;
+}
+
 .video-not-present {
   background-color: lightslategrey;
 }
@@ -114,6 +130,7 @@ video {
 .video-present .video-cam-off {
   display: none;
 }
+
 ::-webkit-media-controls {
   display: none;
 }
