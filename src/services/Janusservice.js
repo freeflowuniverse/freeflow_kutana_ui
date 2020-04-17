@@ -1,7 +1,7 @@
 import { Janus } from "janus-gateway";
 import router from "../plugins/router";
 import socketService from "./socketService";
-import vm from "../main";
+import store from '../plugins/vuex';
 
 let inThrottle;
 
@@ -17,9 +17,9 @@ const hashString = str => {
 export const janusHelpers = {
   videoRoom: {
     onJanusCreateSuccess(state) {
-      state.janus.attach({
+      store.getters.janus.attach({
         plugin: "janus.plugin.videoroom",
-        opaqueId: state.opaqueId,
+        opaqueId: store.getters.opaqueId,
         success: pluginHandle => {
           state.users[0].pluginHandle = pluginHandle;
           janusHelpers.registerUsername(state);
@@ -45,12 +45,13 @@ export const janusHelpers = {
               }
 
               msg["publishers"].forEach(element => {
-                let id = element["id"];
-                let display = element["display"];
-                let audio = element["audio_codec"];
-                let video = element["video_codec"];
-
-                janusHelpers.newRemoteFeed(state, id, display, audio, video);
+                janusHelpers.newRemoteFeed(
+                  state,
+                  element["id"],
+                  element["display"],
+                  element["audio_codec"],
+                  element["video_codec"]
+                );
               });
               break;
             case "destroyed":
@@ -58,14 +59,15 @@ export const janusHelpers = {
               break;
             case "event":
               if (msg["publishers"]) {
-                let list = msg["publishers"];
-                for (const f in list) {
-                  let id = list[f]["id"];
-                  let display = list[f]["display"];
-                  let audio = list[f]["audio_codec"];
-                  let video = list[f]["video_codec"];
-                  janusHelpers.newRemoteFeed(state, id, display, audio, video);
-                }
+                msg["publishers"].forEach(element => {
+                  janusHelpers.newRemoteFeed(
+                    state,
+                    element["id"],
+                    element["display"],
+                    element["audio_codec"],
+                    element["video_codec"]
+                  );
+                });
                 break;
               }
 
@@ -74,11 +76,11 @@ export const janusHelpers = {
                 let remoteFeed = null;
                 for (let i = 1; i < 6; i++) {
                   if (
-                    state.feeds[i] != null &&
-                    state.feeds[i] !== undefined &&
-                    state.feeds[i].rfid === leaving
+                    store.getters.feeds[i] != null &&
+                    store.getters.feeds[i] !== undefined &&
+                    store.getters.feeds[i].rfid === leaving
                   ) {
-                    remoteFeed = state.feeds[i];
+                    remoteFeed = store.getters.feeds[i];
                     break;
                   }
                 }
@@ -92,17 +94,17 @@ export const janusHelpers = {
               if (msg["unpublished"]) {
                 let unpublished = msg["unpublished"];
                 if (unpublished === "ok") {
-                  state.users[0].pluginHandle.hangup();
+                  store.getters.users[0].pluginHandle.hangup();
                   return;
                 }
                 let remoteFeed = null;
                 for (let i = 1; i < 6; i++) {
                   if (
-                    state.feeds[i] != null &&
-                    state.feeds[i] !== undefined &&
-                    state.feeds[i].rfid === unpublished
+                    store.getters.feeds[i] != null &&
+                    store.getters.feeds[i] !== undefined &&
+                    store.getters.feeds[i].rfid === unpublished
                   ) {
-                    remoteFeed = state.feeds[i];
+                    remoteFeed = store.getters.feeds[i];
                     break;
                   }
                 }
@@ -122,14 +124,14 @@ export const janusHelpers = {
               break;
           }
           if (jsep) {
-            state.users[0].pluginHandle.handleRemoteJsep({ jsep: jsep });
+            store.getters.users[0].pluginHandle.handleRemoteJsep({ jsep: jsep });
 
             const audio = msg["audio_codec"];
 
             if (
-              state.users[0].stream &&
-              state.users[0].stream.getAudioTracks() &&
-              state.users[0].stream.getAudioTracks().length > 0 &&
+              store.getters.users[0].stream &&
+              store.getters.users[0].stream.getAudioTracks() &&
+              store.getters.users[0].stream.getAudioTracks().length > 0 &&
               !audio
             ) {
               // Handle the audio rejection
@@ -138,9 +140,9 @@ export const janusHelpers = {
             const video = msg["video_codec"];
 
             if (
-              state.users[0].stream &&
-              state.users[0].stream.getVideoTracks() &&
-              state.users[0].stream.getVideoTracks().length > 0 &&
+              store.getters.users[0].stream &&
+              store.getters.users[0].stream.getVideoTracks() &&
+              store.getters.users[0].stream.getVideoTracks().length > 0 &&
               !video
             ) {
               // Handle the video rejection
@@ -170,9 +172,9 @@ export const janusHelpers = {
   },
   screenShare: {
     onJanusCreateSuccess(state) {
-      state.janus.attach({
+      store.getters.janus.attach({
         plugin: "janus.plugin.videoroom",
-        opaqueId: state.opaqueId,
+        opaqueId: store.getters.opaqueId,
         success: pluginHandle => {
           state.users[0].screenSharePluginHandle = pluginHandle;
         },
@@ -188,7 +190,7 @@ export const janusHelpers = {
               channel: teamName,
               sender: user.name,
               type: "screenshare_started",
-              content: state.screenShareRoom
+              content: store.getters.screenShareRoom
             });
           }
         },
@@ -197,11 +199,10 @@ export const janusHelpers = {
           if (event) {
             switch (event) {
               case "joined":
-
-                if (state.screenShareRole === "publisher") {
-                  state.users[0].screenSharePluginHandle.createOffer({
+                if (store.getters.screenShareRole === "publisher") {
+                  store.getters.users[0].screenSharePluginHandle.createOffer({
                     media: {
-                      video: state.screenShareCapture,
+                      video: store.getters.screenShareCapture,
                       audioSend: true,
                       videoRecv: false
                     },
@@ -211,7 +212,7 @@ export const janusHelpers = {
                         audio: true,
                         video: true
                       };
-                      state.users[0].screenSharePluginHandle.send({
+                      store.getters.users[0].screenSharePluginHandle.send({
                         message: publish,
                         jsep: jsep
                       });
@@ -239,7 +240,7 @@ export const janusHelpers = {
                 break;
               case "event":
                 if (
-                  !(state.screenShareRole === "listener" && msg["publishers"])
+                  !(store.getters.screenShareRole === "listener" && msg["publishers"])
                 ) {
                   break;
                 }
@@ -256,7 +257,7 @@ export const janusHelpers = {
           }
 
           if (jsep !== undefined && jsep !== null) {
-            state.users[0].screenSharePluginHandle.handleRemoteJsep({
+            store.getters.users[0].screenSharePluginHandle.handleRemoteJsep({
               jsep: jsep
             });
           }
@@ -281,7 +282,7 @@ export const janusHelpers = {
         publishers: 1
       };
 
-      state.users[0].screenSharePluginHandle.send({
+      store.getters.users[0].screenSharePluginHandle.send({
         message: create,
         success: result => {
           const event = result["videoroom"];
@@ -291,11 +292,11 @@ export const janusHelpers = {
             let me = JSON.parse(window.localStorage.getItem("account"));
             const register = {
               request: "join",
-              room: state.screenShareRoom,
+              room: store.getters.screenShareRoom,
               ptype: "publisher",
               display: me.name
             };
-            state.users[0].screenSharePluginHandle.send({ message: register });
+            store.getters.users[0].screenSharePluginHandle.send({ message: register });
           }
         }
       });
@@ -307,25 +308,25 @@ export const janusHelpers = {
 
       const register = {
         request: "join",
-        room: state.screenShareRoom,
+        room: store.getters.screenShareRoom,
         ptype: "publisher",
         display: me.name
       };
 
       console.log(
         "Screen share joined: ",
-        state.users[0].screenSharePluginHandle
+        store.getters.users[0].screenSharePluginHandle
       );
-      state.users[0].screenSharePluginHandle.send({ message: register });
+      store.getters.users[0].screenSharePluginHandle.send({ message: register });
     },
     stopScreenShare(state) {
       console.log("Stopped screenshare ... ");
-      state.users[0].screenSharePluginHandle.detach();
+      store.getters.users[0].screenSharePluginHandle.detach();
       state.screenShare = null;
     }
   },
   publishOwnFeed(state, useAudio) {
-    state.users[0].pluginHandle.createOffer({
+    store.getters.users[0].pluginHandle.createOffer({
       media: {
         audioRecv: false,
         videoRecv: false,
@@ -336,7 +337,7 @@ export const janusHelpers = {
       simulcast2: false,
       success: jsep => {
         const publish = { request: "configure", audio: useAudio, video: true };
-        state.users[0].pluginHandle.send({ message: publish, jsep: jsep });
+        store.getters.users[0].pluginHandle.send({ message: publish, jsep: jsep });
       },
       error: error => {
         Janus.error("WebRTC error:", error);
@@ -349,9 +350,9 @@ export const janusHelpers = {
   newRemoteFeed(state, id, display, audio, video) {
     let remoteFeed = null;
 
-    state.janus.attach({
+    store.getters.janus.attach({
       plugin: "janus.plugin.videoroom",
-      opaqueId: state.opaqueId,
+      opaqueId: store.getters.opaqueId,
       success: pluginHandle => {
         remoteFeed = pluginHandle;
         remoteFeed.simulcastStarted = false;
@@ -364,7 +365,7 @@ export const janusHelpers = {
           room: room,
           ptype: "subscriber",
           feed: id,
-          private_id: state.myPrivateId
+          private_id: store.getters.myPrivateId
         };
         if (
           Janus.webRTCAdapter.browserDetails.browser === "safari" &&
@@ -385,8 +386,8 @@ export const janusHelpers = {
           switch (event) {
             case "attached":
               for (let i = 1; i < 16; i++) {
-                if (state.feeds[i] === undefined || state.feeds[i] === null) {
-                  state.feeds[i] = remoteFeed;
+                if (store.getters.feeds[i] === undefined || store.getters.feeds[i] === null) {
+                  store.getters.feeds[i] = remoteFeed;
                   remoteFeed.rfindex = i;
                   break;
                 }
@@ -409,7 +410,7 @@ export const janusHelpers = {
             jsep: jsep,
             media: { audioSend: false, videoSend: false },
             success: jsep => {
-              const body = { request: "start", room: state.roomId };
+              const body = { request: "start", room: store.getters.roomId };
               remoteFeed.send({ message: body, jsep: jsep });
             },
             error: error => {
@@ -445,14 +446,14 @@ export const janusHelpers = {
 
             const average = values / length;
             if (
-              !state.selectedUser ||
+              !store.getters.selectedUser ||
               (average > 20 &&
-                state.selectedUser &&
-                remoteFeed.rfdisplay !== state.selectedUser.username)
+                store.getters.selectedUser &&
+                remoteFeed.rfdisplay !== store.getters.selectedUser.username)
             ) {
               if (!inThrottle) {
                 inThrottle = true;
-                vm.$store.dispatch("selectUser", {
+                store.dispatch("selectUser", {
                   id: id,
                   username: remoteFeed.rfdisplay,
                   stream: stream,
@@ -465,7 +466,7 @@ export const janusHelpers = {
           };
         }
         if (
-          state.users.filter(user => user.username === remoteFeed.rfdisplay)
+          store.getters.users.filter(user => user.username === remoteFeed.rfdisplay)
             .length === 0
         ) {
           let newUser = {
@@ -481,7 +482,7 @@ export const janusHelpers = {
         }
       },
       oncleanup: () => {
-        state.users = state.users.filter(user => user.id !== id);
+        state.users = store.getters.users.filter(user => user.id !== id);
       }
     });
   },
@@ -489,14 +490,14 @@ export const janusHelpers = {
     state.screenShareSource = id;
     let remoteFeed = null;
 
-    state.janus.attach({
+    store.getters.janus.attach({
       plugin: "janus.plugin.videoroom",
-      opaqueId: state.opaqueId,
+      opaqueId: store.getters.opaqueId,
       success: pluginHandle => {
         remoteFeed = pluginHandle;
         const listen = {
           request: "join",
-          room: state.screenShareRoom,
+          room: store.getters.screenShareRoom,
           ptype: "listener",
           feed: id
         };
@@ -517,7 +518,7 @@ export const janusHelpers = {
             jsep: jsep,
             media: { audioSend: false, videoSend: false },
             success: jsep => {
-              const body = { request: "start", room: state.screenShareRoom };
+              const body = { request: "start", room: store.getters.screenShareRoom };
               remoteFeed.send({ message: body, jsep: jsep });
             },
             error: error => {
@@ -528,25 +529,25 @@ export const janusHelpers = {
       },
       onremotestream: stream => {
         if (!stream.getVideoTracks()[0]) {
-          if (state.users.length > 0) {
+          if (store.getters.users.length > 0) {
             const selectUser = {
-              id: state.users[1].id,
-              username: state.users[1].username,
-              stream: state.users[1].stream,
-              pluginHandle: state.users[1].pluginHandle
+              id: store.getters.users[1].id,
+              username: store.getters.users[1].username,
+              stream: store.getters.users[1].stream,
+              pluginHandle: store.getters.users[1].pluginHandle
             };
 
-            vm.$store.dispatch("selectUser", selectUser);
+            store.dispatch("selectUser", selectUser);
             state.screenShare = null;
           }
           return;
         }
 
-        let userIndex = state.users.findIndex(
+        let userIndex = store.getters.users.findIndex(
           user => user.username === remoteFeed.rfdisplay
         );
 
-        if (state.users[userIndex] != null && state.screenShare === null) {
+        if (store.getters.users[userIndex] != null && store.getters.screenShare === null) {
           state.screenShare = stream;
         }
       },
@@ -555,7 +556,7 @@ export const janusHelpers = {
       }
     });
   },
-  createRoom(state) {
+  createRoom() {
     let room = Math.abs(hashString(window.localStorage.getItem("teamName")));
     let me = JSON.parse(window.localStorage.getItem("account"));
 
@@ -570,9 +571,9 @@ export const janusHelpers = {
       publishers: 16
     };
 
-    state.users[0].pluginHandle.send({ message: create });
+    store.getters.users[0].pluginHandle.send({ message: create });
   },
-  joinRoom(state) {
+  joinRoom() {
     let me = JSON.parse(window.localStorage.getItem("account"));
     let room = Math.abs(hashString(window.localStorage.getItem("teamName")));
 
@@ -583,7 +584,7 @@ export const janusHelpers = {
       display: me.name
     };
 
-    state.users[0].pluginHandle.send({ message: register });
+    store.getters.users[0].pluginHandle.send({ message: register });
   },
   registerUsername(state) {
     janusHelpers.createRoom(state);
