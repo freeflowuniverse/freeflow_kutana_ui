@@ -5,6 +5,15 @@ import vm from "../main";
 
 let inThrottle;
 
+const hashString = str => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
+    hash = hash & hash;
+  }
+  return hash;
+};
+
 export const janusHelpers = {
   videoRoom: {
     onJanusCreateSuccess(state) {
@@ -181,81 +190,71 @@ export const janusHelpers = {
               type: "screenshare_started",
               content: state.screenShareRoom
             });
-          } else {
-            // Handle screen session stopped
-            console.log("Sharing seems to have been stopped");
           }
         },
         onmessage: (msg, jsep) => {
           const event = msg["videoroom"];
           if (event) {
-            if (event === "joined") {
-              if (state.screenShareRole === "publisher") {
-                state.users[0].screenSharePluginHandle.createOffer({
-                  media: {
-                    video: state.screenShareCapture,
-                    audioSend: true,
-                    videoRecv: false
-                  },
-                  success: jsep => {
-                    let publish = {
-                      request: "configure",
-                      audio: true,
-                      video: true
-                    };
-                    state.users[0].screenSharePluginHandle.send({
-                      message: publish,
-                      jsep: jsep
-                    });
-                  },
-                  error: error => {
-                    Janus.error("WebRTC error:", error);
-                    console.log(
-                      "User clicked cancel when trying to share his screen."
-                    );
-                  }
-                });
-              } else {
-                if (
-                  msg["publishers"] !== undefined &&
-                  msg["publishers"] !== null
-                ) {
-                  let list = msg["publishers"];
-                  for (let f in list) {
-                    let id = list[f]["id"];
-                    let display = list[f]["display"];
-                    janusHelpers.screenSharingNewRemoteFeed(state, id, display);
-                  }
+            switch (event) {
+              case "joined":
+
+                if (state.screenShareRole === "publisher") {
+                  state.users[0].screenSharePluginHandle.createOffer({
+                    media: {
+                      video: state.screenShareCapture,
+                      audioSend: true,
+                      videoRecv: false
+                    },
+                    success: jsep => {
+                      let publish = {
+                        request: "configure",
+                        audio: true,
+                        video: true
+                      };
+                      state.users[0].screenSharePluginHandle.send({
+                        message: publish,
+                        jsep: jsep
+                      });
+                    },
+                    error: error => {
+                      Janus.error("WebRTC error:", error);
+                      console.log(
+                        "User clicked cancel when trying to share his screen."
+                      );
+                    }
+                  });
+                  break;
                 }
-              }
-            } else if (event === "event") {
-              if (
-                state.screenShareRole === "listener" &&
-                msg["publishers"] !== undefined &&
-                msg["publishers"] !== null
-              ) {
-                let list = msg["publishers"];
-                for (let f in list) {
-                  let id = list[f]["id"];
-                  let display = list[f]["display"];
+
+                if (!msg["publishers"]) {
+                  break;
+                }
+
+                msg["publishers"].forEach(element => {
+                  let id = element["id"];
+                  let display = element["display"];
                   janusHelpers.screenSharingNewRemoteFeed(state, id, display);
-                }
-              } else if (
-                msg["leaving"] !== undefined &&
-                msg["leaving"] !== null
-              ) {
+                });
+
+                break;
+              case "event":
                 if (
-                  state.screenShareRole === "listener" &&
-                  msg["leaving"] === state.screenShareSource
+                  !(state.screenShareRole === "listener" && msg["publishers"])
                 ) {
-                  console.log("Screen share was stopped! 3");
+                  break;
                 }
-              } else if (msg["error"] !== undefined && msg["error"] !== null) {
-                console.log("Screen share was stopped! 4");
-                console.log(msg["error"]);
-              }
+
+                msg["publishers"].forEach(element => {
+                  let id = element["id"];
+                  let display = element["display"];
+
+                  janusHelpers.screenSharingNewRemoteFeed(state, id, display);
+                });
+
+                break;
             }
           }
+
           if (jsep !== undefined && jsep !== null) {
             state.users[0].screenSharePluginHandle.handleRemoteJsep({
               jsep: jsep
@@ -343,8 +342,6 @@ export const janusHelpers = {
         Janus.error("WebRTC error:", error);
         if (useAudio) {
           janusHelpers.publishOwnFeed(false);
-        } else {
-          // Handle WebRTC error
         }
       }
     });
@@ -384,32 +381,29 @@ export const janusHelpers = {
       },
       onmessage: (msg, jsep) => {
         const event = msg["videoroom"];
-        if (msg["error"] !== undefined && msg["error"] !== null) {
-          // Handle msg["error"]
-        } else if (event) {
-          if (event === "attached") {
-            for (let i = 1; i < 16; i++) {
-              if (state.feeds[i] === undefined || state.feeds[i] === null) {
-                state.feeds[i] = remoteFeed;
-                remoteFeed.rfindex = i;
-                break;
+        if (event) {
+          switch (event) {
+            case "attached":
+              for (let i = 1; i < 16; i++) {
+                if (state.feeds[i] === undefined || state.feeds[i] === null) {
+                  state.feeds[i] = remoteFeed;
+                  remoteFeed.rfindex = i;
+                  break;
+                }
               }
-            }
-            remoteFeed.rfid = msg["id"];
-            remoteFeed.rfdisplay = msg["display"];
-          } else if (event === "event") {
-            const substream = msg["substream"];
-            const temporal = msg["temporal"];
-            if (
-              (substream !== null && substream !== undefined) ||
-              (temporal !== null && temporal !== undefined)
-            ) {
-              if (!remoteFeed.simulcastStarted) {
-                remoteFeed.simulcastStarted = true;
+              remoteFeed.rfid = msg["id"];
+              remoteFeed.rfdisplay = msg["display"];
+              break;
+            case "event":
+              if (msg["substream"] || msg["temporal"]) {
+                if (!remoteFeed.simulcastStarted) {
+                  remoteFeed.simulcastStarted = true;
+                }
               }
-            }
+              break;
           }
         }
+
         if (jsep !== undefined && jsep !== null) {
           remoteFeed.createAnswer({
             jsep: jsep,
@@ -533,8 +527,7 @@ export const janusHelpers = {
         }
       },
       onremotestream: stream => {
-        const track = stream.getVideoTracks()[0];
-        if (track === undefined) {
+        if (!stream.getVideoTracks()[0]) {
           if (state.users.length > 0) {
             const selectUser = {
               id: state.users[1].id,
@@ -546,14 +539,15 @@ export const janusHelpers = {
             vm.$store.dispatch("selectUser", selectUser);
             state.screenShare = null;
           }
-        } else {
-          let userIndex = state.users.findIndex(
-            user => user.username === remoteFeed.rfdisplay
-          );
+          return;
+        }
 
-          if (state.users[userIndex] != null && state.screenShare === null) {
-            state.screenShare = stream;
-          }
+        let userIndex = state.users.findIndex(
+          user => user.username === remoteFeed.rfdisplay
+        );
+
+        if (state.users[userIndex] != null && state.screenShare === null) {
+          state.screenShare = stream;
         }
       },
       oncleanup: () => {
@@ -596,12 +590,3 @@ export const janusHelpers = {
     janusHelpers.joinRoom(state);
   }
 };
-
-function hashString(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return hash;
-}
