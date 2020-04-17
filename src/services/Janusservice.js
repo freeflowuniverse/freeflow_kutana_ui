@@ -35,6 +35,54 @@ function selectFirstStream() {
   }
 }
 
+function determineSpeaker(stream, remoteFeed, id) {
+  const AudioContext =
+      window.AudioContext || window.webkitAudioContext || false;
+  let audioContext = new AudioContext();
+  if (audioContext) {
+    let analyser = audioContext.createAnalyser();
+    let microphone = audioContext.createMediaStreamSource(stream);
+    let javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+
+    analyser.smoothingTimeConstant = 0.8;
+    analyser.fftSize = 1024;
+
+    microphone.connect(analyser);
+    analyser.connect(javascriptNode);
+    javascriptNode.connect(audioContext.destination);
+    javascriptNode.onaudioprocess = () => {
+      const array = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(array);
+      let values = 0;
+
+      const length = array.length;
+      for (let i = 0; i < length; i++) {
+        values += array[i];
+      }
+
+      const average = values / length;
+      if (
+          !store.getters.selectedUser ||
+          (average > 20 &&
+              store.getters.selectedUser &&
+              remoteFeed.rfdisplay !== store.getters.selectedUser.username)
+      ) {
+        if (!inThrottle) {
+          inThrottle = true;
+          store.dispatch("selectUser", {
+            id: id,
+            username: remoteFeed.rfdisplay,
+            stream: stream,
+            pluginHandle: remoteFeed,
+            screenShareStream: null
+          });
+          setTimeout(() => (inThrottle = false), 1000);
+        }
+      }
+    };
+  }
+}
+
 export const janusHelpers = {
   videoRoom: {
     onJanusCreateSuccess() {
@@ -54,15 +102,15 @@ export const janusHelpers = {
         onmessage: (msg, jsep) => {
           const event = msg["videoroom"];
 
-          if (!(event !== undefined && event != null)) {
+          if (!event) {
             return;
           }
 
           switch (event) {
             case "joined":
               store.commit("setMyPrivateId", msg["private_id"]);
-
               janusHelpers.publishOwnFeed(true);
+
               if (
                 !(msg["publishers"] !== undefined && msg["publishers"] !== null)
               ) {
@@ -115,11 +163,14 @@ export const janusHelpers = {
               }
               break;
           }
-          if (jsep) {
-            store.getters.users[0].pluginHandle.handleRemoteJsep({
-              jsep: jsep
-            });
+
+          if (!jsep) {
+            return;
           }
+
+          store.getters.users[0].pluginHandle.handleRemoteJsep({
+            jsep: jsep
+          });
         },
         onlocalstream: stream => {
           const users = store.getters.users;
@@ -160,17 +211,19 @@ export const janusHelpers = {
           Janus.error("  -- Error attaching plugin...", error);
         },
         webrtcState: on => {
-          if (on) {
-            let teamName = window.localStorage.getItem("teamName");
-            let user = JSON.parse(window.localStorage.getItem("account"));
-
-            socketService.emit("signal", {
-              channel: teamName,
-              sender: user.name,
-              type: "screenshare_started",
-              content: store.getters.screenShareRoom
-            });
+          if (!on) {
+            return;
           }
+
+          let teamName = window.localStorage.getItem("teamName");
+          let user = JSON.parse(window.localStorage.getItem("account"));
+
+          socketService.emit("signal", {
+            channel: teamName,
+            sender: user.name,
+            type: "screenshare_started",
+            content: store.getters.screenShareRoom
+          });
         },
         onmessage: (msg, jsep) => {
           const event = msg["videoroom"];
@@ -266,21 +319,21 @@ export const janusHelpers = {
       store.getters.users[0].screenSharePluginHandle.send({
         message: create,
         success: result => {
-          const event = result["videoroom"];
-          if (event) {
-            store.commit("setScreenShareRoom", result["room"]);
+          if (!result["videoroom"]) {
+            return;
+          }
 
-            let me = JSON.parse(window.localStorage.getItem("account"));
-            const register = {
+          store.commit("setScreenShareRoom", result["room"]);
+          let me = JSON.parse(window.localStorage.getItem("account"));
+
+          store.getters.users[0].screenSharePluginHandle.send({
+            message: {
               request: "join",
               room: store.getters.screenShareRoom,
               ptype: "publisher",
               display: me.name
-            };
-            store.getters.users[0].screenSharePluginHandle.send({
-              message: register
-            });
-          }
+            }
+          });
         }
       });
     },
@@ -415,51 +468,8 @@ export const janusHelpers = {
         }
       },
       onremotestream: stream => {
-        const AudioContext =
-          window.AudioContext || window.webkitAudioContext || false;
-        let audioContext = new AudioContext();
-        if (audioContext) {
-          let analyser = audioContext.createAnalyser();
-          let microphone = audioContext.createMediaStreamSource(stream);
-          let javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+        determineSpeaker(stream, remoteFeed, id);
 
-          analyser.smoothingTimeConstant = 0.8;
-          analyser.fftSize = 1024;
-
-          microphone.connect(analyser);
-          analyser.connect(javascriptNode);
-          javascriptNode.connect(audioContext.destination);
-          javascriptNode.onaudioprocess = () => {
-            const array = new Uint8Array(analyser.frequencyBinCount);
-            analyser.getByteFrequencyData(array);
-            let values = 0;
-
-            const length = array.length;
-            for (let i = 0; i < length; i++) {
-              values += array[i];
-            }
-
-            const average = values / length;
-            if (
-              !store.getters.selectedUser ||
-              (average > 20 &&
-                store.getters.selectedUser &&
-                remoteFeed.rfdisplay !== store.getters.selectedUser.username)
-            ) {
-              if (!inThrottle) {
-                inThrottle = true;
-                store.dispatch("selectUser", {
-                  id: id,
-                  username: remoteFeed.rfdisplay,
-                  stream: stream,
-                  pluginHandle: remoteFeed,
-                  screenShareStream: null
-                });
-                setTimeout(() => (inThrottle = false), 1000);
-              }
-            }
-          };
-        }
         if (
           store.getters.users.filter(
             user => user.username === remoteFeed.rfdisplay
