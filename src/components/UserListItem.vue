@@ -1,5 +1,5 @@
 <template>
-  <section :class="`userListItem ma-3 ml-2 ${selectedUser !== null && selectedUser.username === user.username ? 'selected' : ''}`">
+  <section :class="isMobile ? `userListItemMobile ma-1 ml-1 ${selectedUser !== null && selectedUser.username === user.username ? 'selected' : ''}` : `userListItem ma-3 ml-2 ${selectedUser !== null && selectedUser.username === user.username ? 'selected' : ''}`">
     <v-card class="stream black">
       <v-card-title class="primary white--text body-1 mb-0 py-1">
         <div class="text-center" style="width:100%">{{user.username}}</div>
@@ -23,8 +23,10 @@
 import { mapGetters } from "vuex";
 import UserListItemControls from "../components/UserListItemControls.vue";
 import JanusVideo from "./JanusVideo";
+import mobile from '../mixin/mobile';
 
 export default {
+  mixins: [mobile],
   data: function() {
     return {
       showWarning: true,
@@ -69,6 +71,11 @@ export default {
 
 .userListItem {
   padding: 5px;
+}
+
+.userListItemMobile {
+  height: 20%;
+  width: 40%;
 }
 
 .UserListItemControls {

@@ -1,6 +1,6 @@
 <template>
     <section>
-    <v-app-bar 
+    <v-app-bar
         color="primary"
         bottom 
         absolute 
@@ -102,7 +102,7 @@ export default {
     this.$root.$on('showInviteUser', this.showAddUserDialog)
   },
   computed: {
-    ...mapGetters(["users", "teamName", "isGeneratingInvite"]),
+    ...mapGetters(["users", "teamName", "isGeneratingInvite", "teamMembers"]),
     inviteLink() {
       let baseUrl = window.location.href;
       if (baseUrl.charAt(baseUrl.length - 1) != "/") {
@@ -197,6 +197,8 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-
+<style lang="scss">
+  .v-toolbar__content {
+    padding: 0;
+  }
 </style>
