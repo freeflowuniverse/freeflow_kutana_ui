@@ -27,7 +27,6 @@ export default {
       {
         username: "Name" + Janus.randomString(12),
         stream: null,
-        screenSharestream: null,
         pluginHandle: null,
         screenSharePluginHandle: null
       }
@@ -50,6 +49,9 @@ export default {
     joinScreen(state, id) {
       janusHelpers.screenShare.joinScreen(state, id);
     },
+    stopScreenShare(state) {
+      janusHelpers.screenShare.stopScreenShare(state);
+    },
     setRoomId(state, roomId) {
       state.roomId = roomId;
     }
@@ -57,7 +59,7 @@ export default {
   actions: {
     initializeJanus(context) {
       Janus.init({
-        debug: false,
+        debug: "all",
         callback: function () {
           if (!Janus.isWebrtcSupported()) {
             console.error("No WebRTC support... ");
@@ -95,6 +97,9 @@ export default {
     },
     joinScreen(context, id) {
       context.commit("joinScreen", id);
+    },
+    stopScreenShare(context) {
+      context.commit("stopScreenShare");
     },
     setRoomId(context, roomId) {
       context.commit("setRoomId", roomId);
@@ -282,6 +287,7 @@ const janusHelpers = {
                 }
               } else if (msg["error"] !== undefined && msg["error"] !== null) {
                 // Handle the error
+                console.log("Screen share was stopped! 1")
               }
             }
 
@@ -378,6 +384,7 @@ const janusHelpers = {
             });
           } else {
             // Handle screen session stopped
+            console.log("Sharing seems to have been stopped")
           }
         },
         onmessage: function (msg, jsep) {
@@ -422,6 +429,8 @@ const janusHelpers = {
                   },
                   error: function (error) {
                     Janus.error("WebRTC error:", error);
+                    console.log("User clicked cancel when trying to share his screen.")
+
                   }
                 });
               } else {
@@ -466,9 +475,46 @@ const janusHelpers = {
                   msg["leaving"] === state.screenShareSource
                 ) {
                   // Handle this case
+                  console.log("Screen share was stopped! 3")
                 }
               } else if (msg["error"] !== undefined && msg["error"] !== null) {
                 // Handle this case
+                console.log("Screen share was stopped! 4")
+                //
+                console.log(msg["error"])
+
+                // if (msg["error"] === "Already in as a publisher on this handle") {
+                //   // Already a publisher ? What to do now? 
+                //   state.users[0].screenSharePluginHandle.detach()
+                //   janusHelpers.screenShare.onJanusCreateSuccess(state) // Lets re-attach the plugin 
+
+                //   // state.users[0].screenSharePluginHandle.createOffer({
+                //   //   media: {
+                //   //     video: state.screenShareCapture,
+                //   //     audioSend: true,
+                //   //     videoRecv: false
+                //   //   },
+                //   //   success: function (jsep) {
+                //   //     Janus.debug("Got publisher SDP!");
+                //   //     Janus.debug(jsep);
+                //   //     let publish = {
+                //   //       request: "configure",
+                //   //       audio: true,
+                //   //       video: true
+                //   //     };
+                //   //     state.users[0].screenSharePluginHandle.send({
+                //   //       message: publish,
+                //   //       jsep: jsep
+                //   //     });
+                //   //   },
+                //   //   error: function (error) {
+                //   //     Janus.error("WebRTC error:", error);
+                //   //     console.log("User clicked cancel when trying to share his screen.")
+
+                //   //   }
+                //   // });
+                // }
+
               }
             }
           }
@@ -479,6 +525,9 @@ const janusHelpers = {
               jsep: jsep
             });
           }
+        },
+        onremotestream: function (stream) {
+          console.log("ORM: onremotestream ", stream)
         },
         onlocalstream: function (stream) {
           Janus.debug(" ::: Got a local stream :::");
@@ -497,7 +546,7 @@ const janusHelpers = {
       var create = {
         request: "create",
         description: "screenshare",
-        bitrate: 1024000,
+        bitrate: 4096000,
         bitrate_cap: true,
         publishers: 1
       };
@@ -526,7 +575,6 @@ const janusHelpers = {
       });
     },
     joinScreen(state, id) {
-
       var roomid = id;
 
       state.screenShareRoom = parseInt(roomid);
@@ -540,7 +588,13 @@ const janusHelpers = {
         display: me.name
       };
 
+      console.log("Screen share joined: ", state.users[0].screenSharePluginHandle)
       state.users[0].screenSharePluginHandle.send({ message: register });
+    },
+    stopScreenShare(state) {
+      console.log("Stopped screenshare ... ")
+      state.users[0].screenSharePluginHandle.detach();
+      state.screenShare = null;
     }
   },
   publishOwnFeed(state, useAudio) {
@@ -571,7 +625,7 @@ const janusHelpers = {
   },
   newRemoteFeed(state, id, display, audio, video) {
     var remoteFeed = null;
-    var timeout = null;
+    // var timeout = null;
     state.janus.attach({
       plugin: "janus.plugin.videoroom",
       opaqueId: state.opaqueId,
@@ -684,48 +738,48 @@ const janusHelpers = {
       },
       onremotestream: function (stream) {
         Janus.debug("Remote feed #" + remoteFeed.rfindex);
-        var AudioContext =
-          window.AudioContext || window.webkitAudioContext || false;
-        let audioContext = new AudioContext();
-        if (audioContext) {
-          let analyser = audioContext.createAnalyser();
-          let microphone = audioContext.createMediaStreamSource(stream);
-          let javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+        // var AudioContext =
+        //   window.AudioContext || window.webkitAudioContext || false;
+        // let audioContext = new AudioContext();
+        // if (audioContext) {
+        //   let analyser = audioContext.createAnalyser();
+        //   let microphone = audioContext.createMediaStreamSource(stream);
+        //   let javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
 
-          analyser.smoothingTimeConstant = 0.8;
-          analyser.fftSize = 1024;
+        //   analyser.smoothingTimeConstant = 0.8;
+        //   analyser.fftSize = 1024;
 
-          microphone.connect(analyser);
-          analyser.connect(javascriptNode);
-          javascriptNode.connect(audioContext.destination);
-          javascriptNode.onaudioprocess = function () {
-            var array = new Uint8Array(analyser.frequencyBinCount);
-            analyser.getByteFrequencyData(array);
-            var values = 0;
+        //   microphone.connect(analyser);
+        //   analyser.connect(javascriptNode);
+        //   javascriptNode.connect(audioContext.destination);
+        //   javascriptNode.onaudioprocess = function () {
+        //     var array = new Uint8Array(analyser.frequencyBinCount);
+        //     analyser.getByteFrequencyData(array);
+        //     var values = 0;
 
-            var length = array.length;
-            for (var i = 0; i < length; i++) {
-              values += array[i];
-            }
+        //     var length = array.length;
+        //     for (var i = 0; i < length; i++) {
+        //       values += array[i];
+        //     }
 
-            var average = values / length;
-            if (
-              !state.selectedUser ||
-              (average > 20 && state.selectedUser && remoteFeed.rfdisplay != state.selectedUser.username)
-            ) {
-              if (timeout != null) clearTimeout(timeout);
-              timeout = setTimeout(() => {
-                vm.$store.dispatch("selectUser", {
-                  id: id,
-                  username: remoteFeed.rfdisplay,
-                  stream: stream,
-                  pluginHandle: remoteFeed,
-                  screenShareStream: null
-                });
-              }, 2000);
-            }
-          };
-        }
+        //     var average = values / length;
+        //     if (
+        //       !state.selectedUser ||
+        //       (average > 20 && state.selectedUser && remoteFeed.rfdisplay != state.selectedUser.username)
+        //     ) {
+        //       if (timeout != null) clearTimeout(timeout);
+        //       timeout = setTimeout(() => {
+        //         vm.$store.dispatch("selectUser", {
+        //           id: id,
+        //           username: remoteFeed.rfdisplay,
+        //           stream: stream,
+        //           pluginHandle: remoteFeed,
+        //           screenShareStream: null
+        //         });
+        //       }, 2000);
+        //     }
+        //   };
+        // }
 
         var addButtons = false;
 
@@ -737,8 +791,7 @@ const janusHelpers = {
             id: id,
             username: remoteFeed.rfdisplay,
             stream: stream,
-            pluginHandle: remoteFeed,
-            screenShareStream: null
+            pluginHandle: remoteFeed
           };
           state.users.push(newUser);
           setTimeout(() => {
@@ -827,13 +880,38 @@ const janusHelpers = {
         }
       },
       onremotestream: function (stream) {
-        let userIndex = state.users.findIndex(
-          user => user.username === remoteFeed.rfdisplay
-        );
+        console.log("Got onremotestream screenshare message: ", stream)
 
-        if (state.users[userIndex] != null && state.screenShare === null) {
-          state.screenShare = stream;
+        const track = stream.getVideoTracks()[0];
+        if (track === undefined) {
+          console.log("Stream doesnt seem to have a track anymore, lets reset it.")
+
+          if (state.users.length > 0) {
+            const selectUser = {
+              id: state.users[1].id,
+              username: state.users[1].username,
+              stream: state.users[1].stream,
+              pluginHandle: state.users[1].pluginHandle
+            }
+
+            vm.$store.dispatch("selectUser", selectUser);
+            state.screenShare = null;
+
+            console.log("state.selectUser: ", selectUser)
+            console.log("state.selectUser: ", state.selectUser)
+          }
+        } else {
+          let userIndex = state.users.findIndex(
+            user => user.username === remoteFeed.rfdisplay
+          );
+
+          if (state.users[userIndex] != null && state.screenShare === null) {
+            state.screenShare = stream;
+          }
         }
+      },
+      onlocalstream: function (stream) {
+        console.log("Got onlocalstream screenshare message: ", stream)
       },
       oncleanup: function () {
         Janus.log(
@@ -852,7 +930,7 @@ const janusHelpers = {
       permanent: false,
       description: me.name,
       is_private: true,
-      bitrate: 1024000,
+      bitrate: 4096000,
       bitrate_cap: true,
       publishers: 16
     };

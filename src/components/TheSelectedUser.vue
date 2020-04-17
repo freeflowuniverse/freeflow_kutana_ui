@@ -10,7 +10,6 @@
       :stream="stream"
       :muted="true"
       :isScreenShare="this.userScreenshareStream !== false"
-      :show-controls="this.userScreenshareStream"
     ></JanusVideo>
   </div>
 </template>
@@ -22,6 +21,8 @@ import JanusVideo from "./JanusVideo";
 export default {
   components: {
     JanusVideo
+  },
+  mounted() {
   },
   computed: {
     ...mapGetters(["selectedUser", "screenShare"]),
@@ -43,12 +44,23 @@ export default {
       if (!this.screenShare) {
         return false;
       }
+      console.log("Got screenshare: ", this.screenShare)
+      const track = this.screenShare.getVideoTracks()[0];
+      console.log("Got track: ", track)
 
       return this.screenShare;
     }
   },
   methods: {
     ...mapActions(["joinScreen"])
+  },
+  watch: {
+    screenShare: {
+      deep: true,
+      handler() {
+        console.log("screenShare CHANGED!");
+      }
+    }
   }
 };
 </script>
@@ -73,5 +85,4 @@ export default {
   left: 0;
   z-index: 1;
 }
-
 </style>
