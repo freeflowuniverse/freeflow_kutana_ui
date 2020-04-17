@@ -14,6 +14,27 @@ const hashString = str => {
   return hash;
 };
 
+const detachFeed = detachRfid => {
+  store.commit(
+    "setFeeds",
+    store.getters.feeds.reduce((carry, feed) => {
+      if (feed.rfid !== detachRfid) {
+        carry.push(feed);
+        return carry;
+      }
+      feed.detach();
+      return carry;
+    }, [])
+  );
+};
+
+function selectFirstStream() {
+  if (store.getters.users.length > 0) {
+    store.dispatch("selectUser", store.getters.users[1]);
+    store.commit("setScreenShare", null);
+  }
+}
+
 export const janusHelpers = {
   videoRoom: {
     onJanusCreateSuccess() {
@@ -74,89 +95,30 @@ export const janusHelpers = {
               }
 
               if (msg["leaving"]) {
-                let leaving = msg["leaving"];
-                let remoteFeed = null;
-                for (let i = 1; i < 6; i++) {
-                  if (
-                    store.getters.feeds[i] != null &&
-                    store.getters.feeds[i] !== undefined &&
-                    store.getters.feeds[i].rfid === leaving
-                  ) {
-                    remoteFeed = store.getters.feeds[i];
-                    break;
-                  }
-                }
-                if (remoteFeed != null) {
-                  const feeds = store.getters.feeds;
-                  feeds[remoteFeed.rfindex] = null;
-
-                  store.commit("setFeeds", feeds);
-                  remoteFeed.detach();
-                }
+                detachFeed(msg["leaving"]);
                 break;
               }
 
               if (msg["unpublished"]) {
-                let unpublished = msg["unpublished"];
-                if (unpublished === "ok") {
+                if (msg["unpublished"] === "ok") {
                   store.getters.users[0].pluginHandle.hangup();
                   return;
                 }
-                let remoteFeed = null;
-                for (let i = 1; i < 6; i++) {
-                  if (
-                    store.getters.feeds[i] != null &&
-                    store.getters.feeds[i] !== undefined &&
-                    store.getters.feeds[i].rfid === unpublished
-                  ) {
-                    remoteFeed = store.getters.feeds[i];
-                    break;
-                  }
-                }
-                if (remoteFeed != null) {
-                  const feeds = store.getters.feeds;
-                  feeds[remoteFeed.rfindex] = null;
 
-                  store.commit("setFeeds", feeds);
-                  remoteFeed.detach();
-                }
+                detachFeed(msg["unpublished"]);
                 break;
               }
 
               if (msg["error"] !== undefined && msg["error"] !== null) {
-                // Handle the error
                 console.log("Screen share was stopped! 1");
                 break;
               }
-
               break;
           }
           if (jsep) {
             store.getters.users[0].pluginHandle.handleRemoteJsep({
               jsep: jsep
             });
-
-            const audio = msg["audio_codec"];
-
-            if (
-              store.getters.users[0].stream &&
-              store.getters.users[0].stream.getAudioTracks() &&
-              store.getters.users[0].stream.getAudioTracks().length > 0 &&
-              !audio
-            ) {
-              // Handle the audio rejection
-            }
-
-            const video = msg["video_codec"];
-
-            if (
-              store.getters.users[0].stream &&
-              store.getters.users[0].stream.getVideoTracks() &&
-              store.getters.users[0].stream.getVideoTracks().length > 0 &&
-              !video
-            ) {
-              // Handle the video rejection
-            }
           }
         },
         onlocalstream: stream => {
@@ -339,6 +301,9 @@ export const janusHelpers = {
         "Screen share joined: ",
         store.getters.users[0].screenSharePluginHandle
       );
+
+      console.log("register ", register);
+
       store.getters.users[0].screenSharePluginHandle.send({
         message: register
       });
@@ -572,17 +537,7 @@ export const janusHelpers = {
       },
       onremotestream: stream => {
         if (!stream.getVideoTracks()[0]) {
-          if (store.getters.users.length > 0) {
-            const selectUser = {
-              id: store.getters.users[1].id,
-              username: store.getters.users[1].username,
-              stream: store.getters.users[1].stream,
-              pluginHandle: store.getters.users[1].pluginHandle
-            };
-
-            store.dispatch("selectUser", selectUser);
-            store.commit("setScreenShare", null);
-          }
+          selectFirstStream();
           return;
         }
 
@@ -590,10 +545,7 @@ export const janusHelpers = {
           user => user.username === remoteFeed.rfdisplay
         );
 
-        if (
-          store.getters.users[userIndex] != null &&
-          store.getters.screenShare === null
-        ) {
+        if (store.getters.users[userIndex] && !store.getters.screenShare) {
           store.commit("setScreenShare", stream);
         }
       },
@@ -606,31 +558,31 @@ export const janusHelpers = {
     let room = Math.abs(hashString(window.localStorage.getItem("teamName")));
     let me = JSON.parse(window.localStorage.getItem("account"));
 
-    const create = {
-      request: "create",
-      room: room,
-      permanent: false,
-      description: me.name,
-      is_private: true,
-      bitrate: 4096000,
-      bitrate_cap: true,
-      publishers: 16
-    };
-
-    store.getters.users[0].pluginHandle.send({ message: create });
+    store.getters.users[0].pluginHandle.send({
+      message: {
+        request: "create",
+        room: room,
+        permanent: false,
+        description: me.name,
+        is_private: true,
+        bitrate: 4096000,
+        bitrate_cap: true,
+        publishers: 16
+      }
+    });
   },
   joinRoom() {
     let me = JSON.parse(window.localStorage.getItem("account"));
     let room = Math.abs(hashString(window.localStorage.getItem("teamName")));
 
-    const register = {
-      request: "join",
-      room: room,
-      ptype: "publisher",
-      display: me.name
-    };
-
-    store.getters.users[0].pluginHandle.send({ message: register });
+    store.getters.users[0].pluginHandle.send({
+      message: {
+        request: "join",
+        room: room,
+        ptype: "publisher",
+        display: me.name
+      }
+    });
   },
   registerUsername() {
     janusHelpers.createRoom();
