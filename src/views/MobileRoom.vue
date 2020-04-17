@@ -89,6 +89,10 @@ export default {
     .main-user {
       display: none;
     }
+
+    .video-list {
+      display: none;
+    }
   }
 
   &.hide-sidebar {
