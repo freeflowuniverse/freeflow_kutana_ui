@@ -25,23 +25,57 @@ export default {
     screenShare: null
   },
   mutations: {
+    setJanus(state, janus) {
+      state.janus = janus;
+    },
+    setScreenShareRole(state, screenShareRole) {
+      state.screenShareRole = screenShareRole;
+    },
+    setScreenShareCapture(state, screenShareCapture) {
+      state.screenShareCapture = screenShareCapture;
+    },
+    setScreenShareSource(state, screenShareSource) {
+      state.screenShareSource = screenShareSource;
+    },
+    setScreenShareRoom(state, screenShareRoom) {
+      state.screenShareRoom = screenShareRoom;
+    },
+    setMyPrivateId(state, myPrivateId) {
+      state.myPrivateId = myPrivateId;
+    },
+    setRoomId(state, roomId) {
+      state.roomId = roomId;
+    },
+    setFeeds(state, feeds) {
+      state.feeds = feeds;
+    },
+    setOpaqueId(state, opaqueId) {
+      state.opaqueId = opaqueId;
+    },
+    setSelectedUser(state, selectedUser) {
+      state.selectedUser = selectedUser;
+    },
+    setUsers(state, users) {
+      state.users = users;
+    },
+    setScreenShare(state, screenShare) {
+      state.screenShare = screenShare;
+    },
+
     initializeJanus(state, janus) {
       state.janus = janus;
     },
     selectUser(state, user) {
       state.selectedUser = user;
     },
-    shareScreen(state) {
-      janusHelpers.screenShare.shareAndPublishScreen(state);
+    shareScreen() {
+      janusHelpers.screenShare.shareAndPublishScreen();
     },
     joinScreen(state, id) {
-      janusHelpers.screenShare.joinScreen(state, id);
+      janusHelpers.screenShare.joinScreen(id);
     },
-    stopScreenShare(state) {
-      janusHelpers.screenShare.stopScreenShare(state);
-    },
-    setRoomId(state, roomId) {
-      state.roomId = roomId;
+    stopScreenShare() {
+      janusHelpers.screenShare.stopScreenShare();
     }
   },
   actions: {
@@ -57,8 +91,8 @@ export default {
           const janus = new Janus({
             server: config.janusServer,
             success: function() {
-              janusHelpers.videoRoom.onJanusCreateSuccess(context.state);
-              janusHelpers.screenShare.onJanusCreateSuccess(context.state);
+              janusHelpers.videoRoom.onJanusCreateSuccess();
+              janusHelpers.screenShare.onJanusCreateSuccess();
             },
             error: function(error) {
               console.error("Janus error callback");
@@ -66,7 +100,7 @@ export default {
             },
             destroyed: function() {
               console.error("Janus destroyed callback");
-              janusHelpers.videoRoom.onJanusCreateDestroyed(context.state);
+              janusHelpers.videoRoom.onJanusCreateDestroyed();
             }
           });
 
