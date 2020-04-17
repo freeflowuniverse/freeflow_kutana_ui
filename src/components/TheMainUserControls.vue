@@ -27,7 +27,7 @@
         </v-row>
       </v-col>
     </v-card>
-    <v-card class="primary pa-1" dark v-else>
+    <v-card class="secondary pa-1" dark v-else>
       <v-btn icon class="mx-1" @click="toggleSettings">
         <v-icon>settings</v-icon>
       </v-btn>

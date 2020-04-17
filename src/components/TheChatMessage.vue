@@ -2,8 +2,8 @@
   <v-card
     :class="`chatMessage ${message.sender === account.name ? 'ml-6 mr-2' : 'mr-12 ml-1'}`"
     elevation="0"
-    :color="`${message.sender === account.name ? 'primary' : 'grey lighten-3' }`"
-    :dark="message.sender === account.name"
+    :color="`${message.sender === account.name ? 'primary' : 'secondary' }`"
+    dark
     v-if="message.type"
   >
     <v-card-subtitle>

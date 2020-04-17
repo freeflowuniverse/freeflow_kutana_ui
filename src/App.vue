@@ -34,3 +34,9 @@ export default {
   }
 };
 </script>
+<style>
+.v-application .title.ttl,
+.ttl {
+  font-family: "Bebas Neue", cursive !important;
+}
+</style>

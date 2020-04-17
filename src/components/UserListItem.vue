@@ -1,8 +1,8 @@
 <template>
   <section :class="`userListItem ma-3 ml-2 ${selectedUser !== null && selectedUser.username === user.username ? 'selected' : ''}`">
     <v-card class="stream black">
-      <v-card-title class="primary white--text body-1 mb-0 py-1">
-        <div class="text-center" style="width:100%">{{user.username}}</div>
+      <v-card-title class="primary white--text body-1 mb-0 pt-1 pb-0">
+        <div class="text-center title ttl" style="width:100%">{{user.username}}</div>
       </v-card-title>
       <div :id="`user${userIndex}`">
         <JanusVideo
