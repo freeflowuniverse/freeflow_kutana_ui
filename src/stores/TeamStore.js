@@ -53,6 +53,13 @@ export default {
 
       context.commit("joinScreen", message.content)
     },
+    stopScreenShare(context) {
+      context.commit("setSnackbarMessage", {
+        text: `Screenshare stopped`,
+      });
+
+      context.commit("stopScreenShare")
+    },
   },
   getters: {
     teamName: (state) => {
