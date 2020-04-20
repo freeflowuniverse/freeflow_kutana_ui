@@ -12,7 +12,6 @@ export default {
     myPrivateId: null,
     roomId: null,
     feeds: [],
-    screenShareEnabled: false,
     opaqueId: "videoroom-" + Janus.randomString(12),
     selectedUser: null,
     users: [
@@ -62,25 +61,19 @@ export default {
     setScreenShare(state, screenShare) {
       state.screenShare = screenShare;
     },
-    setScreenShareEnabled(state, screenShareEnabled) {
-      state.screenShareEnabled = screenShareEnabled;
-    },
     initializeJanus(state, janus) {
       state.janus = janus;
     },
     selectUser(state, user) {
       state.selectedUser = user;
     },
-    shareScreen(state) {
-      state.screenShareEnabled = true;
+    shareScreen() {
       janusHelpers.screenShare.onJanusCreateSuccess(janusHelpers.screenShare.shareAndPublishScreen);
     },
     joinScreen(state, id) {
-      state.screenShareEnabled = true;
       janusHelpers.screenShare.onJanusCreateSuccess(() => janusHelpers.screenShare.joinScreen(id));
     },
-    stopScreenShare(state) {
-      state.screenShareEnabled = false;
+    stopScreenShare() {
       janusHelpers.screenShare.stopScreenShare();
     }
   },
@@ -145,7 +138,6 @@ export default {
     opaqueId: state => state.opaqueId,
     selectedUser: state => state.selectedUser,
     users: state => state.users,
-    screenShare: state => state.screenShare,
-    screenShareEnabled: state => state.screenShareEnabled,
+    screenShare: state => state.screenShare
   }
 };
