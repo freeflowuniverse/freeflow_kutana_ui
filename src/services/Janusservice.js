@@ -176,6 +176,7 @@ export const janusHelpers = {
 
               if (msg["error"] !== undefined && msg["error"] !== null) {
                 console.log("Screen share was stopped! 1");
+                console.log(msg["error"])
                 break;
               }
               break;
@@ -244,6 +245,8 @@ export const janusHelpers = {
           });
         },
         onmessage: (msg, jsep) => {
+          console.log({msg})
+          console.log({jsep})
           const event = msg["videoroom"];
           if (event) {
             switch (event) {
@@ -251,7 +254,7 @@ export const janusHelpers = {
                 if (store.getters.screenShareRole === "publisher") {
                   store.getters.users[0].screenSharePluginHandle.createOffer({
                     media: {
-                      video: store.getters.screenShareCapture,
+                      video: "screen",
                       audioSend: true,
                       videoRecv: false
                     },
@@ -289,25 +292,29 @@ export const janusHelpers = {
                 break;
               case "event":
                 if (
-                  !(
                     store.getters.screenShareRole === "listener" &&
                     msg["publishers"]
-                  )
                 ) {
-                  break;
+                  msg["publishers"].forEach(element => {
+                    let id = element["id"];
+                    let display = element["display"];
+
+                    janusHelpers.screenSharingNewRemoteFeed(id, display);
+                  });
                 }
 
-                msg["publishers"].forEach(element => {
-                  let id = element["id"];
-                  let display = element["display"];
+                if(msg["leaving"]) {
+                  console.log("We should LEAVE now")
+                  detachFeed(msg["leaving"]);
+                  store.dispatch("selectUser", store.getters.users[1]);
 
-                  janusHelpers.screenSharingNewRemoteFeed(id, display);
-                });
-
+                  store.getters.screenShare.removeTrack(store.getters.screenShare.getVideoTracks()[0]);
+                  store.getters.screenShare.removeTrack(store.getters.screenShare.getAudioTracks()[0]);
+                }
                 break;
             }
           }
-
+users
           if (jsep !== undefined && jsep !== null) {
             store.getters.users[0].screenSharePluginHandle.handleRemoteJsep({
               jsep: jsep
@@ -325,13 +332,8 @@ export const janusHelpers = {
         oncleanup: () => {
           Janus.log(" ::: Got a cleanup notification :::");
           console.log("oncleanup Screenshare HERE20, ", store.getters.users[1])
-          store.commit("setScreenShare", null);
+          // store.commit("setScreenShare", null);
           store.dispatch("selectUser", store.getters.users[1]);
-
-          // const users = store.getters.users;
-          // users[0].screenSharePluginHandle = null;
-
-          // store.commit("setUsers", users);
         }
       });
     },
@@ -594,8 +596,7 @@ export const janusHelpers = {
         }
       },
       onremotestream: stream => {
-        console.log("onremotestream to screen share ...");
-        if(!store.getters.screenShare) {
+        if (!store.getters.screenShare) {
           store.commit("setScreenShare", stream);
         }
       },

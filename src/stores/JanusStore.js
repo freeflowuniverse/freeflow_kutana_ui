@@ -69,6 +69,7 @@ export default {
     },
     shareScreen() {
       janusHelpers.screenShare.onJanusCreateSuccess(janusHelpers.screenShare.shareAndPublishScreen);
+      // janusHelpers.screenShare.shareAndPublishScreen();
     },
     joinScreen(state, id) {
       janusHelpers.screenShare.onJanusCreateSuccess(() => janusHelpers.screenShare.joinScreen(id));
