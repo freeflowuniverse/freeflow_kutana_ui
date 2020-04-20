@@ -594,26 +594,14 @@ export const janusHelpers = {
         }
       },
       onremotestream: stream => {
-        console.log("Onremotestream to screen share ...")
-
-        if (!stream.getVideoTracks()[0]) {
-          console.log("Found no video ...")
-          return;
-        }
-
-        let userIndex = store.getters.users.findIndex(
-          user => user.username === remoteFeed.rfdisplay
-        );
-
-        if (store.getters.users[userIndex] && !store.getters.screenShare) {
-          console.log("here?")
+        console.log("onremotestream to screen share ...");
+        if(!store.getters.screenShare) {
           store.commit("setScreenShare", stream);
         }
       },
       oncleanup: () => {
         Janus.log(` ::: Got a cleanup notification (remote feed ${id}) :::`);
         console.log("oncleanup to screen share ...");
-        // store.dispatch("selectUser", store.getters.users[1]);
       }
     });
   },
