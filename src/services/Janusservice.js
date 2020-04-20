@@ -28,19 +28,29 @@ const detachFeed = detachRfid => {
   );
 };
 
-const selectFirstStream = () => {
-  if (store.getters.users.length > 0) {
-    console.log("selectFirstStream")
-    store.dispatch("selectUser", store.getters.users[1]);
-
-    if(store.getters.users[0].screenSharePluginHandle) {
-      store.getters.users[0].screenSharePluginHandle.detach()
-    }
-
-    store.commit("setScreenShare", null);
-
-  }
-};
+// const selectFirstStream = () => {
+//   console.log("detaching ...")
+  // if (store.getters.users.length > 0) {
+  //   console.log("selectFirstStream")
+  //
+  //
+  //   if(store.getters.users[0].screenSharePluginHandle) {
+  //     console.log("detaching ...")
+  //     console.log(store.getters.users[0].screenSharePluginHandle)
+  //     store.getters.users[0].screenSharePluginHandle.detach()
+  //     store.dispatch("selectUser", store.getters.users[1]);
+  //     // store.commit("setScreenShare", null);
+  //     //
+  //     // const users = store.getters.users;
+  //     // users[0].screenSharePluginHandle = null;
+  //     //
+  //     // store.commit("setUsers", users);
+  //   }
+  //
+  //
+  //
+  // }
+// };
 
 const determineSpeaker = (stream, remoteFeed, id) => {
   const AudioContext =
@@ -308,12 +318,19 @@ export const janusHelpers = {
           store.commit("setScreenShare", stream);
           stream.getVideoTracks()[0].addEventListener('ended', () => {
             console.log("Local video stream seems to have ended.")
-            selectFirstStream();
-            return;
-          })
+            store.getters.users[0].screenSharePluginHandle.detach();
+          });
         },
         oncleanup: () => {
           Janus.log(" ::: Got a cleanup notification :::");
+          console.log("oncleanup Screenshare")
+
+          store.commit("setScreenShare", null);
+
+          const users = store.getters.users;
+          users[0].screenSharePluginHandle = null;
+
+          store.commit("setUsers", users);
         }
       });
     },
@@ -578,10 +595,13 @@ export const janusHelpers = {
       onremotestream: stream => {
         console.log("Onremotestream to screen share ...")
 
+        // console.log(stream)
+        // console.log(stream.getVideoTracks())
         if (!stream.getVideoTracks()[0]) {
-          selectFirstStream();
+          console.log("Found no video ...")
           return;
         }
+
 
         let userIndex = store.getters.users.findIndex(
           user => user.username === remoteFeed.rfdisplay
@@ -594,7 +614,6 @@ export const janusHelpers = {
       oncleanup: () => {
         Janus.log(` ::: Got a cleanup notification (remote feed ${id}) :::`);
         console.log("oncleanup to screen share ...")
-        selectFirstStream();
       }
     });
   },
