@@ -35,37 +35,43 @@
   </v-row>
 </template>
 <script>
-  import {mapActions} from 'vuex'
+import { mapActions } from "vuex";
 export default {
   data() {
     return {
+      /* eslint-disable */
+      reg: new RegExp("(?:https:\/\/.*\/room\/invite\/)?(.*)"),
+      /* eslint-enable */
       valid: false,
       inviteUrlRules: [
-        url => !!url || 'Invite url is required'
+        url => !!url || "Invite url is required",
+        url => this.reg.test(url) || "Invite url or room ID  invalid"
       ],
       inviteUrl: null
     };
   },
   methods: {
-    ...mapActions(['createTeam']),
+    ...mapActions(["createTeam"]),
     create() {
-      this.createTeam()
-      this.$router.push({name: 'room'})
+      this.createTeam();
+      this.$router.push({ name: "room" });
     },
     joinRoom() {
-      let token = ''
-      const reg = new RegExp(`${window.location.href}room/invite/(.*)`)
-      if (new RegExp(`${window.location.href}room/invite/(.*)`).test(this.inviteUrl)) {
-        token = this.inviteUrl.match(reg)[1]
-      } else {
-        token = this.inviteUrl
+      if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
+        this.$router.push({
+          name: "waitingRoom",
+          params: {
+            token: this.inviteUrl.match(this.reg)[1]
+          }
+        });
       }
-      this.$router.push({
-        name: "waitingRoom",
-        params: {
-          token
-        }
-      });
+    }
+  },
+  watch: {
+    inviteUrl(val) {
+      if (val && this.reg.test(val) && val.length > 15) {
+        this.inviteUrl = val.match(this.reg)[1];
+      }
     }
   }
 };
