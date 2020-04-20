@@ -319,18 +319,21 @@ export const janusHelpers = {
           stream.getVideoTracks()[0].addEventListener('ended', () => {
             console.log("Local video stream seems to have ended.")
             store.getters.users[0].screenSharePluginHandle.detach();
+            store.commit("setScreenShareEnabled", false);
           });
         },
         oncleanup: () => {
           Janus.log(" ::: Got a cleanup notification :::");
-          console.log("oncleanup Screenshare")
+          console.log("oncleanup Screenshare HERE20, ", store.getters.users[1])
 
+          store.commit("setScreenShareEnabled", false);
           store.commit("setScreenShare", null);
+          store.dispatch("selectUser", store.getters.users[1]);
 
-          const users = store.getters.users;
-          users[0].screenSharePluginHandle = null;
+          // const users = store.getters.users;
+          // users[0].screenSharePluginHandle = null;
 
-          store.commit("setUsers", users);
+          // store.commit("setUsers", users);
         }
       });
     },
@@ -407,7 +410,7 @@ export const janusHelpers = {
     stopScreenShare() {
       console.log("Stopped screenshare ... ");
       store.getters.users[0].screenSharePluginHandle.detach();
-      store.commit("setScreenShare", null);
+      // store.commit("setScreenShare", null);
     }
   },
   publishOwnFeed(useAudio) {
@@ -594,26 +597,38 @@ export const janusHelpers = {
       },
       onremotestream: stream => {
         console.log("Onremotestream to screen share ...")
+        console.log(stream)
 
-        // console.log(stream)
-        // console.log(stream.getVideoTracks())
+        console.log(stream.getVideoTracks())
+
+        if(!store.getters.screenShareEnabled) {
+          console.log("Ignoring the onremote stream")
+          return;
+        } else if(store.getters.screenShare) {
+          console.log("We are here ? ")
+          return;
+        }
+
+        // // console.log(stream)
+        // // console.log(stream.getVideoTracks())
         if (!stream.getVideoTracks()[0]) {
           console.log("Found no video ...")
           return;
         }
-
 
         let userIndex = store.getters.users.findIndex(
           user => user.username === remoteFeed.rfdisplay
         );
 
         if (store.getters.users[userIndex] && !store.getters.screenShare) {
+          console.log("here?")
           store.commit("setScreenShare", stream);
         }
       },
       oncleanup: () => {
         Janus.log(` ::: Got a cleanup notification (remote feed ${id}) :::`);
-        console.log("oncleanup to screen share ...")
+        console.log("oncleanup to screen share ...");
+        // store.dispatch("selectUser", store.getters.users[1]);
       }
     });
   },
