@@ -69,10 +69,10 @@ export default {
       state.selectedUser = user;
     },
     shareScreen() {
-      janusHelpers.screenShare.shareAndPublishScreen();
+      janusHelpers.screenShare.onJanusCreateSuccess(janusHelpers.screenShare.shareAndPublishScreen);
     },
     joinScreen(state, id) {
-      janusHelpers.screenShare.joinScreen(id);
+      janusHelpers.screenShare.onJanusCreateSuccess(() => janusHelpers.screenShare.joinScreen(id));
     },
     stopScreenShare() {
       janusHelpers.screenShare.stopScreenShare();
@@ -92,7 +92,6 @@ export default {
             server: config.janusServer,
             success: function() {
               janusHelpers.videoRoom.onJanusCreateSuccess();
-              janusHelpers.screenShare.onJanusCreateSuccess();
             },
             error: function(error) {
               console.error("Janus error callback");

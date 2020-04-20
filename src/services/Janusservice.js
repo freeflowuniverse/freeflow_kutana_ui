@@ -28,14 +28,21 @@ const detachFeed = detachRfid => {
   );
 };
 
-function selectFirstStream() {
+const selectFirstStream = () => {
   if (store.getters.users.length > 0) {
+    console.log("selectFirstStream")
     store.dispatch("selectUser", store.getters.users[1]);
-    store.commit("setScreenShare", null);
-  }
-}
 
-function determineSpeaker(stream, remoteFeed, id) {
+    if(store.getters.users[0].screenSharePluginHandle) {
+      store.getters.users[0].screenSharePluginHandle.detach()
+    }
+
+    store.commit("setScreenShare", null);
+
+  }
+};
+
+const determineSpeaker = (stream, remoteFeed, id) => {
   const AudioContext =
       window.AudioContext || window.webkitAudioContext || false;
   let audioContext = new AudioContext();
@@ -81,7 +88,7 @@ function determineSpeaker(stream, remoteFeed, id) {
       }
     };
   }
-}
+};
 
 export const janusHelpers = {
   videoRoom: {
@@ -197,7 +204,7 @@ export const janusHelpers = {
     }
   },
   screenShare: {
-    onJanusCreateSuccess() {
+    onJanusCreateSuccess(onAttachSuccess) {
       store.getters.janus.attach({
         plugin: "janus.plugin.videoroom",
         opaqueId: store.getters.opaqueId,
@@ -206,6 +213,7 @@ export const janusHelpers = {
           users[0].screenSharePluginHandle = pluginHandle;
 
           store.commit("setUsers", users);
+          onAttachSuccess();
         },
         error: error => {
           Janus.error("  -- Error attaching plugin...", error);
@@ -298,6 +306,11 @@ export const janusHelpers = {
         },
         onlocalstream: stream => {
           store.commit("setScreenShare", stream);
+          stream.getVideoTracks()[0].addEventListener('ended', () => {
+            console.log("Local video stream seems to have ended.")
+            selectFirstStream();
+            return;
+          })
         },
         oncleanup: () => {
           Janus.log(" ::: Got a cleanup notification :::");
@@ -316,9 +329,13 @@ export const janusHelpers = {
         publishers: 1
       };
 
+      console.log("shareAndPublishScreen Creating screen share")
+
       store.getters.users[0].screenSharePluginHandle.send({
         message: create,
         success: result => {
+          console.log("shareAndPublishScreen Success screen share")
+
           if (!result["videoroom"]) {
             return;
           }
@@ -326,14 +343,23 @@ export const janusHelpers = {
           store.commit("setScreenShareRoom", result["room"]);
           let me = JSON.parse(window.localStorage.getItem("account"));
 
+          console.log("shareAndPublishScreen Join screen share")
+
           store.getters.users[0].screenSharePluginHandle.send({
             message: {
               request: "join",
               room: store.getters.screenShareRoom,
               ptype: "publisher",
               display: me.name
+            },
+            success: result => {
+              console.log("result, ", result)
+              console.log("shareAndPublishScreen Join success screen share")
             }
           });
+        },
+        error: error => {
+          console.log("Error, ", error)
         }
       });
     },
@@ -505,10 +531,12 @@ export const janusHelpers = {
 
     let remoteFeed = null;
 
+    console.log("Attaching to screen share ...")
     store.getters.janus.attach({
       plugin: "janus.plugin.videoroom",
       opaqueId: store.getters.opaqueId,
       success: pluginHandle => {
+        console.log("Succssfully attached to screen share ...")
         remoteFeed = pluginHandle;
         const listen = {
           request: "join",
@@ -520,8 +548,10 @@ export const janusHelpers = {
       },
       error: error => {
         Janus.error("  -- Error attaching plugin...", error);
+        console.log("Error attached to screen share ...")
       },
       onmessage: (msg, jsep) => {
+        console.log("Onmessage to screen share ...")
         const event = msg["videoroom"];
         if (event) {
           if (event === "attached") {
@@ -546,6 +576,8 @@ export const janusHelpers = {
         }
       },
       onremotestream: stream => {
+        console.log("Onremotestream to screen share ...")
+
         if (!stream.getVideoTracks()[0]) {
           selectFirstStream();
           return;
@@ -561,6 +593,8 @@ export const janusHelpers = {
       },
       oncleanup: () => {
         Janus.log(` ::: Got a cleanup notification (remote feed ${id}) :::`);
+        console.log("oncleanup to screen share ...")
+        selectFirstStream();
       }
     });
   },
