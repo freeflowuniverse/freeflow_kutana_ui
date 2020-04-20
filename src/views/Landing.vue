@@ -11,10 +11,10 @@
               <v-form @submit.prevent="joinRoom" v-model="valid">
                 <v-text-field
                   filled
-                  label="Invite url"
+                  label="Invite url or room ID"
                   persistent-hint
                   v-model="inviteUrl"
-                  hint="Paste the url you received"
+                  hint="Paste the url or room ID you've received"
                   :rules="inviteUrlRules"
                   required
                 >
@@ -41,8 +41,7 @@ export default {
     return {
       valid: false,
       inviteUrlRules: [
-        url => !!url || 'Invite url is required',
-        url => new RegExp(`${window.location.href}room/invite/(.*)`).test(url) || 'Invalid invite url'
+        url => !!url || 'Invite url is required'
       ],
       inviteUrl: null
     };
@@ -54,11 +53,17 @@ export default {
       this.$router.push({name: 'room'})
     },
     joinRoom() {
+      let token = ''
       const reg = new RegExp(`${window.location.href}room/invite/(.*)`)
+      if (new RegExp(`${window.location.href}room/invite/(.*)`).test(this.inviteUrl)) {
+        token = this.inviteUrl.match(reg)[1]
+      } else {
+        token = this.inviteUrl
+      }
       this.$router.push({
         name: "waitingRoom",
         params: {
-          token: this.inviteUrl.match(reg)[1]
+          token
         }
       });
     }
