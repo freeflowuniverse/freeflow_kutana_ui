@@ -5313,7 +5313,7 @@ isstream@~0.1.2:
 
 "janus-gateway@git://github.com/threefoldtech/freeflowconnect_janus.git":
   version "0.7.5"
-  resolved "git://github.com/threefoldtech/freeflowconnect_janus.git#ad130a8986e192cae5457bc8ac2e9071f10b711b"
+  resolved "git://github.com/threefoldtech/freeflowconnect_janus.git#2aba26effd14d212173ce7c08b5eb3293c6dd17f"
   dependencies:
     webrtc-adapter "6.4.0"
 
