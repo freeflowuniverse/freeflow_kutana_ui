@@ -34,6 +34,7 @@ export default {
   position: relative;
   height: 100%;
   overflow: hidden;
+  border-radius: 0 !important;
 }
 .inner {
   height: calc(100% - 64px);
