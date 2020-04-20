@@ -8,7 +8,7 @@
           >{{ message.createdAt | parseToTime }}</span>
           <v-divider class="mb-2"></v-divider>
         </div>
-        <div class="pb-1 pt-1" :key="index">
+        <div :key="index">
           <TheChatMessage :message="message" />
         </div>
       </template>

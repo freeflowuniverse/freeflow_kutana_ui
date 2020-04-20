@@ -1,43 +1,46 @@
 <template>
-  <v-card
-    :class="`chatMessage ${message.sender === account.name ? 'ml-6 mr-2' : 'mr-12 ml-1'}`"
-    elevation="0"
-    :color="`${message.sender === account.name ? 'primary' : 'secondary' }`"
-    dark
-    v-if="message.type"
-  >
-    <v-card-subtitle>
-      <v-row class="pr-3 pl-3">
-        <span class="font-weight-bold">{{ message.sender }}</span>
-      </v-row>
-    </v-card-subtitle>
-    <v-card-text v-if="message.type === 'text'" class="font-weight-medium content">
-      <vueMarkdown :anchorAttributes="anchorAttributes" :html="false">{{message.content}}</vueMarkdown>
-    </v-card-text>
-    <v-card-text v-else-if="message.type === 'file' && mimeType === 'image/png'">
-      <v-img :src="message.content.file"></v-img>
-    </v-card-text>
-    <v-card-text v-else-if="message.type === 'file' ">
-      <v-sheet color="primary lighten-2">
-        <v-row class="mx-0 pa-3" align="center">
-          <v-icon large>attachment</v-icon>
-          <v-col>
-            <p class="my-0">
-              <a
-                :href="message.content.file"
-                :download="message.content.name"
-                class="white--text"
-              >{{message.content.name}}</a>
-            </p>
-            <p class="my-0 overline">{{fileSize}}</p>
-          </v-col>
-          <v-btn text icon :href="message.content.file" :download="message.content.name">
-            <v-icon>get_app</v-icon>
-          </v-btn>
+  <section>
+    <v-card
+      :class="`chatMessage mb-2 ${message.sender === account.name ? 'ml-6 mr-2' : 'mr-12 ml-1'}`"
+      elevation="0"
+      :color="`${message.sender === account.name ? 'primary' : 'secondary' }`"
+      dark
+      v-if="message.type"
+    >
+      <v-card-subtitle class="pt-3 pb-1">
+        <v-row class="px-3">
+          <span class="font-weight-bold">{{ message.sender }}</span>
         </v-row>
-      </v-sheet>
-    </v-card-text>
-  </v-card>
+      </v-card-subtitle>
+      <v-card-text v-if="message.type === 'text'" class="font-weight-medium content pb-1">
+        <vueMarkdown :anchorAttributes="anchorAttributes" :html="false">{{message.content}}</vueMarkdown>
+      </v-card-text>
+      <v-card-text v-else-if="message.type === 'file' && mimeType === 'image/png'">
+        <v-img :src="message.content.file"></v-img>
+      </v-card-text>
+      <v-card-text v-else-if="message.type === 'file' ">
+        <v-sheet color="primary lighten-2">
+          <v-row class="mx-0 pa-3" align="center">
+            <v-icon large>attachment</v-icon>
+            <v-col>
+              <p class="my-0">
+                <a
+                  :href="message.content.file"
+                  :download="message.content.name"
+                  class="white--text"
+                >{{message.content.name}}</a>
+              </p>
+              <p class="my-0 overline">{{fileSize}}</p>
+            </v-col>
+            <v-btn text icon :href="message.content.file" :download="message.content.name">
+              <v-icon>get_app</v-icon>
+            </v-btn>
+          </v-row>
+        </v-sheet>
+      </v-card-text>
+    </v-card>
+    <div class="text-center grey--text font-weight-light overline" v-else>{{message.content}}</div>
+  </section>
 </template>
 
 <script type="javascript">
@@ -96,5 +99,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 </style>
