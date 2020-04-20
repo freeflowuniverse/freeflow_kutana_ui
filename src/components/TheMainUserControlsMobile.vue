@@ -63,7 +63,6 @@
         </v-card-title>
         <v-card-text>
           <v-text-field
-            :loading="isGeneratingInvite"
             filled
             label="Invite url"
             persistent-hint
@@ -102,7 +101,7 @@ export default {
     this.$root.$on('showInviteUser', this.showAddUserDialog)
   },
   computed: {
-    ...mapGetters(["users", "teamName", "isGeneratingInvite"]),
+    ...mapGetters(["users", "teamName"]),
     inviteLink() {
       let baseUrl = window.location.href;
       if (baseUrl.charAt(baseUrl.length - 1) != "/") {
