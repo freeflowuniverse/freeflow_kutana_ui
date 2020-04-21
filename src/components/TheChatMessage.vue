@@ -6,10 +6,20 @@
       :color="`${message.sender === account.name ? 'primary' : 'secondary' }`"
       dark
       v-if="message.type"
+      @mouseenter="showTime = !showTime"
+      @mouseleave="showTime = !showTime"
     >
       <v-card-subtitle class="pt-3 pb-1">
-        <v-row class="px-3">
-          <span class="font-weight-bold">{{ message.sender }}</span>
+        <v-row>
+          <v-col class="px-2 py-0" cols="8">
+            <span class="font-weight-bold">{{ message.sender }}</span>
+          </v-col>
+
+          <v-col class="px-2 py-0" align="end">
+            <transition name="fade">
+              <span v-if="showTime">{{timeSent}}</span>
+            </transition>
+          </v-col>
         </v-row>
       </v-card-subtitle>
       <v-card-text v-if="message.type === 'text'" class="font-weight-medium content pb-1">
@@ -46,6 +56,7 @@
 <script type="javascript">
 import { mapGetters } from "vuex";
 import vueMarkdown from "vue-markdown";
+import moment from "moment";
 
 export default {
   props: ["message"],
@@ -54,6 +65,7 @@ export default {
   },
   data() {
     return {
+      showTime: false,
       anchorAttributes: {
         target: "_blank"
       }
@@ -85,6 +97,9 @@ export default {
         urlRegex,
         '<a target="_blank" href="$1">$1</a>'
       );
+    },
+    timeSent() {
+      return moment(this.message.createdAt).format('HH:mm:ss');
     }
   },
   methods: {
@@ -93,10 +108,19 @@ export default {
       win.document.write(
         `<iframe src="${this.message.content.file}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`
       );
+    },
+    displayTime() {
+      this.showTime = true;
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
 </style>
