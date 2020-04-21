@@ -5,10 +5,10 @@
     <v-card class="stream black">
       <v-card-title class="primary white--text body-1 mb-0 pt-1 pb-0">
         <v-row @click="$emit('click')" class="clickable">
-          <v-col class="py-0"></v-col>
-          <v-col class="py-0 title ttl" align="center">{{user.username}}</v-col>
-          <v-col class="py-0" align="end">
-            <v-btn text icon small v-if="isSelected">
+          <v-col cols="2" class="py-0"></v-col>
+          <v-col cols="8" class="py-0 title ttl" align="center">{{user.username}}</v-col>
+          <v-col cols="2" class="py-0" align="end">
+            <v-btn text icon small>
               <v-icon :class="`pin white ${isPinned? '': 'rotate'}`"></v-icon>
             </v-btn>
           </v-col>
@@ -65,7 +65,6 @@ export default {
       return this.selectedUser !== null && this.selectedUser.username === this.user.username
     },
     isPinned () {
-      console.log(`user`, this.selectedUser)
       return this.isSelected && this.selectedUser.pinned
     }
   }

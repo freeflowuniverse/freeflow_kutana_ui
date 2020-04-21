@@ -31,22 +31,17 @@ export default {
     ...mapActions(["selectUser", "setSnackbarMessage"]),
 
     selectStream(user) {
-      if (this.isSelected(user) && this.selectedUser.pinned) {
+      if (this.isSelected(user)) {
         this.selectUser({
           ...user,
           pinned: false
         });
         this.setSnackbarMessage({ text: "User unpinned" });
-      } else if(this.isSelected(user) && !this.selectedUser.pinned){
+      } else{
         this.setSnackbarMessage({ text: "User pinned" });
         this.selectUser({
           ...user,
           pinned: true
-        });
-      } else {
-        this.selectUser({
-          ...user,
-          pinned: false
         });
       }
     },
