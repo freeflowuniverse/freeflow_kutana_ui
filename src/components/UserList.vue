@@ -43,6 +43,11 @@ export default {
           ...user,
           pinned: true
         });
+      } else {
+        this.selectUser({
+          ...user,
+          pinned: false
+        });
       }
     },
     isSelected(user) {
