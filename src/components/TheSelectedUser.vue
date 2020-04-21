@@ -1,5 +1,5 @@
 <template>
-  <div class="stream-wrapper black">
+  <div class="stream-wrapper black" :class="!isMobile ? 'resize-stream' : ''">
     <div
       v-if="selectedUser && selectedUser.username && !isMobile"
       class="name primary pa-2 white--text"
@@ -87,13 +87,16 @@ export default {
   display: flex;
   flex: 1;
   position: relative;
-  width: 100%;
-  height: 100%;
   justify-content: center;
   #selectedStream {
     flex: 1;
     align-self: center;
   }
+}
+
+.resize-stream {
+  width: 100%;
+  height: 100%;
 }
 
 .name {

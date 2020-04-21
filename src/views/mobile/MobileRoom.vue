@@ -1,7 +1,13 @@
 <template>
-  <div class="room-grid" :class="showSideBar || showSettings ? 'show-side-bar' : ''">
+  <div class="room-grid" :class="showSideBar || showSettings ? 'show-side-bar' : showUserList ? 'show-user-list' : ''">
 
-    <div class="user-list" style="position: absolute; width: 100%; z-index: 1">
+    <div class="user-list">
+      <v-toolbar dark class="app-bar">
+        <v-spacer />
+        <v-btn icon @click="$root.$emit('toggleUserList')">
+            <v-icon>group</v-icon>
+        </v-btn>
+      </v-toolbar>
       <UserListMobile :showUserList="showUserList" />
     </div>
 
@@ -96,9 +102,16 @@ export default {
   width: 100vw;
   height: 100vh;
 
+  background-color: black;
+
   display: grid;
-  grid-template-rows: 100%;
-  grid-template-areas: "selected";
+  grid-template-rows: 20% 100%;
+  grid-template-areas: "userList" "selected";
+
+  &.show-user-list {
+    grid-template-rows: 3fr 100%;
+    grid-template-areas: "userList" "selected";
+  }
 
   &.show-side-bar {
     grid-template-rows: 100%;
@@ -128,6 +141,12 @@ export default {
 
 .side-bar {
   grid-area: sideBar;
+}
+
+.user-list {
+  grid-area: userList;
+  width: 100%;
+  z-index: 1
 }
 
 </style>

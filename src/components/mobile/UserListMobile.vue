@@ -1,11 +1,5 @@
 <template>
-  <div>
-    <v-toolbar dark class="app-bar">
-      <v-spacer />
-      <v-btn icon @click="$root.$emit('toggleUserList')">
-          <v-icon>group</v-icon>
-      </v-btn>
-    </v-toolbar>
+
     <section class="list" :class="!showUserList ? 'hide-users': ''">
       <UserListItem class="mobileUser"
         v-for="(user, index) in otherUsers"
@@ -14,8 +8,29 @@
         :userIndex="index"
         :key="index"
       />
+      <UserListItem class="mobileUser"
+        v-for="(user, index) in otherUsers"
+        @click.native="selectStream(user)"
+        :user="user"
+        :userIndex="index"
+        :key="index"
+      />
+      <UserListItem class="mobileUser"
+        v-for="(user, index) in otherUsers"
+        @click.native="selectStream(user)"
+        :user="user"
+        :userIndex="index"
+        :key="index"
+      />
+      <UserListItem class="mobileUser"
+        v-for="(user, index) in otherUsers"
+        @click.native="selectStream(user)"
+        :user="user"
+        :userIndex="index"
+        :key="index"
+      />
     </section>
-  </div>
+
 </template>
 
 <script type="javascript">
@@ -60,10 +75,5 @@ export default {
 
 .hide-users {
   display: none;
-}
-
-.app-bar {
-  background: none !important;
-  width: 100%;
 }
 </style>
