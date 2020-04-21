@@ -18,11 +18,11 @@ export default {
       socketService.emit("signal", {
         ...message,
         channel: context.getters.teamName
-        
       });
     },
     SOCKET_message(context, message) {
       context.commit("addMessage", message);
+      context.commit("alertUser");
     },
     SOCKET_signal(context, message) {
       console.log(`GOT SIGNAL`, message);

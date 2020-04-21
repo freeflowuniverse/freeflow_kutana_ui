@@ -1,10 +1,14 @@
 export default {
     state: {
-        snackbarMessage: ''
+        snackbarMessage: '',
+        alertUser: null
     },
     mutations: {
         setSnackbarMessage(state, message) {
             state.snackbarMessage = message
+        },
+        alertUser(state) {
+            state.alertUser = Math.random()
         }
     },
     actions: {
@@ -13,6 +17,7 @@ export default {
         }
     },
     getters: {
-        snackbarMessage: state => state.snackbarMessage
+        snackbarMessage: state => state.snackbarMessage,
+        alertUser: (state) => { return state.alertUser }
     },
 }

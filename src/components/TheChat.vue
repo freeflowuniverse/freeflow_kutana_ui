@@ -43,7 +43,7 @@ export default {
     });
   },
   computed: {
-    ...mapGetters(["messages", 'account'])
+    ...mapGetters(["messages", "account", "alertUser"])
   },
   methods: {
     showDivider(message, index) {
@@ -57,10 +57,8 @@ export default {
     }
   },
   watch: {
-    messages(val) {
-      if (val && val.length && val[val.length -1].sender != this.account.name) {
-        new Audio("notification.mp3").play();
-      }
+    alertUser() {
+      new Audio("notification.mp3").play();
     }
   }
 };
