@@ -98,6 +98,7 @@
 <script>
 import { Janus } from "janus-gateway";
 import { mapGetters, mapActions } from "vuex";
+import store from "../plugins/vuex";
 
 export default {
   data: function() {
@@ -184,6 +185,13 @@ export default {
     },
 
     screenShare: function() {
+      if(store.getters.screenShare) {
+        this.setSnackbarMessage({
+          type: "",
+          text: `Screenshare already in progress, only one screenshare per room!`
+        });
+        return;
+      }
       console.log("Sharing screen ...");
       this.shareScreen();
     },

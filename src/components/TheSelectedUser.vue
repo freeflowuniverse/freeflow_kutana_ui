@@ -16,6 +16,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+
 import JanusVideo from "./JanusVideo";
 
 export default {
@@ -41,9 +42,23 @@ export default {
       return this.selectedUser.stream;
     },
     userScreenshareStream() {
+
+
       if (!this.screenShare) {
         return false;
       }
+
+      if(!this.screenShare.getVideoTracks()) {
+        return false;
+      }
+      console.log(this.screenShare.getVideoTracks()[0].getSettings().frameRate)
+
+      // Dirty fix to fix leaving of the screen sharing, feel free to fix this yourself kthxbye.
+      if(this.screenShare.getVideoTracks()[0].getSettings().frameRate === 0) {
+        return false;
+      }
+
+
       console.log("Got screenshare: ", this.screenShare)
       const track = this.screenShare.getVideoTracks()[0];
       console.log("Got track: ", track)
