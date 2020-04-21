@@ -1,11 +1,11 @@
 <template>
   <section>
     <v-card
-      :class="`chatMessage mb-2 ${message.sender === account.name ? 'ml-6 mr-2' : 'mr-12 ml-1'}`"
+      :class="`chatMessage mb-2 ${isMine ? 'ml-6 mr-2 mine' : 'mr-12 ml-1'}`"
       elevation="0"
-      :color="`${message.sender === account.name ? 'primary' : 'secondary' }`"
-      dark
+      :color="`${isMine ? 'primary' : 'secondary' }`"
       v-if="message.type"
+      dark
       @mouseenter="showTime = !showTime"
       @mouseleave="showTime = !showTime"
     >
@@ -73,6 +73,9 @@ export default {
   },
   computed: {
     ...mapGetters(["account"]),
+    isMine() {
+      return this.message.sender === this.account.name
+    },
     mimeType() {
       if (this.message.type === "file") {
         return this.message.content.file.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0];

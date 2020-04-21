@@ -39,4 +39,7 @@ export default {
 .ttl {
   font-family: "Bebas Neue", cursive !important;
 }
+.chatMessage.mine a{
+  color: white;
+}
 </style>

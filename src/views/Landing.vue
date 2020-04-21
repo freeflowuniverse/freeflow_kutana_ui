@@ -35,12 +35,12 @@
   </v-row>
 </template>
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 export default {
   data() {
     return {
       /* eslint-disable */
-      reg: new RegExp("(?:https:\/\/.*\/room\/invite\/)?(.*)"),
+      reg: new RegExp("(?:https://.*/room/)?(.*)"),
       /* eslint-enable */
       valid: false,
       inviteUrlRules: [
@@ -50,18 +50,20 @@ export default {
       inviteUrl: null
     };
   },
+  computed: {
+    ...mapGetters(["teamName"])
+  },
   methods: {
     ...mapActions(["createTeam"]),
     create() {
       this.createTeam();
-      this.$router.push({ name: "room" });
     },
     joinRoom() {
       if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
         this.$router.push({
-          name: "waitingRoom",
+          name: "room",
           params: {
-            token: this.inviteUrl.match(this.reg)[1]
+            token: this.inviteUrl.match(this.reg)[1].substring(0,15)
           }
         });
       }
@@ -71,6 +73,11 @@ export default {
     inviteUrl(val) {
       if (val && this.reg.test(val) && val.length > 15) {
         this.inviteUrl = val.match(this.reg)[1];
+      }
+    },
+    teamName(val) {
+      if (val) {
+        this.$router.push({ name: "room", params: { token: val } });
       }
     }
   }

@@ -120,7 +120,7 @@ export default {
       if (baseUrl.charAt(baseUrl.length - 1) != "/") {
         baseUrl += "/";
       }
-      return `${baseUrl}invite/${this.teamName}`;
+      return `${baseUrl}`;
     }
   },
   methods: {

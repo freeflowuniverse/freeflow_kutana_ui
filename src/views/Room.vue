@@ -42,11 +42,11 @@ export default {
     };
   },
   beforeMount() {
+    this.join(this.$route.params.token);
     this.getTeamInfo();
   },
   mounted() {
     if (this.account && this.account.name && this.teamName) {
-      this.join();
       this.setRoomId(Math.abs(this.hashString(this.teamName)));
     }
     this.$root.$on("toggleSidebar", () => {
