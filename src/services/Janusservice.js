@@ -80,9 +80,7 @@ const determineSpeaker = (stream, remoteFeed, id) => {
       const average = values / length;
       if (
           !store.getters.selectedUser ||
-          (average > 20 &&
-              store.getters.selectedUser &&
-              remoteFeed.rfdisplay !== store.getters.selectedUser.username)
+          (store.getters.selectedUser && !store.getters.selectedUser.pinned && average > 20 && remoteFeed.rfdisplay !== store.getters.selectedUser.username)
       ) {
         if (!inThrottle) {
           inThrottle = true;
@@ -91,7 +89,8 @@ const determineSpeaker = (stream, remoteFeed, id) => {
             username: remoteFeed.rfdisplay,
             stream: stream,
             pluginHandle: remoteFeed,
-            screenShareStream: null
+            screenShareStream: null,
+            pinned:false
           });
           setTimeout(() => (inThrottle = false), 1000);
         }
@@ -326,7 +325,10 @@ export const janusHelpers = {
           Janus.log(" ::: Got a cleanup notification :::");
           console.log("oncleanup Screenshare HERE20, ", store.getters.users[1])
           store.commit("setScreenShare", null);
-          store.dispatch("selectUser", store.getters.users[1]);
+          store.dispatch("selectUser", {
+            ...store.getters.users[1],
+            pinned: false
+          });
 
           // const users = store.getters.users;
           // users[0].screenSharePluginHandle = null;
