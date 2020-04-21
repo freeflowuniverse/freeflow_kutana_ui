@@ -1,9 +1,10 @@
 <template>
   <div class="stream-wrapper black">
     <div
-      v-if="selectedUser && selectedUser.username"
+      v-if="!this.userScreenshareStream && selectedUser && selectedUser.username"
       class="name primary pa-2 white--text"
     >{{selectedUser.username}}</div>
+    
     <JanusVideo
       id="selectedStream"
       v-if="stream"
@@ -23,8 +24,7 @@ export default {
   components: {
     JanusVideo
   },
-  mounted() {
-  },
+  mounted() {},
   computed: {
     ...mapGetters(["selectedUser", "screenShare"]),
 
@@ -42,26 +42,23 @@ export default {
       return this.selectedUser.stream;
     },
     userScreenshareStream() {
-
-
       if (!this.screenShare) {
         return false;
       }
 
-      if(!this.screenShare.getVideoTracks()) {
+      if (!this.screenShare.getVideoTracks()) {
         return false;
       }
-      console.log(this.screenShare.getVideoTracks()[0].getSettings().frameRate)
+      console.log(this.screenShare.getVideoTracks()[0].getSettings().frameRate);
 
       // Dirty fix to fix leaving of the screen sharing, feel free to fix this yourself kthxbye.
-      if(this.screenShare.getVideoTracks()[0].getSettings().frameRate === 0) {
+      if (this.screenShare.getVideoTracks()[0].getSettings().frameRate === 0) {
         return false;
       }
 
-
-      console.log("Got screenshare: ", this.screenShare)
+      console.log("Got screenshare: ", this.screenShare);
       const track = this.screenShare.getVideoTracks()[0];
-      console.log("Got track: ", track)
+      console.log("Got track: ", track);
 
       return this.screenShare;
     }
