@@ -17,7 +17,7 @@ staging_build:
         - echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
         - echo "Building ffc staging."
         - docker build -t jimber/freeflowconnect:staging-$CI_COMMIT_TAG .
-        - dockdocker run -dit --name=ffc_backend_redis --network=ffc_network redis:alpine
+        - docker push jimber/freeflowconnect:staging-$CI_COMMIT_TAG
 
 staging_deploy:
     stage: deploy
@@ -30,7 +30,7 @@ staging_deploy:
         - echo "Deploying ffc staging."
         - docker pull jimber/freeflowconnect:staging-$CI_COMMIT_TAG
         - docker rm -f ffc_frontend || true
-        - docker run -d -it --name=ffc_frontend --network=ffc_network -p 8080:80 jimber/freeflowconnect:staging-$CI_COMMIT_TAG
+        - docker run -dit --network=ffc_network --name=ffc_frontend -p 8080:80 jimber/freeflowconnect:staging-$CI_COMMIT_TAG
 
 production_build:
     stage: build
@@ -56,4 +56,4 @@ production_deploy:
         - echo "Deploying ffc production."
         - docker pull jimber/freeflowconnect:production-$CI_COMMIT_TAG
         - docker rm -f ffc_frontend || true
-        - docker run -d -it --name=ffc_frontend --network=ffc_network -p 8080:80 jimber/freeflowconnect:production-$CI_COMMIT_TAG
+        - docker run -dit --network=ffc_network --name=ffc_frontend -p 8080:80 jimber/freeflowconnect:production-$CI_COMMIT_TAG
