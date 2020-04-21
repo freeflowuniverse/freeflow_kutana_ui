@@ -8,7 +8,7 @@
           >{{ message.createdAt | parseToTime }}</span>
           <v-divider class="mb-2"></v-divider>
         </div>
-        <div class="pb-1 pt-1" :key="index">
+        <div :key="index">
           <TheChatMessage :message="message" />
         </div>
       </template>
@@ -43,7 +43,7 @@ export default {
     });
   },
   computed: {
-    ...mapGetters(["messages"])
+    ...mapGetters(["messages", "account", "alertUser"])
   },
   methods: {
     showDivider(message, index) {
@@ -54,6 +54,11 @@ export default {
       const time = moment(message.createdAt);
 
       return time.diff(previousMessage.createdAt, "m") > 5;
+    }
+  },
+  watch: {
+    alertUser() {
+      new Audio("notification.mp3").play();
     }
   }
 };

@@ -5311,9 +5311,9 @@ isstream@~0.1.2:
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
   integrity sha1-R+Y/evVa+m+S4VAOaQ64uFKcCZo=
 
-"janus-gateway@git://github.com/meetecho/janus-gateway.git":
+"janus-gateway@git://github.com/threefoldtech/freeflowconnect_janus.git":
   version "0.7.5"
-  resolved "git://github.com/meetecho/janus-gateway.git#534b1a7a2abe4111db9bca056fc860d04b926eda"
+  resolved "git://github.com/threefoldtech/freeflowconnect_janus.git#2aba26effd14d212173ce7c08b5eb3293c6dd17f"
   dependencies:
     webrtc-adapter "6.4.0"
 

@@ -2,7 +2,7 @@
   <section>
     <UserListItem
       v-for="(user, index) in otherUsers"
-      @click.native="selectStream(user)"
+      @click="selectStream(user)"
       :user="user"
       :userIndex="index"
       :key="index"
@@ -21,17 +21,32 @@ export default {
   },
   mounted() {},
   computed: {
-    ...mapGetters(["users"]),
+    ...mapGetters(["users", "selectedUser"]),
 
     otherUsers() {
       return this.users.slice(1);
     }
   },
   methods: {
-    ...mapActions(["selectUser"]),
+    ...mapActions(["selectUser", "setSnackbarMessage"]),
 
-    selectStream: function(user) {
-      this.selectUser(user);
+    selectStream(user) {
+      if (this.isSelected(user) && this.selectedUser.pinned) {
+        this.selectUser({
+          ...user,
+          pinned: false
+        });
+        this.setSnackbarMessage({ text: "User unpinned" });
+      } else{
+        this.setSnackbarMessage({ text: "User pinned" });
+        this.selectUser({
+          ...user,
+          pinned: true
+        });
+      }
+    },
+    isSelected(user) {
+      return this.selectedUser !== null && this.selectedUser.username === user.username;
     }
   }
 };

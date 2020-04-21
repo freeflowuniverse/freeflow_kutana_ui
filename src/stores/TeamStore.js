@@ -3,16 +3,11 @@ import moment from "moment";
 import ffcService from "../services/ffcService";
 export default {
   state: {
-    isGeneratingInvite: true,
     isAccepted: false,
     teamName: window.localStorage.getItem("teamName") || null,
   },
   mutations: {
-    setIsGeneratingInvite(state, loading) {
-      state.isGeneratingInvite = loading;
-    },
-    
-    setAccepted(state, accepted) {
+     setAccepted(state, accepted) {
       state.isAccepted = accepted;
     },
     setTeamName(state, teamName) {
@@ -25,12 +20,10 @@ export default {
       context.commit("setTeamName", random.stringGenerator(15));
     },
     getTeamInfo(context) {
-      context.commit("setIsGeneratingInvite", true);
       console.log(`context.getters.teamName`, context.getters.teamName)
       ffcService.getTeamInfo(context.getters.teamName).then((result) => {
         let data = result.data;
         context.commit("setMessages", data.messages);
-        context.commit("setIsGeneratingInvite", false);
       });
     },
     requestAccess(context, token) {
@@ -53,13 +46,17 @@ export default {
 
       context.commit("joinScreen", message.content)
     },
+    stopScreenShare(context) {
+      context.commit("setSnackbarMessage", {
+        text: `Screenshare stopped`,
+      });
+
+      context.commit("stopScreenShare")
+    },
   },
   getters: {
     teamName: (state) => {
       return state.teamName;
-    },
-    isGeneratingInvite: (state) => {
-      return state.isGeneratingInvite;
     },
     isAccepted: (state) => {
       return state.isAccepted;

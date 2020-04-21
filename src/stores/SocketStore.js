@@ -2,7 +2,10 @@ import socketService from "../services/socketService";
 
 export default {
   actions: {
-    join(context) {
+    join(context, teamName) {
+      if (teamName) {
+        context.commit('setTeamName', teamName)
+      }
       socketService.emit("join", {
         username: context.getters.account.name,
         channel: context.getters.teamName,
@@ -18,11 +21,11 @@ export default {
       socketService.emit("signal", {
         ...message,
         channel: context.getters.teamName
-        
       });
     },
     SOCKET_message(context, message) {
       context.commit("addMessage", message);
+      context.commit("alertUser");
     },
     SOCKET_signal(context, message) {
       console.log(`GOT SIGNAL`, message);
@@ -31,8 +34,12 @@ export default {
           context.dispatch("accessGranted");
           break;
         case "screenshare_started":
-          console.log("Joining screen share ... ")
+          console.log("Joining screen share ... ");
           context.dispatch("joinScreenShare", message);
+          break;
+        case "screenshare_stopped":
+          console.log("Stopped screen share ... ");
+          // context.dispatch("stopScreenShare");
           break;
         default:
           console.log(`NOT DISPATCHING`);

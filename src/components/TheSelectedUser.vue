@@ -10,13 +10,13 @@
       :stream="stream"
       :muted="true"
       :isScreenShare="this.userScreenshareStream !== false"
-      :show-controls="this.userScreenshareStream"
     ></JanusVideo>
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+
 import JanusVideo from "./JanusVideo";
 import mobile from '../mixin/mobile';
 
@@ -24,6 +24,8 @@ export default {
   mixins: [mobile],
   components: {
     JanusVideo
+  },
+  mounted() {
   },
   computed: {
     ...mapGetters(["selectedUser", "screenShare"]),
@@ -42,15 +44,40 @@ export default {
       return this.selectedUser.stream;
     },
     userScreenshareStream() {
+
+
       if (!this.screenShare) {
         return false;
       }
+
+      if(!this.screenShare.getVideoTracks()) {
+        return false;
+      }
+      console.log(this.screenShare.getVideoTracks()[0].getSettings().frameRate)
+
+      // Dirty fix to fix leaving of the screen sharing, feel free to fix this yourself kthxbye.
+      if(this.screenShare.getVideoTracks()[0].getSettings().frameRate === 0) {
+        return false;
+      }
+
+
+      console.log("Got screenshare: ", this.screenShare)
+      const track = this.screenShare.getVideoTracks()[0];
+      console.log("Got track: ", track)
 
       return this.screenShare;
     }
   },
   methods: {
     ...mapActions(["joinScreen"])
+  },
+  watch: {
+    screenShare: {
+      deep: true,
+      handler() {
+        console.log("screenShare CHANGED!");
+      }
+    }
   }
 };
 </script>
@@ -75,5 +102,4 @@ export default {
   left: 0;
   z-index: 1;
 }
-
 </style>

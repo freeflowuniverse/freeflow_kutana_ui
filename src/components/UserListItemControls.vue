@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 // import { Janus } from "janus-gateway";
 
 export default {
@@ -22,8 +23,10 @@ export default {
   },
   mounted() {
   },
-  methods: { 
+  methods: {
+    ...mapActions(['setSnackbarMessage']),
     toggleMute () {
+      this.setSnackbarMessage({text: `User ${this.muted ? 'un':''}muted`})
       this.muted = !this.muted
       this.$emit('setMute', this.muted)
     }

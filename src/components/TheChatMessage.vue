@@ -1,48 +1,62 @@
 <template>
-  <v-card
-    :class="`chatMessage ${message.sender === account.name ? 'ml-6 mr-2' : 'mr-12 ml-1'}`"
-    elevation="0"
-    :color="`primary ${message.sender === account.name ? 'lighten-2' : 'lighten-3' }`"
-    dark
-    v-if="message.type"
-  >
-    <v-card-subtitle>
-      <v-row class="pr-3 pl-3">
-        <span class="font-weight-bold">{{ message.sender }}</span>
-      </v-row>
-    </v-card-subtitle>
-    <v-card-text v-if="message.type === 'text'" class="font-weight-medium content">
-      <vueMarkdown :anchorAttributes="anchorAttributes" :html="false">{{message.content}}</vueMarkdown>
-    </v-card-text>
-    <v-card-text v-else-if="message.type === 'file' && mimeType === 'image/png'">
-      <v-img :src="message.content.file"></v-img>
-    </v-card-text>
-    <v-card-text v-else-if="message.type === 'file' ">
-      <v-sheet color="primary lighten-2">
-        <v-row class="mx-0 pa-3" align="center">
-          <v-icon large>attachment</v-icon>
-          <v-col>
-            <p class="my-0">
-              <a
-                :href="message.content.file"
-                :download="message.content.name"
-                class="white--text"
-              >{{message.content.name}}</a>
-            </p>
-            <p class="my-0 overline">{{fileSize}}</p>
+  <section>
+    <v-card
+      :class="`chatMessage mb-2 ${isMine ? 'ml-6 mr-2 mine' : 'mr-12 ml-1'}`"
+      elevation="0"
+      :color="`${isMine ? 'primary' : 'secondary' }`"
+      v-if="message.type"
+      dark
+      @mouseenter="showTime = !showTime"
+      @mouseleave="showTime = !showTime"
+    >
+      <v-card-subtitle class="pt-3 pb-1">
+        <v-row>
+          <v-col class="px-2 py-0" cols="8">
+            <span class="font-weight-bold">{{ message.sender }}</span>
           </v-col>
-          <v-btn text icon :href="message.content.file" :download="message.content.name">
-            <v-icon>get_app</v-icon>
-          </v-btn>
+
+          <v-col class="px-2 py-0" align="end">
+            <transition name="fade">
+              <span v-if="showTime">{{timeSent}}</span>
+            </transition>
+          </v-col>
         </v-row>
-      </v-sheet>
-    </v-card-text>
-  </v-card>
+      </v-card-subtitle>
+      <v-card-text v-if="message.type === 'text'" class="font-weight-medium content pb-1">
+        <vueMarkdown :anchorAttributes="anchorAttributes" :html="false">{{message.content}}</vueMarkdown>
+      </v-card-text>
+      <v-card-text v-else-if="message.type === 'file' && mimeType === 'image/png'">
+        <v-img :src="message.content.file"></v-img>
+      </v-card-text>
+      <v-card-text v-else-if="message.type === 'file' ">
+        <v-sheet color="primary lighten-2">
+          <v-row class="mx-0 pa-3" align="center">
+            <v-icon large>attachment</v-icon>
+            <v-col>
+              <p class="my-0">
+                <a
+                  :href="message.content.file"
+                  :download="message.content.name"
+                  class="white--text"
+                >{{message.content.name}}</a>
+              </p>
+              <p class="my-0 overline">{{fileSize}}</p>
+            </v-col>
+            <v-btn text icon :href="message.content.file" :download="message.content.name">
+              <v-icon>get_app</v-icon>
+            </v-btn>
+          </v-row>
+        </v-sheet>
+      </v-card-text>
+    </v-card>
+    <div class="text-center grey--text font-weight-light overline" v-else>{{message.content}}</div>
+  </section>
 </template>
 
 <script type="javascript">
 import { mapGetters } from "vuex";
 import vueMarkdown from "vue-markdown";
+import moment from "moment";
 
 export default {
   props: ["message"],
@@ -51,6 +65,7 @@ export default {
   },
   data() {
     return {
+      showTime: false,
       anchorAttributes: {
         target: "_blank"
       }
@@ -58,6 +73,9 @@ export default {
   },
   computed: {
     ...mapGetters(["account"]),
+    isMine() {
+      return this.message.sender === this.account.name
+    },
     mimeType() {
       if (this.message.type === "file") {
         return this.message.content.file.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0];
@@ -82,6 +100,9 @@ export default {
         urlRegex,
         '<a target="_blank" href="$1">$1</a>'
       );
+    },
+    timeSent() {
+      return moment(this.message.createdAt).format('HH:mm:ss');
     }
   },
   methods: {
@@ -90,10 +111,19 @@ export default {
       win.document.write(
         `<iframe src="${this.message.content.file}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`
       );
+    },
+    displayTime() {
+      this.showTime = true;
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
 </style>

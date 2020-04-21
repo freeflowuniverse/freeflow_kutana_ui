@@ -27,16 +27,16 @@
         </v-row>
       </v-col>
     </v-card>
-    <v-card class="primary pa-1" dark v-else>
+    <v-card class="secondary pa-1" dark v-else>
       <v-btn icon class="mx-1" @click="toggleSettings">
         <v-icon>settings</v-icon>
       </v-btn>
 
-      <v-btn v-if="published" @click="unpublishOwnFeed" icon class="mr-1">
+      <v-btn disabled v-if="published" @click="unpublishOwnFeed" icon class="mr-1">
         <v-icon>videocam</v-icon>
       </v-btn>
 
-      <v-btn v-else @click="publishOwnFeed" icon class="mr-1">
+      <v-btn disabled v-else @click="publishOwnFeed" icon class="mr-1">
         <v-icon>videocam_off</v-icon>
       </v-btn>
 
@@ -76,7 +76,6 @@
         </v-card-title>
         <v-card-text>
           <v-text-field
-            :loading="isGeneratingInvite"
             filled
             label="Invite url"
             persistent-hint
@@ -99,6 +98,7 @@
 <script>
 import { Janus } from "janus-gateway";
 import { mapGetters, mapActions } from "vuex";
+import store from "../plugins/vuex";
 
 export default {
   data: function() {
@@ -115,13 +115,13 @@ export default {
     this.$root.$on('showInviteUser', this.showAddUserDialog)
   },
   computed: {
-    ...mapGetters(["users", "teamName", "isGeneratingInvite"]),
+    ...mapGetters(["users", "teamName"]),
     inviteLink() {
       let baseUrl = window.location.href;
       if (baseUrl.charAt(baseUrl.length - 1) != "/") {
         baseUrl += "/";
       }
-      return `${baseUrl}invite/${this.teamName}`;
+      return `${baseUrl}`;
     }
   },
   methods: {
@@ -132,6 +132,8 @@ export default {
     toggleMute: function() {
       this.muted = this.users[0].pluginHandle.isAudioMuted();
       Janus.log((this.muted ? "Unmuting" : "Muting") + " local stream...");
+
+      this.setSnackbarMessage({text: `You are ${this.muted ? "un" : ""}muted`})
       if (this.muted) {
         this.users[0].pluginHandle.unmuteAudio();
       } else {
@@ -142,7 +144,7 @@ export default {
     },
 
     saveQualityOption() {
-      console.log(`Set quality to ${this.quality} = ${20000 * this.quality}`);
+      this.setSnackbarMessage({text: `Quality set to ${this.qualityOptions[this.quality]}`})
       this.users[0].pluginHandle.send({
         message: { request: "configure", bitrate: 20000 * this.quality}
       });
@@ -183,6 +185,13 @@ export default {
     },
 
     screenShare: function() {
+      if(store.getters.screenShare) {
+        this.setSnackbarMessage({
+          type: "",
+          text: `Screenshare already in progress, only one screenshare per room!`
+        });
+        return;
+      }
       console.log("Sharing screen ...");
       this.shareScreen();
     },

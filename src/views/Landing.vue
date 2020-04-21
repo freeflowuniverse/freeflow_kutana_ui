@@ -11,10 +11,10 @@
               <v-form @submit.prevent="joinRoom" v-model="valid">
                 <v-text-field
                   filled
-                  label="Invite url"
+                  label="Invite url or room ID"
                   persistent-hint
                   v-model="inviteUrl"
-                  hint="Paste the url you received"
+                  hint="Paste the url or room ID you've received"
                   :rules="inviteUrlRules"
                   required
                 >
@@ -35,32 +35,50 @@
   </v-row>
 </template>
 <script>
-  import {mapActions} from 'vuex'
+import { mapActions, mapGetters } from "vuex";
 export default {
   data() {
     return {
+      /* eslint-disable */
+      reg: new RegExp("(?:https://.*/room/)?(.*)"),
+      /* eslint-enable */
       valid: false,
       inviteUrlRules: [
-        url => !!url || 'Invite url is required',
-        url => new RegExp(`${window.location.href}room/invite/(.*)`).test(url) || 'Invalid invite url'
+        url => !!url || "Invite url is required",
+        url => this.reg.test(url) || "Invite url or room ID  invalid"
       ],
       inviteUrl: null
     };
   },
+  computed: {
+    ...mapGetters(["teamName"])
+  },
   methods: {
-    ...mapActions(['createTeam']),
+    ...mapActions(["createTeam"]),
     create() {
-      this.createTeam()
-      this.$router.push({name: 'room'})
+      this.createTeam();
     },
     joinRoom() {
-      const reg = new RegExp(`${window.location.href}room/invite/(.*)`)
-      this.$router.push({
-        name: "waitingRoom",
-        params: {
-          token: this.inviteUrl.match(reg)[1]
-        }
-      });
+      if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
+        this.$router.push({
+          name: "room",
+          params: {
+            token: this.inviteUrl.match(this.reg)[1].substring(0,15)
+          }
+        });
+      }
+    }
+  },
+  watch: {
+    inviteUrl(val) {
+      if (val && this.reg.test(val) && val.length > 15) {
+        this.inviteUrl = val.match(this.reg)[1];
+      }
+    },
+    teamName(val) {
+      if (val) {
+        this.$router.push({ name: "room", params: { token: val } });
+      }
     }
   }
 };

@@ -6,7 +6,7 @@
       :class="this.$props.stream.getVideoTracks().length ? 'video-present janus-video' : 'video-not-present janus-video'"
     >
       <v-btn
-        v-if="showControls"
+        v-if="isScreenShare"
         fab
         small
         :absolute="!isFullScreen"
@@ -45,10 +45,6 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    },
-    showControls: {
-      type: Boolean,
-      required: false
     },
     stream: {
       type: MediaStream,
@@ -105,7 +101,7 @@ export default {
 }
 
 video.fullScreen {
-  object-fit: fill;
+  object-fit: contain;
 }
 
 .janus-video {
@@ -115,7 +111,7 @@ video.fullScreen {
 video {
   width: 100%;
   height: 100%;
-  object-fit: fill;
+  object-fit: contain;
   background-color: black;
 }
 
