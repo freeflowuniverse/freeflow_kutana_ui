@@ -43,7 +43,7 @@ export default {
     });
   },
   computed: {
-    ...mapGetters(["messages"])
+    ...mapGetters(["messages", 'account'])
   },
   methods: {
     showDivider(message, index) {
@@ -54,6 +54,13 @@ export default {
       const time = moment(message.createdAt);
 
       return time.diff(previousMessage.createdAt, "m") > 5;
+    }
+  },
+  watch: {
+    messages(val) {
+      if (val && val.length && val[val.length -1].sender != this.account.name) {
+        new Audio("notification.mp3").play();
+      }
     }
   }
 };
