@@ -302,13 +302,14 @@ export const janusHelpers = {
                   });
                 }
 
+                // This is a subscriber that is leaving. Hmhmhmhm
                 if(msg["leaving"]) {
                   console.log("We should LEAVE now?")
-                  store.dispatch("selectUser", {
-                    ...store.getters.users[1],
-                    pinned: false
-                  });
-                  store.commit("setScreenShare", null);
+                  // store.dispatch("selectUser", {
+                  //   ...store.getters.users[1],
+                  //   pinned: false
+                  // });
+                  // store.commit("setScreenShare", null);
                 }
                 break;
             }
@@ -612,6 +613,13 @@ export const janusHelpers = {
               type: "screenshare_stopped",
               content: store.getters.screenShareRoom
             });
+
+            store.dispatch("selectUser", {
+              ...store.getters.users[1],
+              pinned: false
+            });
+            store.commit("setScreenShare", null);
+
             return false;
           }
 
@@ -623,6 +631,7 @@ export const janusHelpers = {
       oncleanup: () => {
         Janus.log(` ::: Got a cleanup notification (remote feed ${id}) :::`);
         console.log("oncleanup to screen share ...");
+
       }
     });
   },
