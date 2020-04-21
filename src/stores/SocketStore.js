@@ -39,7 +39,7 @@ export default {
           break;
         case "screenshare_stopped":
           console.log("Stopped screen share ... ");
-          context.dispatch("stopScreenShare");
+          // context.dispatch("stopScreenShare");
           break;
         default:
           console.log(`NOT DISPATCHING`);
