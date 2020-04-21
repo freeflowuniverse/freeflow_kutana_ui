@@ -304,7 +304,10 @@ export const janusHelpers = {
 
                 if(msg["leaving"]) {
                   console.log("We should LEAVE now?")
-                  store.dispatch("selectUser", store.getters.users[1]);
+                  store.dispatch("selectUser", {
+                    ...store.getters.users[1],
+                    pinned: false
+                  });
                   store.commit("setScreenShare", null);
                 }
                 break;
@@ -409,7 +412,6 @@ export const janusHelpers = {
     stopScreenShare() {
       console.log("Stopped screenshare ... ");
       store.getters.users[0].screenSharePluginHandle.detach();
-      // store.commit("setScreenShare", null);
     }
   },
   publishOwnFeed(useAudio) {
@@ -610,8 +612,6 @@ export const janusHelpers = {
               type: "screenshare_stopped",
               content: store.getters.screenShareRoom
             });
-            // store.dispatch("selectUser", store.getters.users[1]);
-            // store.commit("setScreenShare", null);
             return false;
           }
 
