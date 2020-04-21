@@ -60,15 +60,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.fill {
-  height: 100%;
-  position: absolute;
-  width: 100%;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
 .userListItem {
   padding: 5px;
 }

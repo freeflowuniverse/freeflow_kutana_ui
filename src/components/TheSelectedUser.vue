@@ -1,7 +1,7 @@
 <template>
   <div class="stream-wrapper black">
     <div
-      v-if="selectedUser && selectedUser.username"
+      v-if="selectedUser && selectedUser.username && !isMobile"
       class="name primary pa-2 white--text"
     >{{selectedUser.username}}</div>
     <JanusVideo
@@ -18,8 +18,10 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import JanusVideo from "./JanusVideo";
+import mobile from '../mixin/mobile';
 
 export default {
+  mixins: [mobile],
   components: {
     JanusVideo
   },

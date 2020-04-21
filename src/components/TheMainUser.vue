@@ -6,7 +6,6 @@
     </section>
     <section v-else>
       <JanusVideo class="mobileMainUserStream" v-if="stream" :stream="stream" muted></JanusVideo>
-      <TheMainUserControlsMobile />
     </section>
   </div>
 </template>
@@ -14,14 +13,12 @@
 <script>
 import { mapGetters } from "vuex";
 import TheMainUserControls from "./TheMainUserControls";
-import TheMainUserControlsMobile from "./TheMainUserControlsMobile";
 import JanusVideo from "./JanusVideo";
 import mobile from '../mixin/mobile';
 
 export default {
   mixins: [mobile],
   components: {
-    TheMainUserControlsMobile,
     TheMainUserControls,
     JanusVideo
   },
