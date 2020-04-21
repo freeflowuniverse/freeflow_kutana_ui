@@ -131,6 +131,8 @@ export default {
     toggleMute: function() {
       this.muted = this.users[0].pluginHandle.isAudioMuted();
       Janus.log((this.muted ? "Unmuting" : "Muting") + " local stream...");
+
+      this.setSnackbarMessage({text: `You are ${this.muted ? "un" : ""}muted`})
       if (this.muted) {
         this.users[0].pluginHandle.unmuteAudio();
       } else {
@@ -141,7 +143,7 @@ export default {
     },
 
     saveQualityOption() {
-      console.log(`Set quality to ${this.quality} = ${20000 * this.quality}`);
+      this.setSnackbarMessage({text: `Quality set to ${this.qualityOptions[this.quality]}`})
       this.users[0].pluginHandle.send({
         message: { request: "configure", bitrate: 20000 * this.quality}
       });
