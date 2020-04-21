@@ -347,7 +347,7 @@ export const janusHelpers = {
       const create = {
         request: "create",
         description: "screenshare",
-        bitrate: 4096000,
+        bitrate: 256000,
         bitrate_cap: true,
         publishers: 1
       };
@@ -646,7 +646,7 @@ export const janusHelpers = {
         permanent: false,
         description: me.name,
         is_private: true,
-        bitrate: 4096000,
+        bitrate: 256000,
         bitrate_cap: true,
         publishers: 16
       }
