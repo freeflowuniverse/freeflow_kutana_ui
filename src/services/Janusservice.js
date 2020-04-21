@@ -304,17 +304,14 @@ export const janusHelpers = {
                 }
 
                 if(msg["leaving"]) {
-                  console.log("We should LEAVE now")
-                  detachFeed(msg["leaving"]);
+                  console.log("We should LEAVE now?")
                   store.dispatch("selectUser", store.getters.users[1]);
-
-                  store.getters.screenShare.removeTrack(store.getters.screenShare.getVideoTracks()[0]);
-                  store.getters.screenShare.removeTrack(store.getters.screenShare.getAudioTracks()[0]);
+                  store.commit("setScreenShare", null);
                 }
                 break;
             }
           }
-users
+
           if (jsep !== undefined && jsep !== null) {
             store.getters.users[0].screenSharePluginHandle.handleRemoteJsep({
               jsep: jsep
@@ -331,9 +328,10 @@ users
         },
         oncleanup: () => {
           Janus.log(" ::: Got a cleanup notification :::");
-          console.log("oncleanup Screenshare HERE20, ", store.getters.users[1])
-          // store.commit("setScreenShare", null);
+          console.log("oncleanup Screenshare", store.getters.users[1])
+
           store.dispatch("selectUser", store.getters.users[1]);
+          store.commit("setScreenShare", null);
         }
       });
     },
@@ -596,9 +594,20 @@ users
         }
       },
       onremotestream: stream => {
-        if (!store.getters.screenShare) {
-          store.commit("setScreenShare", stream);
-        }
+
+        setTimeout(() => {
+          // Dirty fix to fix leaving of the screen sharing, feel free to fix this yourself kthxbye.
+          if(stream.getVideoTracks()[0].getSettings().frameRate === 0) {
+            console.log("Detected video that has 0 fps. Video is corrupt or unusable.")
+            // store.dispatch("selectUser", store.getters.users[1]);
+            // store.commit("setScreenShare", null);
+            return false;
+          }
+
+          if (!store.getters.screenShare) {
+            store.commit("setScreenShare", stream);
+          }
+        }, 250);
       },
       oncleanup: () => {
         Janus.log(` ::: Got a cleanup notification (remote feed ${id}) :::`);

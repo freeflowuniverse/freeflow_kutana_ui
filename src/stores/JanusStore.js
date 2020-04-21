@@ -68,10 +68,12 @@ export default {
       state.selectedUser = user;
     },
     shareScreen() {
+      console.log("shareScreen")
       janusHelpers.screenShare.onJanusCreateSuccess(janusHelpers.screenShare.shareAndPublishScreen);
       // janusHelpers.screenShare.shareAndPublishScreen();
     },
     joinScreen(state, id) {
+      console.log("joinScreen")
       janusHelpers.screenShare.onJanusCreateSuccess(() => janusHelpers.screenShare.joinScreen(id));
     },
     stopScreenShare() {
