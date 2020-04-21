@@ -598,7 +598,17 @@ export const janusHelpers = {
         setTimeout(() => {
           // Dirty fix to fix leaving of the screen sharing, feel free to fix this yourself kthxbye.
           if(stream.getVideoTracks()[0].getSettings().frameRate === 0) {
-            console.log("Detected video that has 0 fps. Video is corrupt or unusable.")
+            console.log("Detected video that has 0 fps. Video is corrupt or unusable. Emitting screenshare_stopped")
+
+            let teamName = window.localStorage.getItem("teamName");
+            let user = JSON.parse(window.localStorage.getItem("account"));
+
+            socketService.emit("signal", {
+              channel: teamName,
+              sender: user.name,
+              type: "screenshare_stopped",
+              content: store.getters.screenShareRoom
+            });
             // store.dispatch("selectUser", store.getters.users[1]);
             // store.commit("setScreenShare", null);
             return false;

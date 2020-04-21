@@ -16,6 +16,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+
 import JanusVideo from "./JanusVideo";
 
 export default {
