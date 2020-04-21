@@ -31,7 +31,7 @@ export default {
     ...mapActions(["selectUser", "setSnackbarMessage"]),
 
     selectStream(user) {
-      if (this.isSelected(user)) {
+      if (this.isSelected(user) && this.selectedUser.pinned) {
         this.selectUser({
           ...user,
           pinned: false
