@@ -2,7 +2,10 @@ import socketService from "../services/socketService";
 
 export default {
   actions: {
-    join(context) {
+    join(context, teamName) {
+      if (teamName) {
+        context.commit('setTeamName', teamName)
+      }
       socketService.emit("join", {
         username: context.getters.account.name,
         channel: context.getters.teamName,
