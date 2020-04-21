@@ -32,11 +32,11 @@
         <v-icon>settings</v-icon>
       </v-btn>
 
-      <v-btn v-if="published" @click="unpublishOwnFeed" icon class="mr-1">
+      <v-btn disabled v-if="published" @click="unpublishOwnFeed" icon class="mr-1">
         <v-icon>videocam</v-icon>
       </v-btn>
 
-      <v-btn v-else @click="publishOwnFeed" icon class="mr-1">
+      <v-btn disabled v-else @click="publishOwnFeed" icon class="mr-1">
         <v-icon>videocam_off</v-icon>
       </v-btn>
 
