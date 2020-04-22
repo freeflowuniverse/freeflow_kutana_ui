@@ -1,7 +1,6 @@
 <template>
   <div class="stream-wrapper black" :class="!isMobile ? 'resize-stream' : ''">
     <div
-      v-if="selectedUser && selectedUser.username && !isMobile"
       v-if="!this.userScreenshareStream && selectedUser && selectedUser.username && !isMobile"
       class="name primary pa-2 white--text"
     >{{selectedUser.username}}</div>
