@@ -2,7 +2,7 @@ import VueRouter from "vue-router";
 import Vue from "vue";
 
 import Landing from "../views/Landing.vue";
-import Room from "../views/mobile/MobileRoom.vue";
+import Room from "../views/Room.vue";
 import Login from "../views/Login.vue";
 
 Vue.use(VueRouter);

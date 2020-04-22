@@ -1,6 +1,6 @@
 <template>
   <section 
-  :class="isMobile ? `userListItemMobile ma-1 ml-1 ${isSelected ? 'selected' : ''}` : `userListItem ma-3 ml-2 ${isSelected ? 'selected' : ''}`"
+    :class="isMobile ? `userListItemMobile ma-1 ml-1 ${isSelected ? 'selected' : ''}` : `userListItem ma-3 ml-2 ${isSelected ? 'selected' : ''}`"
   >
     <v-card class="stream black">
       <v-card-title class="primary white--text body-1 mb-0 pt-1 pb-0">

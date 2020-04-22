@@ -1,67 +1,105 @@
 <template>
-  <section class="mainControls">
-    <v-card class="primary px-5" dark v-if="showExtraSettings">
-      <v-col style="width:250px">
-        <v-row  align="center" justify="space-between" class="mx-0">
-          <v-col cols="2" class="ma-0 pa-0">
-            <v-btn text icon @click="toggleSettings">
-              <v-icon>arrow_left</v-icon>
-            </v-btn>
-          </v-col>
-          <v-col cols="8" class="ma-0 pa-0" align="center">
-            <p class="mb-0">Quality</p>
-          </v-col>
-          <v-col class="ma-0 pa-0"></v-col>
-        </v-row>
-        <v-row class="mx-0">
-          <v-slider
-            :tick-labels="qualityOptions"
-            :max="3"
-            step="1"
-            ticks="always"
-            :tick-size="4"
-            v-model="quality"
-            @change="saveQualityOption"
-          >
-          </v-slider>
-        </v-row>
-      </v-col>
-    </v-card>
-    <v-card class="secondary pa-1" dark v-else>
-      <v-btn icon class="mx-1" @click="toggleSettings">
-        <v-icon>settings</v-icon>
-      </v-btn>
+  <section>
+    <div class="mainControls" v-if="!isMobile">
+      <v-card class="primary px-5" dark v-if="showExtraSettings">
+        <v-col style="width:250px">
+          <v-row  align="center" justify="space-between" class="mx-0">
+            <v-col cols="2" class="ma-0 pa-0">
+              <v-btn text icon @click="toggleSettings">
+                <v-icon>arrow_left</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col cols="8" class="ma-0 pa-0" align="center">
+              <p class="mb-0">Quality</p>
+            </v-col>
+            <v-col class="ma-0 pa-0"></v-col>
+          </v-row>
+          <v-row class="mx-0">
+            <v-slider
+              :tick-labels="qualityOptions"
+              :max="3"
+              step="1"
+              ticks="always"
+              :tick-size="4"
+              v-model="quality"
+              @change="saveQualityOption"
+            >
+            </v-slider>
+          </v-row>
+        </v-col>
+      </v-card>
+      <v-card class="secondary pa-1" dark v-else>
+        <v-btn icon class="mx-1" @click="toggleSettings">
+          <v-icon>settings</v-icon>
+        </v-btn>
 
-      <v-btn disabled v-if="published" @click="unpublishOwnFeed" icon class="mr-1">
-        <v-icon>videocam</v-icon>
-      </v-btn>
+        <v-btn disabled v-if="published" @click="unpublishOwnFeed" icon class="mr-1">
+          <v-icon>videocam</v-icon>
+        </v-btn>
 
-      <v-btn disabled v-else @click="publishOwnFeed" icon class="mr-1">
-        <v-icon>videocam_off</v-icon>
-      </v-btn>
+        <v-btn disabled v-else @click="publishOwnFeed" icon class="mr-1">
+          <v-icon>videocam_off</v-icon>
+        </v-btn>
 
-      <v-btn v-if="muted" @click="toggleMute" icon class="mr-0">
-        <v-icon>mic_off</v-icon>
-      </v-btn>
-      <v-btn v-else @click="toggleMute" icon class="mr-0">
-        <v-icon>mic</v-icon>
-      </v-btn>
+        <v-btn v-if="muted" @click="toggleMute" icon class="mr-0">
+          <v-icon>mic_off</v-icon>
+        </v-btn>
+        <v-btn v-else @click="toggleMute" icon class="mr-0">
+          <v-icon>mic</v-icon>
+        </v-btn>
 
-      <v-btn @click="hangUp" icon class="red mx-2 endCall">
-        <v-icon>call_end</v-icon>
-      </v-btn>
+        <v-btn @click="hangUp" icon class="red mx-2 endCall">
+          <v-icon>call_end</v-icon>
+        </v-btn>
 
-      <v-btn @click="screenShare" icon class="ml-1">
-        <v-icon>screen_share</v-icon>
-      </v-btn>
+        <v-btn @click="screenShare" icon class="ml-1">
+          <v-icon>screen_share</v-icon>
+        </v-btn>
 
-      <v-btn icon class="ml-1" @click="showAddUserDialog">
-        <v-icon>person_add</v-icon>
-      </v-btn>
-      <v-btn icon class="mx-1" @click="$root.$emit('toggleSidebar')">
-        <v-icon>chat_bubble</v-icon>
-      </v-btn>
-    </v-card>
+        <v-btn icon class="ml-1" @click="showAddUserDialog">
+          <v-icon>person_add</v-icon>
+        </v-btn>
+        <v-btn icon class="mx-1" @click="$root.$emit('toggleSidebar')">
+          <v-icon>chat_bubble</v-icon>
+        </v-btn>
+      </v-card>
+    </div>
+    <template v-else>
+      <v-toolbar dark absolute bottom class="app-bar">
+        <!-- Settings -->
+        <v-btn icon @click="$root.$emit('toggleSettings')">
+            <v-icon>settings</v-icon>
+        </v-btn>
+        <v-spacer />
+        <!-- Camera -->
+        <v-btn v-if="published" @click="unpublishOwnFeed" icon>
+          <v-icon>videocam</v-icon>
+        </v-btn>
+        <v-btn v-else @click="publishOwnFeed" icon>
+          <v-icon>videocam_off</v-icon>
+        </v-btn>
+        <!-- Mic -->
+        <v-btn v-if="muted" @click="toggleMute" icon>
+          <v-icon>mic_off</v-icon>
+        </v-btn>
+        <v-btn v-else @click="toggleMute" icon>
+          <v-icon>mic</v-icon>
+        </v-btn>
+        <!-- Invite -->
+        <v-btn icon @click="showAddUserDialog">
+          <v-icon>person_add</v-icon>
+        </v-btn>
+        <!-- Leave -->
+        <v-btn @click="hangUp" icon class="red">
+          <v-icon>call_end</v-icon>
+        </v-btn>
+        <v-spacer />
+        <!-- Chat -->
+        <v-btn @click="$root.$emit('toggleSidebar')" icon>
+            <v-icon>chat</v-icon>
+        </v-btn>
+      </v-toolbar>
+    </template>
 
     <v-dialog width="500" v-model="addUserDialog">
       <v-card>
@@ -99,8 +137,10 @@
 import { Janus } from "janus-gateway";
 import { mapGetters, mapActions } from "vuex";
 import store from "../plugins/vuex";
+import mobile from '../mixin/mobile';
 
 export default {
+  mixins: [mobile],
   data: function() {
     return {
       muted: false,
@@ -223,9 +263,13 @@ export default {
 .mainControls {
   border-radius: 15px !important;
   overflow: hidden;
-  widows: 100%;
+  width: 100%;
   > div {
     display: flex;
   }
+}
+.app-bar {
+  background: none !important;
+  width: 100%;
 }
 </style>
