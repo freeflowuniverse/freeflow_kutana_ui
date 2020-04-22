@@ -1,8 +1,13 @@
 <template>
-  <section class="stream">
-    <JanusVideo v-if="stream" :stream="stream" muted></JanusVideo>
-    <TheMainUserControls class="TheMainUserControls" />
-  </section>
+  <div>
+    <section class="stream" v-if="!isMobile">
+      <JanusVideo v-if="stream" :stream="stream" muted></JanusVideo>
+      <TheMainUserControls class="TheMainUserControls" />
+    </section>
+    <section v-else>
+      <JanusVideo class="mobileMainUserStream" v-if="stream" :stream="stream" muted></JanusVideo>
+    </section>
+  </div>
 </template>
 
 <script>
@@ -47,9 +52,9 @@ export default {
 <style lang="scss" scoped>
 .mobileMainUserStream {
   position: absolute;
-  bottom: 80px;
+  bottom: 160px;
   right: 20px;
-  height: 100px;
+  height: 20px;
   width: 150px;
   z-index: 3;
 }
