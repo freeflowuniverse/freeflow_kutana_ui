@@ -1,11 +1,11 @@
 <template>
-  <div class="room-grid" :class="showSidebar ? '' : 'hide-sidebar'">
+  <div :class="`room-grid ${showSidebar ? '' : 'hide-sidebar'}`">
     <div class="video-selected">
       <TheSelectedUser></TheSelectedUser>
     </div>
 
     <div class="video-list">
-      <UserList></UserList>
+      <UserList grid></UserList>
     </div>
 
     <div class="video-main">
@@ -26,7 +26,7 @@ import TheMainUser from "../components/TheMainUser";
 import TheSelectedUser from "../components/TheSelectedUser";
 import UserList from "../components/UserList";
 import TheSidebar from "../components/TheSidebar";
-import mobile from '../mixin/mobile'
+import mobile from "../mixin/mobile";
 
 export default {
   mixins: [mobile],
@@ -53,9 +53,9 @@ export default {
       this.showSidebar = !this.showSidebar;
     });
 
-    if (!this.isJanusInitialized) {
-      this.initializeJanus();
-    }
+    // if (!this.isJanusInitialized) {
+    //   this.initializeJanus();
+    // }
   },
   methods: {
     ...mapActions(["initializeJanus", "getTeamInfo", "join", "setRoomId"]),
@@ -78,6 +78,15 @@ export default {
 .room-grid {
   width: 100vw;
   height: 100vh;
+  display: grid;
+
+  grid-template-columns: 1fr 450px;
+  grid-template-rows: 1fr;
+  grid-template-areas: "list chat";
+}
+.room-speaker {
+  width: 100vw;
+  height: 100vh;
 
   display: grid;
   grid-template-columns: 1fr 400px 450px;
@@ -93,31 +102,34 @@ export default {
       display: none;
     }
   }
-
-  .video-selected {
-    grid-area: selected;
-  }
-
   .video-list {
-    grid-area: list;
     overflow-y: scroll;
   }
-
   .video-main {
-    position: relative;
-    grid-area: main;
+  position: relative;
+  grid-area: main;
 
-    .video-main__container {
-      position: absolute;
-      width: 100%;
-      max-width: 550px;
-      right: 0;
-      bottom: 0;
-    }
+  .video-main__container {
+    position: absolute;
+    width: 100%;
+    max-width: 550px;
+    right: 0;
+    bottom: 0;
   }
+}
+}
+.video-selected {
+  grid-area: selected;
+}
 
-  .chat {
-    grid-area: chat;
-  }
+.video-list {
+  grid-area: list;
+}
+.video-main {
+  position: relative;
+  grid-area: main;
+}
+.chat {
+  grid-area: chat;
 }
 </style>

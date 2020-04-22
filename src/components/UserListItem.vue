@@ -1,6 +1,6 @@
 <template>
   <section
-    :class="`userListItem ma-3 ml-2 ${isSelected ? 'selected' : ''}`"
+    :class="`userListItem ${isSelected ? 'selected' : ''} ${inGrid? 'inGrid': ''}`"
   >
     <v-card class="stream black">
       <v-card-title class="primary white--text body-1 mb-0 pt-1 pb-0">
@@ -14,7 +14,7 @@
           </v-col>
         </v-row>
       </v-card-title>
-      <div @click="$emit('click')" :id="`user${userIndex}`" class="clickable">
+      <div @click="$emit('click')" :id="`user${userIndex}`" class="wrapper clickable">
         <JanusVideo
           v-if="userVideoStream && userVideoStream.active"
           :stream="userVideoStream"
@@ -47,7 +47,7 @@ export default {
     JanusVideo
   },
   mounted() {},
-  props: ["user", "userIndex"],
+  props: ["user", "userIndex", "inGrid"],
   methods: {
     setMute() {
       this.muted = !this.muted;
@@ -72,6 +72,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.inGrid,
+.inGrid >*,
+.inGrid .wrapper,
+.inGrid .content {
+  height: 100%;
+}
+.inGrid .wrapper {
+  height: calc(100% - 46px);
+}
 .clickable {
   cursor: pointer;
 }
