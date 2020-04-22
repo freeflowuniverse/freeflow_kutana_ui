@@ -85,18 +85,22 @@
         <v-btn v-else @click="toggleMute" icon>
           <v-icon>mic</v-icon>
         </v-btn>
-        <!-- Invite -->
-        <v-btn icon @click="showAddUserDialog">
-          <v-icon>person_add</v-icon>
-        </v-btn>
         <!-- Leave -->
         <v-btn @click="hangUp" icon class="red">
           <v-icon>call_end</v-icon>
         </v-btn>
+        <!-- Screen Share -->
+        <v-btn @click="screenShare" disabled icon>
+          <v-icon>screen_share</v-icon>
+        </v-btn>
+        <!-- Invite -->
+        <v-btn icon @click="showAddUserDialog">
+          <v-icon>person_add</v-icon>
+        </v-btn>
         <v-spacer />
         <!-- Chat -->
         <v-btn @click="$root.$emit('toggleSidebar')" icon>
-            <v-icon>chat</v-icon>
+            <v-icon>chat_bubble</v-icon>
         </v-btn>
       </v-toolbar>
     </template>
