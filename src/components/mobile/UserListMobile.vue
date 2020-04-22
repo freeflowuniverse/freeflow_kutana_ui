@@ -1,5 +1,4 @@
 <template>
-
     <section class="list" :class="!showUserList ? 'hide-users': ''">
       <UserListItem class="mobileUser"
         v-for="(user, index) in otherUsers"
@@ -8,29 +7,7 @@
         :userIndex="index"
         :key="index"
       />
-      <UserListItem class="mobileUser"
-        v-for="(user, index) in otherUsers"
-        @click.native="selectStream(user)"
-        :user="user"
-        :userIndex="index"
-        :key="index"
-      />
-      <UserListItem class="mobileUser"
-        v-for="(user, index) in otherUsers"
-        @click.native="selectStream(user)"
-        :user="user"
-        :userIndex="index"
-        :key="index"
-      />
-      <UserListItem class="mobileUser"
-        v-for="(user, index) in otherUsers"
-        @click.native="selectStream(user)"
-        :user="user"
-        :userIndex="index"
-        :key="index"
-      />
     </section>
-
 </template>
 
 <script type="javascript">

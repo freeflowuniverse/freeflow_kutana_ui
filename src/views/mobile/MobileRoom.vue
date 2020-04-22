@@ -4,7 +4,7 @@
     <div class="user-list">
       <v-toolbar dark class="app-bar">
         <v-spacer />
-        <v-btn icon @click="$root.$emit('toggleUserList')">
+        <v-btn icon :disabled="users.length <= 1 ? true : false" @click="$root.$emit('toggleUserList')">
             <v-icon>group</v-icon>
         </v-btn>
       </v-toolbar>
