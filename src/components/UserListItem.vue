@@ -1,13 +1,13 @@
 <template>
-  <section
-    :class="`userListItem ma-3 ml-2 ${isSelected ? 'selected' : ''}`"
+  <section 
+    :class="isMobile ? `userListItemMobile ma-1 ml-1 ${isSelected ? 'selected' : ''}` : `userListItem ma-3 ml-2 ${isSelected ? 'selected' : ''}`"
   >
     <v-card class="stream black">
       <v-card-title class="primary white--text body-1 mb-0 pt-1 pb-0">
-        <v-row @click="$emit('click')" class="clickable">
+        <v-row align="center" @click="$emit('click')" class="clickable" no-gutters>
           <v-col cols="2" class="py-0"></v-col>
-          <v-col cols="8" class="py-0 title ttl" align="center">{{user.username}}</v-col>
-          <v-col cols="2" class="py-0" align="end">
+          <v-col cols="8" :class="isMobile ? 'subtitle' : 'title'" class="py-0 ttl" align="center">{{user.username}}</v-col>
+          <v-col cols="2" class="py-0">
             <v-btn text icon small>
               <v-icon :class="`pin white ${isPinned? '': 'rotate'}`"></v-icon>
             </v-btn>
@@ -33,8 +33,10 @@
 import { mapGetters } from "vuex";
 import UserListItemControls from "../components/UserListItemControls.vue";
 import JanusVideo from "./JanusVideo";
+import mobile from '../mixin/mobile';
 
 export default {
+  mixins: [mobile],
   data: function() {
     return {
       showWarning: true,
@@ -75,14 +77,6 @@ export default {
 .clickable {
   cursor: pointer;
 }
-.fill {
-  height: 100%;
-  position: absolute;
-  width: 100%;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
 
 .userListItem {
   padding: 5px;
@@ -103,7 +97,7 @@ export default {
 }
 
 .selected .stream > div {
-  border: 5px solid var(--primary-color);
+  border: 3px solid var(--primary-color);
 }
 .v-icon {
   transition: all 300ms ease-in-out;
