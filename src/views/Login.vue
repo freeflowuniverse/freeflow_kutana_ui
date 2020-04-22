@@ -1,15 +1,22 @@
 <template>
   <v-row align="center" justify="center">
-      <v-card loading width="500">
+      <v-card :loading="$route.query.callback" width="500">
         <v-card-title>
-          Login
+          Freeflow Connect
         </v-card-title>
         <v-card-text v-if="$route.query.callback">
           Validating auth...
         </v-card-text>
-        <v-card-text v-else>
-          Redirecting to login...
-        </v-card-text>
+        <v-container  v-else>
+          <v-card-text>
+            Please login using 3Bot Connect or continue as guest.
+          </v-card-text>
+          <v-card-actions>
+            <v-btn v-on:click="threebotConnectLogin" text>Use 3Bot Connect</v-btn>
+            <v-spacer></v-spacer>
+            <v-btn v-on:click="guestLogin" text>Continue as Guest</v-btn>
+          </v-card-actions>
+        </v-container>
       </v-card>
   </v-row>
 </template>
@@ -19,15 +26,19 @@ export default {
   mounted () {
     if(this.$route.query.callback) {
       this.checkResponse(window.location.href)
-    } else {
-      this.generateLoginUrl(this.$route.query)
-    }
+    } 
   },
   methods: {
     ...mapActions([
       'generateLoginUrl',
       'checkResponse'
-    ])
+    ]),
+    threebotConnectLogin: function() {
+      this.generateLoginUrl(this.$route.query)
+    },
+    guestLogin: function() {
+      this.$router.push( { path: "guestlogin", query: { 'redirect' : this.$route.query.redirect}});
+    }
   },
   computed: {
     ...mapGetters([
