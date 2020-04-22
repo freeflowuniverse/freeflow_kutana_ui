@@ -29,7 +29,7 @@ export default {
         (name) =>
           name.length <= 20 || "Name should be no longer than 20 characters",
         (name) =>
-          name.match(/^[a-z0-9]+$/i) || "Please use letters and numbers only",
+          name.match(/^[a-z0-9]+$/i) !== null || "Please use letters and numbers only",
       ],
     };
   },
@@ -37,7 +37,7 @@ export default {
     ...mapActions(["loginAsGuest"]),
     continueLogin() {
       this.loginAsGuest(this.guestName);
-      if (this.$route.query.redirect) {
+      if (!this.$route.query.redirect) {
         return;
       }
       this.$router.push(this.$route.query.redirect);
