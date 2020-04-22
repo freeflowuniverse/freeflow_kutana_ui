@@ -4,28 +4,33 @@
       <v-card-title>Freeflow Connect</v-card-title>
       <v-container>
         <v-card-text>Choose your guest name</v-card-text>
-        <v-text-field :rules="guestNameRules" v-model="guestName" label="guest" single-line></v-text-field>
+        <v-text-field
+          :rules="guestNameRules"
+          v-model="guestName"
+          label="guest"
+          single-line
+        ></v-text-field>
       </v-container>
       <v-card-actions>
-        <v-btn v-on:click="continueLogin">Continue as Guest</v-btn>
+        <v-btn @click="continueLogin">Continue as Guest</v-btn>
       </v-card-actions>
     </v-card>
   </v-row>
 </template>
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions } from "vuex";
 export default {
   mounted() {},
   data() {
     return {
       guestName: "",
       guestNameRules: [
-        name => name.length >= 3 || "Name should be at least 3 characters",
-        name =>
+        (name) => name.length >= 3 || "Name should be at least 3 characters",
+        (name) =>
           name.length <= 20 || "Name should be no longer than 20 characters",
-        name =>
-          name.match(/^[a-z0-9]+$/i) || "Please use letters and numbers only"
-      ]
+        (name) =>
+          name.match(/^[a-z0-9]+$/i) || "Please use letters and numbers only",
+      ],
     };
   },
   methods: {
@@ -33,15 +38,10 @@ export default {
     continueLogin() {
       this.loginAsGuest(this.guestName);
       if (this.$route.query.redirect) {
-        this.$router.push(this.$route.query.redirect);
-      } else {
-        //   this.$router.push({ name: "room" });
+        return;
       }
-    }
+      this.$router.push(this.$route.query.redirect);
+    },
   },
-  computed: {
-    ...mapGetters(["loginUrl", "account"])
-  },
-  watch: {}
 };
 </script>

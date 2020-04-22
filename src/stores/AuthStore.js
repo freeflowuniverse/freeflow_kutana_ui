@@ -42,9 +42,9 @@ export default {
         )}&redirecturl=${encodeURIComponent(redirectUrl)}`
       );
     },
-    async loginAsGuest(context, guestName){
+    loginAsGuest(context, guestName){
       context.dispatch("clearStorage");
-      context.commit("setAccount", { name: `${guestName}*`});
+      context.commit("setAccount", { name: `${guestName}*`}); // * indicates guest login
     },
     async checkResponse(context, responseUrl) {
       responseUrl = new URL(responseUrl);
