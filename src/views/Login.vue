@@ -48,18 +48,20 @@ export default {
   },
   watch: {
     loginUrl(val) {
-      if (val) {
-        window.location.replace(val);
+      if (!val) {
+        return;
       }
+      window.location.replace(val);
     },
     account(val) {
-      if (val) {
-        if (this.$route.query.redirect) {
-          this.$router.push(this.$route.query.redirect);
-        } else {
-          this.$router.push({ name: "room" });
-        }
+      if (!val) {
+        return;
       }
+      if (!this.$route.query.redirect) {
+        this.$router.push({ name: "room" });
+        return;
+      }
+      this.$router.push(this.$route.query.redirect);
     },
   },
 };
