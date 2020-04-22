@@ -16,6 +16,7 @@ staging_build:
     script:
         - echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
         - echo "Building ffc staging."
+        - cp ./public/config.staging.js ./public/config.js
         - docker build -t jimber/freeflowconnect:staging-$CI_COMMIT_TAG .
         - docker push jimber/freeflowconnect:staging-$CI_COMMIT_TAG
 
@@ -41,6 +42,7 @@ production_build:
     script:
         - echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
         - echo "Building ffc production."
+        - cp ./public/config.production.js ./public/config.js
         - docker build -t jimber/freeflowconnect:production-$CI_COMMIT_TAG .
         - docker push jimber/freeflowconnect:production-$CI_COMMIT_TAG
 
