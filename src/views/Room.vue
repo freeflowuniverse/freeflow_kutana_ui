@@ -1,7 +1,7 @@
 <template>
-  <div :class="[isMobile ? 'mobile-room-grid' : 'room-grid', showUserList ? 'show-video-list' : '', showSidebar || showSettings ? 'show-sidebar' : 'hide-sidebar']">
+  <div class="room-grid" :class="[showUserList && !showSidebar ? 'show-video-list' : '', showSidebar || showSettings ? 'show-sidebar' : 'hide-sidebar']">
     <div class="video-list">
-      <v-toolbar dark class="app-bar" v-if="isMobile">
+      <v-toolbar dark class="app-bar">
         <v-spacer />
         <v-btn icon :disabled="users.length <= 1 ? true : false" @click="$root.$emit('toggleUserList')">
             <v-icon>group</v-icon>
@@ -14,7 +14,7 @@
       <TheSelectedUser />
     </div>
 
-    <div class="user-controls" v-if="isMobile">
+    <div class="user-controls">
       <UserControls />
     </div>
 
@@ -37,12 +37,10 @@ import TheMainUser from "@/components/TheMainUser";
 import TheSelectedUser from "@/components/TheSelectedUser";
 import UserList from "@/components/UserList";
 import TheSidebar from "@/components/TheSidebar";
-import mobile from '@/mixin/mobile';
 import UserControls from '@/components/TheMainUserControls';
 import TheUserSettings from '@/components/TheUserSettings';
 
 export default {
-  mixins: [mobile],
   components: {
     TheMainUser,
     TheSelectedUser,
@@ -53,7 +51,7 @@ export default {
   },
   data() {
     return {
-      showSidebar: !this.isMobile,
+      showSidebar: true,
       showSettings: false,
       showUserList: false
     };
@@ -103,83 +101,81 @@ export default {
 .room-grid {
   width: 100vw;
   height: 100vh;
-
-  display: grid;
-  grid-template-columns: 1fr 400px 450px;
-  grid-template-rows: 1fr 300px;
-  gap: 8px 8px;
-  grid-template-areas: "selected userList sidebar" "selected main sidebar";
+  
+  grid-template-columns: 1fr;
+  grid-template-rows: 100%;
+  grid-template-areas: "sidebar";
 
   &.hide-sidebar {
-    grid-template-columns: 1fr 400px;
-    grid-template-areas: "selected userList" "selected main";
+    background-color: black;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 6fr 1fr;
+    grid-gap: 0px 0px;
+    grid-template-areas: "userList" "selected" "controls";
+  }
 
-    .side-bar {
+  &.show-video-list {
+      grid-template-columns: 1fr;
+      grid-template-rows: 4fr 6fr 1fr;
+      grid-template-areas: "userList" "selected" "controls";
+  }
+
+  &.show-sidebar {
+    .sidebar {
+      width: 100%;
+      height: 100%;
+    }
+    .video-list, .video-main, .user-controls, .video-selected {
       display: none;
     }
   }
 
-  .video-selected {
-    grid-area: selected;
-  }
-
-  .sidebar {
-    grid-area: sidebar;
-  }
-
-  .video-list {
-    grid-area: userList;
-    overflow-y: scroll;
-  }
-
-  .video-main {
-    position: relative;
-    grid-area: main;
-
-    .video-main__container {
-      position: absolute;
-      width: 100%;
-      max-width: 550px;
-      right: 0;
-      bottom: 0;
-    }
-  }
-}
-
-.mobile-room-grid {
-  width: 100vw;
-  height: 100vh;
-
-  background-color: black;
-
-  display: grid;
-  grid-template-rows: 20% 100%;
-  grid-template-areas: "userList" "selected";
-
   .hide-video-list {
-    display: none !important;
-  }
-
-  .video-list {
-    grid-area: userList;
-    width: 100%;
-    z-index: 1;
+    display: none;
   }
 
   .app-bar {
     background: none !important;
   }
 
-  &.show-video-list {
-    grid-template-rows: 1fr 100%;
-    grid-template-areas: "userList" "selected";
+  .user-controls {
+    display: block;
   }
 
-  &.show-sidebar {
-    grid-template-rows: 100%;
-    grid-template-areas: "sideBar";
+  .video-selected { grid-area: selected; }
 
-    .video-selected {
+  .user-list { grid-area: userList; }
+
+  .user-controls { grid-area: controls; }
+
+  .sidebar { grid-area: sidebar; }
+
+}
+
+@media (min-width: 1025px) {
+  .room-grid {
+    width: 100vw;
+    height: 100vh;
+
+    display: grid;
+    grid-template-columns: 1fr 400px 450px;
+    grid-template-rows: 1fr 300px;
+    gap: 8px 8px;
+    grid-template-areas: "selected userList sidebar" "selected main sidebar";
+
+    &.hide-sidebar {
+      background-color: white;
+      grid-template-columns: 1fr 400px;
+      grid-template-rows: 1fr 300px;
+      gap: 8px 8px;
+      grid-template-areas: "selected userList" "selected main";
+
+      .side-bar {
+        display: none;
+      }
+    }
+
+    .app-bar {
       display: none;
     }
 
@@ -188,11 +184,34 @@ export default {
     }
 
     .video-list {
-      display: none;
+      grid-area: userList;
+      overflow-y: scroll;
+      .hide-video-list {
+        display: inline;
+      }
+    }
+
+    &.show-sidebar {
+      .video-list, .video-main, .video-selected {
+        display: inline;
+      }
+
+      .app-bar {
+        display: none;
+      }
     }
 
     .video-main {
-      display: none;
+      position: relative;
+      grid-area: main;
+
+      .video-main__container {
+        position: absolute;
+        width: 100%;
+        max-width: 550px;
+        right: 0;
+        bottom: 0;
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
 <template>
-  <div class="stream-wrapper black" :class="!isMobile ? 'resize-stream' : ''">
+  <div class="stream-wrapper black resize-stream">
     <div
-      v-if="!this.userScreenshareStream && selectedUser && selectedUser.username && !isMobile"
+      v-if="selectedUser && selectedUser.username"
       class="name primary pa-2 white--text"
     >{{selectedUser.username}}</div>
     
@@ -19,10 +19,8 @@
 import { mapActions, mapGetters } from "vuex";
 
 import JanusVideo from "./JanusVideo";
-import mobile from '../mixin/mobile';
 
 export default {
-  mixins: [mobile],
   components: {
     JanusVideo
   },
@@ -80,26 +78,32 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.stream-wrapper {
-  display: flex;
-  flex: 1;
-  position: relative;
-  justify-content: center;
-  #selectedStream {
-    flex: 1;
-    align-self: center;
+  .name {
+    display: none;
   }
-}
 
-.resize-stream {
-  width: 100%;
-  height: 100%;
-}
+  .stream-wrapper {
+    display: flex;
+    flex: 1;
+    position: relative;
+    justify-content: center;
+    #selectedStream {
+      flex: 1;
+      align-self: center;
+    }
+  }
 
-.name {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  z-index: 1;
-}
+  .resize-stream {
+    width: 100%;
+    height: 100%;
+  }
+  @media (min-width: 1025px) {  
+    .name {
+      display: inline;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 1;
+    }
+  }
 </style>

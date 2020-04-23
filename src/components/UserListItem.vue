@@ -1,12 +1,12 @@
 <template>
   <section 
-    :class="isMobile ? `userListItemMobile ma-1 ml-1 ${isSelected ? 'selected' : ''}` : `userListItem ma-3 ml-2 ${isSelected ? 'selected' : ''}`"
+    :class="`userListItem ${isSelected ? 'selected' : ''}`"
   >
     <v-card class="stream black">
       <v-card-title class="primary white--text body-1 mb-0 pt-1 pb-0">
         <v-row align="center" @click="$emit('click')" class="clickable" no-gutters>
           <v-col cols="2" class="py-0"></v-col>
-          <v-col cols="8" :class="isMobile ? 'subtitle' : 'title'" class="py-0 ttl" align="center">{{user.username}}</v-col>
+          <v-col cols="8" class="py-0 ttl title" align="center">{{user.username}}</v-col>
           <v-col cols="2" class="py-0">
             <v-btn text icon small>
               <v-icon :class="`pin white ${isPinned? '': 'rotate'}`"></v-icon>
@@ -33,10 +33,8 @@
 import { mapGetters } from "vuex";
 import UserListItemControls from "../components/UserListItemControls.vue";
 import JanusVideo from "./JanusVideo";
-import mobile from '../mixin/mobile';
 
 export default {
-  mixins: [mobile],
   data: function() {
     return {
       showWarning: true,
@@ -79,7 +77,7 @@ export default {
 }
 
 .userListItem {
-  padding: 5px;
+  margin: 4px !important;
 }
 
 .UserListItemControls {
@@ -88,6 +86,14 @@ export default {
   right: 0;
   z-index: 2;
 }
+
+.title {
+  font-size: 1rem !important;
+  font-weight: 500;
+  line-height: 2rem;
+  letter-spacing: 0.0125em !important;
+}
+
 .stream .content {
   min-height: 200px;
 }
@@ -99,6 +105,7 @@ export default {
 .selected .stream > div {
   border: 3px solid var(--primary-color);
 }
+
 .v-icon {
   transition: all 300ms ease-in-out;
   transform: rotate(0deg);
@@ -111,6 +118,21 @@ export default {
   }
   &.rotate {
     transform: rotate(45deg);
+  }
+}
+
+@media (min-width: 1025px) {
+  .selected .stream > div {
+    border: 5px solid var(--primary-color);
+  }
+
+  .userListItem {
+    margin-left: 8px !important;
+    margin: 12px !important;
+  }
+
+  .title {
+    font-size: 1.25rem !important;
   }
 }
 </style>

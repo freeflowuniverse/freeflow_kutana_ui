@@ -1,6 +1,6 @@
 <template>
-  <section>
-    <div class="mainControls" v-if="!isMobile">
+  <section class="controls">
+    <div class="mainControls">
       <v-card class="primary px-5" dark v-if="showExtraSettings">
         <v-col style="width:250px">
           <v-row  align="center" justify="space-between" class="mx-0">
@@ -64,7 +64,7 @@
         </v-btn>
       </v-card>
     </div>
-    <template v-else>
+    <div class="mobile-controls">
       <v-toolbar dark absolute bottom class="app-bar">
         <!-- Settings -->
         <v-btn icon @click="$root.$emit('toggleSettings')">
@@ -103,7 +103,7 @@
             <v-icon>chat_bubble</v-icon>
         </v-btn>
       </v-toolbar>
-    </template>
+    </div>
 
     <v-dialog width="500" v-model="addUserDialog">
       <v-card>
@@ -141,10 +141,8 @@
 import { Janus } from "janus-gateway";
 import { mapGetters, mapActions } from "vuex";
 import store from "../plugins/vuex";
-import mobile from '../mixin/mobile';
 
 export default {
-  mixins: [mobile],
   data: function() {
     return {
       muted: false,
@@ -264,16 +262,32 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.mainControls {
-  border-radius: 15px !important;
-  overflow: hidden;
-  width: 100%;
-  > div {
-    display: flex;
+ .controls {
+    .mainControls {
+      display: none;
+    }
   }
-}
-.app-bar {
-  background: none !important;
-  width: 100%;
-}
+
+  .app-bar {
+    background: none !important;
+    width: 100%;
+  }
+
+  @media (min-width: 1025px) {  
+  .controls {
+      .mainControls {
+        display: block;
+        border-radius: 15px !important;
+        overflow: hidden;
+        width: 100%;
+        > div {
+          display: flex;
+        }
+      }
+
+      .mobile-controls {
+        display: none;
+      }
+    }
+  }
 </style>

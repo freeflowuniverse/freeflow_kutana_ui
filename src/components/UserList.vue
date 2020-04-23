@@ -1,6 +1,6 @@
 <template>
-  <section :class="isMobile ? 'mobile-user-list' : ''">
-      <UserListItem :class="isMobile ? 'mobile-user' : ''"
+  <section class="user-list">
+      <UserListItem class="user"
         v-for="(user, index) in otherUsers"
         @click.native="selectStream(user)"
         :user="user"
@@ -14,10 +14,8 @@
 import { mapGetters, mapActions } from "vuex";
 
 import UserListItem from "./UserListItem";
-import mobile from '../mixin/mobile';
 
 export default {
-  mixins: [mobile],
   components: {
     UserListItem
   },
@@ -55,14 +53,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .mobile-user-list {
+  .user-list {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
 
-    .mobile-user {
+    .user {
       flex-shrink: 0;
       width: 35%;
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .user-list {
+      display: inline;
+
+      .user {
+        width: 95%;
+      }
     }
   }
   

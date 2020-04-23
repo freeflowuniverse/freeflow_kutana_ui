@@ -1,11 +1,8 @@
 <template>
   <div>
-    <section class="stream" v-if="!isMobile">
+    <section class="stream">
       <JanusVideo v-if="stream" :stream="stream" muted></JanusVideo>
       <TheMainUserControls class="TheMainUserControls" />
-    </section>
-    <section v-else>
-      <JanusVideo class="mobileMainUserStream" v-if="stream" :stream="stream" muted></JanusVideo>
     </section>
   </div>
 </template>
@@ -14,10 +11,8 @@
 import { mapGetters } from "vuex";
 import TheMainUserControls from "./TheMainUserControls";
 import JanusVideo from "./JanusVideo";
-import mobile from '../mixin/mobile';
 
 export default {
-  mixins: [mobile],
   components: {
     TheMainUserControls,
     JanusVideo
@@ -50,25 +45,33 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.mobileMainUserStream {
-  position: absolute;
-  bottom: 160px;
-  right: 20px;
-  height: 20px;
-  width: 150px;
-  z-index: 3;
-}
-.stream {
-  position: relative;
-}
+  .stream {
+    position: absolute;
+    right: 10px;
+    bottom: 50px;
+    width: 45%;
+  }
 
-.TheMainUserControls {
-  display: flex;
-  position: absolute;
-  width: auto;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 5px;
-  z-index: 2;
+  .TheMainUserControls {
+    display: none;
+  }
+
+@media (min-width: 1025px) {  
+  .stream {
+    position: relative;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+  }
+
+  .TheMainUserControls {
+    display: flex;
+    position: absolute;
+    width: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 5px;
+    z-index: 2;
+  }
 }
 </style>
