@@ -34,6 +34,7 @@ staging_deploy:
         - echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
         - echo "Deploying ffc staging."
         - docker rm -f ffc_frontend || true
+        - docker-compose pull
         - docker-compose up -d
 
 production_build:
@@ -64,4 +65,5 @@ production_deploy:
         - echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
         - echo "Deploying ffc production."
         - docker rm -f ffc_frontend || true
+        - docker-compose pull
         - docker-compose up -d
