@@ -1,6 +1,0 @@
-FROM node:alpine
-WORKDIR /app
-COPY . . 
-ENV NODE_ENV dev
-RUN yarn install --build-from-source
-CMD ["yarn", "test:unit"]
