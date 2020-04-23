@@ -28,30 +28,6 @@ const detachFeed = detachRfid => {
   );
 };
 
-// const selectFirstStream = () => {
-//   console.log("detaching ...")
-  // if (store.getters.users.length > 0) {
-  //   console.log("selectFirstStream")
-  //
-  //
-  //   if(store.getters.users[0].screenSharePluginHandle) {
-  //     console.log("detaching ...")
-  //     console.log(store.getters.users[0].screenSharePluginHandle)
-  //     store.getters.users[0].screenSharePluginHandle.detach()
-  //     store.dispatch("selectUser", store.getters.users[1]);
-  //     // store.commit("setScreenShare", null);
-  //     //
-  //     // const users = store.getters.users;
-  //     // users[0].screenSharePluginHandle = null;
-  //     //
-  //     // store.commit("setUsers", users);
-  //   }
-  //
-  //
-  //
-  // }
-// };
-
 const determineSpeaker = (stream, remoteFeed, id) => {
   const AudioContext =
       window.AudioContext || window.webkitAudioContext || false;
