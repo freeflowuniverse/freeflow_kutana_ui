@@ -48,7 +48,8 @@ export default {
     JanusVideo
   },
   mounted() {
-    if (!this.userIndex) this.muted = true
+    //@todo implement this 
+    // if (!this.userIndex) this.muted = true
   },
   props: ["user", "userIndex", "inGrid"],
   methods: {
