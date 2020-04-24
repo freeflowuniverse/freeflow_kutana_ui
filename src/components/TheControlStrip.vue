@@ -1,31 +1,34 @@
 <template>
   <section class="mainControls">
-    <v-card class="primary px-5" dark v-if="showExtraSettings">
-      <v-col style="width:250px">
-        <v-row align="center" justify="space-between" class="mx-0">
-          <v-col cols="2" class="ma-0 pa-0">
-            <v-btn text icon @click="toggleSettings">
-              <v-icon>arrow_left</v-icon>
-            </v-btn>
-          </v-col>
-          <v-col cols="8" class="ma-0 pa-0" align="center">
-            <p class="mb-0">Quality</p>
-          </v-col>
-          <v-col class="ma-0 pa-0"></v-col>
-        </v-row>
-        <v-row class="mx-0">
+    <v-dialog v-model="showExtraSettings" width="500">
+      <v-card>
+        <v-card-title class="primary">
+          <v-row align="center">
+            <v-col cols="1" class="ma-0 pa-0"></v-col>
+            <v-col cols="10" class="ma-0 pa-0" align="center">
+              <p class="mb-0 white--text">Settings</p>
+            </v-col>
+            <v-col cols="1" class="ma-0 pa-0">
+              <v-btn text icon @click="toggleSettings">
+                <v-icon color="white">close</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-title>
+        <v-card-text class="pt-5">
           <v-slider
             :tick-labels="qualityOptions"
             :max="3"
             step="1"
             ticks="always"
+            label="Quality"
             :tick-size="4"
             v-model="quality"
             @change="saveQualityOption"
           ></v-slider>
-        </v-row>
-      </v-col>
-    </v-card>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <!-- <v-card class="secondary pa-1" dark v-else> -->
     <v-row class="mx-2" justify="center" align="center" style="height:60px">
       <v-btn disabled v-if="published" @click="unpublishOwnFeed" icon class="mr-1">
@@ -59,7 +62,7 @@
         <v-icon>chat_bubble</v-icon>
       </v-btn>
       <v-btn icon class="mx-1" @click="toggleSettings">
-        <v-icon>more_horiz</v-icon>
+        <v-icon>settings</v-icon>
       </v-btn>
     </v-row>
   </section>
@@ -71,7 +74,7 @@ import { mapGetters, mapActions } from "vuex";
 import store from "../plugins/vuex";
 
 export default {
-  props: ['grid'],
+  props: ["grid"],
   data: function() {
     return {
       muted: false,
@@ -79,7 +82,7 @@ export default {
       addUserDialog: false,
       showExtraSettings: false,
       quality: 0,
-      qualityOptions: ["Auto", "Low", "Normal", "High"],
+      qualityOptions: ["Auto", "Low", "Normal", "High"]
     };
   },
   mounted() {
@@ -193,5 +196,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 </style>
