@@ -20,7 +20,11 @@ export default {
                 return !Number.isNaN(w) && !Number.isNaN(h)
             }
         },
-        width: String
+        width: String,
+        positionStatic: {
+            type: Boolean,
+            default: false
+        }
     },
     data() {
         return {
@@ -30,12 +34,16 @@ export default {
     },
     computed: {
         componentStyle() {
-            return this.width ? {width: this.width} : {maxWidth: `calc(${(this.w / this.h) * 100}vh)`}
+            return this.width ? {width: this.width} : {maxWidth: `${(this.w / this.h) * 100}vh`}
         },
         innerStyle() {
-            return {
+            var style = {
                 paddingTop: (this.h / this.w) * 100 + "%"
             }
+            if (!this.positionStatic) {
+                style.position = 'relative'
+            }
+            return style
         }
     },
     created() {
@@ -47,14 +55,12 @@ export default {
 </script>
 
 <style scoped>
-
+.vue-aspect-ratio {
+    width: 100%;
+}
 .vue-aspect-ratio-slot {
     width: 100%;
     height: 100%;
-}
-
-.vue-aspect-ratio__inner {
-    position: relative;
 }
 .vue-aspect-ratio__content {
     position: absolute;

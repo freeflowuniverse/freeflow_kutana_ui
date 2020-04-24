@@ -1,14 +1,16 @@
 <template>
-  <div :class="`room-grid ${showSidebar ? '' : 'hide-sidebar'}`">
-    <div class="video-selected">
+  <div :class="`${grid? 'room-grid' : 'room-speaker'} ${showSidebar ? '' : 'hide-sidebar'}`">
+    <div class="video-selected" v-if="!grid">
       <TheSelectedUser></TheSelectedUser>
     </div>
 
     <div class="video-list">
-      <UserList grid></UserList>
+      <UserList :grid="grid"></UserList>
     </div>
 
-    <div class="video-main">
+    <TheMainUserControls id="TheMainUserControls" :grid='grid'/>
+
+    <div class="video-main" v-if="!grid">
       <div class="video-main__container">
         <TheMainUser></TheMainUser>
       </div>
@@ -18,11 +20,13 @@
       <TheSidebar></TheSidebar>
     </div>
   </div>
+
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
 import TheMainUser from "../components/TheMainUser";
+import TheMainUserControls from "../components/TheControlStrip";
 import TheSelectedUser from "../components/TheSelectedUser";
 import UserList from "../components/UserList";
 import TheSidebar from "../components/TheSidebar";
@@ -34,10 +38,12 @@ export default {
     TheMainUser,
     TheSelectedUser,
     TheSidebar,
-    UserList
+    UserList,
+    TheMainUserControls
   },
   data() {
     return {
+      grid: true,
       showSidebar: true
     };
   },
@@ -49,13 +55,16 @@ export default {
     if (this.account && this.account.name && this.teamName) {
       this.setRoomId(Math.abs(this.hashString(this.teamName)));
     }
+    this.$root.$on("toggleGridPresentation", () => {
+      this.grid = !this.grid;
+    });
     this.$root.$on("toggleSidebar", () => {
       this.showSidebar = !this.showSidebar;
     });
 
-    // if (!this.isJanusInitialized) {
-    //   this.initializeJanus();
-    // }
+    if (!this.isJanusInitialized) {
+      this.initializeJanus();
+    }
   },
   methods: {
     ...mapActions(["initializeJanus", "getTeamInfo", "join", "setRoomId"]),
@@ -69,7 +78,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["isJanusInitialized", "users", "teamName", "account"])
+    ...mapGetters(["isJanusInitialized", "users", "teamName", "account", "screenShare"])
+  },
+  watch: {
+    screenShare(val) {
+      if (val) this.grid = false
+    }
   }
 };
 </script>
@@ -80,9 +94,20 @@ export default {
   height: 100vh;
   display: grid;
 
+  gap: 0px 8px;
   grid-template-columns: 1fr 450px;
-  grid-template-rows: 1fr;
-  grid-template-areas: "list chat";
+  grid-template-areas: "list chat" "controls chat";
+  grid-template-rows: 1fr 60px;
+  &.hide-sidebar {
+    grid-template-columns: 1fr;
+    grid-template-areas:  "list";
+    .chat {
+      display: none;
+    }
+  }
+  .video-list {
+    margin-right: -5px;
+  }
 }
 .room-speaker {
   width: 100vw;
@@ -90,9 +115,9 @@ export default {
 
   display: grid;
   grid-template-columns: 1fr 400px 450px;
-  grid-template-rows: 1fr 300px;
+  grid-template-rows: 1fr 300px 60px;
   gap: 8px 8px;
-  grid-template-areas: "selected list chat" "selected main chat";
+  grid-template-areas: "selected list chat" "selected main chat" "controls controls chat";
 
   &.hide-sidebar {
     grid-template-columns: 1fr 400px;
@@ -118,12 +143,15 @@ export default {
   }
 }
 }
+#TheMainUserControls {
+  grid-area: controls;
+}
 .video-selected {
   grid-area: selected;
 }
-
 .video-list {
   grid-area: list;
+  position: relative;
 }
 .video-main {
   position: relative;

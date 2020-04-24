@@ -69,7 +69,8 @@ export default {
   watch: {
     screenShare: {
       deep: true,
-      handler() {
+      handler(val) {
+        if(val) this.$root.$emit('setPresentationView')
         console.log("screenShare CHANGED!");
       }
     }

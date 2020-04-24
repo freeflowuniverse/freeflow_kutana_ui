@@ -5,7 +5,7 @@
         <v-btn v-if="isMobile" icon @click="$root.$emit('toggleSidebar')">
           <v-icon color="white">arrow_back</v-icon>
         </v-btn>
-        <v-col align="center" class="py-0 ttl"><h3>Chat</h3></v-col>
+        <v-col align="center" class="py-0 ttl"><h3>Messages</h3></v-col>
         <v-btn v-if="!isMobile" icon @click="$root.$emit('toggleSidebar')">
           <v-icon color="white">close</v-icon>
         </v-btn>
@@ -37,9 +37,6 @@ export default {
   border-radius: 0 !important;
 }
 .inner {
-  height: calc(100% - 64px);
-}
-.chat {
-  height: 100%;
+  height: calc(100vh - 64px);
 }
 </style>

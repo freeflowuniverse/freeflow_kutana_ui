@@ -20,51 +20,6 @@ export default {
         stream: null,
         pluginHandle: null,
         screenSharePluginHandle: null
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
-      },
-      {
-        username: "Name" + Janus.randomString(12),
       }
     ],
     screenShare: null

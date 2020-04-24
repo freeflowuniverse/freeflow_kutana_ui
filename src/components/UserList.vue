@@ -11,18 +11,73 @@
   </section>
 </template>
 
+<script type="javascript">
+import { mapGetters, mapActions } from "vuex";
+
+import UserListItem from "./UserListItem";
+
+export default {
+  components: {
+    UserListItem
+  },
+  props: {
+    grid: {
+      type: Boolean,
+      default: false
+    }
+  },
+  computed: {
+    ...mapGetters(["users", "selectedUser"]),
+
+    usersToShow() {
+      return this.grid ? this.users : this.users.slice(1);
+    }
+  },
+  methods: {
+    ...mapActions(["selectUser", "setSnackbarMessage"]),
+
+    selectStream(user) {
+      if (this.grid) return
+      if (this.isSelected(user) && this.selectedUser.pinned) {
+        this.selectUser({
+          ...user,
+          pinned: false
+        });
+        this.setSnackbarMessage({ text: "User unpinned" });
+      } else {
+        this.setSnackbarMessage({ text: "User pinned" });
+        this.selectUser({
+          ...user,
+          pinned: true
+        });
+      }
+    },
+    isSelected(user) {
+      return (
+        this.selectedUser !== null &&
+        this.selectedUser.username === user.username
+      );
+    }
+  }
+};
+</script>
+
 <style lang="scss" scoped>
 .grid {
   display: grid;
-  position: relative;
-  height: 100%;
+  height: calc(100vh - 60px);
   grid-template-columns: repeat(12, 1fr);
   * {
     grid-column: span 3;
   }
+  &.grid-1 {
+    * {
+      grid-column: span 12;
+    }
+  }
   &.grid-2 {
     * {
-      grid-column: span 6;
+      grid-column: span 12;
     }
   }
   &.grid-3 {
@@ -99,53 +154,3 @@
   }
 }
 </style>
-
-<script type="javascript">
-import { mapGetters, mapActions } from "vuex";
-
-import UserListItem from "./UserListItem";
-
-export default {
-  components: {
-    UserListItem
-  },
-  props: {
-    grid: {
-      type: Boolean,
-      default: false
-    }
-  },
-  computed: {
-    ...mapGetters(["users", "selectedUser"]),
-
-    usersToShow() {
-      return this.grid ? this.users : this.users.slice(1);
-    }
-  },
-  methods: {
-    ...mapActions(["selectUser", "setSnackbarMessage"]),
-
-    selectStream(user) {
-      if (this.isSelected(user) && this.selectedUser.pinned) {
-        this.selectUser({
-          ...user,
-          pinned: false
-        });
-        this.setSnackbarMessage({ text: "User unpinned" });
-      } else {
-        this.setSnackbarMessage({ text: "User pinned" });
-        this.selectUser({
-          ...user,
-          pinned: true
-        });
-      }
-    },
-    isSelected(user) {
-      return (
-        this.selectedUser !== null &&
-        this.selectedUser.username === user.username
-      );
-    }
-  }
-};
-</script>

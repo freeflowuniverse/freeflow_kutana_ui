@@ -43,7 +43,7 @@ export default {
       context.commit("setSnackbarMessage", {
         text: `Screenshare started`,
       });
-
+      
       context.commit("joinScreen", message.content)
     },
     stopScreenShare(context) {

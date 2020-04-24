@@ -58,7 +58,7 @@ export default {
   },
   watch: {
     alertUser() {
-      new Audio("notification.mp3").play();
+      new Audio("/notification.mp3").play();
     }
   }
 };

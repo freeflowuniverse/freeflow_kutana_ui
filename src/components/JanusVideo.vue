@@ -1,5 +1,5 @@
 <template>
-  <AspectRatio ar="4:3">
+  <AspectRatio ar="4:3" :positionStatic="positionStatic">
     <div
       ref="videoAndMore"
       @fullscreenchange="fullScreenChanged"
@@ -23,7 +23,7 @@
         ref="video"
         :src-object.prop.camel="stream"
         :class="[isFullScreen ? 'fullScreen' : '',
-                 isScreenShare ? 'screenshare' : '']"
+                 isScreenShare ? 'screenshare' : 'noScreenshare']"
         autoplay
       ></video>
       <v-row align="center" justify="center" class="video-cam-off">
@@ -53,6 +53,10 @@ export default {
     muted: {
       type: Boolean,
       required: false
+    },
+    positionStatic: {
+      type: Boolean,
+      default: false
     }
   },
   mounted() {
@@ -115,6 +119,9 @@ video {
   background-color: black;
 }
 
+video.noScreenshare {
+  transform: rotateY(180deg);
+}
 video.screenshare {
   object-fit: contain;
 }

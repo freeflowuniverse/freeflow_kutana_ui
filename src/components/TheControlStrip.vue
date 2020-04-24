@@ -2,7 +2,7 @@
   <section class="mainControls">
     <v-card class="primary px-5" dark v-if="showExtraSettings">
       <v-col style="width:250px">
-        <v-row  align="center" justify="space-between" class="mx-0">
+        <v-row align="center" justify="space-between" class="mx-0">
           <v-col cols="2" class="ma-0 pa-0">
             <v-btn text icon @click="toggleSettings">
               <v-icon>arrow_left</v-icon>
@@ -22,16 +22,12 @@
             :tick-size="4"
             v-model="quality"
             @change="saveQualityOption"
-          >
-          </v-slider>
+          ></v-slider>
         </v-row>
       </v-col>
     </v-card>
-    <v-card class="secondary pa-1" dark v-else>
-      <v-btn icon class="mx-1" @click="toggleSettings">
-        <v-icon>settings</v-icon>
-      </v-btn>
-
+    <!-- <v-card class="secondary pa-1" dark v-else> -->
+    <v-row class="mx-2" justify="center" align="center" style="height:60px">
       <v-btn disabled v-if="published" @click="unpublishOwnFeed" icon class="mr-1">
         <v-icon>videocam</v-icon>
       </v-btn>
@@ -46,52 +42,26 @@
       <v-btn v-else @click="toggleMute" icon class="mr-0">
         <v-icon>mic</v-icon>
       </v-btn>
-
-      <v-btn @click="hangUp" icon class="red mx-2 endCall">
+      <v-spacer></v-spacer>
+      <v-btn icon class="mx-1" @click="$root.$emit('toggleGridPresentation')">
+        <v-icon v-if="grid">grid_off</v-icon>
+        <v-icon v-else>grid_on</v-icon>
+      </v-btn>
+      <v-btn @click="hangUp" dark icon class="red mx-2 endCall">
         <v-icon>call_end</v-icon>
       </v-btn>
-
       <v-btn @click="screenShare" icon class="ml-1">
         <v-icon>screen_share</v-icon>
       </v-btn>
+      <v-spacer></v-spacer>
 
-      <v-btn icon class="ml-1" @click="showAddUserDialog">
-        <v-icon>person_add</v-icon>
-      </v-btn>
       <v-btn icon class="mx-1" @click="$root.$emit('toggleSidebar')">
         <v-icon>chat_bubble</v-icon>
       </v-btn>
-    </v-card>
-
-    <v-dialog width="500" v-model="addUserDialog">
-      <v-card>
-        <v-card-title>
-          <v-row class="mx-0">
-            Add member
-            <v-spacer></v-spacer>
-            <v-btn icon text @click="closeAddUserDialog">
-              <v-icon>close</v-icon>
-            </v-btn>
-          </v-row>
-        </v-card-title>
-        <v-card-text>
-          <v-text-field
-            filled
-            label="Invite url"
-            persistent-hint
-            readonly
-            hint="Invite people by sharing this url"
-            :value="inviteLink"
-          >
-            <template v-slot:append>
-              <v-btn small icon text @click="copyUrl">
-                <v-icon>file_copy</v-icon>
-              </v-btn>
-            </template>
-          </v-text-field>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+      <v-btn icon class="mx-1" @click="toggleSettings">
+        <v-icon>more_horiz</v-icon>
+      </v-btn>
+    </v-row>
   </section>
 </template>
 
@@ -101,6 +71,7 @@ import { mapGetters, mapActions } from "vuex";
 import store from "../plugins/vuex";
 
 export default {
+  props: ['grid'],
   data: function() {
     return {
       muted: false,
@@ -108,11 +79,11 @@ export default {
       addUserDialog: false,
       showExtraSettings: false,
       quality: 0,
-      qualityOptions: ["Auto", "Low", "Normal", "High"]
+      qualityOptions: ["Auto", "Low", "Normal", "High"],
     };
   },
   mounted() {
-    this.$root.$on('showInviteUser', this.showAddUserDialog)
+    this.$root.$on("showInviteUser", this.showAddUserDialog);
   },
   computed: {
     ...mapGetters(["users", "teamName"]),
@@ -133,7 +104,9 @@ export default {
       this.muted = this.users[0].pluginHandle.isAudioMuted();
       Janus.log((this.muted ? "Unmuting" : "Muting") + " local stream...");
 
-      this.setSnackbarMessage({text: `You are ${this.muted ? "un" : ""}muted`})
+      this.setSnackbarMessage({
+        text: `You are ${this.muted ? "un" : ""}muted`
+      });
       if (this.muted) {
         this.users[0].pluginHandle.unmuteAudio();
       } else {
@@ -143,9 +116,11 @@ export default {
     },
 
     saveQualityOption() {
-      this.setSnackbarMessage({text: `Quality set to ${this.qualityOptions[this.quality]}`})
+      this.setSnackbarMessage({
+        text: `Quality set to ${this.qualityOptions[this.quality]}`
+      });
       this.users[0].pluginHandle.send({
-        message: { request: "configure", bitrate: 20000 * this.quality}
+        message: { request: "configure", bitrate: 20000 * this.quality }
       });
     },
 
@@ -180,11 +155,11 @@ export default {
 
     hangUp: function() {
       this.users[0].pluginHandle.hangup();
-      this.$router.push({name: 'home'})
+      this.$router.push({ name: "home" });
     },
 
     screenShare: function() {
-      if(store.getters.screenShare) {
+      if (store.getters.screenShare) {
         this.setSnackbarMessage({
           type: "",
           text: `Screenshare already in progress, only one screenshare per room!`
@@ -218,12 +193,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.mainControls {
-  border-radius: 15px !important;
-  overflow: hidden;
-  widows: 100%;
-  > div {
-    display: flex;
-  }
-}
+
 </style>
