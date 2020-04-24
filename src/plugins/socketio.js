@@ -8,7 +8,7 @@ Vue.use(
   new VueSocketIO({
     debug: true,
     secure: true,
-    connection: io(config.ffcBackend, { transports: ["websocket"] }),
+    connection: io(config.ffcBackend),
     vuex: {
       store,
       actionPrefix: "SOCKET_",

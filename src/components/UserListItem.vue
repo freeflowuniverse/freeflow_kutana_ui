@@ -1,10 +1,10 @@
 <template>
-  <section :class="`userListItem ${isSelected ? 'selected' : ''} ${inGrid? 'inGrid': ''}`">
+  <section :class="isMobile ? `userListItemMobile ma-1 ml-1 ${isSelected ? 'selected' : ''}` : `userListItem ${isSelected ? 'selected' : ''}  ${inGrid? 'inGrid': ''}`" >
     <v-card class="stream black">
       <v-card-title class="primary white--text body-1 mb-0 pt-1 pb-0">
-        <v-row @click="$emit('click')" :class="!inGrid? 'clickable' : ''">
+        <v-row align="center" @click="$emit('click')" class="clickable" no-gutters>
           <v-col cols="2" class="py-0"></v-col>
-          <v-col cols="8" class="py-0 title ttl" align="center">{{user.username}}</v-col>
+          <v-col cols="8" :class="isMobile ? 'subtitle' : 'title'" class="py-0 ttl" align="center">{{user.username}}</v-col>
           <v-col cols="2" class="py-0" align="end">
             <v-btn text icon small v-if="!inGrid">
               <v-icon :class="`pin white ${isPinned? '': 'rotate'}`"></v-icon>
@@ -32,8 +32,10 @@
 import { mapGetters } from "vuex";
 import UserListItemControls from "./UserListItemControls.vue";
 import JanusVideo from "./JanusVideo";
+import mobile from '../mixin/mobile';
 
 export default {
+  mixins: [mobile],
   data: function() {
     return {
       showWarning: true,
@@ -88,18 +90,10 @@ export default {
   justify-content: center;
   position: absolute;
   width: 100%;
-  height: calc(100% - 46px);
+  height: calc(100% - 42px);
 }
 .clickable {
   cursor: pointer;
-}
-.fill {
-  height: 100%;
-  position: absolute;
-  width: 100%;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
 }
 
 .userListItem {
@@ -122,7 +116,7 @@ export default {
 }
 
 .selected .stream > div {
-  border: 5px solid var(--primary-color);
+  border: 3px solid var(--primary-color);
 }
 .v-icon {
   transition: all 300ms ease-in-out;

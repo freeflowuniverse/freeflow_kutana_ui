@@ -1,36 +1,43 @@
 <template>
-  <div :class="`${grid? 'room-grid' : 'room-speaker'} ${showSidebar ? '' : 'hide-sidebar'}`">
-    <div class="video-selected" v-if="!grid">
-      <TheSelectedUser></TheSelectedUser>
-    </div>
-
+  <div :class="roomClass">
     <div class="video-list">
-      <UserList :grid="grid"></UserList>
+      <v-row no-gutters v-if="isMobile">
+        <v-spacer />
+        <v-btn
+          icon
+          :disabled="users.length <= 1 ? true : false"
+          @click="$root.$emit('toggleUserList')"
+        >
+          <v-icon>group</v-icon>
+        </v-btn>
+      </v-row>
+      <UserList :class="!showUserList ? 'hide-video-list' : ''" :grid="grid" />
     </div>
 
-    <TheMainUserControls id="TheMainUserControls" :grid='grid'/>
+    <div class="video-selected" v-if="!grid">
+      <TheSelectedUser />
+    </div>
+
+    <TheMainUserControls :minimal="isMobile" id="TheMainUserControls" :grid="grid" />
 
     <div class="video-main" v-if="!grid">
       <div class="video-main__container">
-        <TheMainUser></TheMainUser>
+        <TheMainUser />
       </div>
     </div>
 
-    <div class="chat">
-      <TheSidebar></TheSidebar>
-    </div>
+    <TheSidebar class="sidebar" v-if="showSidebar" />
   </div>
-
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
 import TheMainUser from "../components/TheMainUser";
-import TheMainUserControls from "../components/TheControlStrip";
 import TheSelectedUser from "../components/TheSelectedUser";
 import UserList from "../components/UserList";
 import TheSidebar from "../components/TheSidebar";
 import mobile from "../mixin/mobile";
+import TheMainUserControls from "../components/TheControlStrip";
 
 export default {
   mixins: [mobile],
@@ -38,13 +45,15 @@ export default {
     TheMainUser,
     TheSelectedUser,
     TheSidebar,
-    UserList,
-    TheMainUserControls
+    TheMainUserControls,
+    UserList
   },
   data() {
     return {
-      grid: true,
-      showSidebar: true
+      grid: false,
+      showSidebar: !this.isMobile,
+      showSettings: false,
+      showUserList: true
     };
   },
   beforeMount() {
@@ -60,6 +69,14 @@ export default {
     });
     this.$root.$on("toggleSidebar", () => {
       this.showSidebar = !this.showSidebar;
+    });
+
+    this.$root.$on("toggleSettings", () => {
+      this.showSettings = !this.showSettings;
+    });
+
+    this.$root.$on("toggleUserList", () => {
+      this.showUserList = !this.showUserList;
     });
 
     if (!this.isJanusInitialized) {
@@ -78,11 +95,32 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["isJanusInitialized", "users", "teamName", "account", "screenShare"])
+    ...mapGetters([
+      "isJanusInitialized",
+      "users",
+      "teamName",
+      "account",
+      "screenShare"
+    ]),
+    roomClass() {
+      let theClass = "";
+      if (this.isMobile) {
+        theClass += " mobile-room-grid";
+      } else {
+        if (this.grid) {
+          theClass += " room-grid";
+        } else {
+          theClass += " room-speaker";
+        }
+      }
+      if (this.showSidebar || this.showSettings) theClass += " show-sidebar";
+      else theClass += " hide-sidebar";
+      return theClass;
+    }
   },
   watch: {
     screenShare(val) {
-      if (val) this.grid = false
+      if (val) this.grid = false;
     }
   }
 };
@@ -96,11 +134,11 @@ export default {
 
   gap: 0px 8px;
   grid-template-columns: 1fr 450px;
-  grid-template-areas: "list chat" "controls chat";
+  grid-template-areas: "userList sideBar" "controls sideBar";
   grid-template-rows: 1fr 60px;
   &.hide-sidebar {
     grid-template-columns: 1fr;
-    grid-template-areas:  "list";
+    grid-template-areas: "userList" "controls";
     .chat {
       display: none;
     }
@@ -117,31 +155,41 @@ export default {
   grid-template-columns: 1fr 400px 450px;
   grid-template-rows: 1fr 300px 60px;
   gap: 8px 8px;
-  grid-template-areas: "selected list chat" "selected main chat" "controls controls chat";
+  grid-template-areas: "selected userList sideBar" "selected main sideBar" "controls controls sideBar";
 
   &.hide-sidebar {
     grid-template-columns: 1fr 400px;
-    grid-template-areas: "selected list" "selected main";
+    grid-template-areas: "selected userList" "selected main" "controls controls";
 
-    .chat {
+    .side-bar {
       display: none;
     }
   }
-  .video-list {
-    overflow-y: scroll;
-  }
-  .video-main {
-  position: relative;
-  grid-area: main;
-
-  .video-main__container {
-    position: absolute;
-    width: 100%;
-    max-width: 550px;
-    right: 0;
-    bottom: 0;
-  }
 }
+.mobile-room-grid {
+  width: 100vw;
+  height: 100vh;
+
+  display: grid;
+  grid-template-rows: 300px 2fr 1fr 60px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "userList userList" "selected selected" "nothing main" "controls controls";
+  .hide-video-list {
+    display: none !important;
+  }
+
+  &.show-sidebar {
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
+    grid-template-areas: "sideBar";
+
+    .video-selected,
+    #TheMainUserControls,
+    .video-main,
+    .video-list {
+      display: none;
+    }
+  }
 }
 #TheMainUserControls {
   grid-area: controls;
@@ -150,14 +198,19 @@ export default {
   grid-area: selected;
 }
 .video-list {
-  grid-area: list;
+  grid-area: userList;
   position: relative;
 }
 .video-main {
   position: relative;
   grid-area: main;
+  display: flex;
+  align-items: center;
+  .video-main__container {
+    width: 100%;
+  }
 }
-.chat {
-  grid-area: chat;
+.sidebar {
+  grid-area: sideBar;
 }
 </style>

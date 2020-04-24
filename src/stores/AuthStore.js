@@ -42,6 +42,10 @@ export default {
         )}&redirecturl=${encodeURIComponent(redirectUrl)}`
       );
     },
+    loginAsGuest(context, guestName){
+      context.dispatch("clearStorage");
+      context.commit("setAccount", { name: `${guestName}*`}); // * indicates guest login
+    },
     async checkResponse(context, responseUrl) {
       responseUrl = new URL(responseUrl);
       let url = new URL(window.location.href);

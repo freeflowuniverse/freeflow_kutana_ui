@@ -1,8 +1,9 @@
 <template>
-  <section :class="grid ? `grid grid-${usersToShow.length}`: 'list'">
+  <section :class="`${isMobile ? 'mobile-user-list' : ''} ${grid? 'grid grid-' + usersToShow.length:''}`">
     <UserListItem
+      :class="isMobile ? 'mobile-user' : ''"
       v-for="(user, index) in usersToShow"
-      @click="selectStream(user)"
+      @click.native="selectStream(user)"
       :user="user"
       :userIndex="index"
       :key="index"
@@ -15,8 +16,10 @@
 import { mapGetters, mapActions } from "vuex";
 
 import UserListItem from "./UserListItem";
+import mobile from "../mixin/mobile";
 
 export default {
+  mixins: [mobile],
   components: {
     UserListItem
   },
@@ -37,7 +40,7 @@ export default {
     ...mapActions(["selectUser", "setSnackbarMessage"]),
 
     selectStream(user) {
-      if (this.grid) return
+      if (this.grid) return;
       if (this.isSelected(user) && this.selectedUser.pinned) {
         this.selectUser({
           ...user,
@@ -151,6 +154,16 @@ export default {
     *:nth-child(-n + 3) {
       grid-column: span 4;
     }
+  }
+}
+.mobile-user-list {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+
+  .mobile-user {
+    flex-shrink: 0;
+    width: 35%;
   }
 }
 </style>

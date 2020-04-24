@@ -1,0 +1,14 @@
+version: "3.3"
+services:
+  ffc_frontend:
+    image: "jimber/ffc_frontend-${ENVIRONMENT}:${CI_COMMIT_TAG}"
+    build: .
+    container_name: "ffc_frontend"
+    restart: always
+    networks:
+      - ffc_network
+    ports:
+      - "8080:80"
+networks:
+  ffc_network:
+    external: true

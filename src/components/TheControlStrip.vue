@@ -46,14 +46,14 @@
         <v-icon>mic</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
-      <v-btn icon class="mx-1" @click="$root.$emit('toggleGridPresentation')">
+      <v-btn v-if="!minimal" icon class="mx-1" @click="$root.$emit('toggleGridPresentation')">
         <v-icon v-if="grid">grid_off</v-icon>
         <v-icon v-else>grid_on</v-icon>
       </v-btn>
       <v-btn @click="hangUp" dark icon class="red mx-2 endCall">
         <v-icon>call_end</v-icon>
       </v-btn>
-      <v-btn @click="screenShare" icon class="ml-1">
+      <v-btn @click="screenShare" icon class="ml-1" v-if="!minimal">
         <v-icon>screen_share</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
@@ -74,7 +74,7 @@ import { mapGetters, mapActions } from "vuex";
 import store from "../plugins/vuex";
 
 export default {
-  props: ["grid"],
+  props: ["grid", "minimal"],
   data: function() {
     return {
       muted: false,
