@@ -56,7 +56,6 @@
       "parser": "babel-eslint"
     },
     "rules": {
-      "debugger": "1"
     }
   },
   "browserslist": [
