@@ -52,6 +52,6 @@ export default {
 //   z-index: 3;
 // }
 .stream {
-  position: relative;
+  height: 100%;
 }
 </style>

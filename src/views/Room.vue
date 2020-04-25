@@ -153,7 +153,7 @@ export default {
 
   display: grid;
   grid-template-columns: 1fr 400px 450px;
-  grid-template-rows: 1fr 300px 60px;
+  grid-template-rows: 1fr minmax(60px ,300px) 60px;
   gap: 8px 8px;
   grid-template-areas: "selected userList sideBar" "selected main sideBar" "controls controls sideBar";
 
@@ -196,17 +196,17 @@ export default {
 }
 .video-selected {
   grid-area: selected;
+  overflow: hidden;
 }
 .video-list {
   grid-area: userList;
   position: relative;
 }
 .video-main {
-  position: relative;
   grid-area: main;
-  display: flex;
-  align-items: center;
+  height: 100%;
   .video-main__container {
+    height: 100%;
     width: 100%;
   }
 }

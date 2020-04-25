@@ -1,5 +1,4 @@
 <template>
-  <AspectRatio ar="4:3" :positionStatic="positionStatic">
     <div
       ref="videoAndMore"
       @fullscreenchange="fullScreenChanged"
@@ -30,16 +29,11 @@
         <v-icon color="white">videocam_off</v-icon>
       </v-row>
     </div>
-  </AspectRatio>
 </template>
 
 <script type="javascript">
-import AspectRatio from "../components/AspectRatio";
 
 export default {
-  components: {
-    AspectRatio
-  },
   props: {
     isScreenShare: {
       type: Boolean,
