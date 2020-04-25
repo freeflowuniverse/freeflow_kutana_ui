@@ -48,7 +48,8 @@ export default {
     JanusVideo
   },
   mounted() {
-    if (this.userIndex === 0 ) this.muted = true
+    // only incoming streams have ids
+    if (!this.user.id) this.muted = true
   },
   props: ["user", "userIndex", "inGrid"],
   methods: {
