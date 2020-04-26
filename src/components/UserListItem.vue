@@ -23,7 +23,7 @@
           <v-icon color="white">videocam_off</v-icon>
         </v-row>
       </div>
-      <UserListItemControls v-if="inGrid && userIndex" @setMute="setMute" class="UserListItemControls" />
+      <UserListItemControls v-if="user.id" @setMute="setMute" class="UserListItemControls" />
     </v-card>
   </section>
 </template>

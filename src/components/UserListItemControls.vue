@@ -1,9 +1,8 @@
 <template>
   <section class="mainControls">
     <v-card class="primary pa-1 elevation-0" dark>
-      <v-btn small @click="toggleMute" icon class="mr-0">
-        <v-icon v-if="muted" small>mic_off</v-icon>
-        <v-icon v-else small>mic</v-icon>
+      <v-btn small @click.stop="toggleMute" icon class="mr-0">
+        <v-icon small>{{muted ? 'mic_off': 'mic' }}</v-icon>
       </v-btn>
     </v-card>
   </section>
