@@ -151,6 +151,8 @@ export default {
   width: 100vw;
   height: 100vh;
 
+  background: #F5F5F5;
+  
   display: grid;
   grid-template-columns: 1fr 400px 450px;
   grid-template-rows: 1fr minmax(60px ,300px) 60px;
