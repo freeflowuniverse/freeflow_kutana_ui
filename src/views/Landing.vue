@@ -1,5 +1,5 @@
 <template>
-  <v-row align="center" justify="center">
+  <v-row align="center" justify="center" class="landing">
     <v-col cols="8">
       <v-card>
         <v-card-title>
@@ -83,3 +83,8 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+  .landing{
+    background: #F5F5F5;
+  }
+  </style>
