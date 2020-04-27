@@ -96,8 +96,8 @@ export default {
               janusHelpers.videoRoom.onJanusCreateSuccess();
             },
             error: function(error) {
-              console.error("Janus error callback");
-              janusHelpers.videoRoom.onJanusCreateError(context, error);
+              console.error("Janus error callback: ", error);
+              // janusHelpers.videoRoom.onJanusCreateError(context, error);
             },
             destroyed: function() {
               console.error("Janus destroyed callback");
