@@ -7,16 +7,16 @@
       <v-card-text v-if="$route.query.callback">
         Validating auth...
       </v-card-text>
-      <v-container v-else>
+      <span v-else>
         <v-card-text>
           Please login using 3Bot Connect or continue as guest.
         </v-card-text>
         <v-card-actions>
-          <v-btn @click="threebotConnectLogin" text>Use 3Bot Connect</v-btn>
           <v-spacer></v-spacer>
           <v-btn @click="guestLogin" text>Continue as Guest</v-btn>
+          <v-btn @click="threebotConnectLogin" text>Use 3Bot Connect</v-btn>
         </v-card-actions>
-      </v-container>
+      </span>
     </v-card>
   </v-row>
 </template>

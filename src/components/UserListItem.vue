@@ -4,7 +4,7 @@
       <v-card-title class="primary white--text body-1 mb-0 pt-1 pb-0">
         <v-row align="center" @click="$emit('click')" class="clickable" no-gutters>
           <v-col cols="2" class="py-0"></v-col>
-          <v-col cols="8" :class="isMobile ? 'subtitle' : 'title'" class="py-0 ttl" align="center">{{user.username}}</v-col>
+          <v-col cols="8" :class="isMobile ? 'subtitle' : 'title'" class="py-0 ttl" align="center">{{userIndex == 0 ? me.name : user.username}}</v-col>
           <v-col cols="2" class="py-0" align="end">
             <v-btn text icon small v-if="!inGrid">
               <v-icon :class="`pin white ${isPinned? '': 'rotate'}`"></v-icon>
@@ -12,12 +12,13 @@
           </v-col>
         </v-row>
       </v-card-title>
-      <div @click="$emit('click')" :id="`user${userIndex}`" :class="`wrapper ${!inGrid? 'clickable' : ''}`">
+      <div :id="`user${userIndex}`" :class="`wrapper ${!inGrid? 'clickable' : ''}`">
         <JanusVideo
           v-if="userVideoStream && userVideoStream.active"
           :stream="userVideoStream"
           :muted="muted"
           :positionStatic="inGrid"
+          @click="$emit('click')"
         ></JanusVideo>
         <v-row v-else align="center" justify="center" class="content">
           <v-icon color="white">videocam_off</v-icon>
@@ -58,7 +59,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["selectedUser"]),
+    ...mapGetters({
+      selectedUser: 'selectedUser',
+      me: 'account'
+    }),
     userVideoStream() {
       if (!this.$props.user || !this.$props.user.stream) {
         return false;

@@ -14,26 +14,21 @@
       <UserList :class="!showUserList ? 'hide-video-list' : ''" :grid="grid" />
     </div>
 
-    <div class="video-selected" v-if="!grid && selectedUser">
-      <TheSelectedUser />
-    </div>
-
-    <div class="no" v-if="!grid && !selectedUser">
-      <div class="no-users layout justify-center align-center fill-height">
-        <v-card>
+    <div class="video-selected" v-if="!grid">
+      <TheSelectedUser v-if="users.length > 1 && selectedUser" />
+      <v-row align="center" justify="center" v-else-if="users.length === 1" class="fill-height">
+        <v-card width="500">
           <v-card-title>
-            <v-row class="mx-0">
-              No users yet
-            </v-row>
+            <v-row class="mx-0">No users yet</v-row>
           </v-card-title>
           <v-card-text>
             <v-text-field
-                    filled
-                    label="Invite url"
-                    persistent-hint
-                    readonly
-                    hint="Invite people by sharing this url"
-                    :value="inviteLink"
+              filled
+              label="Invite url"
+              persistent-hint
+              readonly
+              hint="Invite people by sharing this url"
+              :value="inviteLink"
             >
               <template v-slot:append>
                 <v-btn small icon text @click="copyUrl">
@@ -43,8 +38,12 @@
             </v-text-field>
           </v-card-text>
         </v-card>
-      </div>
+      </v-row>
     </div>
+
+    <!-- <div class="no" v-if="!grid && !selectedUser">
+      <div class=" layout justify-center align-center fill-height"></div>
+    </div>-->
 
     <TheMainUserControls :minimal="isMobile" id="TheMainUserControls" :grid="grid" />
 
@@ -123,16 +122,16 @@ export default {
     },
     copyUrl() {
       navigator.clipboard
-              .writeText(this.inviteLink)
-              .then(() => {
-                this.setSnackbarMessage({
-                  type: "",
-                  text: `Link copied to clipboard`
-                });
-              })
-              .catch(e => {
-                console.error(e);
-              });
+        .writeText(this.inviteLink)
+        .then(() => {
+          this.setSnackbarMessage({
+            type: "",
+            text: `Link copied to clipboard`
+          });
+        })
+        .catch(e => {
+          console.error(e);
+        });
     }
   },
   computed: {
@@ -142,7 +141,7 @@ export default {
       "teamName",
       "account",
       "screenShare",
-      "selectedUser",
+      "selectedUser"
     ]),
     roomClass() {
       let theClass = "";
@@ -153,6 +152,9 @@ export default {
           theClass += " room-grid";
         } else {
           theClass += " room-speaker";
+          if (this.users.length == 1) {
+            theClass += " no-users";
+          }
         }
       }
       if (this.showSidebar || this.showSettings) theClass += " show-sidebar";
@@ -200,14 +202,19 @@ export default {
   width: 100vw;
   height: 100vh;
 
-  background: #F5F5F5;
-  
+  background: #f5f5f5;
+
   display: grid;
   grid-template-columns: 1fr 400px 450px;
   grid-template-rows: 1fr minmax(60px ,300px) 60px;
   gap: 8px 8px;
   grid-template-areas: "selected userList sideBar" "selected main sideBar" "controls controls sideBar";
-
+  &.no-users {
+    grid-template-areas: "selected selected sideBar" "nothing main sideBar" "controls controls sideBar";
+    .video-list {
+      display: none;
+    }
+  }
   &.hide-sidebar {
     grid-template-columns: 1fr 400px;
     grid-template-areas: "selected userList" "selected main" "controls controls";
@@ -252,6 +259,7 @@ export default {
 .video-list {
   grid-area: userList;
   position: relative;
+  overflow-y: auto;
 }
 .video-main {
   grid-area: main;

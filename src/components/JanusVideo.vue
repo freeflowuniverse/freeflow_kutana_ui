@@ -1,38 +1,37 @@
 <template>
-    <div
-      ref="videoAndMore"
-      @fullscreenchange="fullScreenChanged"
-      :class="this.$props.stream.getVideoTracks().length ? 'video-present janus-video' : 'video-not-present janus-video'"
+  <div
+    ref="videoAndMore"
+    @fullscreenchange="fullScreenChanged"
+    :class="this.$props.stream.getVideoTracks().length ? 'video-present janus-video' : 'video-not-present janus-video'"
+  >
+    <v-btn
+      v-if="isScreenShare"
+      fab
+      small
+      :absolute="!isFullScreen"
+      :fixed="isFullScreen"
+      text
+      right
+      class="semiBlack mt-3"
+      @click="toggleFullscreen"
     >
-      <v-btn
-        v-if="isScreenShare"
-        fab
-        small
-        :absolute="!isFullScreen"
-        :fixed="isFullScreen"
-        text
-        right
-        class="semiBlack mt-3"
-        @click="toggleFullscreen"
-      >
-        <v-icon color="white" v-if="!isFullScreen">fullscreen</v-icon>
-        <v-icon color="white" v-else>fullscreen_exit</v-icon>
-      </v-btn>
-      <video
-        ref="video"
-        :src-object.prop.camel="stream"
-        :class="[isFullScreen ? 'fullScreen' : '',
+      <v-icon color="white" v-if="!isFullScreen">fullscreen</v-icon>
+      <v-icon color="white" v-else>fullscreen_exit</v-icon>
+    </v-btn>
+    <video
+      ref="video"
+      :src-object.prop.camel="stream"
+      :class="[isFullScreen ? 'fullScreen' : '',
                  isScreenShare ? 'screenshare' : 'noScreenshare']"
-        autoplay
-      ></video>
-      <v-row align="center" justify="center" class="video-cam-off">
-        <v-icon color="white">videocam_off</v-icon>
-      </v-row>
-    </div>
+      autoplay
+    ></video>
+    <v-row align="center" justify="center" class="video-cam-off">
+      <v-icon color="white">videocam_off</v-icon>
+    </v-row>
+  </div>
 </template>
 
 <script type="javascript">
-
 export default {
   props: {
     isScreenShare: {
@@ -104,6 +103,7 @@ video.fullScreen {
 
 .janus-video {
   height: 100%;
+  width: 100%;
 }
 
 video {
