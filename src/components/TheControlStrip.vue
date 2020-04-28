@@ -26,6 +26,11 @@
             v-model="quality"
             @change="saveQualityOption"
           ></v-slider>
+          <v-divider class="my-5"></v-divider>
+          <v-col align="center" justify="center">
+            <p class="text-center">Currently logged in as <b>{{account.name}}</b></p>
+            <v-btn color="error" text @click="logout">Log out</v-btn>
+          </v-col>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -89,7 +94,7 @@ export default {
     this.$root.$on("showInviteUser", this.showAddUserDialog);
   },
   computed: {
-    ...mapGetters(["users", "teamName"]),
+    ...mapGetters(["users", "teamName", "account"]),
     inviteLink() {
       let baseUrl = window.location.href;
       if (baseUrl.charAt(baseUrl.length - 1) != "/") {
@@ -99,7 +104,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["shareScreen", "setSnackbarMessage"]),
+    ...mapActions(["shareScreen", "setSnackbarMessage", "clearStorage"]),
+    logout() {
+      this.clearStorage()
+      this.$router.push({name: 'home'})
+    },
     toggleSettings() {
       this.showExtraSettings = !this.showExtraSettings;
     },

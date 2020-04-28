@@ -176,6 +176,7 @@ export default {
     clearStorage(context) {
       context.commit("setState", null);
       context.commit("setKeys", null);
+      context.commit("setAccount", null);
     }
   },
   mutations: {

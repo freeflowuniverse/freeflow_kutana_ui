@@ -79,7 +79,6 @@ export default {
     return {
       grid: false,
       showSidebar: !this.isMobile,
-      showSettings: false,
       showUserList: true
     };
   },
@@ -97,11 +96,7 @@ export default {
     this.$root.$on("toggleSidebar", () => {
       this.showSidebar = !this.showSidebar;
     });
-
-    this.$root.$on("toggleSettings", () => {
-      this.showSettings = !this.showSettings;
-    });
-
+    
     this.$root.$on("toggleUserList", () => {
       this.showUserList = !this.showUserList;
     });
@@ -161,7 +156,7 @@ export default {
           }
         }
       }
-      if (this.showSidebar || this.showSettings) theClass += " show-sidebar";
+      if (this.showSidebar) theClass += " show-sidebar";
       else theClass += " hide-sidebar";
       return theClass;
     },
