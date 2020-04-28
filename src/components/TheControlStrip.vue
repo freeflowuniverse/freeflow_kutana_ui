@@ -58,8 +58,11 @@
       <v-btn @click="hangUp" dark icon class="red mx-2 endCall">
         <v-icon>call_end</v-icon>
       </v-btn>
-      <v-btn @click="screenShare" icon class="ml-1" v-if="!minimal">
+      <v-btn @click="enableScreenShare" v-if="screenShareRole !== 'publisher' && !minimal" icon class="ml-1">
         <v-icon>screen_share</v-icon>
+      </v-btn>
+      <v-btn @click="disableScreenShare" v-else-if="screenShareRole === 'publisher' && !minimal" icon class="ml-1">
+        <v-icon>stop_screen_share</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
 
@@ -76,7 +79,6 @@
 <script>
 import { Janus } from "janus-gateway";
 import { mapGetters, mapActions } from "vuex";
-import store from "../plugins/vuex";
 
 export default {
   props: ["grid", "minimal"],
@@ -94,7 +96,7 @@ export default {
     this.$root.$on("showInviteUser", this.showAddUserDialog);
   },
   computed: {
-    ...mapGetters(["users", "teamName", "account"]),
+    ...mapGetters(["users", "teamName", "account", "screenShareRole", "screenShare"]),
     inviteLink() {
       let baseUrl = window.location.href;
       if (baseUrl.charAt(baseUrl.length - 1) != "/") {
@@ -104,7 +106,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["shareScreen", "setSnackbarMessage", "clearStorage"]),
+    ...mapActions(["shareScreen", "stopScreenShare", "setSnackbarMessage", "clearStorage"]),
     logout() {
       this.clearStorage()
       this.$router.push({name: 'home'})
@@ -170,8 +172,8 @@ export default {
       this.$router.push({ name: "home" });
     },
 
-    screenShare: function() {
-      if (store.getters.screenShare) {
+    enableScreenShare: function() {
+      if (this.screenShare) {
         this.setSnackbarMessage({
           type: "",
           text: `Screenshare already in progress, only one screenshare per room!`
@@ -179,6 +181,15 @@ export default {
         return;
       }
       this.shareScreen();
+    },
+
+    disableScreenShare: function() {
+      if (this.screenShareRole !== 'publisher') {
+        console.log('tests 2')
+        return;
+      }
+      console.log('tests')
+      this.stopScreenShare();
     },
 
     showAddUserDialog() {
