@@ -42,4 +42,7 @@ export default {
 .chatMessage.mine a{
   color: white;
 }
+.video-main video.noScreenshare {
+  transform: rotateY(180deg);
+}
 </style>
