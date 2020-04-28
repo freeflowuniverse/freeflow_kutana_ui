@@ -1,10 +1,17 @@
 <template>
-  <section :class="isMobile ? `userListItemMobile ma-1 ml-1 ${isSelected ? 'selected' : ''}` : `userListItem ${isSelected ? 'selected' : ''}  ${inGrid? 'inGrid': ''}`" >
+  <section
+    :class="isMobile ? `userListItemMobile ma-1 ml-1 ${isSelected ? 'selected' : ''}` : `userListItem ${isSelected ? 'selected' : ''}  ${inGrid? 'inGrid': ''}`"
+  >
     <v-card class="stream black">
       <v-card-title class="primary white--text body-1 mb-0 pt-1 pb-0">
         <v-row align="center" @click="$emit('click')" class="clickable" no-gutters>
           <v-col cols="2" class="py-0"></v-col>
-          <v-col cols="8" :class="isMobile ? 'subtitle' : 'title'" class="py-0 ttl" align="center">{{userIndex == 0 ? me.name : user.username}}</v-col>
+          <v-col
+            cols="8"
+            :class="isMobile ? 'subtitle' : 'title'"
+            class="py-0 ttl"
+            align="center"
+          >{{isMine ? me.name : user.username}} {{muted}}</v-col>
           <v-col cols="2" class="py-0" align="end">
             <v-btn text icon small v-if="!inGrid">
               <v-icon :class="`pin white ${isPinned? '': 'rotate'}`"></v-icon>
@@ -16,7 +23,7 @@
         <JanusVideo
           v-if="userVideoStream && userVideoStream.active"
           :stream="userVideoStream"
-          :muted="muted"
+          :muted="isMine || muted"
           :positionStatic="inGrid"
           @click="$emit('click')"
         ></JanusVideo>
@@ -24,7 +31,7 @@
           <v-icon color="white">videocam_off</v-icon>
         </v-row>
       </div>
-      <UserListItemControls v-if="user.id" @setMute="setMute" class="UserListItemControls" />
+      <UserListItemControls v-if="!isMine" @setMute="setMute" class="UserListItemControls" />
     </v-card>
   </section>
 </template>
@@ -54,11 +61,15 @@ export default {
   },
   computed: {
     ...mapGetters({
-      selectedUser: 'selectedUser',
-      me: 'account'
+      selectedUser: "selectedUser",
+      me: "account",
+      users: "users"
     }),
-    isMobile () {
-      return this.$vuetify.breakpoint.mdAndDown
+    isMobile() {
+      return this.$vuetify.breakpoint.mdAndDown;
+    },
+    isMine() {
+      return this.user == this.users[0];
     },
     userVideoStream() {
       if (!this.$props.user || !this.$props.user.stream) {
