@@ -11,7 +11,7 @@
             :class="isMobile ? 'subtitle' : 'title'"
             class="py-0 ttl"
             align="center"
-          >{{isMine ? me.name : user.username}} {{muted}}</v-col>
+          >{{isMine ? me.name : user.username}}</v-col>
           <v-col cols="2" class="py-0" align="end">
             <v-btn text icon small v-if="!inGrid">
               <v-icon :class="`pin white ${isPinned? '': 'rotate'}`"></v-icon>
