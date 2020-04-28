@@ -1,18 +1,20 @@
 <template>
   <v-row align="center" justify="center">
-    <v-form @submit.prevent="continueLogin">
-      <v-card :loading="$route.query.callback" width="500">
-        <v-card-title>Freeflow Connect</v-card-title>
-        <v-card-text>
-          <p>Choose your guest name</p>
-          <v-text-field :rules="guestNameRules" v-model="guestName" label="Guest" single-line></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text type="submit">Continue as Guest</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-form>
+    <v-col cols="12" md="6" class="mx-5">
+      <v-form @submit.prevent="continueLogin">
+        <v-card :loading="$route.query.callback">
+          <v-card-title>Freeflow Connect</v-card-title>
+          <v-card-text>
+            <p>Choose your guest name</p>
+            <v-text-field :rules="guestNameRules" v-model="guestName" label="Guest" single-line></v-text-field>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn text type="submit">Continue as Guest</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-col>
   </v-row>
 </template>
 <script>

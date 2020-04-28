@@ -8,10 +8,8 @@
 <script>
 import { mapGetters } from "vuex";
 import JanusVideo from "./JanusVideo";
-import mobile from '../mixin/mobile';
 
 export default {
-  mixins: [mobile],
   components: {
     JanusVideo
   },
@@ -37,7 +35,10 @@ export default {
       }
 
       return this.users[0].screenShareStream;
-    }
+    },
+    isMobile () {
+      return this.$vuetify.breakpoint.mdAndDown
+    },
   }
 };
 </script>

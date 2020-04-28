@@ -53,7 +53,8 @@ export default {
     }
   },
   mounted() {
-    this.$refs.video.muted = this.$props.muted;
+    console.log(`muted`, this.muted)
+    this.$refs.video.muted = this.muted;
   },
   data() {
     return {

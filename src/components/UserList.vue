@@ -14,12 +14,9 @@
 
 <script type="javascript">
 import { mapGetters, mapActions } from "vuex";
-
 import UserListItem from "./UserListItem";
-import mobile from "../mixin/mobile";
 
 export default {
-  mixins: [mobile],
   components: {
     UserListItem
   },
@@ -34,7 +31,10 @@ export default {
 
     usersToShow() {
       return this.grid ? this.users : this.users.slice(1);
-    }
+    },
+    isMobile () {
+      return this.$vuetify.breakpoint.mdAndDown
+    },
   },
   methods: {
     ...mapActions(["selectUser", "setSnackbarMessage"]),

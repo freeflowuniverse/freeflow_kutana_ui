@@ -19,13 +19,15 @@
 
 <script type="javascript">
 import TheChat from "./TheChat";
-import mobile from '../mixin/mobile';
 export default {
-  mixins: [mobile],
   components: {
     TheChat
   },
-  mounted() {}
+  computed: {
+    isMobile () {
+      return this.$vuetify.breakpoint.mdAndDown
+    }
+  }
 };
 </script>
 

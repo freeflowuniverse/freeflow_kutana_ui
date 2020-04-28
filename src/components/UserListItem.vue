@@ -33,10 +33,8 @@
 import { mapGetters } from "vuex";
 import UserListItemControls from "./UserListItemControls.vue";
 import JanusVideo from "./JanusVideo";
-import mobile from '../mixin/mobile';
 
 export default {
-  mixins: [mobile],
   data: function() {
     return {
       showWarning: true,
@@ -47,10 +45,6 @@ export default {
   components: {
     UserListItemControls,
     JanusVideo
-  },
-  mounted() {
-    // only incoming streams have ids
-    if (!this.user.id) this.muted = true
   },
   props: ["user", "userIndex", "inGrid"],
   methods: {
@@ -63,6 +57,9 @@ export default {
       selectedUser: 'selectedUser',
       me: 'account'
     }),
+    isMobile () {
+      return this.$vuetify.breakpoint.mdAndDown
+    },
     userVideoStream() {
       if (!this.$props.user || !this.$props.user.stream) {
         return false;

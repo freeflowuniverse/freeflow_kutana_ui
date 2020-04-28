@@ -17,27 +17,29 @@
     <div class="video-selected" v-if="!grid">
       <TheSelectedUser v-if="users.length > 1 && selectedUser" />
       <v-row align="center" justify="center" v-else-if="users.length === 1" class="fill-height">
-        <v-card width="500">
-          <v-card-title>
-            <v-row class="mx-0">No users yet</v-row>
-          </v-card-title>
-          <v-card-text>
-            <v-text-field
-              filled
-              label="Invite url"
-              persistent-hint
-              readonly
-              hint="Invite people by sharing this url"
-              :value="inviteLink"
-            >
-              <template v-slot:append>
-                <v-btn small icon text @click="copyUrl">
-                  <v-icon>file_copy</v-icon>
-                </v-btn>
-              </template>
-            </v-text-field>
-          </v-card-text>
-        </v-card>
+        <v-col cols="12" md="8" lg="6" class="mx-5">
+          <v-card>
+            <v-card-title>
+              <v-row class="mx-0">No users yet</v-row>
+            </v-card-title>
+            <v-card-text>
+              <v-text-field
+                filled
+                label="Invite url"
+                persistent-hint
+                readonly
+                hint="Invite people by sharing this url"
+                :value="inviteLink"
+              >
+                <template v-slot:append>
+                  <v-btn small icon text @click="copyUrl">
+                    <v-icon>file_copy</v-icon>
+                  </v-btn>
+                </template>
+              </v-text-field>
+            </v-card-text>
+          </v-card>
+        </v-col>
       </v-row>
     </div>
 
@@ -63,11 +65,9 @@ import TheMainUser from "../components/TheMainUser";
 import TheSelectedUser from "../components/TheSelectedUser";
 import UserList from "../components/UserList";
 import TheSidebar from "../components/TheSidebar";
-import mobile from "../mixin/mobile";
 import TheMainUserControls from "../components/TheControlStrip";
 
 export default {
-  mixins: [mobile],
   components: {
     TheMainUser,
     TheSelectedUser,
@@ -143,8 +143,12 @@ export default {
       "screenShare",
       "selectedUser"
     ]),
+    isMobile() {
+      return this.$vuetify.breakpoint.mdAndDown;
+    },
     roomClass() {
       let theClass = "";
+      console.log(`this.isMobile`, this.isMobile);
       if (this.isMobile) {
         theClass += " mobile-room-grid";
       } else {
@@ -206,7 +210,7 @@ export default {
 
   display: grid;
   grid-template-columns: 1fr 400px 450px;
-  grid-template-rows: 1fr minmax(60px ,300px) 60px;
+  grid-template-rows: 1fr minmax(60px, 300px) 60px;
   gap: 8px 8px;
   grid-template-areas: "selected userList sideBar" "selected main sideBar" "controls controls sideBar";
   &.no-users {

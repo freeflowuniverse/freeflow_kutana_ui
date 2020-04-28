@@ -1,13 +1,13 @@
 <template>
-  <v-row align="center" justify="center" class="landing">
-    <v-col cols="8">
+  <v-row align="center" justify="center" class="landing px-5">
+    <v-col cols="12" md="6">
       <v-card>
         <v-card-title>
           <p class="text-center" style="width:100%">FreeFlowConnect</p>
         </v-card-title>
         <v-card-text>
-          <v-row align="center">
-            <v-col align="center">
+          <v-row align="center" justify="space-around">
+            <v-col cols="12" md="5" align="center">
               <v-form @submit.prevent="joinRoom" v-model="valid">
                 <v-text-field
                   filled
@@ -24,8 +24,8 @@
                 </v-text-field>
               </v-form>
             </v-col>
-            <v-divider vertical></v-divider>
-            <v-col align="center">
+            <v-divider :vertical="$vuetify.breakpoint.mdAndUp"></v-divider>
+            <v-col cols="12" md="5" align="center">
               <v-btn text @click="create">Create room</v-btn>
             </v-col>
           </v-row>
