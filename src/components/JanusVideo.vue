@@ -114,9 +114,6 @@ video {
   background-color: black;
 }
 
-video.noScreenshare {
-  transform: rotateY(180deg);
-}
 video.screenshare {
   object-fit: contain;
 }
