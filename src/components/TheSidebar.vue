@@ -1,14 +1,20 @@
 <template>
   <v-card class="ma-0 sideBar">
     <v-card-title class="primary">
-      <v-row justify="center" class="white--text px-2">
-        <v-btn v-if="isMobile" icon @click="$root.$emit('toggleSidebar')">
-          <v-icon color="white">arrow_back</v-icon>
-        </v-btn>
-        <v-col align="center" class="py-0 ttl"><h3>Messages</h3></v-col>
-        <v-btn v-if="!isMobile" icon @click="$root.$emit('toggleSidebar')">
-          <v-icon color="white">close</v-icon>
-        </v-btn>
+      <v-row align="center" justify="center" class="white--text px-2">
+        <v-col cols="1" class="py-0">
+          <v-btn v-if="isMobile" icon @click="$root.$emit('toggleSidebar')">
+            <v-icon color="white">arrow_back</v-icon>
+          </v-btn>
+        </v-col>
+        <v-col align="center" class="py-0 ttl">
+          <h3>Messages</h3>
+        </v-col>
+        <v-col cols="1" class="py-0">
+          <v-btn v-if="!isMobile" icon @click="$root.$emit('toggleSidebar')">
+            <v-icon color="white">close</v-icon>
+          </v-btn>
+        </v-col>
       </v-row>
     </v-card-title>
     <v-card-text class="inner pb-0">
@@ -24,8 +30,8 @@ export default {
     TheChat
   },
   computed: {
-    isMobile () {
-      return this.$vuetify.breakpoint.mdAndDown
+    isMobile() {
+      return this.$vuetify.breakpoint.mdAndDown;
     }
   }
 };
