@@ -100,7 +100,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["initializeJanus", "getTeamInfo", "join", "setRoomId"]),
+    ...mapActions(["setSnackbarMessage", "initializeJanus", "getTeamInfo", "join", "setRoomId"]),
     hashString(str) {
       let hash = 0;
       for (let i = 0; i < str.length; i++) {
