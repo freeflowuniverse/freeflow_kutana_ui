@@ -76,8 +76,12 @@ export default {
       console.log("joinScreen")
       janusHelpers.screenShare.onJanusCreateSuccess(() => janusHelpers.screenShare.joinScreen(id));
     },
-    stopScreenShare() {
+    stopScreenShare(state) {
       janusHelpers.screenShare.stopScreenShare();
+      state.screenShareRole = null;
+      state.screenShareCapture = null;
+      state.screenShareSource = null;
+      state.screenShare = null;
     }
   },
   actions: {

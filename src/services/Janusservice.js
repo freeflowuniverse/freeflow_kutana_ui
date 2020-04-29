@@ -246,6 +246,7 @@ export const janusHelpers = {
                     },
                     error: error => {
                       Janus.error("WebRTC error:", error);
+                      store.commit('setScreenShareRole', null);
                       console.log(
                         "User clicked cancel when trying to share his screen."
                       );
