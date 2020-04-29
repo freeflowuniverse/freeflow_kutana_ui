@@ -53,7 +53,6 @@ export default {
     }
   },
   mounted() {
-    console.log(`muted`, this.muted)
     this.$refs.video.muted = this.muted;
   },
   data() {
@@ -111,7 +110,6 @@ video {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background-color: black;
 }
 
 video.screenshare {

@@ -5,7 +5,6 @@
         <v-spacer />
         <v-btn
           icon
-          :disabled="users.length <= 1 ? true : false"
           @click="$root.$emit('toggleUserList')"
         >
           <v-icon>group</v-icon>
@@ -17,8 +16,8 @@
     <div class="video-selected" v-if="!grid">
       <TheSelectedUser v-if="users.length > 1 && selectedUser" />
       <v-row align="center" justify="center" v-else-if="users.length === 1" class="fill-height">
-        <v-col cols="12" md="8" lg="6" class="mx-5">
-          <v-card>
+        <v-col cols="12" md="8" lg="6">
+          <v-card class="mx-5">
             <v-card-title>
               <v-row class="mx-0">No users yet</v-row>
             </v-card-title>
@@ -43,18 +42,13 @@
       </v-row>
     </div>
 
-    <!-- <div class="no" v-if="!grid && !selectedUser">
-      <div class=" layout justify-center align-center fill-height"></div>
-    </div>-->
-
-    <TheMainUserControls :minimal="isMobile" id="TheMainUserControls" :grid="grid" />
-
     <div class="video-main" v-if="!grid">
       <div class="video-main__container">
         <TheMainUser />
       </div>
     </div>
 
+    <TheMainUserControls :minimal="isMobile" id="TheMainUserControls" :grid="grid" class="grey lighten-4"/>
     <TheSidebar class="sidebar" v-if="showSidebar" />
   </div>
 </template>
@@ -66,7 +60,7 @@ import TheSelectedUser from "../components/TheSelectedUser";
 import UserList from "../components/UserList";
 import TheSidebar from "../components/TheSidebar";
 import TheMainUserControls from "../components/TheControlStrip";
-
+// TODO: margin right when in grid && no
 export default {
   components: {
     TheMainUser,
@@ -96,7 +90,7 @@ export default {
     this.$root.$on("toggleSidebar", () => {
       this.showSidebar = !this.showSidebar;
     });
-    
+
     this.$root.$on("toggleUserList", () => {
       this.showUserList = !this.showUserList;
     });
@@ -142,7 +136,7 @@ export default {
       return this.$vuetify.breakpoint.mdAndDown;
     },
     roomClass() {
-      let theClass = "";
+      let theClass = "room ";
       console.log(`this.isMobile`, this.isMobile);
       if (this.isMobile) {
         theClass += " mobile-room-grid";
@@ -169,6 +163,15 @@ export default {
     }
   },
   watch: {
+    isMobile: {
+      immediate: true,
+      handler(val) {
+        if (val) this.showSidebar = true;
+      }
+    },
+    users (val) {
+      this.showUserList = val && val.length > 2
+    },
     screenShare(val) {
       if (val) this.grid = false;
     }
@@ -179,9 +182,7 @@ export default {
 <style lang="scss" scoped>
 .room-grid {
   width: 100vw;
-  height: 100vh;
   display: grid;
-
   gap: 0px 8px;
   grid-template-columns: 1fr 450px;
   grid-template-areas: "userList sideBar" "controls sideBar";
@@ -189,6 +190,7 @@ export default {
   &.hide-sidebar {
     grid-template-columns: 1fr;
     grid-template-areas: "userList" "controls";
+    padding-right: 8px;
     .chat {
       display: none;
     }
@@ -224,13 +226,15 @@ export default {
   }
 }
 .mobile-room-grid {
-  width: 100vw;
   height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
 
+  width: 100vw;
   display: grid;
-  grid-template-rows: 300px 2fr 1fr 60px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(20px, auto) 2fr 1fr 60px;
+  grid-template-columns: 3fr 1fr;
   grid-template-areas: "userList userList" "selected selected" "nothing main" "controls controls";
+  gap: 8px 0px;
   .hide-video-list {
     display: none !important;
   }

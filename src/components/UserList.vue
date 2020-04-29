@@ -68,7 +68,7 @@ export default {
 <style lang="scss" scoped>
 .grid {
   display: grid;
-  height: calc(100vh - 60px);
+  height: calc(100% - 60px);
   grid-template-columns: repeat(12, 1fr);
   * {
     grid-column: span 3;

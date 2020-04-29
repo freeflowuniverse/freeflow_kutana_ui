@@ -45,6 +45,6 @@ export default {
   border-radius: 0 !important;
 }
 .inner {
-  height: calc(100vh - 64px);
+  height: calc(100% - 64px);
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <v-row align="center" justify="center">
-    <v-col cols="12" md="6" class="mx-5">
-      <v-form @submit.prevent="continueLogin">
+    <v-col cols="12" md="6">
+      <v-form @submit.prevent="continueLogin" class="mx-5">
         <v-card :loading="$route.query.callback">
           <v-card-title>Freeflow Connect</v-card-title>
           <v-card-text>

@@ -2,7 +2,7 @@
   <section
     :class="isMobile ? `userListItemMobile ma-1 ml-1 ${isSelected ? 'selected' : ''}` : `userListItem ${isSelected ? 'selected' : ''}  ${inGrid? 'inGrid': ''}`"
   >
-    <v-card class="stream black">
+    <v-card class="stream">
       <v-card-title class="primary white--text body-1 mb-0 pt-1 pb-0">
         <v-row align="center" @click="$emit('click')" class="clickable" no-gutters>
           <v-col cols="2" class="py-0"></v-col>
@@ -129,7 +129,7 @@ export default {
 }
 
 .selected .stream > div {
-  border: 3px solid var(--primary-color);
+  border: 3px solid var(--primary-color);    
 }
 .v-icon {
   transition: all 300ms ease-in-out;

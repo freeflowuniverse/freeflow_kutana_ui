@@ -1,5 +1,5 @@
 <template>
-  <div class="stream-wrapper black" :class="!isMobile ? 'resize-stream' : ''">
+  <div class="stream-wrapper" :class="!isMobile ? 'resize-stream' : ''">
     <div
       v-if="!this.userScreenshareStream && selectedUser && selectedUser.username && !isMobile"
       class="name primary pa-2 white--text"
@@ -85,6 +85,8 @@ export default {
   flex: 1;
   position: relative;
   justify-content: center;
+  height: 100%;
+  width: 100%;
   #selectedStream {
     flex: 1;
     align-self: center;

@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app" :style="cssProps">
+  <v-app :style="cssProps">
     <router-view></router-view>
     <v-snackbar top v-model="showSnackbar" :color="snackbarMessage.type">{{snackbarMessage.text}}</v-snackbar>
   </v-app>
@@ -22,6 +22,16 @@ export default {
       };
     }
   },
+  mounted() {
+    let vh = window.innerHeight * 0.01;
+    // Then we set the value in the --vh custom property to the root of the document
+    document.documentElement.style.setProperty("--vh", `${vh}px`);
+    window.addEventListener("resize", () => {
+      let vh = window.innerHeight * 0.01;
+      // Then we set the value in the --vh custom property to the root of the document
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+    });
+  },
   watch: {
     snackbarMessage(val) {
       if (val) {
@@ -39,10 +49,13 @@ export default {
 .ttl {
   font-family: "Bebas Neue", cursive !important;
 }
-.chatMessage.mine a{
+.chatMessage.mine a {
   color: white;
 }
 .video-main video.noScreenshare {
   transform: rotateY(180deg);
+}
+video {
+  margin-bottom: -6px;
 }
 </style>
