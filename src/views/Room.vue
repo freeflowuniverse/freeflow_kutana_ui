@@ -166,7 +166,7 @@ export default {
     isMobile: {
       immediate: true,
       handler(val) {
-        if (val) this.showSidebar = true;
+        if (val) this.showSidebar = false;
       }
     },
     users (val) {
