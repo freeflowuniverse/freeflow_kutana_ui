@@ -19,7 +19,7 @@
           </v-col>
         </v-row>
       </v-card-title>
-      <div :id="`user${userIndex}`" :class="`wrapper ${!inGrid? 'clickable' : ''}`">
+      <div :id="`user${userIndex}`" :class="`wrapper black ${!inGrid? 'clickable' : ''}`">
         <JanusVideo
           v-if="userVideoStream && userVideoStream.active"
           :stream="userVideoStream"

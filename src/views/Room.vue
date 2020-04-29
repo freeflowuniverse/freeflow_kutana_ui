@@ -43,7 +43,7 @@
     </div>
 
     <div class="video-main" v-if="!grid">
-      <div class="video-main__container">
+      <div class="video-main__container black">
         <TheMainUser />
       </div>
     </div>
