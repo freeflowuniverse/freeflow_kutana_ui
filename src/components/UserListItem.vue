@@ -124,7 +124,7 @@ export default {
 }
 
 .stream > div {
-  border: 5px solid transparent;
+  border: 3px solid black;
   transition: all 300ms ease-in-out;
 }
 
