@@ -1,7 +1,7 @@
 <template>
   <v-row align="center" justify="center">
     <v-col cols="12" md="6">
-      <v-form @submit.prevent="continueLogin" class="mx-5">
+      <v-form @submit.prevent="continueLogin" class="mx-5" v-model="valid">
         <v-card :loading="$route.query.callback">
           <v-card-title>Freeflow Connect</v-card-title>
           <v-card-text>
@@ -10,7 +10,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn text type="submit">Continue as Guest</v-btn>
+            <v-btn :disabled="!valid" text type="submit">Continue as Guest</v-btn>
           </v-card-actions>
         </v-card>
       </v-form>
@@ -23,6 +23,7 @@ export default {
   mounted() {},
   data() {
     return {
+      valid: false,
       guestName: "",
       guestNameRules: [
         name => name.length >= 3 || "Name should be at least 3 characters",
@@ -37,11 +38,13 @@ export default {
   methods: {
     ...mapActions(["loginAsGuest"]),
     continueLogin() {
-      this.loginAsGuest(this.guestName);
-      if (!this.$route.query.redirect) {
-        return;
+      if (this.valid) {
+        this.loginAsGuest(this.guestName);
+        if (!this.$route.query.redirect) {
+          return;
+        }
+        this.$router.push(this.$route.query.redirect);
       }
-      this.$router.push(this.$route.query.redirect);
     }
   }
 };
