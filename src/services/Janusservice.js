@@ -279,14 +279,8 @@ export const janusHelpers = {
                   });
                 }
 
-                // This is a subscriber that is leaving. Hmhmhmhm
                 if(msg["leaving"]) {
-                  console.log("We should LEAVE now?")
-                  // store.dispatch("selectUser", {
-                  //   ...store.getters.users[1],
-                  //   pinned: false
-                  // });
-                  // store.commit("setScreenShare", null);
+                  // Possible leaving hook, seems inconsistent, needs further investigation.
                 }
                 break;
             }
@@ -302,18 +296,23 @@ export const janusHelpers = {
           store.commit("setScreenShare", stream);
           stream.getVideoTracks()[0].addEventListener('ended', () => {
             console.log("Local video stream seems to have ended.")
-            stream.removeTrack(stream.getVideoTracks()[0]);
-            store.getters.users[0].screenSharePluginHandle.detach();
+
+            store.commit("setScreenShare", null);
+
+            // Lets broadcast to everybody that our stream has ended.
+            let teamName = window.localStorage.getItem("teamName");
+            let user = JSON.parse(window.localStorage.getItem("account"));
+
+            socketService.emit("signal", {
+              channel: teamName,
+              sender: user.name,
+              type: "screenshare_stopped",
+              content: store.getters.screenShareRoom
+            });
           });
         },
         oncleanup: () => {
           Janus.log(" ::: Got a cleanup notification :::");
-          console.log("oncleanup Screenshare", store.getters.users[1])
-          store.dispatch("selectUser", {
-            ...store.getters.users[1],
-            pinned: false
-          });
-          store.commit("setScreenShare", null);
         }
       });
     },
@@ -389,7 +388,6 @@ export const janusHelpers = {
     },
     stopScreenShare() {
       console.log("Stopped screenshare ... ");
-      store.getters.users[0].screenSharePluginHandle.detach();
     }
   },
   publishOwnFeed(useAudio) {
@@ -576,39 +574,19 @@ export const janusHelpers = {
       },
       onremotestream: stream => {
 
-        setTimeout(() => {
-          // Dirty fix to fix leaving of the screen sharing, feel free to fix this yourself kthxbye.
-          if(stream.getVideoTracks()[0].getSettings().frameRate === 0) {
-            console.log("Detected video that has 0 fps. Video is corrupt or unusable. Emitting screenshare_stopped")
+        setTimeout(()  => {
+          let videoTrack = stream.getVideoTracks()[0];
 
-            let teamName = window.localStorage.getItem("teamName");
-            let user = JSON.parse(window.localStorage.getItem("account"));
-
-            socketService.emit("signal", {
-              channel: teamName,
-              sender: user.name,
-              type: "screenshare_stopped",
-              content: store.getters.screenShareRoom
-            });
-
-            store.dispatch("selectUser", {
-              ...store.getters.users[1],
-              pinned: false
-            });
-            store.commit("setScreenShare", null);
-
-            return false;
-          }
-
-          if (!store.getters.screenShare) {
+          if(!store.screenShare && videoTrack.getSettings().frameRate !== 0) {
             store.commit("setScreenShare", stream);
           }
         }, 250);
+
       },
       oncleanup: () => {
         Janus.log(` ::: Got a cleanup notification (remote feed ${id}) :::`);
         console.log("oncleanup to screen share ...");
-
+        store.commit("setScreenShare", null);
       }
     });
   },

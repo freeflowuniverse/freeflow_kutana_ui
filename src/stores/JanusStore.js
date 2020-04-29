@@ -1,6 +1,7 @@
 import { Janus } from "janus-gateway";
 import config from "../../public/config";
 import { janusHelpers } from "../services/Janusservice";
+// import store from "../plugins/vuex";
 
 export default {
   state: {
@@ -77,11 +78,11 @@ export default {
       janusHelpers.screenShare.onJanusCreateSuccess(() => janusHelpers.screenShare.joinScreen(id));
     },
     stopScreenShare(state) {
-      janusHelpers.screenShare.stopScreenShare();
-      state.screenShareRole = null;
-      state.screenShareCapture = null;
-      state.screenShareSource = null;
+      // state.screenShareRole = null;`
+      // state.screenShareCapture = null;
+      // state.screenShareSource = null;
       state.screenShare = null;
+      janusHelpers.screenShare.stopScreenShare();
     }
   },
   actions: {

@@ -58,10 +58,10 @@
       <v-btn @click="hangUp" dark icon class="red mx-2 endCall">
         <v-icon>call_end</v-icon>
       </v-btn>
-      <v-btn @click="enableScreenShare" v-if="screenShareRole !== 'publisher' && !minimal" icon class="ml-1">
+      <v-btn @click="enableScreenShare" v-if="screenShare === null" icon class="ml-1">
         <v-icon>screen_share</v-icon>
       </v-btn>
-      <v-btn @click="disableScreenShare" v-else-if="screenShareRole === 'publisher' && !minimal" icon class="ml-1">
+      <v-btn @click="disableScreenShare" v-else icon class="ml-1">
         <v-icon>stop_screen_share</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
@@ -180,16 +180,17 @@ export default {
         });
         return;
       }
+
       this.shareScreen();
     },
 
     disableScreenShare: function() {
-      if (this.screenShareRole !== 'publisher') {
+      /*if (this.screenShareRole !== 'publisher') {
         console.log('tests 2')
         return;
       }
       console.log('tests')
-      this.stopScreenShare();
+      this.stopScreenShare();*/
     },
 
     showAddUserDialog() {

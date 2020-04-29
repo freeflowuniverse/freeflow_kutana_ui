@@ -34,12 +34,12 @@ export default {
           context.dispatch("accessGranted");
           break;
         case "screenshare_started":
-          console.log("Joining screen share ... ");
+          console.log("[Signal] Joining screen share ... ");
           context.dispatch("joinScreenShare", message);
           break;
         case "screenshare_stopped":
-          console.log("Stopped screen share ... ");
-          // context.dispatch("stopScreenShare");
+          console.log("[Signal] Stopped screen share ... ");
+          context.dispatch("stopScreenShare");
           break;
         default:
           console.log(`NOT DISPATCHING`);
