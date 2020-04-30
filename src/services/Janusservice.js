@@ -323,7 +323,7 @@ export const janusHelpers = {
       const create = {
         request: "create",
         description: "screenshare",
-        bitrate: 256000,
+        bitrate: 1024000,
         bitrate_cap: true,
         publishers: 1
       };
