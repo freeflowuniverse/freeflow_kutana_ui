@@ -24,6 +24,7 @@
       :class="[isFullScreen ? 'fullScreen' : '',
                  isScreenShare ? 'screenshare' : 'noScreenshare']"
       autoplay
+      playsinline
     ></video>
     <v-row align="center" justify="center" class="video-cam-off">
       <v-icon color="white">videocam_off</v-icon>
