@@ -75,13 +75,18 @@ export default {
     },
     joinScreen(state, id) {
       console.log("joinScreen")
+      if(state.screenShareRole === "publisher") {
+        console.log("I am a publisher, cant join again ...")
+        return;
+      }
       janusHelpers.screenShare.onJanusCreateSuccess(() => janusHelpers.screenShare.joinScreen(id));
     },
     stopScreenShare(state) {
-      // state.screenShareRole = null;`
-      // state.screenShareCapture = null;
-      // state.screenShareSource = null;
+      state.screenShareRole = null;
+      state.screenShareCapture = null;
+      state.screenShareSource = null;
       state.screenShare = null;
+
       janusHelpers.screenShare.stopScreenShare();
     }
   },
