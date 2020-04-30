@@ -388,6 +388,19 @@ export const janusHelpers = {
     },
     stopScreenShare() {
       console.log("Stopped screenshare ... ");
+
+      // Lets broadcast to everybody that our stream has ended.
+      let teamName = window.localStorage.getItem("teamName");
+      let user = JSON.parse(window.localStorage.getItem("account"));
+
+      socketService.emit("signal", {
+        channel: teamName,
+        sender: user.name,
+        type: "screenshare_stopped",
+        content: store.getters.screenShareRoom
+      });
+
+      store.getters.users[0].screenSharePluginHandle.detach();
     }
   },
   publishOwnFeed(useAudio) {

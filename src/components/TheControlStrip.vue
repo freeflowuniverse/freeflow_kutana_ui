@@ -185,12 +185,19 @@ export default {
     },
 
     disableScreenShare: function() {
-      /*if (this.screenShareRole !== 'publisher') {
-        console.log('tests 2')
+      if (this.screenShareRole !== 'publisher') {
+        if (this.screenShare) {
+          this.setSnackbarMessage({
+            type: "",
+            text: `Screenshare already in progress, only one screenshare per room!`
+          });
+          return;
+        }
         return;
       }
-      console.log('tests')
-      this.stopScreenShare();*/
+
+      console.log("A publisher woooo ... ", this.screenShareRole)
+      this.stopScreenShare();
     },
 
     showAddUserDialog() {
