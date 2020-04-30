@@ -54,18 +54,13 @@ export default {
     ...mapGetters(["teamName"])
   },
   methods: {
-    ...mapActions(["createTeam"]),
+    ...mapActions(["createTeam", "join"]),
     create() {
       this.createTeam();
     },
     joinRoom() {
       if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
-        this.$router.push({
-          name: "room",
-          params: {
-            token: this.inviteUrl.match(this.reg)[1].substring(0,15)
-          }
-        });
+        this.join(this.inviteUrl.match(this.reg)[1].substring(0,15))
       }
     }
   },

@@ -11,6 +11,7 @@ export default {
       state.isAccepted = accepted;
     },
     setTeamName(state, teamName) {
+      if (teamName.length < 15) teamName = teamName.toLowerCase()
       window.localStorage.setItem("teamName", teamName);
       state.teamName = teamName;
     },
