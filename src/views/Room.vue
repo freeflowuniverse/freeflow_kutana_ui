@@ -24,7 +24,7 @@
             <v-card-text>
               <v-text-field
                 filled
-                label="Invite url"
+                label="Invite link"
                 persistent-hint
                 readonly
                 hint="Invite people by sharing this url"

@@ -11,10 +11,10 @@
               <v-form @submit.prevent="joinRoom" v-model="valid">
                 <v-text-field
                   filled
-                  label="Invite url or room ID"
+                  label="Invite link or room ID"
                   persistent-hint
                   v-model="inviteUrl"
-                  hint="Paste the url or room ID you've received"
+                  hint="Paste the link or room ID you've received"
                   :rules="inviteUrlRules"
                   required
                 >
@@ -51,7 +51,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["teamName"])
+    ...mapGetters(["account", "teamName"])
   },
   methods: {
     ...mapActions(["createTeam", "join"]),
@@ -60,7 +60,10 @@ export default {
     },
     joinRoom() {
       if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
-        this.join(this.inviteUrl.match(this.reg)[1].substring(0,15))
+        this.$router.push({
+          name: "room",
+          params: { token: this.inviteUrl.match(this.reg)[1].substring(0, 15) }
+        });
       }
     }
   },
@@ -79,7 +82,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-  .landing{
-    background: #F5F5F5;
-  }
-  </style>
+.landing {
+  background: #f5f5f5;
+}
+</style>

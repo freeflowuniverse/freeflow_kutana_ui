@@ -145,4 +145,11 @@ export default {
     transform: rotate(45deg);
   }
 }
+.userListItemMobile .stream {
+  height: 100%;
+}
+.userListItemMobile .wrapper {
+  width: 100%;
+  height: calc(100% - 38px);
+}
 </style>
