@@ -1,18 +1,17 @@
 <template>
   <section>
     <v-card
-      :class="`chatMessage mb-0 ${isMine ? 'ml-6 mr-2 mine' : 'mr-12 ml-1'}`"
+      :class="`chatMessage ${dense? 'mt-0 dense' : 'mt-3'}`"
       elevation="0"
-      :color="`${isMine ? 'primary' : 'secondary' }`"
+      :color="`transparent`"
       v-if="message.type"
-      dark
       @mouseenter="showTime = !showTime"
       @mouseleave="showTime = !showTime"
     >
       <!-- <v-card-subtitle class="pt-3 pb-1"> -->
-        <v-row class="ma-0">
+        <v-row class="ma-0" v-if="!dense">
           <v-col class="px-2 py-0" cols="8">
-            <span class="font-weight-medium primary--text text--darken-2">{{ message.sender }}</span>
+            <span :class="`font-weight-bold primary--text`">{{ message.sender }}</span>
           </v-col>
 
           <v-col class="px-2 py-0" align="end">
@@ -22,7 +21,7 @@
           </v-col>
         </v-row>
       <!-- </v-card-subtitle> -->
-      <v-card-text v-if="message.type === 'text'" class="font-weight-bold white--text content pa-1 pl-2">
+      <v-card-text v-if="message.type === 'text'" class="font-weight-bold content pa-1 pl-2">
         <vueMarkdown :anchorAttributes="anchorAttributes" :html="false">{{message.content}}</vueMarkdown>
       </v-card-text>
       <v-card-text v-else-if="message.type === 'file' && mimeType === 'image/png'">
@@ -59,7 +58,7 @@ import vueMarkdown from "vue-markdown";
 import moment from "moment";
 
 export default {
-  props: ["message"],
+  props: ["message", "dense"],
   components: {
     vueMarkdown
   },
@@ -126,5 +125,7 @@ export default {
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
-
+.chatMessage {
+  border-radius:  0 !important;
+}
 </style>
