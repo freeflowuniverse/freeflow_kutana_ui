@@ -295,7 +295,7 @@ export default {
 }
 .sidebar {
   grid-area: sideBar;
-  min-width: 180px;
+  min-width: 200px;
   position: relative;
 
   .resizer{
