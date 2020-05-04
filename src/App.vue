@@ -44,13 +44,18 @@ export default {
   }
 };
 </script>
-<style>
+<style lang="scss">
 .v-application .title.ttl,
 .ttl {
   font-family: "Bebas Neue", cursive !important;
 }
-.chatMessage.mine a {
-  color: white;
+.chatMessage {
+  .content p {
+    margin-bottom: 0;
+  }
+  &.mine a {
+    color: white;
+  }
 }
 .video-main video.noScreenshare {
   transform: rotateY(180deg);

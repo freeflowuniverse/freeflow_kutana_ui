@@ -1,7 +1,7 @@
 <template>
   <section>
     <v-card
-      :class="`chatMessage mb-2 ${isMine ? 'ml-6 mr-2 mine' : 'mr-12 ml-1'}`"
+      :class="`chatMessage mb-0 ${isMine ? 'ml-6 mr-2 mine' : 'mr-12 ml-1'}`"
       elevation="0"
       :color="`${isMine ? 'primary' : 'secondary' }`"
       v-if="message.type"
@@ -9,10 +9,10 @@
       @mouseenter="showTime = !showTime"
       @mouseleave="showTime = !showTime"
     >
-      <v-card-subtitle class="pt-3 pb-1">
-        <v-row>
+      <!-- <v-card-subtitle class="pt-3 pb-1"> -->
+        <v-row class="ma-0">
           <v-col class="px-2 py-0" cols="8">
-            <span class="font-weight-bold">{{ message.sender }}</span>
+            <span class="font-weight-medium primary--text text--darken-2">{{ message.sender }}</span>
           </v-col>
 
           <v-col class="px-2 py-0" align="end">
@@ -21,8 +21,8 @@
             </transition>
           </v-col>
         </v-row>
-      </v-card-subtitle>
-      <v-card-text v-if="message.type === 'text'" class="font-weight-medium content pb-1">
+      <!-- </v-card-subtitle> -->
+      <v-card-text v-if="message.type === 'text'" class="font-weight-bold white--text content pa-1 pl-2">
         <vueMarkdown :anchorAttributes="anchorAttributes" :html="false">{{message.content}}</vueMarkdown>
       </v-card-text>
       <v-card-text v-else-if="message.type === 'file' && mimeType === 'image/png'">
@@ -126,4 +126,5 @@ export default {
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
+
 </style>
