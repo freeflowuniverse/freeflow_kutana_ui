@@ -117,9 +117,7 @@ export default {
 
 <style lang="scss" scoped>
 .theChatInput {
-  padding: 0 8px;
-  width: calc(100% + 8px);
-  width: calc(100% + 20px);
-  margin: 0 -10px;
+  width: calc(100% + 30px);
+  margin: 0 -15px
 }
 </style>

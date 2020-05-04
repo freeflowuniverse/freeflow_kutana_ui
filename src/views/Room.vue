@@ -184,7 +184,7 @@ export default {
   width: 100vw;
   display: grid;
   gap: 0px 8px;
-  grid-template-columns: 1fr 450px;
+  grid-template-columns: 1fr 350px;
   grid-template-areas: "userList sideBar" "controls sideBar";
   grid-template-rows: 1fr 60px;
   &.hide-sidebar {
@@ -206,7 +206,7 @@ export default {
   background: #f5f5f5;
 
   display: grid;
-  grid-template-columns: 1fr 400px 450px;
+  grid-template-columns: 1fr 400px 350px;
   grid-template-rows: 1fr minmax(60px, 300px) 60px;
   gap: 8px 8px;
   grid-template-areas: "selected userList sideBar" "selected main sideBar" "controls controls sideBar";
