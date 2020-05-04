@@ -49,7 +49,11 @@
     </div>
 
     <TheMainUserControls :minimal="isMobile" id="TheMainUserControls" :grid="grid" class="grey lighten-4"/>
-    <TheSidebar class="sidebar" v-if="showSidebar" />
+    <div class="sidebar" v-if="showSidebar" ref="sidebar">
+      <p class="resizer" ref="rez" @mousedown="startDrag"></p>
+      <TheSidebar  />
+    </div>
+
   </div>
 </template>
 
@@ -73,7 +77,9 @@ export default {
     return {
       grid: false,
       showSidebar: !this.isMobile,
-      showUserList: true
+      showUserList: true,
+      startX: null,
+      dragging: false
     };
   },
   beforeMount() {
@@ -121,6 +127,21 @@ export default {
         .catch(e => {
           console.error(e);
         });
+    },
+    startDrag(e) {
+      e.disable
+      this.startX = e.clientX
+      this.startWidth = parseInt(document.defaultView.getComputedStyle(this.$refs.sidebar).width, 10);
+      document.addEventListener('mousemove', this.doDrag, false);
+      document.addEventListener('mouseup', this.stopDrag, false);
+    },
+    stopDrag() {
+      document.removeEventListener('mousemove', this.doDrag, false);
+      document.removeEventListener('mouseup', this.stopDrag, false);
+    },
+    doDrag(e) {
+      console.log(e)
+      this.$refs.sidebar.style.width = (this.startWidth     +  this.startX - e.clientX) + 'px';
     }
   },
   computed: {
@@ -206,7 +227,7 @@ export default {
   background: #f5f5f5;
 
   display: grid;
-  grid-template-columns: 1fr 400px 300px;
+  grid-template-columns: 1fr 400px min-content;
   grid-template-rows: 1fr minmax(60px, 300px) 60px;
   gap: 8px 8px;
   grid-template-areas: "selected userList sideBar" "selected main sideBar" "controls controls sideBar";
@@ -274,5 +295,18 @@ export default {
 }
 .sidebar {
   grid-area: sideBar;
+  min-width: 180px;
+  position: relative;
+
+  .resizer{
+    width: 10px;
+    left:-5px;
+    height: 100%;
+    background: #000;
+    position: absolute;
+    cursor: e-resize;
+    z-index: 999;
+    opacity: 0;
+  }
 }
 </style>
