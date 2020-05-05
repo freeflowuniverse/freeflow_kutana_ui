@@ -44,14 +44,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// .mobileMainUserStream {
-//   position: absolute;
-//   bottom: 160px;
-//   right: 20px;
-//   height: 20px;
-//   width: 150px;
-//   z-index: 3;
-// }
 .stream {
   height: 100%;
 }

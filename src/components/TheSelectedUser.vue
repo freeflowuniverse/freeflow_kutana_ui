@@ -52,15 +52,6 @@ export default {
   },
   methods: {
     ...mapActions(["joinScreen"])
-  },
-  watch: {
-    screenShare: {
-      deep: true,
-      handler(val) {
-        // if(val) this.$root.$emit('setPresentationView')
-        console.log("screenShare CHANGED!, ", val);
-      }
-    }
   }
 };
 </script>

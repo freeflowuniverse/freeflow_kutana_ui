@@ -55,12 +55,6 @@ export default {
 
       return time.diff(previousMessage.createdAt, "m") > 5;
     }
-  },
-  watch: {
-    alertUser() {
-      // disabled notification
-      // new Audio("/notification.mp3").play();
-    }
   }
 };
 </script>

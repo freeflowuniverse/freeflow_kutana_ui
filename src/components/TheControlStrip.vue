@@ -199,12 +199,8 @@ export default {
       console.log("A publisher woooo ... ", this.screenShareRole)
       this.stopScreenShare();
     },
-
     showAddUserDialog() {
       this.addUserDialog = true;
-    },
-    closeAddUserDialog() {
-      this.addUserDialog = false;
     },
     copyUrl() {
       navigator.clipboard

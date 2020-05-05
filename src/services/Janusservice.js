@@ -3,7 +3,7 @@ import router from "../plugins/router";
 import socketService from "./socketService";
 import store from "../plugins/vuex";
 
-let inThrottle;
+// let inThrottle;
 
 const hashString = str => {
   let hash = 0;
@@ -28,52 +28,52 @@ const detachFeed = detachRfid => {
   );
 };
 
-const determineSpeaker = (stream, remoteFeed, id) => {
-  const AudioContext =
-      window.AudioContext || window.webkitAudioContext || false;
-  let audioContext = new AudioContext();
-  if (audioContext) {
-    let analyser = audioContext.createAnalyser();
-    let microphone = audioContext.createMediaStreamSource(stream);
-    let javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
-
-    analyser.smoothingTimeConstant = 0.8;
-    analyser.fftSize = 1024;
-
-    microphone.connect(analyser);
-    analyser.connect(javascriptNode);
-    javascriptNode.connect(audioContext.destination);
-    javascriptNode.onaudioprocess = () => {
-      const array = new Uint8Array(analyser.frequencyBinCount);
-      analyser.getByteFrequencyData(array);
-      let values = 0;
-
-      const length = array.length;
-      for (let i = 0; i < length; i++) {
-        values += array[i];
-      }
-
-      const average = values / length;
-      if (
-          !store.getters.selectedUser ||
-          (store.getters.selectedUser && !store.getters.selectedUser.pinned && average > 20 && remoteFeed.rfdisplay !== store.getters.selectedUser.username)
-      ) {
-        if (!inThrottle) {
-          inThrottle = true;
-          store.dispatch("selectUser", {
-            id: id,
-            username: remoteFeed.rfdisplay,
-            stream: stream,
-            pluginHandle: remoteFeed,
-            screenShareStream: null,
-            pinned:false
-          });
-          setTimeout(() => (inThrottle = false), 1000);
-        }
-      }
-    };
-  }
-};
+// const determineSpeaker = (stream, remoteFeed, id) => {
+//   const AudioContext =
+//       window.AudioContext || window.webkitAudioContext || false;
+//   let audioContext = new AudioContext();
+//   if (audioContext) {
+//     let analyser = audioContext.createAnalyser();
+//     let microphone = audioContext.createMediaStreamSource(stream);
+//     let javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+//
+//     analyser.smoothingTimeConstant = 0.8;
+//     analyser.fftSize = 1024;
+//
+//     microphone.connect(analyser);
+//     analyser.connect(javascriptNode);
+//     javascriptNode.connect(audioContext.destination);
+//     javascriptNode.onaudioprocess = () => {
+//       const array = new Uint8Array(analyser.frequencyBinCount);
+//       analyser.getByteFrequencyData(array);
+//       let values = 0;
+//
+//       const length = array.length;
+//       for (let i = 0; i < length; i++) {
+//         values += array[i];
+//       }
+//
+//       const average = values / length;
+//       if (
+//           !store.getters.selectedUser ||
+//           (store.getters.selectedUser && !store.getters.selectedUser.pinned && average > 20 && remoteFeed.rfdisplay !== store.getters.selectedUser.username)
+//       ) {
+//         if (!inThrottle) {
+//           inThrottle = true;
+//           store.dispatch("selectUser", {
+//             id: id,
+//             username: remoteFeed.rfdisplay,
+//             stream: stream,
+//             pluginHandle: remoteFeed,
+//             screenShareStream: null,
+//             pinned:false
+//           });
+//           setTimeout(() => (inThrottle = false), 1000);
+//         }
+//       }
+//     };
+//   }
+// };
 
 export const janusHelpers = {
   videoRoom: {
@@ -504,7 +504,7 @@ export const janusHelpers = {
         }
       },
       onremotestream: stream => {
-        determineSpeaker(stream, remoteFeed, id);
+        // determineSpeaker(stream, remoteFeed, id);
 
         if (
           store.getters.users.filter(
@@ -529,10 +529,16 @@ export const janusHelpers = {
         }
       },
       oncleanup: () => {
+        console.log("# Got a cleanup: " + id)
+        console.log(store.getters.users)
+
         store.commit(
           "setUsers",
           store.getters.users.filter(user => user.id !== id)
         );
+
+        console.log(store.getters.users)
+        console.log("# End of cleanup")
       }
     });
   },

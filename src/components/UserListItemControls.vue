@@ -10,7 +10,6 @@
 
 <script>
 import { mapActions } from 'vuex';
-// import { Janus } from "janus-gateway";
 
 export default {
   props: [],

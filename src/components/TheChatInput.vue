@@ -33,43 +33,12 @@ export default {
     };
   },
   mounted() {
-    // document.onpaste = event => {
-    //   let items = (event.clipboardData || event.originalEvent.clipboardData)
-    //     .items;
-    //   for (let index in items) {
-    //     let item = items[index];
-    //     if (item.kind === "file") {
-    //       let blob = item.getAsFile();
-    //       let reader = new FileReader();
-    //       reader.onload = event => {
-    //         this.sendIt(
-    //           {
-    //             name: 'Clipboard',
-    //             file: event.target.result
-    //           },
-    //           "file"
-    //         );
-    //       }; // data url!
-    //       if (blob) {
-    //         reader.readAsDataURL(blob);
-    //       } else {
-    //         this.setSnackbarMessage({
-    //           type: "warning",
-    //           text: `Can't paste file, only images. Please use the upload button`
-    //         });
-    //       }
-    //     }
-    //   }
-    // };
   },
   computed: {
     ...mapGetters(["account"])
   },
   methods: {
     ...mapActions(["sendMessage", "setSnackbarMessage"]),
-    showFileUploader() {
-      this.$refs.fileUpper.click();
-    },
     forwardMessage() {
       this.sendIt(this.message);
     },
