@@ -205,7 +205,7 @@ export default {
   width: 100vw;
   display: grid;
   gap: 0px 8px;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr min-content;
   grid-template-areas: "userList sideBar" "controls sideBar";
   grid-template-rows: 1fr 60px;
   &.hide-sidebar {
