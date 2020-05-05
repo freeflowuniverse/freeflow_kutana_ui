@@ -12,7 +12,7 @@
     "bip39": "^3.0.2",
     "core-js": "^3.6.4",
     "exports-loader": "^0.7.0",
-    "janus-gateway": "git://github.com/threefoldtech/freeflowconnect_janus.git",
+    "janus-gateway": "git://github.com/meetecho/janus-gateway.git",
     "libsodium": "^0.7.6",
     "libsodium-wrappers": "^0.7.6",
     "moment": "^2.24.0",
