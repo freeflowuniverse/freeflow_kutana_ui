@@ -613,7 +613,7 @@ export const janusHelpers = {
         room: room,
         permanent: false,
         description: me.name,
-        bitrate: 128000,
+        bitrate: 64000,
         publishers: 16,
         transport_wide_cc_ext: true,
         fir_freq: 10,
