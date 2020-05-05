@@ -613,11 +613,10 @@ export const janusHelpers = {
         room: room,
         permanent: false,
         description: me.name,
-        bitrate: 64000,
+        bitrate: 128000,
         publishers: 16,
         transport_wide_cc_ext: true,
         fir_freq: 10,
-        bitrate_cap: true,
         is_private: true
       }
     });
