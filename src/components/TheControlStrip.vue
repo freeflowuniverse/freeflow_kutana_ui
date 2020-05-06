@@ -134,13 +134,12 @@ export default {
         text: `Quality set to ${this.qualityOptions[this.quality]}`
       });
       this.users[0].pluginHandle.send({
-        message: { request: "configure", bitrate: 20000 * this.quality }
+        message: { request: "configure", bitrate: 128000 * this.quality }
       });
     },
 
     unpublishOwnFeed: function() {
-      var unpublish = { request: "unpublish" };
-      this.users[0].pluginHandle.send({ message: unpublish });
+      this.users[0].pluginHandle.hangUp();
       this.published = false;
     },
 
@@ -167,9 +166,25 @@ export default {
       });
     },
 
+    // This function could be improved. @TODO @SingleCore
     hangUp: function() {
+      console.log("Hanging up call")
       this.users[0].pluginHandle.hangup();
+
+      console.log("Detaching pluginHandle")
+      this.users[0].pluginHandle.detach();
+
+      console.log("Clearing localstorage")
+      // localStorage.clear()
+      localStorage.removeItem("teamName");
+      localStorage.removeItem("state");
+      localStorage.removeItem("tempKeys");
+
+      console.log("Redirecting home")
       this.$router.push({ name: "home" });
+
+      console.log("Forcing reload")
+      location.reload()
     },
 
     enableScreenShare: function() {

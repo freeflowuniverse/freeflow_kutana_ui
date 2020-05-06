@@ -615,35 +615,58 @@ export const janusHelpers = {
         let room = Math.abs(hashString(window.localStorage.getItem("teamName")));
         let me = JSON.parse(window.localStorage.getItem("account"));
 
+        console.group("Room management logs")
+        console.log("=> Creating if room exists")
         store.getters.users[0].pluginHandle.send({
             message: {
-                request: "create",
-                room: room,
-                permanent: false,
-                description: me.name,
-                bitrate: 128000,
-                publishers: 16,
-                transport_wide_cc_ext: true,
-                fir_freq: 10,
-                is_private: true
+                request: "exists",
+                room: room
+            },
+            success: (result) => {
+                if(result.exists) {
+                    console.log("=> Room already exists")
+                    janusHelpers.joinRoom(room, me.name)
+                    return;
+                }
+
+                console.log("=> Room doesnt exists, creating room")
+                store.getters.users[0].pluginHandle.send({
+                    message: {
+                        request: "create",
+                        room: room,
+                        permanent: false,
+                        description: me.name,
+                        bitrate: 128000,
+                        publishers: 16,
+                        transport_wide_cc_ext: true,
+                        fir_freq: 10,
+                        is_private: true
+                    },
+                    success: (result) => {
+                        console.log("=> Room created: ", result)
+                        janusHelpers.joinRoom(room, me.name)
+                    }
+                });
             }
         });
     },
-    joinRoom() {
-        let me = JSON.parse(window.localStorage.getItem("account"));
-        let room = Math.abs(hashString(window.localStorage.getItem("teamName")));
 
+    joinRoom(room, name) {
+        console.log("=> Joining room")
         store.getters.users[0].pluginHandle.send({
             message: {
                 request: "join",
                 room: room,
                 ptype: "publisher",
-                display: me.name
+                display: name
+            },
+            success: () => {
+                console.log("=> Room joined")
+                console.groupEnd();
             }
         });
     },
     registerUsername() {
         janusHelpers.createRoom();
-        janusHelpers.joinRoom();
     }
 };
