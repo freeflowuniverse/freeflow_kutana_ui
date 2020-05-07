@@ -63,4 +63,9 @@ export default {
 video {
   margin-bottom: -6px;
 }
+.mobile-room-grid {
+  #selectedStream{
+    background: white;
+  }
+}
 </style>

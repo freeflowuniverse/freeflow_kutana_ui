@@ -1,15 +1,6 @@
 <template>
   <div :class="roomClass">
     <div class="video-list">
-      <v-row no-gutters v-if="isMobile">
-        <v-spacer />
-        <v-btn
-          icon
-          @click="$root.$emit('toggleUserList')"
-        >
-          <v-icon>group</v-icon>
-        </v-btn>
-      </v-row>
       <UserList :class="!showUserList ? 'hide-video-list' : ''" :grid="grid" />
     </div>
 
@@ -252,14 +243,23 @@ export default {
 
   width: 100vw;
   display: grid;
-  grid-template-rows: minmax(20px, auto) 2fr 1fr 60px;
-  grid-template-columns: 3fr 1fr;
-  grid-template-areas: "userList userList" "selected selected" "nothing main" "controls controls";
+  grid-template-rows:  1fr minmax(0px, auto) 60px;
+  grid-template-areas: "selected" "userList" "controls";
   gap: 8px 0px;
   .hide-video-list {
     display: none !important;
   }
-
+  .video-main {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    width: 25%;
+    height: auto;
+  }
+  #selectedStream{
+    background: white;
+  }
   &.show-sidebar {
     grid-template-rows: 1fr;
     grid-template-columns: 1fr;
@@ -295,7 +295,8 @@ export default {
 }
 .sidebar {
   grid-area: sideBar;
-  min-width: 200px;
+  min-width: 300px;
+  max-width: 900px;
   position: relative;
 
   .resizer{
