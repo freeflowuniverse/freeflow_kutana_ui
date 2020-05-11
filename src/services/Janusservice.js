@@ -31,7 +31,8 @@ const detachFeed = detachRfid => {
 const determineSpeaker = (stream, remoteFeed, id) => {
     if (!window.audioContext) {
         console.log("Creating AudioContext ...")
-        window.audioContext = new AudioContext();
+        var _AudioContext = window.AudioContext || window.webkitAudioContext;
+        window.audioContext = new _AudioContext();
     }
 
     if (window.audioContext) {
