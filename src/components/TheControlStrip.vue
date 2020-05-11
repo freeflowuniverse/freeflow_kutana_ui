@@ -51,10 +51,10 @@
         <v-icon>mic</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
-      <!-- <v-btn icon v-if="minimal" class="mx-1" @click="$root.$emit('toggleGridPresentation')">
+      <v-btn icon v-if="minimal" class="mx-1" @click="$root.$emit('toggleGridPresentation')">
         <v-icon v-if="grid">grid_off</v-icon>
         <v-icon v-else>grid_on</v-icon>
-      </v-btn> -->
+      </v-btn>
       <v-btn @click="hangUp" dark icon class="red mx-2 endCall">
         <v-icon>call_end</v-icon>
       </v-btn>
