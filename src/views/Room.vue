@@ -1,10 +1,10 @@
 <template>
   <div :class="roomClass">
     <div class="video-list">
-      <UserList :class="!showUserList ? 'hide-video-list' : ''" :grid="grid" />
+      <UserList :class="!showUserList ? 'hide-video-list' : ''" />
     </div>
 
-    <div class="video-selected" v-if="!grid">
+    <div class="video-selected" v-if="!isGridView">
       <TheSelectedUser v-if="users.length > 1 && selectedUser" />
       <v-row align="center" justify="center" v-else-if="users.length === 1" class="fill-height">
         <v-col cols="12" md="8" lg="6">
@@ -33,13 +33,13 @@
       </v-row>
     </div>
 
-    <div class="video-main" v-if="!grid">
+    <div class="video-main" v-if="!isGridView">
       <div class="video-main__container black">
         <TheMainUser />
       </div>
     </div>
 
-    <TheMainUserControls :minimal="isMobile" id="TheMainUserControls" :grid="grid" class="grey lighten-4"/>
+    <TheMainUserControls :minimal="isMobile" id="TheMainUserControls" class="grey lighten-4"/>
     <div class="sidebar" v-if="showSidebar" ref="sidebar">
       <p class="resizer" ref="rez" @mousedown="startDrag"></p>
       <TheSidebar  />
@@ -66,7 +66,6 @@ export default {
   },
   data() {
     return {
-      grid: false,
       showSidebar: !this.isMobile,
       showUserList: true,
       startX: null,
@@ -81,9 +80,6 @@ export default {
     if (this.account && this.account.name && this.teamName) {
       this.setRoomId(Math.abs(this.hashString(this.teamName)));
     }
-    this.$root.$on("toggleGridPresentation", () => {
-      this.grid = !this.grid;
-    });
     this.$root.$on("toggleSidebar", () => {
       this.showSidebar = !this.showSidebar;
     });
@@ -142,7 +138,8 @@ export default {
       "teamName",
       "account",
       "screenShare",
-      "selectedUser"
+      "selectedUser",
+      "isGridView"
     ]),
     isMobile() {
       return this.$vuetify.breakpoint.mdAndDown;
@@ -153,7 +150,7 @@ export default {
       if (this.isMobile) {
         theClass += " mobile-room-grid";
       } else {
-        if (this.grid) {
+        if (this.isGridView) {
           theClass += " room-grid";
         } else {
           theClass += " room-speaker";
@@ -185,7 +182,7 @@ export default {
       this.showUserList = val && val.length > 2
     },
     screenShare(val) {
-      if (val) this.grid = false;
+      if (val) this.isGridView = false;
     }
   }
 };

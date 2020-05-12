@@ -51,8 +51,8 @@
         <v-icon>mic</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
-      <v-btn icon v-if="minimal" class="mx-1" @click="$root.$emit('toggleGridPresentation')">
-        <v-icon v-if="grid">grid_off</v-icon>
+      <v-btn icon class="mx-1" @click="changeViewStyle(isGridView ? 'Default' : 'Grid')">
+        <v-icon v-if="isGridView">grid_off</v-icon>
         <v-icon v-else>grid_on</v-icon>
       </v-btn>
       <v-btn @click="hangUp" dark icon class="red mx-2 endCall">
@@ -83,7 +83,7 @@ import { Janus } from "janus-gateway";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-  props: ["grid", "minimal"],
+  props: ["minimal"],
   data: function() {
     return {
       muted: false,
@@ -98,7 +98,7 @@ export default {
     this.$root.$on("showInviteUser", this.showAddUserDialog);
   },
   computed: {
-    ...mapGetters(["users", "teamName", "account", "screenShareRole", "screenShare"]),
+    ...mapGetters(["users", "teamName", "account", "screenShareRole", "screenShare", "isGridView"]),
     inviteLink() {
       let baseUrl = window.location.href;
       if (baseUrl.charAt(baseUrl.length - 1) != "/") {
@@ -108,7 +108,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["shareScreen", "stopScreenShare", "setSnackbarMessage", "clearStorage"]),
+    ...mapActions(["shareScreen", "stopScreenShare", "setSnackbarMessage", "clearStorage", "changeViewStyle"]),
     logout() {
       this.clearStorage()
       this.$router.push({name: 'home'})
