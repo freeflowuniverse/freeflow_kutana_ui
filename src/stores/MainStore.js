@@ -21,12 +21,13 @@ export default {
             context.commit('setSnackbarMessage', message)
         },
         changeViewStyle(context, style) {
+            console.log(style)
             context.commit('changeViewStyle', style);
         }
     },
     getters: {
         isGridView: state => state.viewStyle.toString() === 'Grid',
         snackbarMessage: state => state.snackbarMessage,
-        alertUser: (state) => { return state.alertUser }
+        alertUser: state => state.alertUser
     },
 }

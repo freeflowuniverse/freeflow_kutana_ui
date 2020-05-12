@@ -1,10 +1,10 @@
 <template>
   <div :class="roomClass">
     <div class="video-list">
-      <UserList :class="!showUserList ? 'hide-video-list' : ''" />
+      <UserList :grid="isGrid" :class="!showUserList ? 'hide-video-list' : ''" />
     </div>
 
-    <div class="video-selected" v-if="!isGridView">
+    <div class="video-selected" v-if="!isGrid">
       <TheSelectedUser v-if="users.length > 1 && selectedUser" />
       <v-row align="center" justify="center" v-else-if="users.length === 1" class="fill-height">
         <v-col cols="12" md="8" lg="6">
@@ -33,13 +33,13 @@
       </v-row>
     </div>
 
-    <div class="video-main" v-if="!isGridView">
+    <div class="video-main" v-if="!isGrid">
       <div class="video-main__container black">
         <TheMainUser />
       </div>
     </div>
 
-    <TheMainUserControls :minimal="isMobile" id="TheMainUserControls" class="grey lighten-4"/>
+    <TheMainUserControls :grid="isGrid" :minimal="isMobile" id="TheMainUserControls" class="grey lighten-4"/>
     <div class="sidebar" v-if="showSidebar" ref="sidebar">
       <p class="resizer" ref="rez" @mousedown="startDrag"></p>
       <TheSidebar  />
@@ -66,6 +66,7 @@ export default {
   },
   data() {
     return {
+      isGrid: false,
       showSidebar: !this.isMobile,
       showUserList: true,
       startX: null,
@@ -73,6 +74,7 @@ export default {
     };
   },
   beforeMount() {
+    this.isGrid = this.isGridView;
     this.join(this.$route.params.token);
     this.getTeamInfo();
   },
@@ -80,6 +82,12 @@ export default {
     if (this.account && this.account.name && this.teamName) {
       this.setRoomId(Math.abs(this.hashString(this.teamName)));
     }
+
+    this.$root.$on("toggleGrid", () => {
+      this.changeViewStyle(this.isGrid ? 'Default' : 'Grid')
+      this.isGrid = !this.isGrid;
+    });
+
     this.$root.$on("toggleSidebar", () => {
       this.showSidebar = !this.showSidebar;
     });
@@ -93,7 +101,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["setSnackbarMessage", "initializeJanus", "getTeamInfo", "join", "setRoomId"]),
+    ...mapActions(["setSnackbarMessage", "initializeJanus", "getTeamInfo", "join", "setRoomId", "changeViewStyle"]),
     hashString(str) {
       let hash = 0;
       for (let i = 0; i < str.length; i++) {
@@ -128,7 +136,7 @@ export default {
     },
     doDrag(e) {
       console.log(e)
-      this.$refs.sidebar.style.width = (this.startWidth     +  this.startX - e.clientX) + 'px';
+      this.$refs.sidebar.style.width = (this.startWidth + this.startX - e.clientX) + 'px';
     }
   },
   computed: {
@@ -150,7 +158,7 @@ export default {
       if (this.isMobile) {
         theClass += " mobile-room-grid";
       } else {
-        if (this.isGridView) {
+        if (this.isGrid) {
           theClass += " room-grid";
         } else {
           theClass += " room-speaker";
@@ -182,7 +190,11 @@ export default {
       this.showUserList = val && val.length > 2
     },
     screenShare(val) {
-      if (val) this.isGridView = false;
+      if (val) {
+        this.isGrid = false;
+        return;
+      }
+      this.isGrid = this.isGridView;
     }
   }
 };

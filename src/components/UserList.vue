@@ -1,5 +1,5 @@
 <template>
-  <section :class="`${isMobile ? 'mobile-user-list' : ''} ${isGridView? 'grid grid-' + usersToShow.length:''}`">
+  <section :class="`${isMobile ? 'mobile-user-list' : ''} ${grid ? 'grid grid-' + usersToShow.length:''}`">
     <UserListItem
       :class="isMobile ? 'mobile-user' : ''"
       v-for="(user, index) in usersToShow"
@@ -7,7 +7,7 @@
       :user="user"
       :userIndex="index"
       :key="index"
-      :inGrid="isGridView"
+      :inGrid="grid"
     />
   </section>
 </template>
@@ -20,11 +20,17 @@ export default {
   components: {
     UserListItem
   },
+  props: {
+    grid: {
+      type: Boolean,
+      default: false
+    }
+  },
   computed: {
-    ...mapGetters(["users", "selectedUser", "isGridView"]),
+    ...mapGetters(["users", "selectedUser"]),
 
     usersToShow() {
-      return this.isGridView ? this.users : this.users.slice(1);
+      return this.grid ? this.users : this.users.slice(1);
     },
     isMobile () {
       return this.$vuetify.breakpoint.mdAndDown
@@ -34,7 +40,7 @@ export default {
     ...mapActions(["selectUser", "setSnackbarMessage"]),
 
     selectStream(user) {
-      if (this.isGridView) return;
+      if (this.grid) return;
       if (this.isSelected(user) && this.selectedUser.pinned) {
         this.selectUser({
           ...user,
