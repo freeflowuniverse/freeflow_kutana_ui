@@ -1,5 +1,5 @@
 <template>
-  <section :class="`${isMobile ? 'mobile-user-list' : ''} ${grid? 'grid grid-' + usersToShow.length:''}`">
+  <section :class="`${isMobile ? 'mobile-user-list' : ''} ${grid ? 'grid grid-' + usersToShow.length:''}`">
     <UserListItem
       :class="isMobile ? 'mobile-user' : ''"
       v-for="(user, index) in usersToShow"

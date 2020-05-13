@@ -51,17 +51,17 @@
         <v-icon>mic</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
-      <v-btn icon v-if="minimal" class="mx-1" @click="$root.$emit('toggleGridPresentation')">
+      <v-btn icon class="mx-1" @click="$root.$emit('toggleGridPresentation')">
         <v-icon v-if="grid">grid_off</v-icon>
         <v-icon v-else>grid_on</v-icon>
       </v-btn>
       <v-btn @click="hangUp" dark icon class="red mx-2 endCall">
         <v-icon>call_end</v-icon>
       </v-btn>
-      <v-btn @click="enableScreenShare" v-if="!minimal && screenShare === null" icon class="ml-1">
+      <v-btn @click="enableScreenShare" v-if="canScreenShare && screenShare === null" icon class="ml-1">
         <v-icon>screen_share</v-icon>
       </v-btn>
-      <v-btn @click="disableScreenShare" v-else-if="!minimal" icon class="ml-1">
+      <v-btn @click="disableScreenShare" v-else-if="canScreenShare" icon class="ml-1">
         <v-icon>stop_screen_share</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
@@ -109,11 +109,14 @@ export default {
   },
   methods: {
     ...mapActions(["shareScreen", "stopScreenShare", "setSnackbarMessage", "clearStorage"]),
-    logout() {
+    canScreenShare: function() {
+      return !!navigator.mediaDevices.getDisplayMedia;
+    },
+    logout: function() {
       this.clearStorage()
       this.$router.push({name: 'home'})
     },
-    toggleSettings() {
+    toggleSettings: function() {
       this.showExtraSettings = !this.showExtraSettings;
     },
     toggleMute: function() {
