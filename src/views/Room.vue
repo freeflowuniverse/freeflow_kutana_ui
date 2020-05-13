@@ -83,7 +83,7 @@ export default {
       this.setRoomId(Math.abs(this.hashString(this.teamName)));
     }
 
-    this.$root.$on("toggleGrid", () => {
+    this.$root.$on("toggleGridPresentation", () => {
       this.changeViewStyle(this.isGrid ? 'Default' : 'Grid')
       this.isGrid = !this.isGrid;
     });

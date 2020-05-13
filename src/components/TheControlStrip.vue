@@ -51,7 +51,7 @@
         <v-icon>mic</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
-      <v-btn icon class="mx-1" @click="$root.$emit('toggleGrid')">
+      <v-btn icon class="mx-1" @click="$root.$emit('toggleGridPresentation')">
         <v-icon v-if="grid">grid_off</v-icon>
         <v-icon v-else>grid_on</v-icon>
       </v-btn>
