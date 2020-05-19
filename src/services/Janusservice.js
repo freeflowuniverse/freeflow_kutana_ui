@@ -1,4 +1,4 @@
-import {Janus} from "janus-gateway";
+import { Janus } from "janus-gateway";
 import router from "../plugins/router";
 import socketService from "./socketService";
 import store from "../plugins/vuex";
@@ -85,6 +85,7 @@ export const janusHelpers = {
                 plugin: "janus.plugin.videoroom",
                 opaqueId: store.getters.opaqueId,
                 success: pluginHandle => {
+                    console.log("")
                     const users = store.getters.users;
                     users[0].pluginHandle = pluginHandle;
 
@@ -95,7 +96,13 @@ export const janusHelpers = {
                     Janus.error("  -- Error attaching plugin...", error);
                 },
                 onmessage: (msg, jsep) => {
+
+                    console.log("msg: ")
+                    console.log({msg})
+                    console.log({jsep})
                     const event = msg["videoroom"];
+
+                    console.log({event})
 
                     if (!event) {
                         return;
@@ -137,8 +144,25 @@ export const janusHelpers = {
                                 break;
                             }
 
+                            if (msg["joining"]) {
+                                let newUser = {
+                                    id: msg["joining"]["id"],
+                                    username: msg["joining"]["display"]
+                                };
+
+                                const users = store.getters.users;
+                                users.push(newUser);
+
+                                store.commit("setUsers", users);
+                                break;
+                            }
+
                             if (msg["leaving"]) {
                                 detachFeed(msg["leaving"]);
+                                store.commit(
+                                    "setUsers",
+                                    store.getters.users.filter(user => user.id !== msg["leaving"])
+                                );
                                 break;
                             }
 
@@ -328,7 +352,7 @@ export const janusHelpers = {
                 description: "screenshare",
                 bitrate: 1024000,
                 bitrate_cap: true,
-                publishers: 1
+                publishers: 1,
             };
 
             console.log("shareAndPublishScreen Creating screen share")
@@ -509,11 +533,11 @@ export const janusHelpers = {
             onremotestream: stream => {
                 determineSpeaker(stream, remoteFeed, id);
 
-                if (
-                    store.getters.users.filter(
-                        user => user.username === remoteFeed.rfdisplay
-                    ).length === 0
-                ) {
+                let filteredUser = store.getters.users.find(
+                    user => user.username === remoteFeed.rfdisplay
+                );
+
+                if (!filteredUser) {
                     let newUser = {
                         id: id,
                         username: remoteFeed.rfdisplay,
@@ -529,6 +553,11 @@ export const janusHelpers = {
                     setTimeout(() => {
                         store.commit("setSelectedUser", newUser);
                     }, 500);
+                } else {
+                    const users = store.getters.users;
+                    users.splice(users.findIndex(user => user.id === filteredUser.id), 1, filteredUser);
+
+                    store.commit("setUsers", users);
                 }
             },
             oncleanup: () => {
@@ -641,7 +670,9 @@ export const janusHelpers = {
                         publishers: 16,
                         transport_wide_cc_ext: true,
                         fir_freq: 10,
-                        is_private: true
+                        is_private: true,
+                        // require_pvtid: true,
+                        notify_joining: true
                     },
                     success: (result) => {
                         console.log("=> Room created: ", result)

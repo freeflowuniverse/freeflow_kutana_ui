@@ -93,7 +93,7 @@ export default {
   actions: {
     initializeJanus(context) {
       Janus.init({
-        debug: false,
+        debug: "all",
         callback: function() {
           if (!Janus.isWebrtcSupported()) {
             console.error("No WebRTC support... ");
