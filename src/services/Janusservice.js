@@ -85,7 +85,7 @@ export const janusHelpers = {
                 plugin: "janus.plugin.videoroom",
                 opaqueId: store.getters.opaqueId,
                 success: pluginHandle => {
-                    console.log("")
+                    console.log("onJanusCreateSuccess: success: ", pluginHandle)
                     const users = store.getters.users;
                     users[0].pluginHandle = pluginHandle;
 
@@ -93,16 +93,12 @@ export const janusHelpers = {
                     janusHelpers.registerUsername();
                 },
                 error: error => {
+                    console.log("onJanusCreateSuccess: error: ", error)
                     Janus.error("  -- Error attaching plugin...", error);
                 },
                 onmessage: (msg, jsep) => {
-
-                    console.log("msg: ")
-                    console.log({msg})
-                    console.log({jsep})
+                    console.log("onJanusCreateSuccess: onmessage: ", msg, jsep)
                     const event = msg["videoroom"];
-
-                    console.log({event})
 
                     if (!event) {
                         return;

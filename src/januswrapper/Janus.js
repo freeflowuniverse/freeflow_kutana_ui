@@ -1,48 +1,40 @@
-import { janusGateway } from "janus-gateway";
+import { Janus as JanusGateway } from "janus-gateway";
 
 export class Janus {
-    async constructor(server, debug) {
-        this._users = [];
-        this._server = server;
-        this._debug = debug;
-        this._janusGateway = null;
+    constructor(server) {
+        this.users = [];
+        this.plugins = [];
+        this.server = server;
 
-        await initializeJanus();
+        this.janusGateway = new JanusGateway({
+            server: this.server,
+            success: this.janusGatewayInitializationSuccess,
+            error: this.janusGatewayInitializationError,
+            destroyed: this.janusGatewayInitializationDestroyed
+        })
     }
 
-    get users() {
-        return this._users;
+    janusGatewayInitializationSuccess() {
+        for (const plugin of this.plugins) {
+            this.janusGateway.attach(plugin.attach())
+        }
     }
 
-    async initializeJanus() {
-        janusGateway.init({
-            debug: "all",
-            callback: function() {
-                if (!Janus.isWebrtcSupported()) {
-                    console.error("No WebRTC support... ");
-                    return;
-                }
+    janusGatewayInitializationError() {
 
-                this._janusGateway = new Janus({
-                    server: config.janusServer,
-                    success: function() {
-                        janusHelpers.videoRoom.onJanusCreateSuccess();
-                    },
-                    error: function(error) {
-                        console.error("Janus error callback: ", error);
-                        // janusHelpers.videoRoom.onJanusCreateError(context, error);
-                    },
-                    destroyed: function() {
-                        console.error("Janus destroyed callback");
-                        janusHelpers.videoRoom.onJanusCreateDestroyed();
-                    }
-                });
-
-                context.commit("initializeJanus", janus);
-            }
-        });
     }
 
+    janusGatewayInitializationDestroyed() {
+
+    }
+
+    attachPlugin(plugin) {
+        this.plugins.push(plugin)
+    }
+
+    emitEvent() {
+
+    }
 }
 
 
