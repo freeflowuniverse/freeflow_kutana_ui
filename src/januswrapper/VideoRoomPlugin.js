@@ -36,8 +36,9 @@ export class VideoRoomPlugin {
         }
     }
 
-    onAttachSucces() {
-        // Register username ...
+    onAttachSucces(pluginHandle) {
+        this.pluginHandle = pluginHandle;
+        this.createRoom();
     }
 
     onError(error) {
@@ -123,6 +124,65 @@ export class VideoRoomPlugin {
 
             store.commit("setUsers", users);
         };
+    }
+
+    createRoom() {
+        let room = Math.abs(hashString(window.localStorage.getItem("teamName")));
+        let me = JSON.parse(window.localStorage.getItem("account"));
+
+        console.group("Room management logs")
+        console.log("=> Creating if room exists")
+
+        this.pluginHandle.send({
+            message: {
+                request: "exists",
+                room: room
+            },
+            success: (result) => {
+                if(result.exists) {
+                    console.log("=> Room already exists")
+                    this.joinRoom(room, me.name)
+                    return;
+                }
+
+                console.log("=> Room doesnt exists, creating room")
+                this.pluginHandle.send({
+                    message: {
+                        request: "create",
+                        room: room,
+                        permanent: false,
+                        description: me.name,
+                        bitrate: 128000,
+                        publishers: 16,
+                        transport_wide_cc_ext: true,
+                        fir_freq: 10,
+                        is_private: true,
+                        // require_pvtid: true,
+                        notify_joining: true
+                    },
+                    success: (result) => {
+                        console.log("=> Room created: ", result)
+                        this.joinRoom(room, me.name)
+                    }
+                });
+            }
+        });
+    }
+
+    joinRoom(room, name) {
+        console.log("=> Joining room")
+        this.pluginHandle.send({
+            message: {
+                request: "join",
+                room: room,
+                ptype: "publisher",
+                display: name
+            },
+            success: () => {
+                console.log("=> Room joined")
+                console.groupEnd();
+            }
+        });
     }
 
 }
