@@ -3,40 +3,22 @@
 </template>
 
 <script>
-    import { JanusBuilder } from "../januswrapper/JanusBuilder";
-    import { VideoRoomPlugin } from "../januswrapper/VideoRoomPlugin";
+    import {JanusBuilder} from "../januswrapper/JanusBuilder";
+    import {VideoRoomPlugin} from "../januswrapper/VideoRoomPlugin";
 
     export default {
         async mounted() {
-            const janusBuilder = new JanusBuilder(false, "");
-            const videoRoomPlugin = new VideoRoomPlugin();
+            const janusBuilder = new JanusBuilder("https://janus.staging.jimber.org/janus", "all");
+            const videoRoomPlugin = new VideoRoomPlugin("123");
 
-            // videoRoomPlugin.addEventListener("userJoined", (user) => {
-            //
-            // });
-            //
-            // videoRoomPlugin.addEventListener("userLeft", (user) => {
-            //
-            // });
-            //
-            // videoRoomPlugin.addEventListener("userUpdated", (user) => {
-            //
-            // });
-
-            videoRoomPlugin.addEventListener("error", (user) => {
-
-            });
+            const janus = await janusBuilder
+                .addPlugin(videoRoomPlugin)
+                .build();
 
 
+            videoRoomPlugin.createRoom();
 
-
-
-
-            janusBuilder.addPlugin(videoRoomPlugin);
-
-            const janus = await janusBuilder.build()
-
-
+            console.log(janus);
         },
     };
 </script>

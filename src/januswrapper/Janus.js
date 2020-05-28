@@ -3,36 +3,26 @@ import { Janus as JanusGateway } from "janus-gateway";
 export class Janus {
     constructor(server) {
         this.users = [];
-        this.plugins = [];
         this.server = server;
+    }
 
-        this.janusGateway = new JanusGateway({
-            server: this.server,
-            success: this.janusGatewayInitializationSuccess,
-            error: this.janusGatewayInitializationError,
-            destroyed: this.janusGatewayInitializationDestroyed
+    async initializeJanusGateway() {
+        return new Promise((resolve, reject) => {
+            console.log("Attempting to connect to: " + this.server)
+            this.janusGateway = new JanusGateway({
+                server: this.server,
+                success: resolve,
+                error: reject,
+                destroyed: this.janusGatewayInitializationDestroyed
+            });
         })
     }
 
-    janusGatewayInitializationSuccess() {
-        for (const plugin of this.plugins) {
-            this.janusGateway.attach(plugin.attach())
-        }
-    }
-
-    janusGatewayInitializationError() {
-
-    }
-
     janusGatewayInitializationDestroyed() {
-
+        console.log("Destroyed")
     }
 
     attachPlugin(plugin) {
-        this.plugins.push(plugin)
-    }
-
-    emitEvent() {
-
+        this.janusGateway.attach(plugin.attach());
     }
 }
