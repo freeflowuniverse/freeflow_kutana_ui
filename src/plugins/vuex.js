@@ -8,6 +8,7 @@ import AuthStore from '../stores/AuthStore'
 import MainStore from '../stores/MainStore'
 import TeamStore from '../stores/TeamStore'
 import SocketStore from '../stores/SocketStore'
+import DeviceStore from '../stores/DeviceStore'
 
 Vue.use(Vuex)
 
@@ -19,6 +20,7 @@ export default new Vuex.Store({
         AuthStore,
         MainStore,
         TeamStore,
-        SocketStore
+        SocketStore,
+        DeviceStore
     }
 })
