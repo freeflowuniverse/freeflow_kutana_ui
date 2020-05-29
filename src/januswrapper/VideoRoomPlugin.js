@@ -14,22 +14,32 @@ export class VideoRoomPlugin {
             "userJoined": [],
             "userLeft": [],
             "userUpdated": [],
-            "attach": []
+            "attach": [],
+            "roomAvailable": [],
+            "pluginAttached": [],
+            "ownUserJoined": []
         };
+        this.myId = null;
+        this.myPrivateId = null;
+        this.myRoom = null;
+        this.myUsername = null;
     }
 
     attach() {
-        console.log("Emitting attach event")
-        return new Promise((resolve, reject) => {
-            return {
-                plugin: "janus.plugin.videoroom",
-                opaqueId: this.opaqueId,
-                success: resolve,
-                error: reject,
-                onmessage: this.onMessage,
-                onlocalstream: this.onLocalStream
+        return {
+            plugin: "janus.plugin.videoroom",
+            opaqueId: this.opaqueId,
+            success: (pluginHandle) => {
+                this.onAttachSucces(pluginHandle);
+            },
+            error: this.onError,
+            onmessage: async (msg, jsep) => {
+                await this.onMessage(msg, jsep)
+            },
+            onlocalstream: (stream) => {
+                this.onLocalStream(stream)
             }
-        });
+        }
     }
 
     determineSpeaker(stream, remoteFeed, id) {
@@ -119,9 +129,8 @@ export class VideoRoomPlugin {
     }
 
     onAttachSucces(pluginHandle) {
-        console.log("[onAttachSucces]")
         this.pluginHandle = pluginHandle;
-        // this.createRoom();
+        this.emitEvent("pluginAttached", pluginHandle);
     }
 
     onError(error) {
@@ -130,146 +139,113 @@ export class VideoRoomPlugin {
         this.emitEvent("error", error)
     }
 
-    onMessage(msg, jsep) {
+    async onMessage(msg, jsep) {
         console.log("[onMessage]")
-        console.log(msg)
-        console.log(jsep)
-        // const event = msg["videoroom"];
-        //
-        // if (!event) {
-        //     return;
-        // }
-        //
-        // switch (event) {
-        //     case "joined":
-        //         this.emitEvent("userJoined", {});
-        //         break;
-        //     case "destroyed":
-        //         Janus.warn("The room has been destroyed!");
-        //         break;
-        //     case "event":
-        //         if (msg["publishers"]) {
-        //             msg["publishers"].forEach(element => {
-        //                 this.attachSubscriber(
-        //                     element["id"],
-        //                     element["display"],
-        //                     element["audio_codec"],
-        //                     element["video_codec"]
-        //                 )
-        //             });
-        //             break;
-        //         }
-        //
-        //         if (msg["joining"]) {
-        //             let newUser = {
-        //                 id: msg["joining"]["id"],
-        //                 username: msg["joining"]["display"]
-        //             };
-        //
-        //             const users = store.getters.users;
-        //             users.push(newUser);
-        //
-        //             store.commit("setUsers", users);
-        //             break;
-        //         }
-        //
-        //         if (msg["leaving"]) {
-        //             this.emitEvent("userLeft", {})
-        //             break;
-        //         }
-        //
-        //         if (msg["unpublished"]) {
-        //             if (msg["unpublished"] === "ok") {
-        //                 store.getters.users[0].pluginHandle.hangup();
-        //                 return;
-        //             }
-        //
-        //             this.detachFeed(msg["unpublished"]);
-        //             break;
-        //         }
-        //
-        //         if (msg["error"] !== undefined && msg["error"] !== null) {
-        //             console.log("Screen share was stopped! 1");
-        //             console.log(msg["error"])
-        //             break;
-        //         }
-        //         break;
-        // }
-        //
-        // if (!jsep) {
-        //     return;
-        // }
-        //
-        // this.pluginHandle.handleRemoteJsep({
-        //     jsep: jsep
-        // });
+        console.log({msg, jsep})
+
+        if(msg.unpublished) {
+            console.log("Got unpublished msg")
+        }
+
+        if(msg.leaving) {
+            console.log("Got leaving msg")
+        }
+
+        if(msg.videoroom === "joined") {
+            this.myPrivateId = msg.private_id;
+            this.myId = msg.id;
+            this.myRoom = msg.room;
+
+            await this.publishOwnFeed()
+            return;
+        }
+
+        if(msg.joining) {
+            console.log({msg})
+            console.log("Remote user is joining")
+        }
+    }
+
+    async publishOwnFeed() {
+        console.log("Publishing own feed ...")
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+
+        this.pluginHandle.createOffer({
+            media: {
+                audioRecv: false,
+                videoRecv: false,
+                audioSend: true,
+                videoSend: true
+            },
+            simulcast: false,
+            simulcast2: false,
+            stream: stream,
+            success: jsep => {
+                const publish = { request: "configure", audio: true, video: true };
+                this.pluginHandle.send({
+                    message: publish,
+                    jsep: jsep
+                });
+            },
+            error: error => {
+                Janus.error("WebRTC error:", error);
+            }
+        });
     }
 
     onLocalStream(stream) {
-        let me = JSON.parse(window.localStorage.getItem("account"));
-        this.emitEvent("localUserJoined", {
-            id: 0,
-            username: me.name,
-            stream: stream
-        });
+        this.emitEvent("ownUserJoined", {id: this.myId, username: this.myUsername, room: this.myRoom, stream: stream})
     }
 
-    createRoom() {
-        let room = Math.abs(this.hashString(window.localStorage.getItem("teamName")));
-        let me = JSON.parse(window.localStorage.getItem("account"));
-
-        console.group("Room management logs")
-        console.log("=> Creating if room exists")
-
-        this.pluginHandle.send({
-            message: {
-                request: "exists",
-                room: room
-            },
-            success: (result) => {
-                if (result.exists) {
-                    console.log("=> Room already exists")
-                    this.joinRoom(room, me.name)
-                    return;
-                }
-
-                console.log("=> Room doesnt exists, creating room")
-                this.pluginHandle.send({
-                    message: {
-                        request: "create",
-                        room: room,
-                        permanent: false,
-                        description: me.name,
-                        bitrate: 128000,
-                        publishers: 16,
-                        transport_wide_cc_ext: true,
-                        fir_freq: 10,
-                        is_private: true,
-                        // require_pvtid: true,
-                        notify_joining: true
-                    },
-                    success: (result) => {
-                        console.log("=> Room created: ", result)
-                        this.joinRoom(room, me.name)
+    async createRoom(roomName) {
+        return new Promise(((resolve, reject) => {
+            this.pluginHandle.send({
+                message: {
+                    request: "exists",
+                    room: roomName
+                },
+                success: (result) => {
+                    if (result.exists) {
+                        resolve(result)
+                        return;
                     }
-                });
-            }
-        });
+
+                    this.pluginHandle.send({
+                        message: {
+                            request: "create",
+                            room: roomName,
+                            permanent: false,
+                            description: "Super room!",
+                            bitrate: 128000,
+                            publishers: 16,
+                            transport_wide_cc_ext: true,
+                            fir_freq: 10,
+                            is_private: true,
+                            notify_joining: true
+                        },
+                        success: (result) => {
+                            resolve(result)
+                        }
+                    });
+                }
+            });
+        }))
     }
 
-    joinRoom(room, name) {
-        console.log("=> Joining room")
-        this.pluginHandle.send({
-            message: {
-                request: "join",
-                room: room,
-                ptype: "publisher",
-                display: name
-            },
-            success: () => {
-                console.log("=> Room joined")
-                console.groupEnd();
-            }
+    async joinRoom(roomName, username) {
+        return new Promise((resolve, reject) => {
+            this.pluginHandle.send({
+                message: {
+                    request: "join",
+                    room: roomName,
+                    ptype: "publisher",
+                    display: username
+                },
+                success: () => {
+                    this.myUsername = username;
+                    resolve()
+                }
+            });
         });
     }
 
@@ -292,7 +268,7 @@ export class VideoRoomPlugin {
                     room: room,
                     ptype: "subscriber",
                     feed: id,
-                    private_id: store.getters.myPrivateId
+                    private_id: this.myPrivateId
                 };
                 if (
                     Janus.webRTCAdapter.browserDetails.browser === "safari" &&

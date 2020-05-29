@@ -620,7 +620,6 @@ export const janusHelpers = {
                 }
             },
             onremotestream: stream => {
-
                 setTimeout(() => {
                     let videoTrack = stream.getVideoTracks()[0];
 

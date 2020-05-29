@@ -21,7 +21,7 @@ export class JanusBuilder {
         await janus.initializeJanusGateway();
 
         for (const plugin of this.plugins) {
-            janus.attachPlugin(plugin);
+            await janus.attachPlugin(plugin);
         }
 
         return janus;

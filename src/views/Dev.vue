@@ -10,15 +10,34 @@
         async mounted() {
             const janusBuilder = new JanusBuilder("https://janus.staging.jimber.org/janus", "all");
             const videoRoomPlugin = new VideoRoomPlugin("123");
+            const me = JSON.parse(window.localStorage.getItem("account")).name
+
+            videoRoomPlugin.addEventListener("pluginAttached", async (room) => {
+                const roomCreationResult = await videoRoomPlugin.createRoom(1236548);
+                await videoRoomPlugin.joinRoom(roomCreationResult.room, me)
+            })
+
+            // To manage my own stream.
+            videoRoomPlugin.addEventListener("ownUserJoined", (user) => {
+                console.log("[ownUserJoined]: ", user)
+
+            })
+
+            // To manage my other streams.
+            videoRoomPlugin.addEventListener("userJoined", (user) => {
+                console.log("[userJoined]: ", user)
+
+            })
+
 
             const janus = await janusBuilder
                 .addPlugin(videoRoomPlugin)
                 .build();
 
 
-            videoRoomPlugin.createRoom();
 
             console.log(janus);
+
         },
     };
 </script>
