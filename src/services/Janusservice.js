@@ -463,12 +463,18 @@ export const janusHelpers = {
         let bg = new Image()
         bg.src = "/retina.jpeg"
 
+        let fg = new Image()
+        //fg.src = "/logoDark.svg"
+        fg.src = "/logoDark.svg"
+
+   
         var imageWaiter = (image) =>
             new Promise((resolve) => {
                 image.onload = () => { resolve() }
             });
 
         await imageWaiter(bg)
+     //   await imageWaiter(fg)
 
         segmentContext.drawImage(bg, 0, 0, width, height)
         console.log(segmentCanvas.toDataURL())
@@ -508,6 +514,12 @@ export const janusHelpers = {
             segmentContext.restore()
             segmentContext.globalCompositeOperation = "destination-over"
             segmentContext.drawImage(bg, 0, 0)
+
+
+        
+            segmentContext.globalCompositeOperation = "source-over";
+            segmentContext.drawImage(fg, 400, 350, 136, 72)
+
             update()
 
         }
