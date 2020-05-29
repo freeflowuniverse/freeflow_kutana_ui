@@ -210,7 +210,7 @@ export default {
     toggleMute: function() {
       Janus.log((this.micEnabled ? "Muting" : "Unmuting") + " local stream...");
 
-      this.setMicEnabled(this.micEnabled);
+      this.setMicEnabled(!this.micEnabled);
       this.setSnackbarMessage({
         text: `You are ${this.micEnabled ? "" : "un"}muted`
       });
