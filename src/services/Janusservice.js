@@ -450,6 +450,10 @@ export const janusHelpers = {
             store.getters.users[0].screenSharePluginHandle.detach();
         }
     },
+    changeDevice(isCameraActive, isAudioActive, newAudioDeviceId, newVideoDeviceId) {
+        // TODO @JDelrue
+        console.log({isCameraActive, isAudioActive, newAudioDeviceId, newVideoDeviceId});
+    },
     async filterStream(stream) {
         var height = stream.getVideoTracks()[0].getSettings().height
         var width = stream.getVideoTracks()[0].getSettings().width

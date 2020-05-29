@@ -75,8 +75,16 @@ export default {
   },
   beforeMount() {
     this.isGrid = this.isGridView;
-    this.join(this.$route.params.token);
-    this.getTeamInfo();
+    if (this.teamName == this.$route.params.token) {
+      this.join(this.$route.params.token);
+      this.getTeamInfo();
+    } else {
+      console.log(`Not joined yet`)
+      this.$router.push({
+        name: "joinRoom",
+        params: { token: this.$route.params.token }
+      });
+    }
   },
   mounted() {
     if (this.account && this.account.name && this.teamName) {
