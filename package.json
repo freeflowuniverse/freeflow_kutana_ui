@@ -5,9 +5,13 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "postinstall": "patch-package"
   },
   "dependencies": {
+    "@tensorflow-models/body-pix": "^2.0.5",
+    "@tensorflow/tfjs-converter": "^1.7.4",
+    "@tensorflow/tfjs-core": "^1.7.4",
     "axios": "^0.19.2",
     "bip39": "^3.0.2",
     "core-js": "^3.6.4",
@@ -16,6 +20,8 @@
     "libsodium": "^0.7.6",
     "libsodium-wrappers": "^0.7.6",
     "moment": "^2.24.0",
+    "patch-package": "^6.2.2",
+    "postinstall-postinstall": "^2.1.0",
     "socket.io-client": "^2.3.0",
     "tweetnacl-util": "^0.15.1",
     "vue": "^2.6.11",
@@ -56,6 +62,7 @@
       "parser": "babel-eslint"
     },
     "rules": {
+      
     }
   },
   "browserslist": [

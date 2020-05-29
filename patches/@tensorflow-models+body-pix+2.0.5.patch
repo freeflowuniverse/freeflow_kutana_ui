@@ -1,0 +1,28 @@
+diff --git a/node_modules/@tensorflow-models/body-pix/dist/output_rendering_util.js b/node_modules/@tensorflow-models/body-pix/dist/output_rendering_util.js
+index b6e9a73..943541d 100644
+--- a/node_modules/@tensorflow-models/body-pix/dist/output_rendering_util.js
++++ b/node_modules/@tensorflow-models/body-pix/dist/output_rendering_util.js
+@@ -85,7 +85,7 @@ function toMask(personOrPartSegmentation, foreground, background, drawContour, f
+     }; }
+     if (background === void 0) { background = {
+         r: 0,
+-        g: 0,
++        g: 255,
+         b: 0,
+         a: 255
+     }; }
+@@ -220,12 +220,12 @@ var CANVAS_NAMES = {
+     lowresPartMask: 'lowres-part-mask',
+ };
+ function drawMask(canvas, image, maskImage, maskOpacity, maskBlurAmount, flipHorizontal) {
++    alert("yo2")
+     if (maskOpacity === void 0) { maskOpacity = 0.7; }
+     if (maskBlurAmount === void 0) { maskBlurAmount = 0; }
+     if (flipHorizontal === void 0) { flipHorizontal = false; }
+     var _a = util_1.getInputSize(image), height = _a[0], width = _a[1];
+-    canvas.width = width;
+-    canvas.height = height;
++    alert("yo")
+     var ctx = canvas.getContext('2d');
+     ctx.save();
+     if (flipHorizontal) {
