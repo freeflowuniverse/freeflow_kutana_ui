@@ -61,7 +61,7 @@ export default {
       state.users = users;
     },
     addUser(state, user) {
-      const userIndex = state.users.findIndex(user => user.id === id);
+      const userIndex = state.users.findIndex(u => u.id === user.id);
 
       if (userIndex === -1) {
         state.users.push(user);
