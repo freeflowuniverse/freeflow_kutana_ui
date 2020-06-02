@@ -1,5 +1,9 @@
 <template>
-    <p>because ...</p>
+    <div>
+        <p>because ...</p>
+        <video :src-object.prop.camel="ownUserStream" muted autoplay playsinline></video>
+        <audio :src-object.prop.camel="ownUserStream" autoplay></audio>
+    </div>
 </template>
 
 <script>
@@ -7,8 +11,14 @@
     import {VideoRoomPlugin} from "../januswrapper/VideoRoomPlugin";
 
     export default {
+        data() {
+            return {
+                ownUserStream: null
+            };
+        },
         async mounted() {
             const janusBuilder = new JanusBuilder("https://janus.staging.jimber.org/janus", "all");
+
             const videoRoomPlugin = new VideoRoomPlugin("123");
             const me = JSON.parse(window.localStorage.getItem("account")).name
 
@@ -20,7 +30,10 @@
             // To manage my own stream.
             videoRoomPlugin.addEventListener("ownUserJoined", (user) => {
                 console.log("[ownUserJoined]: ", user)
-
+                if( user.stream) {
+                    console.log("WE GOT A STREAM: ",  user.stream)
+                }
+                this.ownUserStream = user.stream;
             })
 
             // To manage my other streams.
@@ -33,7 +46,6 @@
             const janus = await janusBuilder
                 .addPlugin(videoRoomPlugin)
                 .build();
-
 
 
             console.log(janus);

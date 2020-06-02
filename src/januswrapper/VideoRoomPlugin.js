@@ -168,6 +168,8 @@ export class VideoRoomPlugin {
 
     async publishOwnFeed() {
         console.log("Publishing own feed ...")
+
+        // TODO Pass stream from the users perspective.
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
 
         this.pluginHandle.createOffer({
