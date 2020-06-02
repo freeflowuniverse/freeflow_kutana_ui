@@ -1,6 +1,7 @@
 import { Janus } from "janus-gateway";
 import config from "../../public/config";
 import { janusHelpers } from "../services/Janusservice";
+import store from "../plugins/vuex";
 // import store from "../plugins/vuex";
 
 export default {
@@ -58,6 +59,19 @@ export default {
     },
     setUsers(state, users) {
       state.users = users;
+    },
+    addUser(state, user) {
+      const users = state.users;
+
+      const userIndex = users.findIndex(user => user.id === id);
+
+      // i know
+      if (userIndex === -1) {
+        users.push(user);
+      } else {
+        users.splice(userIndex, 1, user);
+      }
+      state.users = users
     },
     setScreenShare(state, screenShare) {
       state.screenShare = screenShare;

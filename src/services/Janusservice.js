@@ -535,17 +535,7 @@ export const janusHelpers = {
                     stream: stream,
                     pluginHandle: remoteFeed
                 };
-                const users = store.getters.users;
-
-                const userIndex = users.findIndex(user => user.id === id);
-
-                // i know
-                if (userIndex === -1) {
-                    users.push(user);
-                } else {
-                    users.splice(userIndex, 1, user);
-                }
-                store.commit("setUsers", users);
+                store.commit("addUser", user);
 
                 setTimeout(() => {
                     store.commit("setSelectedUser", user);
