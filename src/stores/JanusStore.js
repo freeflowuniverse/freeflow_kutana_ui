@@ -61,17 +61,13 @@ export default {
       state.users = users;
     },
     addUser(state, user) {
-      const users = state.users;
+      const userIndex = state.users.findIndex(user => user.id === id);
 
-      const userIndex = users.findIndex(user => user.id === id);
-
-      // i know
       if (userIndex === -1) {
-        users.push(user);
-      } else {
-        users.splice(userIndex, 1, user);
+        state.users.push(user);
+        return
       }
-      state.users = users
+      state.users.splice(userIndex, 1, user);
     },
     setScreenShare(state, screenShare) {
       state.screenShare = screenShare;
