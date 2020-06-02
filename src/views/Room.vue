@@ -66,7 +66,7 @@ export default {
   },
   data() {
     return {
-      isGrid: false,
+      isGrid: true,
       showSidebar: !this.isMobile,
       showUserList: true,
       startX: null,
