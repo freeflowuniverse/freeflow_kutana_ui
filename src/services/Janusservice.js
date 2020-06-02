@@ -1,4 +1,4 @@
-import { Janus } from "janus-gateway";
+import {Janus} from "janus-gateway";
 import router from "../plugins/router";
 import socketService from "./socketService";
 import store from "../plugins/vuex";
@@ -529,32 +529,28 @@ export const janusHelpers = {
             onremotestream: stream => {
                 determineSpeaker(stream, remoteFeed, id);
 
-                let filteredUser = store.getters.users.find(
-                    user => user.username === remoteFeed.rfdisplay
-                );
+                const user = {
+                    id: id,
+                    username: remoteFeed.rfdisplay,
+                    stream: stream,
+                    pluginHandle: remoteFeed
+                };
+                const users = store.getters.users;
 
-                if (!filteredUser) {
-                    let newUser = {
-                        id: id,
-                        username: remoteFeed.rfdisplay,
-                        stream: stream,
-                        pluginHandle: remoteFeed
-                    };
+                const userIndex = users.findIndex(user => user.id === id);
 
-                    const users = store.getters.users;
-                    users.push(newUser);
-
-                    store.commit("setUsers", users);
-
-                    setTimeout(() => {
-                        store.commit("setSelectedUser", newUser);
-                    }, 500);
+                // i know
+                if (userIndex === -1) {
+                    users.push(user);
                 } else {
-                    const users = store.getters.users;
-                    users.splice(users.findIndex(user => user.id === filteredUser.id), 1, filteredUser);
-
-                    store.commit("setUsers", users);
+                    users.splice(userIndex, 1, user);
                 }
+                store.commit("setUsers", users);
+
+                setTimeout(() => {
+                    store.commit("setSelectedUser", user);
+                }, 500);
+
             },
             oncleanup: () => {
                 console.log("# Got a cleanup: " + id)
@@ -648,7 +644,7 @@ export const janusHelpers = {
                 room: room
             },
             success: (result) => {
-                if(result.exists) {
+                if (result.exists) {
                     console.log("=> Room already exists")
                     janusHelpers.joinRoom(room, me.name)
                     return;
