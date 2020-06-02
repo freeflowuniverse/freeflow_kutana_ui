@@ -1,10 +1,8 @@
 <template>
   <section class="mainControls">
-    <v-card class="primary pa-1 elevation-0" dark>
-      <v-btn small @click.stop="toggleMute" icon class="mr-0">
-        <v-icon small>{{muted ? 'mic_off': 'mic' }}</v-icon>
+      <v-btn small @click.stop="toggleMute" icon class="mute mr-0">
+        <v-icon small color="white">{{muted ? 'mic_off': 'mic' }}</v-icon>
       </v-btn>
-    </v-card>
   </section>
 </template>
 
@@ -37,5 +35,10 @@ export default {
   > div {
     display: flex;
   }
+}
+
+.mute {
+  background: #000;
+  border-radius: 5px 0 0 0;
 }
 </style>

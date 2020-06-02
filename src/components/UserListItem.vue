@@ -3,22 +3,6 @@
     :class="isMobile ? `userListItemMobile ma-1 ml-1 ${isSelected ? 'selected' : ''}` : `userListItem ${isSelected ? 'selected' : ''}  ${inGrid? 'inGrid': ''}`"
   >
     <v-card class="stream">
-      <v-card-title class="primary white--text body-1 mb-0 pt-1 pb-0">
-        <v-row align="center" @click="$emit('click')" class="clickable" no-gutters>
-          <v-col cols="2" class="py-0"></v-col>
-          <v-col
-            cols="8"
-            :class="isMobile ? 'subtitle' : 'title'"
-            class="py-0 ttl"
-            align="center"
-          >{{isMine ? me.name : user.username}}</v-col>
-          <v-col cols="2" class="py-0" align="end">
-            <v-btn text icon small v-if="!inGrid">
-              <v-icon :class="`pin white ${isPinned? '': 'rotate'}`"></v-icon>
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-title>
       <div :id="`user${userIndex}`" :class="`wrapper black ${!inGrid? 'clickable' : ''}`">
         <JanusVideo
           v-if="userVideoStream && userVideoStream.active"
@@ -26,12 +10,13 @@
           :muted="isMine || muted"
           :positionStatic="inGrid"
           @click="$emit('click')"
+          :label="isMine ? me.name : user.username"
         ></JanusVideo>
         <v-row v-else align="center" justify="center" class="content">
           <v-icon color="white">videocam_off</v-icon>
         </v-row>
+        <UserListItemControls v-if="!isMine" @setMute="setMute" class="UserListItemControls" />
       </div>
-      <UserListItemControls v-if="!isMine" @setMute="setMute" class="UserListItemControls" />
     </v-card>
   </section>
 </template>
@@ -103,7 +88,7 @@ export default {
   justify-content: center;
   position: absolute;
   width: 100%;
-  height: calc(100% - 42px);
+  height: 100%;
 }
 .clickable {
   cursor: pointer;

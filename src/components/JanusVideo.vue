@@ -4,6 +4,7 @@
     @fullscreenchange="fullScreenChanged"
     :class="this.$props.stream.getVideoTracks().length ? 'video-present janus-video' : 'video-not-present janus-video'"
   >
+    <span class="video-label">{{label}}</span>
     <v-btn
       v-if="isScreenShare"
       fab
@@ -50,7 +51,11 @@ export default {
     },
     positionStatic: {
       type: Boolean,
-      default: false
+      default: false,
+    },
+    label: {
+      type: String,
+      required: false,
     }
   },
   mounted() {
@@ -105,6 +110,7 @@ video.fullScreen {
 .janus-video {
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
 video {
@@ -128,5 +134,14 @@ video.screenshare {
 
 ::-webkit-media-controls {
   display: none;
+}
+
+.video-label {
+  color: white;
+  position: absolute;
+  padding: 5px;
+  background: #000000;
+  bottom: 0;
+  left: 0;
 }
 </style>

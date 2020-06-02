@@ -1,16 +1,12 @@
 <template>
   <div class="stream-wrapper black" :class="!isMobile ? 'resize-stream' : ''">
-    <div
-      v-if="!this.userScreenshareStream && selectedUser && selectedUser.username && !isMobile"
-      class="name primary pa-2 white--text"
-    >{{selectedUser.username}}</div>
-    
     <JanusVideo
       id="selectedStream"
       v-if="stream"
       :stream="stream"
       :muted="true"
       :isScreenShare="this.userScreenshareStream !== false"
+      :label="selectedUser.username"
     ></JanusVideo>
   </div>
 </template>
