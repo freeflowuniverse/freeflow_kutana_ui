@@ -27,26 +27,17 @@
                 await videoRoomPlugin.joinRoom(roomCreationResult.room, me)
             })
 
-            // To manage my own stream.
             videoRoomPlugin.addEventListener("ownUserJoined", (user) => {
-                console.log("[ownUserJoined]: ", user)
-                if( user.stream) {
-                    console.log("WE GOT A STREAM: ",  user.stream)
-                }
                 this.ownUserStream = user.stream;
             })
 
-            // To manage my other streams.
             videoRoomPlugin.addEventListener("userJoined", (user) => {
                 console.log("[userJoined]: ", user)
-
             })
-
 
             const janus = await janusBuilder
                 .addPlugin(videoRoomPlugin)
                 .build();
-
 
             console.log(janus);
 

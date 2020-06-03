@@ -193,7 +193,10 @@ export class VideoRoomPlugin {
         }
 
         this.pluginHandle.handleRemoteJsep({
-            jsep: jsep
+            jsep: jsep,
+            success: () => {
+                console.log("handleRemoteJsep: success")
+            }
         });
     }
 
@@ -214,10 +217,17 @@ export class VideoRoomPlugin {
             simulcast2: false,
             stream: this.myStream,
             success: jsep => {
+                console.log("publishOwnFeed success")
                 const publish = { request: "configure", audio: true, video: true };
                 this.pluginHandle.send({
                     message: publish,
-                    jsep: jsep
+                    jsep: jsep,
+                    success: () => {
+                        console.log("Publish success???")
+                    },
+                    error: () => {
+                        console.log("Error publish ???")
+                    }
                 });
             },
             error: error => {
@@ -283,13 +293,14 @@ export class VideoRoomPlugin {
     }
 
     attachSubscriber(id, display, audio, video) {
+        console.log("[attachSubscriber]: ", id, display, audio, video)
         let pluginHandle = {};
 
         return {
             plugin: "janus.plugin.videoroom",
             opaqueId: this.opaqueId,
             success: succesHandle => {
-                console.log("Attatched a substriber: ", succesHandle)
+                console.log("[attachSubscriber]: Attatched a substriber: ", succesHandle)
                 pluginHandle = succesHandle;
                 pluginHandle.simulcastStarted = false;
 
@@ -309,9 +320,10 @@ export class VideoRoomPlugin {
                 pluginHandle.send({message: subscribe});
             },
             error: error => {
-                console.log("Error")
+                console.log("[attachSubscriber]: Error")
             },
             onmessage: (msg, jsep) => {
+                console.log("[attachSubscriber]: onmessage")
                 console.log({msg, jsep});
 
                 const event = msg["videoroom"];
@@ -342,10 +354,12 @@ export class VideoRoomPlugin {
                 }
 
                 if (jsep !== undefined && jsep !== null) {
+                    console.log("createAnswer");
                     pluginHandle.createAnswer({
                         jsep: jsep,
                         media: {audioSend: false, videoSend: false},
                         success: jsep => {
+                            console.log("Answer success");
                             const body = {request: "start", room: this.roomId};
                             pluginHandle.send({message: body, jsep: jsep});
                         },
@@ -358,7 +372,7 @@ export class VideoRoomPlugin {
             onremotestream: stream => {
                 // this.determineSpeaker(stream, pluginHandle, id);
 
-                console.log("onremotestream: ", stream);
+                console.log("[attachSubscriber]: onremotestream: ", stream);
 
                 // let filteredUser = store.getters.users.find(
                 //     user => user.username === pluginHandle.rfdisplay
@@ -369,8 +383,8 @@ export class VideoRoomPlugin {
                 // }, 500);
             },
             oncleanup: () => {
-                console.log("# Got a cleanup: " + id)
-                console.log("# End of cleanup")
+                console.log("[attachSubscriber]: # Got a cleanup: " + id)
+                console.log("[attachSubscriber]: # End of cleanup")
             }
         };
     }
