@@ -23,6 +23,12 @@ export class Janus {
     }
 
     attachPlugin(plugin) {
+        plugin.addEventListener("attachSubscriberPlugin", (subscriberAttach) => {
+            this.janusGateway.attach(subscriberAttach);
+        });
+
         this.janusGateway.attach(plugin.attach());
     }
+
+
 }

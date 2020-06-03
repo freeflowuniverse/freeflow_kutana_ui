@@ -114,7 +114,7 @@ export const janusHelpers = {
                             ) {
                                 break;
                             }
-
+                            console.log("Publishers: ", msg["publishers"])
                             msg["publishers"].forEach(element => {
                                 janusHelpers.newRemoteFeed(
                                     element["id"],
@@ -129,6 +129,7 @@ export const janusHelpers = {
                             break;
                         case "event":
                             if (msg["publishers"]) {
+                                console.log("Publishers2: ", msg["publishers"])
                                 msg["publishers"].forEach(element => {
                                     janusHelpers.newRemoteFeed(
                                         element["id"],
@@ -479,7 +480,7 @@ export const janusHelpers = {
                     subscribe["offer_video"] = false;
                 }
                 remoteFeed.videoCodec = video;
-                remoteFeed.send({message: subscribe});
+                remoteFeed.send({ message: subscribe });
             },
             error: error => {
                 Janus.error("  -- Error attaching plugin...", error);

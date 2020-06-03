@@ -17,12 +17,14 @@ export class VideoRoomPlugin {
             "attach": [],
             "roomAvailable": [],
             "pluginAttached": [],
-            "ownUserJoined": []
+            "ownUserJoined": [],
+            "attachSubscriberPlugin": []
         };
         this.myId = null;
         this.myPrivateId = null;
         this.myRoom = null;
         this.myUsername = null;
+        this.myStream = null;
     }
 
     attach() {
@@ -38,6 +40,9 @@ export class VideoRoomPlugin {
             },
             onlocalstream: (stream) => {
                 this.onLocalStream(stream)
+            },
+            onremotestream: (stream) => {
+                console.log("ON REMOTE STREAM: ", stream)
             }
         }
     }
@@ -157,20 +162,46 @@ export class VideoRoomPlugin {
             this.myRoom = msg.room;
 
             await this.publishOwnFeed()
+
+            if (msg.publishers) {
+                console.log("PUBLISHERS: ", msg.publishers);
+                msg.publishers.forEach(element => {
+                    this.emitEvent("attachSubscriberPlugin", this.attachSubscriber(element["id"], element["display"], element["audio_codec"], element["video_codec"]));
+                });
+            }
+
             return;
+        }
+
+        if(msg.videoroom === "event") {
+            if (msg.publishers) {
+                console.log("PUBLISHERS2: ", msg.publishers);
+                msg.publishers.forEach(element => {
+                    this.emitEvent("attachSubscriberPlugin", this.attachSubscriber(element["id"], element["display"], element["audio_codec"], element["video_codec"]));
+                });
+            }
         }
 
         if(msg.joining) {
             console.log({msg})
             console.log("Remote user is joining")
+
         }
+
+        if (!jsep) {
+            return;
+        }
+
+        this.pluginHandle.handleRemoteJsep({
+            jsep: jsep
+        });
     }
 
     async publishOwnFeed() {
         console.log("Publishing own feed ...")
 
         // TODO Pass stream from the users perspective.
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+        this.myStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
 
         this.pluginHandle.createOffer({
             media: {
@@ -181,7 +212,7 @@ export class VideoRoomPlugin {
             },
             simulcast: false,
             simulcast2: false,
-            stream: stream,
+            stream: this.myStream,
             success: jsep => {
                 const publish = { request: "configure", audio: true, video: true };
                 this.pluginHandle.send({
@@ -254,13 +285,14 @@ export class VideoRoomPlugin {
     attachSubscriber(id, display, audio, video) {
         let pluginHandle = {};
 
-        console.log("Attaching subscriber ...")
-        this.emitEvent("attach", {
+        return {
             plugin: "janus.plugin.videoroom",
-            opaqueId: store.getters.opaqueId,
+            opaqueId: this.opaqueId,
             success: succesHandle => {
+                console.log("Attatched a substriber: ", succesHandle)
                 pluginHandle = succesHandle;
                 pluginHandle.simulcastStarted = false;
+
                 let room = Math.abs(
                     this.hashString(window.localStorage.getItem("teamName"))
                 );
@@ -272,30 +304,26 @@ export class VideoRoomPlugin {
                     feed: id,
                     private_id: this.myPrivateId
                 };
-                if (
-                    Janus.webRTCAdapter.browserDetails.browser === "safari" &&
-                    (video === "vp9" || (video === "vp8" && !Janus.safariVp8))
-                ) {
-                    if (video) video = video.toUpperCase();
-                    subscribe["offer_video"] = false;
-                }
+
                 pluginHandle.videoCodec = video;
                 pluginHandle.send({message: subscribe});
             },
             error: error => {
-                // Janus.error("  -- Error attaching plugin...", error);
+                console.log("Error")
             },
             onmessage: (msg, jsep) => {
+                console.log({msg, jsep});
+
                 const event = msg["videoroom"];
                 if (event) {
                     switch (event) {
                         case "attached":
                             for (let i = 1; i < 16; i++) {
                                 if (
-                                    store.getters.feeds[i] === undefined ||
-                                    store.getters.feeds[i] === null
+                                    this.feeds[i] === undefined ||
+                                    this.feeds[i] === null
                                 ) {
-                                    store.getters.feeds[i] = pluginHandle;
+                                    this.feeds[i] = pluginHandle;
                                     pluginHandle.rfindex = i;
                                     break;
                                 }
@@ -318,7 +346,7 @@ export class VideoRoomPlugin {
                         jsep: jsep,
                         media: {audioSend: false, videoSend: false},
                         success: jsep => {
-                            const body = {request: "start", room: store.getters.roomId};
+                            const body = {request: "start", room: this.roomId};
                             pluginHandle.send({message: body, jsep: jsep});
                         },
                         error: error => {
@@ -328,47 +356,22 @@ export class VideoRoomPlugin {
                 }
             },
             onremotestream: stream => {
-                this.determineSpeaker(stream, pluginHandle, id);
+                // this.determineSpeaker(stream, pluginHandle, id);
 
-                let filteredUser = store.getters.users.find(
-                    user => user.username === pluginHandle.rfdisplay
-                );
+                console.log("onremotestream: ", stream);
 
-                if (!filteredUser) {
-                    let newUser = {
-                        id: id,
-                        username: pluginHandle.rfdisplay,
-                        stream: stream,
-                        pluginHandle: pluginHandle
-                    };
+                // let filteredUser = store.getters.users.find(
+                //     user => user.username === pluginHandle.rfdisplay
+                // );
 
-                    const users = store.getters.users;
-                    users.push(newUser);
-
-                    store.commit("setUsers", users);
-
-                    setTimeout(() => {
-                        store.commit("setSelectedUser", newUser);
-                    }, 500);
-                } else {
-                    const users = store.getters.users;
-                    users.splice(users.findIndex(user => user.id === filteredUser.id), 1, filteredUser);
-
-                    store.commit("setUsers", users);
-                }
+                // setTimeout(() => {
+                //     store.commit("setSelectedUser", newUser);
+                // }, 500);
             },
             oncleanup: () => {
                 console.log("# Got a cleanup: " + id)
-                console.log(store.getters.users)
-
-                store.commit(
-                    "setUsers",
-                    store.getters.users.filter(user => user.id !== id)
-                );
-
-                console.log(store.getters.users)
                 console.log("# End of cleanup")
             }
-        });
+        };
     }
 }
