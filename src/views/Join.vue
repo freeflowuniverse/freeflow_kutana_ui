@@ -14,7 +14,6 @@
             ></video>
           </v-row>
           <v-select
-            v-if="video"
             v-model="videoDevice"
             dense
             prepend-icon="videocam"
@@ -29,7 +28,6 @@
             :disabled="videoInputDevices.length <= 0 || !video"
           />
           <v-select
-            v-if="audio"
             v-model="audioDevice"
             dense
             prepend-icon="mic"
@@ -44,8 +42,8 @@
             :disabled="audioInputDevices.length <= 0 || !audio"
           />
           <v-row justify="center">
-            <v-switch v-model="video" class="pa-2" label="Join with video" @change="changeDevice" />
-            <v-switch v-model="audio" class="pa-2" label="Join with audio" @change="changeDevice" />
+            <v-switch v-model="video" class="pa-2" label="Webcam" @change="changeDevice" />
+            <v-switch v-model="audio" class="pa-2" label="Microphone" @change="changeDevice" />
           </v-row>
         </v-card-text>
         <v-card-actions>
@@ -73,12 +71,14 @@ export default {
     return {
       videoDevice: undefined,
       audioDevice: undefined,
-      audio: false,
-      video: false,
+      audio: true,
+      video: true,
       videoStream: undefined
     };
   },
-  mounted: function() {},
+  mounted: function() {
+    this.changeDevice();
+  },
   computed: {
     ...mapGetters([
       "videoInputDevices",
@@ -95,21 +95,19 @@ export default {
       "join",
       "getTeamInfo",
       "setVideoEnabled",
-      "setMicEnabled"
+      "setMicEnabled",
+      "setInputSelection"
     ]),
-    changeDevice: function() {
-      if (this.audio || this.video) {
-        this.initialiseDevices({
-          audio: this.audio,
-          video: this.video,
-          audioDevice: this.audioDevice,
-          videoDevice: this.videoDevice
-        });
-      }
+    async changeDevice() {
+      await this.initialiseDevices({
+        audio: this.audio,
+        video: this.video,
+        audioDevice: this.audioDevice,
+        videoDevice: this.videoDevice
+      });
     },
     joinRoom() {
-      this.join(this.$route.params.token);
-      this.getTeamInfo();
+      this.setInputSelection(this.$route.params.token);
       this.$router.push({
         name: "room",
         params: { token: this.$route.params.token }
@@ -117,12 +115,12 @@ export default {
     }
   },
   watch: {
-    videoInputDevices (val) {
+    videoInputDevices(val) {
       if (!this.videoDevice && val && val.length) {
         this.videoDevice = val[0].deviceId;
       }
     },
-    audioInputDevices (val) {
+    audioInputDevices(val) {
       if (!this.audioDevice && val && val.length) {
         this.audioDevice = val[0].deviceId;
       }

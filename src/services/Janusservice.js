@@ -2,28 +2,11 @@ import { Janus } from "janus-gateway";
 import router from "../plugins/router";
 import socketService from "./socketService";
 import store from "../plugins/vuex";
-import * as bodyPix from "@tensorflow-models/body-pix";
 
+import * as localForage from "localforage";
+import StreamFilterService from "./streamFilterService"
 let inThrottle;
 
-let bodypixNet;
-let mirrorCanvas;
-let segmentCanvas;
-let segmentation;
-let segmentationCounter = 0
-const initializeBodyPixNet = async () => {
-    if (bodypixNet) {
-        console.log("**** RETURNING")
-        return
-    }
-    bodypixNet = await bodyPix.load({
-        architecture: "MobileNetV1",
-        outputStride: 16,
-        multiplier: 0.75,
-        quantBytes: 2
-    });
-    console.log("return bodypixnet!")
-}
 
 const hashString = str => {
     let hash = 0;
@@ -110,7 +93,7 @@ export const janusHelpers = {
                     users[0].pluginHandle = pluginHandle;
 
                     store.commit("setUsers", users);
-                    janusHelpers.registerUsername();
+                    janusHelpers.createRoom();
                 },
                 error: error => {
                     Janus.error("  -- Error attaching plugin...", error);
@@ -127,11 +110,10 @@ export const janusHelpers = {
                     if (!event) {
                         return;
                     }
-
                     switch (event) {
                         case "joined":
                             store.commit("setMyPrivateId", msg["private_id"]);
-                            janusHelpers.publishOwnFeed(true);
+                            janusHelpers.publishOwnFeed();
 
                             if (
                                 !(msg["publishers"] !== undefined && msg["publishers"] !== null)
@@ -219,6 +201,8 @@ export const janusHelpers = {
                     store.commit("setUsers", users);
                 }
             });
+
+
         },
 
         onJanusCreateError(context, error) {
@@ -450,112 +434,37 @@ export const janusHelpers = {
             store.getters.users[0].screenSharePluginHandle.detach();
         }
     },
-    changeDevice(isCameraActive, isAudioActive, newAudioDeviceId, newVideoDeviceId) {
-        // TODO @JDelrue
-        console.log({isCameraActive, isAudioActive, newAudioDeviceId, newVideoDeviceId});
+    async changeWallpaper(wallpaperDataUrl) {
+
+        this.streamFilterService.setWallpaper(wallpaperDataUrl)
+        localForage.setItem("wallpaper", wallpaperDataUrl)
+
     },
-    async filterStream(stream) {
-        var height = stream.getVideoTracks()[0].getSettings().height
-        var width = stream.getVideoTracks()[0].getSettings().width
-        mirrorCanvas = document.createElement("canvas");
-        mirrorCanvas.width = width
-        mirrorCanvas.height = height
-        segmentCanvas = document.createElement("canvas");
-        segmentCanvas.width = width
-        segmentCanvas.height = height
-        var segmentContext = segmentCanvas.getContext("2d");
-        let bg = new Image()
-        bg.src = "/retina.jpeg"
-
-        let fg = new Image()
-        //fg.src = "/logoDark.svg"
-        fg.src = "/logoDark.svg"
-
-   
-        var imageWaiter = (image) =>
-            new Promise((resolve) => {
-                image.onload = () => { resolve() }
-            });
-
-        await imageWaiter(bg)
-     //   await imageWaiter(fg)
-
-        segmentContext.drawImage(bg, 0, 0, width, height)
-        console.log(segmentCanvas.toDataURL())
-        bg.src = segmentCanvas.toDataURL()
-
-        let imageCapture = new ImageCapture(stream.getVideoTracks()[0]);
-        var outStream = segmentCanvas.captureStream(60);
-
-        var update = async function () {
-
-            var capture = await imageCapture.grabFrame()
-            var image = await createImageBitmap(capture)
-
-            mirrorCanvas.getContext("2d").drawImage(image, 0, 0, mirrorCanvas.width, mirrorCanvas.height)
-            segmentationCounter++
-            if (!segmentation || segmentationCounter >= 1) {
-                segmentationCounter = 0
-                const personSegmentation = await bodypixNet.segmentPerson(mirrorCanvas, true);
-
-                const foregroundColor = { r: 0, g: 255, b: 0, a: 255 };
-                const backgroundColor = { r: 255, g: 0, b: 0, a: 0 };
-                segmentation = bodyPix.toMask(
-                    personSegmentation,
-                    foregroundColor,
-                    backgroundColor
-                );
-
-            }
-
-            segmentContext.save()
-            segmentContext.clearRect(0, 0, width, height);
-            await bodyPix.drawMask(segmentCanvas, new Image(640, 480), segmentation, 1, 3);
-
-            segmentContext.globalCompositeOperation = "source-in";
-            segmentContext.drawImage(image, 0, 0);
-
-            segmentContext.restore()
-            segmentContext.globalCompositeOperation = "destination-over"
-            segmentContext.drawImage(bg, 0, 0)
-
-
-        
-            segmentContext.globalCompositeOperation = "source-over";
-            segmentContext.drawImage(fg, 400, 350, 136, 72)
-
-            update()
-
-        }
-        update()
-
-        outStream.addTrack(stream.getAudioTracks()[0])
-        return outStream;
+    changeDevice(isCameraActive, isAudioActive, newAudioDeviceId, newVideoDeviceId, wallpaperEnabled) {
+        this.streamFilterService.changeSettings(isCameraActive, isAudioActive, wallpaperEnabled)
+        console.log({ isCameraActive, isAudioActive, newAudioDeviceId, newVideoDeviceId, wallpaperEnabled });
     },
-    async publishOwnFeed(useAudio) {
-        await initializeBodyPixNet()
-        var prestream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-        var stream = await this.filterStream(prestream)
-        //prestream.getAudioTracks()[0].getSettings().volume = 100
+    async publishOwnFeed() {
+        this.wallpaperEnabled = store.getters.wallpaperEnabled
 
-        useAudio = true
+        this.mediaStream = store.getters.localStream
+        const useAudio = !!this.mediaStream.getAudioTracks().length
+
+        this.streamFilterService = new StreamFilterService(this.mediaStream, "/default_background.png", this.mediaStream.publishVideo, this.mediaStream.publishAudio, this.wallpaperEnabled)
+        this.stream = await this.streamFilterService.getResultStream()
+        this.streamFilterService.start()
+
+        console.log(this.stream)
         /* use the stream */
         store.getters.users[0].pluginHandle.createOffer({
-            media: {
-                audioRecv: false,
-                videoRecv: false,
-                audioSend: useAudio,
-                videoSend: true
-            },
             simulcast: false,
             simulcast2: false,
-            stream: stream,
+            stream: this.stream,
             success: jsep => {
-                console.log(jsep)
                 const publish = { request: "configure", audio: useAudio, video: true };
                 store.getters.users[0].pluginHandle.send({
                     message: publish,
-                    jsep: jsep
+                    jsep
                 });
             },
             error: error => {
@@ -649,13 +558,15 @@ export const janusHelpers = {
                     user => user.username === remoteFeed.rfdisplay
                 );
 
+                let newUser = {
+                    id: id,
+                    username: remoteFeed.rfdisplay,
+                    stream: stream,
+                    pluginHandle: remoteFeed
+                };
+
                 if (!filteredUser) {
-                    let newUser = {
-                        id: id,
-                        username: remoteFeed.rfdisplay,
-                        stream: stream,
-                        pluginHandle: remoteFeed
-                    };
+                    
 
                     const users = store.getters.users;
                     users.push(newUser);
@@ -667,7 +578,7 @@ export const janusHelpers = {
                     }, 500);
                 } else {
                     const users = store.getters.users;
-                    users.splice(users.findIndex(user => user.id === filteredUser.id), 1, filteredUser);
+                    users.splice(users.findIndex(user => user.id === filteredUser.id), 1, newUser);
 
                     store.commit("setUsers", users);
                 }
@@ -796,6 +707,7 @@ export const janusHelpers = {
     },
 
     joinRoom(room, name) {
+        console.log(room, name)
         console.log("=> Joining room")
         store.getters.users[0].pluginHandle.send({
             message: {
@@ -810,7 +722,5 @@ export const janusHelpers = {
             }
         });
     },
-    registerUsername() {
-        janusHelpers.createRoom();
-    }
+
 };

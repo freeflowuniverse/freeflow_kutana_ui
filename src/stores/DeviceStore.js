@@ -2,18 +2,19 @@ export default {
     state: {
         stream: undefined,
         activeAudioDevice: window.localStorage.getItem("activeAudioDevice")
-        ? JSON.parse(window.localStorage.getItem("activeAudioDevice"))
-        : null,
+            ? JSON.parse(window.localStorage.getItem("activeAudioDevice"))
+            : null,
         activeAudioOutputDevice: undefined,
         activeVideoDevice: window.localStorage.getItem("activeVideoDevice")
-        ? JSON.parse(window.localStorage.getItem("activeVideoDevice"))
-        : null,
+            ? JSON.parse(window.localStorage.getItem("activeVideoDevice"))
+            : null,
         videoInputDevices: [],
         audioInputDevices: [],
         audioOutputDevices: [],
         permissionError: false,
         videoEnabled: window.localStorage.getItem('videoEnabled') ? JSON.parse(window.localStorage.getItem('videoEnabled')) : false,
-        micEnabled: window.localStorage.getItem('micEnabled') ? JSON.parse(window.localStorage.getItem('micEnabled')) : false
+        micEnabled: window.localStorage.getItem('micEnabled') ? JSON.parse(window.localStorage.getItem('micEnabled')) : false,
+        wallpaperEnabled: window.localStorage.getItem('wallpaperEnabled') ? JSON.parse(window.localStorage.getItem('wallpaperEnabled')) : false,
     },
     mutations: {
         refreshDevices(state, devices) {
@@ -66,19 +67,24 @@ export default {
         setPermissionError(state) {
             state.permissionError = true
         },
-        setVideoEnabled (state, enabled) { 
+        setVideoEnabled(state, enabled) {
             window.localStorage.setItem('videoEnabled', enabled)
-            state.videoEnabled = enabled 
+            state.videoEnabled = enabled
         },
-        setMicEnabled (state, enabled) { 
+        setMicEnabled(state, enabled) {
             window.localStorage.setItem('micEnabled', enabled)
-            state.micEnabled = enabled 
+            state.micEnabled = enabled
         },
+        setWallPaperEnabled(state, enabled) {
+            window.localStorage.setItem('wallpaperEnabled', enabled)
+            state.wallpaperEnabled = enabled
+        }
     },
     actions: {
-        clearDeviceSelection (context) {
+        clearDeviceSelection(context) {
             context.commit('setMicEnabled', false)
             context.commit('setVideoEnabled', false)
+            context.commit('setWallPaperEnabled', false)
             context.commit('activeAudioDevice', null)
             context.commit('activeVideoDevice', null)
         },
@@ -103,25 +109,29 @@ export default {
                     commit('setPermissionError');
                 })
         },
-        initialiseDevices({ commit, dispatch }, { audio, video, audioDevice, videoDevice }) {
-            const hasSpecificAudio = audio && audioDevice;
-            const hasSpecificVideo = video && videoDevice;
-            navigator.mediaDevices.getUserMedia({
-                audio: hasSpecificAudio ? { deviceId: { exact: audioDevice } } : audio, 
-                video: hasSpecificVideo ? { deviceId: { exact: videoDevice } } : video 
-            }).then(stream => {
-                    stream.getAudioTracks().forEach(audioTrack => {
-                        audioTrack.stop();
-                    });
-                    dispatch('refreshDevices');
-                    commit('refreshActiveDevices', stream.getTracks());
-                    commit('setStream', stream);
+        async initialiseDevices({ commit, dispatch }, { audio, video, audioDevice, videoDevice }) {
+
+            const hasSpecificAudio = audioDevice;
+            const hasSpecificVideo = videoDevice;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: hasSpecificAudio ? { deviceId: { exact: audioDevice } } : audio,
+                    video: hasSpecificVideo ? { deviceId: { exact: videoDevice } } : video
                 })
-                .catch(error => {
-                    console.log(error);
-                    commit('setPermissionError');
-                    commit('removeStream');
-                })
+                stream.publishVideo = video
+                stream.publishAudio = audio
+
+                dispatch('refreshDevices');
+                commit('refreshActiveDevices', stream.getTracks());
+                commit('setStream', stream);
+                console.log("STREAM!!!", stream)
+
+            } catch (error) {
+                console.log(error);
+                commit('setPermissionError');
+                commit('removeStream');
+            }
+
         },
         setAudioOutputDevice({ commit }, audioOutputDevice) {
             const userStreams = document.getElementsByTagName("video");
@@ -132,6 +142,7 @@ export default {
         },
         setVideoEnabled({ commit }, enabled) { commit('setVideoEnabled', enabled) },
         setMicEnabled({ commit }, enabled) { commit('setMicEnabled', enabled) },
+        setWallPaperEnabled({ commit }, enabled) { commit('setWallPaperEnabled', enabled) },
     },
     getters: {
         videoInputDevices: state => state.videoInputDevices,
@@ -144,6 +155,7 @@ export default {
         permissionError: state => state.permissionError,
         videoEnabled: state => state.videoEnabled,
         micEnabled: state => state.micEnabled,
+        wallpaperEnabled: state => state.wallpaperEnabled
 
     },
 }

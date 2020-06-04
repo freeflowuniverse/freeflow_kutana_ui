@@ -19,6 +19,7 @@
     "janus-gateway": "git://github.com/threefoldtech/freeflowconnect_janus.git",
     "libsodium": "^0.7.6",
     "libsodium-wrappers": "^0.7.6",
+    "localforage": "^1.7.3",
     "moment": "^2.24.0",
     "patch-package": "^6.2.2",
     "postinstall-postinstall": "^2.1.0",
@@ -55,15 +56,12 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
+      "plugin:vue/essential"
     ],
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {
-      
-    }
+    "rules": {}
   },
   "browserslist": [
     "> 1%",

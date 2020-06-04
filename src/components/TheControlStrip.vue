@@ -68,6 +68,18 @@
             hide-details
             :disabled="audioOutputDevices.length <= 0"
           ></v-select>
+          <v-file-input
+            dense
+            v-model="wallpaperFile"
+            prepend-icon="image"
+            label="Background wallpaper"
+            item-text="label"
+            item-value="wallpaper"
+            outlined
+            @change="setWallPaper"
+            class="my-4"
+            hide-details
+          ></v-file-input>
           <v-divider class="my-5"></v-divider>
           <v-col align="center" justify="center">
             <p class="text-center">
@@ -109,6 +121,19 @@
       <v-btn @click="disableScreenShare" v-else-if="canScreenShare" icon class="ml-1">
         <v-icon>stop_screen_share</v-icon>
       </v-btn>
+      <!-- Virtual background button -->
+      <v-btn
+        @click="toggleWallpaper"
+        v-if="!wallpaperEnabled && screenShare === null"
+        icon
+        class="ml-2"
+      >
+        <v-icon>image</v-icon>
+      </v-btn>
+      <v-btn @click="toggleWallpaper" v-else-if="wallpaperEnabled" icon class="ml-1">
+        <span class="material-icons">broken_image</span>
+      </v-btn>
+      <!-- End virtual background button -->
       <v-spacer></v-spacer>
       <v-btn v-if="minimal" icon class="ml-1" @click="$root.$emit('toggleUserList')">
         <v-icon>group</v-icon>
@@ -139,7 +164,8 @@ export default {
       qualityOptions: ["Auto", "Low", "Normal", "High"],
       videoDevice: undefined,
       audioInputDevice: undefined,
-      audioOutputDevice: undefined
+      audioOutputDevice: undefined,
+      wallpaperFile: undefined
     };
   },
   mounted() {
@@ -160,7 +186,8 @@ export default {
       "activeVideoDevice",
       "activeAudioOutputDevice",
       "videoEnabled",
-      "micEnabled"
+      "micEnabled",
+      "wallpaperEnabled"
     ]),
     inviteLink() {
       let baseUrl = window.location.href;
@@ -179,7 +206,8 @@ export default {
       "refreshDevices",
       "setAudioOutputDevice",
       "setVideoEnabled",
-      "setMicEnabled"
+      "setMicEnabled",
+      "setWallPaperEnabled"
     ]),
     canScreenShare: function() {
       return !!navigator.mediaDevices.getDisplayMedia;
@@ -201,7 +229,8 @@ export default {
         this.videoEnabled,
         this.micEnabled,
         this.audioInputDevice,
-        this.videoDevice
+        this.videoDevice,
+        this.wallpaperEnabled
       );
     },
     changeAudioOutputDevice: function() {
@@ -212,7 +241,7 @@ export default {
 
       this.setMicEnabled(!this.micEnabled);
       this.setSnackbarMessage({
-        text: `You are ${this.micEnabled ? "" : "un"}muted`
+        text: `You are ${!this.micEnabled ? "" : "un"}muted`
       });
       // if (this.micEnabled) {
       //   this.users[0].pluginHandle.unmuteAudio();
@@ -290,6 +319,17 @@ export default {
 
       console.log("A publisher woooo ... ", this.screenShareRole);
       this.stopScreenShare();
+    },
+    toggleWallpaper: function() {
+      this.setWallPaperEnabled(!this.wallpaperEnabled)
+      this.changeDevice();
+    },
+    setWallPaper: function() {
+      var reader = new FileReader();
+      reader.readAsDataURL(this.wallpaperFile);
+      reader.onload = function() {
+        janusHelpers.changeWallpaper(reader.result)
+      };
     },
     showAddUserDialog() {
       this.addUserDialog = true;
