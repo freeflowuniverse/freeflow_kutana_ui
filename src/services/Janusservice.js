@@ -435,7 +435,9 @@ export const janusHelpers = {
         }
     },
     async changeWallpaper(wallpaperDataUrl) {
-
+        if(wallpaperDataUrl === undefined){
+            wallpaperDataUrl = "/default_background.png"
+        }
         this.streamFilterService.setWallpaper(wallpaperDataUrl)
         localForage.setItem("wallpaper", wallpaperDataUrl)
 
@@ -449,8 +451,7 @@ export const janusHelpers = {
 
         this.mediaStream = store.getters.localStream
         const useAudio = !!this.mediaStream.getAudioTracks().length
-
-        this.streamFilterService = new StreamFilterService(this.mediaStream, "/default_background.png", this.mediaStream.publishVideo, this.mediaStream.publishAudio, this.wallpaperEnabled)
+        this.streamFilterService = new StreamFilterService(this.mediaStream, "/default_background.png", store.getters.videoEnabled, store.getters.micEnabled, this.wallpaperEnabled)
         this.stream = await this.streamFilterService.getResultStream()
         this.streamFilterService.start()
 

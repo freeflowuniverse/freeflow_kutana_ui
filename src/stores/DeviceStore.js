@@ -110,7 +110,6 @@ export default {
                 })
         },
         async initialiseDevices({ commit, dispatch }, { audio, video, audioDevice, videoDevice }) {
-
             const hasSpecificAudio = audioDevice;
             const hasSpecificVideo = videoDevice;
             try {
@@ -118,9 +117,10 @@ export default {
                     audio: hasSpecificAudio ? { deviceId: { exact: audioDevice } } : audio,
                     video: hasSpecificVideo ? { deviceId: { exact: videoDevice } } : video
                 })
-                stream.publishVideo = video
-                stream.publishAudio = audio
 
+
+                commit('setVideoEnabled', video)
+                commit('setMicEnabled', audio)
                 dispatch('refreshDevices');
                 commit('refreshActiveDevices', stream.getTracks());
                 commit('setStream', stream);

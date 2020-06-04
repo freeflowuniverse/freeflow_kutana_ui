@@ -124,7 +124,7 @@
       <!-- Virtual background button -->
       <v-btn
         @click="toggleWallpaper"
-        v-if="!wallpaperEnabled && screenShare === null"
+        v-if="!wallpaperEnabled"
         icon
         class="ml-2"
       >
@@ -325,6 +325,14 @@ export default {
       this.changeDevice();
     },
     setWallPaper: function() {
+
+      if(this.wallpaperFile === undefined){
+        janusHelpers.changeWallpaper(undefined) // go to default wallpaper
+      }
+      if(this.wallpaperFile.name.split('.').pop() != "jpeg" && this.wallpaperFile.name.split('.').pop() != "jpg" && this.wallpaperFile.name.split('.').pop() != "png"){
+        alert("Please use PNG or JPG image")
+        return
+      }
       var reader = new FileReader();
       reader.readAsDataURL(this.wallpaperFile);
       reader.onload = function() {

@@ -99,6 +99,7 @@ export default {
       "setInputSelection"
     ]),
     async changeDevice() {
+
       await this.initialiseDevices({
         audio: this.audio,
         video: this.video,
