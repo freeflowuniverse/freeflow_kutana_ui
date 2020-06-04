@@ -10,6 +10,7 @@
                         <v-col cols="12" md="5" align="center">
                             <v-form @submit.prevent="joinRoom" v-model="valid">
                                 <v-text-field
+                                        id="roomId"
                                         filled
                                         label="Invite link or room ID"
                                         persistent-hint
@@ -19,14 +20,15 @@
                                         required
                                 >
                                     <template v-slot:append>
-                                        <v-btn :disabled="!valid" small text type="submit">Join room</v-btn>
+                                        <v-btn id="joinBtn" :disabled="!valid" small text type="submit">Join room
+                                        </v-btn>
                                     </template>
                                 </v-text-field>
                             </v-form>
                         </v-col>
                         <v-divider :vertical="$vuetify.breakpoint.mdAndUp"></v-divider>
                         <v-col cols="12" md="5" align="center">
-                            <v-btn text @click="create">Create room</v-btn>
+                            <v-btn id="createRoomBtn" text @click="create">Create room</v-btn>
                         </v-col>
                     </v-row>
                 </v-card-text>
