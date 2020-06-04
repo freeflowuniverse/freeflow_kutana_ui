@@ -145,16 +145,18 @@ export class VideoRoomPlugin {
     }
 
     async onMessage(msg, jsep) {
-        console.log("[onMessage]")
-        console.log({msg, jsep})
+        // console.group("[onMessage]");
+        // console.log(" * msg => ", msg);
+        // console.log(" * jsep => ", jsep);
+        // console.groupEnd();
 
-        if(msg.unpublished) {
-            console.log("Got unpublished msg")
-        }
-
-        if(msg.leaving) {
-            console.log("Got leaving msg")
-        }
+        // if(msg.unpublished) {
+        //     console.log("Got unpublished msg")
+        // }
+        //
+        // if(msg.leaving) {
+        //     console.log("Got leaving msg")
+        // }
 
         if(msg.videoroom === "joined") {
             this.myPrivateId = msg.private_id;
@@ -164,7 +166,6 @@ export class VideoRoomPlugin {
             await this.publishOwnFeed()
 
             if (msg.publishers) {
-                console.log("PUBLISHERS: ", msg.publishers);
                 msg.publishers.forEach(element => {
                     this.emitEvent("attachSubscriberPlugin", this.attachSubscriber(element["id"], element["display"], element["audio_codec"], element["video_codec"]));
                 });
@@ -175,7 +176,7 @@ export class VideoRoomPlugin {
 
         if(msg.videoroom === "event") {
             if (msg.publishers) {
-                console.log("PUBLISHERS2: ", msg.publishers);
+                // console.log("PUBLISHERS2: ", msg.publishers);
                 msg.publishers.forEach(element => {
                     this.emitEvent("attachSubscriberPlugin", this.attachSubscriber(element["id"], element["display"], element["audio_codec"], element["video_codec"]));
                 });
@@ -183,8 +184,8 @@ export class VideoRoomPlugin {
         }
 
         if(msg.joining) {
-            console.log({msg})
-            console.log("Remote user is joining")
+            // console.log({msg})
+            // console.log("Remote user is joining")
 
         }
 
@@ -192,18 +193,19 @@ export class VideoRoomPlugin {
             return;
         }
 
+        console.group("[onMessage, handleRemoteJsep]");
         this.pluginHandle.handleRemoteJsep({
             jsep: jsep,
             success: () => {
-                console.log("handleRemoteJsep: success")
+                console.log("handleRemoteJsep => success")
+                console.groupEnd()
             }
         });
     }
 
     async publishOwnFeed() {
-        console.log("Publishing own feed ...")
+        console.group("[publishOwnFeed]")
 
-        // TODO Pass stream from the users perspective.
         this.myStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
 
         this.pluginHandle.createOffer({
@@ -217,21 +219,25 @@ export class VideoRoomPlugin {
             simulcast2: false,
             stream: this.myStream,
             success: jsep => {
-                console.log("publishOwnFeed success")
+                console.log(" * createOffer => success");
                 const publish = { request: "configure", audio: true, video: true };
                 this.pluginHandle.send({
                     message: publish,
                     jsep: jsep,
                     success: () => {
-                        console.log("Publish success???")
+                        console.log(" * send configure => success");
+                        console.groupEnd()
                     },
                     error: () => {
-                        console.log("Error publish ???")
+                        console.log(" * send configure => error");
+                        console.groupEnd()
                     }
                 });
             },
             error: error => {
-                Janus.error("WebRTC error:", error);
+                console.log(" * createOffer => WebRTC error");
+                console.log(error);
+                console.groupEnd()
             }
         });
     }
@@ -241,6 +247,8 @@ export class VideoRoomPlugin {
     }
 
     async createRoom(roomName) {
+        console.group("[createRoom]: ", roomName);
+
         return new Promise(((resolve, reject) => {
             this.pluginHandle.send({
                 message: {
@@ -248,10 +256,14 @@ export class VideoRoomPlugin {
                     room: roomName
                 },
                 success: (result) => {
+                    console.log(" * exists => success: ", result.exists);
+
                     if (result.exists) {
+                        console.groupEnd();
                         resolve(result)
                         return;
                     }
+
 
                     this.pluginHandle.send({
                         message: {
@@ -267,6 +279,8 @@ export class VideoRoomPlugin {
                             notify_joining: true
                         },
                         success: (result) => {
+                            console.log(" * create => success: ", result.exists);
+                            console.groupEnd();
                             resolve(result)
                         }
                     });
@@ -293,20 +307,20 @@ export class VideoRoomPlugin {
     }
 
     attachSubscriber(id, display, audio, video) {
-        console.log("[attachSubscriber]: ", id, display, audio, video)
+        console.group("[attachSubscriber]");
+        console.log(" * params => ", id, display, audio, video);
+
         let pluginHandle = {};
+
+        let room = 1733824855;
 
         return {
             plugin: "janus.plugin.videoroom",
             opaqueId: this.opaqueId,
             success: succesHandle => {
-                console.log("[attachSubscriber]: Attatched a substriber: ", succesHandle)
+                console.log(" * attach => success");
                 pluginHandle = succesHandle;
                 pluginHandle.simulcastStarted = false;
-
-                let room = Math.abs(
-                    this.hashString(window.localStorage.getItem("teamName"))
-                );
 
                 const subscribe = {
                     request: "join",
@@ -316,15 +330,27 @@ export class VideoRoomPlugin {
                     private_id: this.myPrivateId
                 };
 
+                console.log(" * subscribe => ", subscribe);
+
                 pluginHandle.videoCodec = video;
-                pluginHandle.send({message: subscribe});
+                pluginHandle.send({
+                    message: subscribe,
+                    success: () => {
+                        console.log(" * join => success");
+                        console.groupEnd();
+                    }
+                });
             },
             error: error => {
-                console.log("[attachSubscriber]: Error")
+                console.log(" * attach => error");
+                console.log(error);
+                console.groupEnd();
             },
             onmessage: (msg, jsep) => {
-                console.log("[attachSubscriber]: onmessage")
-                console.log({msg, jsep});
+                console.group("[attachSubscriber, onmessage]");
+                console.log(msg)
+                console.log(jsep)
+                console.groupEnd()
 
                 const event = msg["videoroom"];
                 if (event) {
@@ -354,17 +380,31 @@ export class VideoRoomPlugin {
                 }
 
                 if (jsep !== undefined && jsep !== null) {
-                    console.log("createAnswer");
+                    console.group("[attachSubscriber, onmessage, createAnswer]");
                     pluginHandle.createAnswer({
                         jsep: jsep,
                         media: {audioSend: false, videoSend: false},
                         success: jsep => {
-                            console.log("Answer success");
-                            const body = {request: "start", room: this.roomId};
-                            pluginHandle.send({message: body, jsep: jsep});
+                            console.log("[attachSubscriber, onmessage, createAnswer] => success");
+
+                            const body = {
+                                request: "start",
+                                room: room
+                            };
+
+                            pluginHandle.send({
+                                message: body,
+                                jsep: jsep,
+                                success: () => {
+                                    console.log("[attachSubscriber, onmessage, start] => success");
+                                    console.groupEnd();
+                                }
+                            });
                         },
                         error: error => {
-                            Janus.error("WebRTC error:", error);
+                            console.log("[attachSubscriber, onmessage, start] => WebRTC error");
+                            console.log(error)
+                            console.groupEnd();
                         }
                     });
                 }
@@ -372,7 +412,16 @@ export class VideoRoomPlugin {
             onremotestream: stream => {
                 // this.determineSpeaker(stream, pluginHandle, id);
 
-                console.log("[attachSubscriber]: onremotestream: ", stream);
+                // console.group("[onremotestream]");
+                // console.log(stream)
+                // console.log(stream.getVideoTracks())
+                // console.log(stream.getAudioTracks())
+                // console.log(stream.id)
+                // console.log(stream.active)
+                // console.log(stream.ended)
+                // console.groupEnd()
+
+                this.emitEvent("userJoined", {id: pluginHandle.rfid, username: pluginHandle.rfdisplay, room: room, stream: stream})
 
                 // let filteredUser = store.getters.users.find(
                 //     user => user.username === pluginHandle.rfdisplay
@@ -383,8 +432,8 @@ export class VideoRoomPlugin {
                 // }, 500);
             },
             oncleanup: () => {
-                console.log("[attachSubscriber]: # Got a cleanup: " + id)
-                console.log("[attachSubscriber]: # End of cleanup")
+                console.log("[attachSubscriber, oncleanup]: # Got a cleanup: " + id)
+                console.log("[attachSubscriber, oncleanup]: # End of cleanup")
             }
         };
     }

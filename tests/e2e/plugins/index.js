@@ -30,7 +30,7 @@ module.exports = (on, config) => {
                 ],
             });
             const page = await browser.newPage();
-            await page.goto('https://localhost:8081/room/cypresstestroom');
+            await page.goto('http://localhost:8080/room/cypresstestroom');
             await page.click('#guestLoginBtn');
             await page.keyboard.type('puppeteeruser');
             await page.click('#continueAsGuestbtn');
