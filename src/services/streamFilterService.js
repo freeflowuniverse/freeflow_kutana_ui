@@ -21,20 +21,19 @@ const initializeBodyPixNet = async () => {
 }
 
 function drawImageScaled(img, ctx) {
-    var canvas = ctx.canvas ;
-    var hRatio = canvas.width  / img.width    ;
-    var vRatio =  canvas.height / img.height  ;
-    var ratio  = Math.max ( hRatio, vRatio );
-    var centerShift_x = ( canvas.width - img.width*ratio ) / 2;
-    var centerShift_y = ( canvas.height - img.height*ratio ) / 2;  
-    ctx.drawImage(img, 0,0, img.width, img.height,
-                       centerShift_x,centerShift_y,img.width*ratio, img.height*ratio);  
- }
+    var canvas = ctx.canvas;
+    var hRatio = canvas.width / img.width;
+    var vRatio = canvas.height / img.height;
+    var ratio = Math.max(hRatio, vRatio);
+    var centerShift_x = (canvas.width - img.width * ratio) / 2;
+    var centerShift_y = (canvas.height - img.height * ratio) / 2;
+    ctx.drawImage(img, 0, 0, img.width, img.height,
+        centerShift_x, centerShift_y, img.width * ratio, img.height * ratio);
+}
 
 class StreamFilterService {
 
-    constructor(mediaStream, defaultWallpaper, videoEnabled, audioEnabled, wallpaperEnabled) {
-        console.log(defaultWallpaper, videoEnabled, audioEnabled, wallpaperEnabled)
+    constructor(mediaStream, defaultWallpaper, videoPublished, audioEnabled, wallpaperEnabled) {
 
         this.mediaStream = mediaStream
         if (this.mediaStream.getAudioTracks().length > 0) {
@@ -47,13 +46,11 @@ class StreamFilterService {
         this.height = 480
 
         if (this.mediaStream.getVideoTracks().length > 0) {
-            this.imageCapture = new ImageCapture(this.mediaStream.getVideoTracks()[0]);
-            this.width = this.mediaStream.getVideoTracks()[0].getSettings().width
-            this.height = this.mediaStream.getVideoTracks()[0].getSettings().height
+            this.startVideo(this.mediaStream)
         }
 
         this.wallpaperEnabled = wallpaperEnabled
-        this.publishVideo = videoEnabled
+        this.publishVideo = videoPublished
         this.publishAudio = audioEnabled
 
 
@@ -69,14 +66,21 @@ class StreamFilterService {
         this.mirrorContext = this.mirrorCanvas.getContext("2d")
         this.resultContext = this.resultCanvas.getContext("2d")
         //When not using fakevideo, stream will stop if we dont capture frame every x milliseconds
-        this.fakeVideo = document.createElement('video');
-        this.fakeVideo.srcObject = this.mediaStream;
+
         this.bg = new Image()
-        console.log("wallpaper", defaultWallpaper)
         this.bg.src = defaultWallpaper
         this.person = new Image();
         this.person.src = "/person.png"
+        
 
+    }
+    async startVideo(mediaStream) {
+        this.videoTrack = mediaStream.getVideoTracks()[0];
+        this.imageCapture = new ImageCapture(this.videoTrack);
+        this.width = this.videoTrack.getSettings().width
+        this.height = this.videoTrack.getSettings().height
+        this.fakeVideo = document.createElement('video');
+        this.fakeVideo.srcObject = mediaStream;
     }
     async setWallpaper(wallpaperDataUrl) {
         this.bg.src = wallpaperDataUrl
@@ -86,12 +90,10 @@ class StreamFilterService {
         let image = new Image(); // pre init
         var capture = await this.imageCapture.grabFrame()
         image = await createImageBitmap(capture)
+
         return image
-
-
     }
     async init() {
-
         await initializeBodyPixNet()
         this.initialized = true
     }
@@ -154,8 +156,8 @@ class StreamFilterService {
     toggleVideo() {
         this.publishVideo = !this.publishVideo
     }
-    changeSettings(videoEnabled, audioEnabled, wallpaperEnabled) {
-        this.publishVideo = videoEnabled
+    changeSettings(videoPublished, audioEnabled, wallpaperEnabled) {
+        this.publishVideo = videoPublished
         this.publishAudio = audioEnabled
         this.wallpaperEnabled = wallpaperEnabled
         this.audiotrack.enabled = audioEnabled

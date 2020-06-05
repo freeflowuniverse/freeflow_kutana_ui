@@ -12,7 +12,7 @@ export default {
         audioInputDevices: [],
         audioOutputDevices: [],
         permissionError: false,
-        videoEnabled: window.localStorage.getItem('videoEnabled') ? JSON.parse(window.localStorage.getItem('videoEnabled')) : false,
+        videoPublished: window.localStorage.getItem('videoPublished') ? JSON.parse(window.localStorage.getItem('videoPublished')) : false,
         micEnabled: window.localStorage.getItem('micEnabled') ? JSON.parse(window.localStorage.getItem('micEnabled')) : false,
         wallpaperEnabled: window.localStorage.getItem('wallpaperEnabled') ? JSON.parse(window.localStorage.getItem('wallpaperEnabled')) : false,
     },
@@ -67,9 +67,9 @@ export default {
         setPermissionError(state) {
             state.permissionError = true
         },
-        setVideoEnabled(state, enabled) {
-            window.localStorage.setItem('videoEnabled', enabled)
-            state.videoEnabled = enabled
+        setVideoPublished(state, enabled) {
+            window.localStorage.setItem('videoPublished', enabled)
+            state.videoPublished = enabled
         },
         setMicEnabled(state, enabled) {
             window.localStorage.setItem('micEnabled', enabled)
@@ -83,7 +83,7 @@ export default {
     actions: {
         clearDeviceSelection(context) {
             context.commit('setMicEnabled', false)
-            context.commit('setVideoEnabled', false)
+            context.commit('setVideoPublished', false)
             context.commit('setWallPaperEnabled', false)
             context.commit('activeAudioDevice', null)
             context.commit('activeVideoDevice', null)
@@ -117,9 +117,10 @@ export default {
                     audio: hasSpecificAudio ? { deviceId: { exact: audioDevice } } : audio,
                     video: hasSpecificVideo ? { deviceId: { exact: videoDevice } } : video
                 })
+                stream.audioConstraints = { deviceId: { exact: audioDevice } }
+                stream.videoConstraints = { deviceId: { exact: videoDevice } }
 
-
-                commit('setVideoEnabled', video)
+                commit('setVideoPublished', video)
                 commit('setMicEnabled', audio)
                 dispatch('refreshDevices');
                 commit('refreshActiveDevices', stream.getTracks());
@@ -140,7 +141,7 @@ export default {
             });
             commit('setAudioOutputDevice', audioOutputDevice);
         },
-        setVideoEnabled({ commit }, enabled) { commit('setVideoEnabled', enabled) },
+        setVideoPublished({ commit }, enabled) { commit('setVideoPublished', enabled) },
         setMicEnabled({ commit }, enabled) { commit('setMicEnabled', enabled) },
         setWallPaperEnabled({ commit }, enabled) { commit('setWallPaperEnabled', enabled) },
     },
@@ -153,7 +154,7 @@ export default {
         activeAudioOutputDevice: state => state.activeAudioOutputDevice || state.audioOutputDevices[0],
         localStream: state => state.stream,
         permissionError: state => state.permissionError,
-        videoEnabled: state => state.videoEnabled,
+        videoPublished: state => state.videoPublished,
         micEnabled: state => state.micEnabled,
         wallpaperEnabled: state => state.wallpaperEnabled
 

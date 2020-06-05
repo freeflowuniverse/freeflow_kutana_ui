@@ -435,27 +435,48 @@ export const janusHelpers = {
         }
     },
     async changeWallpaper(wallpaperDataUrl) {
-        if(wallpaperDataUrl === undefined){
+        if (wallpaperDataUrl === undefined) {
             wallpaperDataUrl = "/default_background.png"
         }
         this.streamFilterService.setWallpaper(wallpaperDataUrl)
         localForage.setItem("wallpaper", wallpaperDataUrl)
 
     },
-    changeDevice(isCameraActive, isAudioActive, newAudioDeviceId, newVideoDeviceId, wallpaperEnabled) {
+    async changeDevice(isCameraActive, isAudioActive, newAudioDeviceId, newVideoDeviceId, wallpaperEnabled) {
+        if (!isCameraActive) {
+            this.streamFilterService.changeSettings(isCameraActive, isAudioActive, wallpaperEnabled)
+            setTimeout(() => {
+                this.currentVideo.stop()
+                this.mediaStream.removeTrack(this.currentVideo) // This will stop the camera led, do it 200ms later or get race condition
+            }, 200)
+            return
+        }
+        //Get the video stream again and put it in the filter
+        const tempStream = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId: { exact: newVideoDeviceId } }
+        })
+
+        this.streamFilterService.startVideo(tempStream)
+        this.currentVideo = tempStream.getVideoTracks()[0]
         this.streamFilterService.changeSettings(isCameraActive, isAudioActive, wallpaperEnabled)
-        console.log({ isCameraActive, isAudioActive, newAudioDeviceId, newVideoDeviceId, wallpaperEnabled });
     },
     async publishOwnFeed() {
         this.wallpaperEnabled = store.getters.wallpaperEnabled
 
         this.mediaStream = store.getters.localStream
+
+        if (this.mediaStream.getVideoTracks().length > 0) {
+            this.currentVideo = this.mediaStream.getVideoTracks()[0]
+        }
+        if (this.mediaStream.getAudioTracks().length > 0) {
+            this.currentAudio = this.mediaStream.getAudioTracks()[0]
+        }
+
         const useAudio = !!this.mediaStream.getAudioTracks().length
-        this.streamFilterService = new StreamFilterService(this.mediaStream, "/default_background.png", store.getters.videoEnabled, store.getters.micEnabled, this.wallpaperEnabled)
+        this.streamFilterService = new StreamFilterService(this.mediaStream, "/default_background.png", store.getters.videoPublished, store.getters.micEnabled, this.wallpaperEnabled)
         this.stream = await this.streamFilterService.getResultStream()
         this.streamFilterService.start()
 
-        console.log(this.stream)
         /* use the stream */
         store.getters.users[0].pluginHandle.createOffer({
             simulcast: false,
@@ -567,7 +588,7 @@ export const janusHelpers = {
                 };
 
                 if (!filteredUser) {
-                    
+
 
                     const users = store.getters.users;
                     users.push(newUser);

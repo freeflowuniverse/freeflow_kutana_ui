@@ -94,7 +94,7 @@
     <!-- <v-card class="secondary pa-1" dark v-else> -->
     <v-row class="mx-2" justify="center" align="center" style="height:60px">
       <v-btn @click="toggleCamera" icon class="mr-1">
-        <v-icon v-if="videoEnabled">videocam</v-icon>
+        <v-icon v-if="videoPublished">videocam</v-icon>
         <v-icon v-else>videocam_off</v-icon>
       </v-btn>
 
@@ -150,7 +150,7 @@
 
 <script>
 import { Janus } from "janus-gateway";
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapMutations } from "vuex";
 import { janusHelpers } from "@/services/Janusservice";
 
 export default {
@@ -169,6 +169,7 @@ export default {
     };
   },
   mounted() {
+    this.videoDevice = this.activeVideoDevice.deviceId;
     this.$root.$on("showInviteUser", this.showAddUserDialog);
     this.refreshDevices();
   },
@@ -185,7 +186,7 @@ export default {
       "activeAudioDevice",
       "activeVideoDevice",
       "activeAudioOutputDevice",
-      "videoEnabled",
+      "videoPublished",
       "micEnabled",
       "wallpaperEnabled"
     ]),
@@ -205,9 +206,12 @@ export default {
       "clearStorage",
       "refreshDevices",
       "setAudioOutputDevice",
-      "setVideoEnabled",
+      "setVideoPublished",
       "setMicEnabled",
       "setWallPaperEnabled"
+    ]),
+    ...mapMutations([
+      "setVideoDevice"
     ]),
     canScreenShare: function() {
       return !!navigator.mediaDevices.getDisplayMedia;
@@ -218,7 +222,7 @@ export default {
     },
     toggleSettings: function() {
       this.refreshDevices();
-      this.videoDevice = this.activeVideoDevice.deviceId;
+      this.setVideoDevice(this.videoDevice)
       this.audioInputDevice = this.activeAudioDevice.deviceId;
       if (this.activeAudioOutputDevice)
         this.audioOutputDevice = this.activeAudioOutputDevice.deviceId;
@@ -226,7 +230,7 @@ export default {
     },
     changeDevice: function() {
       janusHelpers.changeDevice(
-        this.videoEnabled,
+        this.videoPublished,
         this.micEnabled,
         this.audioInputDevice,
         this.videoDevice,
@@ -262,12 +266,12 @@ export default {
 
     toggleCamera: function() {
       //todo check if camera can be activated.
-      this.setVideoEnabled(!this.videoEnabled);
+      this.setVideoPublished(!this.videoPublished);
       Janus.log(
-        (this.videoEnabled ? "Disabling" : "Enabling") + " local camera..."
+        (this.videoPublished ? "Disabling" : "Enabling") + " local camera..."
       );
       this.setSnackbarMessage({
-        text: `Camera ${this.videoEnabled ? "enabled" : "disabled"}`
+        text: `Camera ${this.videoPublished ? "enabled" : "disabled"}`
       });
       this.changeDevice();
     },

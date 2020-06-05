@@ -94,7 +94,7 @@ export default {
       "initialiseDevices",
       "join",
       "getTeamInfo",
-      "setVideoEnabled",
+      "setVideoPublished",
       "setMicEnabled",
       "setInputSelection"
     ]),
@@ -137,7 +137,7 @@ export default {
       }
     },
     video: function(newVideo) {
-      this.setVideoEnabled(newVideo);
+      this.setVideoPublished(newVideo);
       if (!newVideo && this.localStream) {
         this.stopTracks();
         this.removeStream();
