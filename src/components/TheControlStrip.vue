@@ -40,7 +40,7 @@
             hide-details
             :disabled="videoInputDevices.length <= 0"
           ></v-select>
-          <v-select
+          <!-- <v-select
             v-model="audioInputDevice"
             dense
             prepend-icon="mic"
@@ -67,7 +67,7 @@
             class="my-4"
             hide-details
             :disabled="audioOutputDevices.length <= 0"
-          ></v-select>
+          ></v-select> -->
           <v-file-input
             dense
             v-model="wallpaperFile"

@@ -456,9 +456,12 @@ export const janusHelpers = {
             video: { deviceId: { exact: newVideoDeviceId } }
         })
 
-        this.streamFilterService.startVideo(tempStream)
         this.currentVideo = tempStream.getVideoTracks()[0]
-        this.streamFilterService.changeSettings(isCameraActive, isAudioActive, wallpaperEnabled)
+        setTimeout(() => {
+
+            this.streamFilterService.startVideo(tempStream)
+            this.streamFilterService.changeSettings(isCameraActive, isAudioActive, wallpaperEnabled)
+        }, 200)
     },
     async publishOwnFeed() {
         this.wallpaperEnabled = store.getters.wallpaperEnabled
