@@ -12,6 +12,7 @@ export default {
     screenShareRoom: null,
     myPrivateId: null,
     roomId: null,
+    inputSelection: null, //for which room did you do input selection
     feeds: [],
     opaqueId: "videoroom-" + Janus.randomString(12),
     selectedUser: null,
@@ -67,6 +68,9 @@ export default {
     },
     selectUser(state, user) {
       state.selectedUser = user;
+    }, 
+    setInputSelection(state, room) {
+      state.inputSelection = room;
     },
     shareScreen() {
       console.log("shareScreen")
@@ -75,7 +79,7 @@ export default {
     },
     joinScreen(state, id) {
       console.log("joinScreen")
-      if(state.screenShareRole === "publisher") {
+      if (state.screenShareRole === "publisher") {
         console.log("I am a publisher, cant join again ...")
         return;
       }
@@ -94,7 +98,7 @@ export default {
     initializeJanus(context) {
       Janus.init({
         debug: "all",
-        callback: function() {
+        callback: function () {
           if (!Janus.isWebrtcSupported()) {
             console.error("No WebRTC support... ");
             return;
@@ -102,14 +106,14 @@ export default {
 
           const janus = new Janus({
             server: config.janusServer,
-            success: function() {
+            success: function () {
               janusHelpers.videoRoom.onJanusCreateSuccess();
             },
-            error: function(error) {
+            error: function (error) {
               console.error("Janus error callback: ", error);
               // janusHelpers.videoRoom.onJanusCreateError(context, error);
             },
-            destroyed: function() {
+            destroyed: function () {
               console.error("Janus destroyed callback");
               janusHelpers.videoRoom.onJanusCreateDestroyed();
             }
@@ -136,6 +140,9 @@ export default {
     },
     setRoomId(context, roomId) {
       context.commit("setRoomId", roomId);
+    },
+    setInputSelection(context, room) {
+      context.commit("setInputSelection", room);
     }
   },
   getters: {
@@ -151,6 +158,7 @@ export default {
     opaqueId: state => state.opaqueId,
     selectedUser: state => state.selectedUser,
     users: state => state.users,
-    screenShare: state => state.screenShare
+    screenShare: state => state.screenShare,
+    inputSelection: state => state.inputSelection
   }
 };

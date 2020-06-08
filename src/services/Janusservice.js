@@ -3,7 +3,10 @@ import router from "../plugins/router";
 import socketService from "./socketService";
 import store from "../plugins/vuex";
 
+import * as localForage from "localforage";
+import StreamFilterService from "./streamFilterService"
 let inThrottle;
+
 
 const hashString = str => {
     let hash = 0;
@@ -90,7 +93,7 @@ export const janusHelpers = {
                     users[0].pluginHandle = pluginHandle;
 
                     store.commit("setUsers", users);
-                    janusHelpers.registerUsername();
+                    janusHelpers.createRoom();
                 },
                 error: error => {
                     Janus.error("  -- Error attaching plugin...", error);
@@ -98,20 +101,19 @@ export const janusHelpers = {
                 onmessage: (msg, jsep) => {
 
                     console.log("msg: ")
-                    console.log({msg})
-                    console.log({jsep})
+                    console.log({ msg })
+                    console.log({ jsep })
                     const event = msg["videoroom"];
 
-                    console.log({event})
+                    console.log({ event })
 
                     if (!event) {
                         return;
                     }
-
                     switch (event) {
                         case "joined":
                             store.commit("setMyPrivateId", msg["private_id"]);
-                            janusHelpers.publishOwnFeed(true);
+                            janusHelpers.publishOwnFeed();
 
                             if (
                                 !(msg["publishers"] !== undefined && msg["publishers"] !== null)
@@ -199,12 +201,14 @@ export const janusHelpers = {
                     store.commit("setUsers", users);
                 }
             });
+
+
         },
 
         onJanusCreateError(context, error) {
             Janus.error(error);
 
-            router.push({name: "home"}).then(() => {
+            router.push({ name: "home" }).then(() => {
                 context.commit("setSnackbarMessage", {
                     type: "error",
                     text: "Oops, our server seems to have a problem."
@@ -247,8 +251,8 @@ export const janusHelpers = {
                     });
                 },
                 onmessage: (msg, jsep) => {
-                    console.log({msg})
-                    console.log({jsep})
+                    console.log({ msg })
+                    console.log({ jsep })
                     const event = msg["videoroom"];
                     if (event) {
                         switch (event) {
@@ -430,21 +434,62 @@ export const janusHelpers = {
             store.getters.users[0].screenSharePluginHandle.detach();
         }
     },
-    publishOwnFeed(useAudio) {
+    async changeWallpaper(wallpaperDataUrl) {
+        if (wallpaperDataUrl === undefined) {
+            wallpaperDataUrl = "/default_background.png"
+        }
+        this.streamFilterService.setWallpaper(wallpaperDataUrl)
+        localForage.setItem("wallpaper", wallpaperDataUrl)
+
+    },
+    async changeDevice(isCameraActive, isAudioActive, newAudioDeviceId, newVideoDeviceId, wallpaperEnabled) {
+        if (!isCameraActive) {
+            this.streamFilterService.changeSettings(isCameraActive, isAudioActive, wallpaperEnabled)
+            setTimeout(() => {
+                this.currentVideo.stop()
+                this.mediaStream.removeTrack(this.currentVideo) // This will stop the camera led, do it 200ms later or get race condition
+            }, 200)
+            return
+        }
+        //Get the video stream again and put it in the filter
+        const tempStream = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId: { exact: newVideoDeviceId } }
+        })
+
+        this.currentVideo = tempStream.getVideoTracks()[0]
+        setTimeout(() => {
+
+            this.streamFilterService.startVideo(tempStream)
+            this.streamFilterService.changeSettings(isCameraActive, isAudioActive, wallpaperEnabled)
+        }, 200)
+    },
+    async publishOwnFeed() {
+        this.wallpaperEnabled = store.getters.wallpaperEnabled
+
+        this.mediaStream = store.getters.localStream
+
+        if (this.mediaStream.getVideoTracks().length > 0) {
+            this.currentVideo = this.mediaStream.getVideoTracks()[0]
+        }
+        if (this.mediaStream.getAudioTracks().length > 0) {
+            this.currentAudio = this.mediaStream.getAudioTracks()[0]
+        }
+
+        const useAudio = !!this.mediaStream.getAudioTracks().length
+        this.streamFilterService = new StreamFilterService(this.mediaStream, "/default_background.png", store.getters.videoPublished, store.getters.micEnabled, this.wallpaperEnabled)
+        this.stream = await this.streamFilterService.getResultStream()
+        this.streamFilterService.start()
+
+        /* use the stream */
         store.getters.users[0].pluginHandle.createOffer({
-            media: {
-                audioRecv: false,
-                videoRecv: false,
-                audioSend: useAudio,
-                videoSend: true
-            },
             simulcast: false,
             simulcast2: false,
+            stream: this.stream,
             success: jsep => {
-                const publish = {request: "configure", audio: useAudio, video: true};
+                const publish = { request: "configure", audio: useAudio, video: true };
                 store.getters.users[0].pluginHandle.send({
                     message: publish,
-                    jsep: jsep
+                    jsep
                 });
             },
             error: error => {
@@ -454,6 +499,7 @@ export const janusHelpers = {
                 }
             }
         });
+
     },
     newRemoteFeed(id, display, audio, video) {
         let remoteFeed = null;
@@ -483,7 +529,7 @@ export const janusHelpers = {
                     subscribe["offer_video"] = false;
                 }
                 remoteFeed.videoCodec = video;
-                remoteFeed.send({message: subscribe});
+                remoteFeed.send({ message: subscribe });
             },
             error: error => {
                 Janus.error("  -- Error attaching plugin...", error);
@@ -519,10 +565,10 @@ export const janusHelpers = {
                 if (jsep !== undefined && jsep !== null) {
                     remoteFeed.createAnswer({
                         jsep: jsep,
-                        media: {audioSend: false, videoSend: false},
+                        media: { audioSend: false, videoSend: false },
                         success: jsep => {
-                            const body = {request: "start", room: store.getters.roomId};
-                            remoteFeed.send({message: body, jsep: jsep});
+                            const body = { request: "start", room: store.getters.roomId };
+                            remoteFeed.send({ message: body, jsep: jsep });
                         },
                         error: error => {
                             Janus.error("WebRTC error:", error);
@@ -537,13 +583,15 @@ export const janusHelpers = {
                     user => user.username === remoteFeed.rfdisplay
                 );
 
+                let newUser = {
+                    id: id,
+                    username: remoteFeed.rfdisplay,
+                    stream: stream,
+                    pluginHandle: remoteFeed
+                };
+
                 if (!filteredUser) {
-                    let newUser = {
-                        id: id,
-                        username: remoteFeed.rfdisplay,
-                        stream: stream,
-                        pluginHandle: remoteFeed
-                    };
+
 
                     const users = store.getters.users;
                     users.push(newUser);
@@ -555,7 +603,7 @@ export const janusHelpers = {
                     }, 500);
                 } else {
                     const users = store.getters.users;
-                    users.splice(users.findIndex(user => user.id === filteredUser.id), 1, filteredUser);
+                    users.splice(users.findIndex(user => user.id === filteredUser.id), 1, newUser);
 
                     store.commit("setUsers", users);
                 }
@@ -592,7 +640,7 @@ export const janusHelpers = {
                     ptype: "listener",
                     feed: id
                 };
-                remoteFeed.send({message: listen});
+                remoteFeed.send({ message: listen });
             },
             error: error => {
                 Janus.error("  -- Error attaching plugin...", error);
@@ -609,13 +657,13 @@ export const janusHelpers = {
                 if (jsep !== undefined && jsep !== null) {
                     remoteFeed.createAnswer({
                         jsep: jsep,
-                        media: {audioSend: false, videoSend: false},
+                        media: { audioSend: false, videoSend: false },
                         success: jsep => {
                             const body = {
                                 request: "start",
                                 room: store.getters.screenShareRoom
                             };
-                            remoteFeed.send({message: body, jsep: jsep});
+                            remoteFeed.send({ message: body, jsep: jsep });
                         },
                         error: error => {
                             Janus.error("WebRTC error:", error);
@@ -653,7 +701,7 @@ export const janusHelpers = {
                 room: room
             },
             success: (result) => {
-                if(result.exists) {
+                if (result.exists) {
                     console.log("=> Room already exists")
                     janusHelpers.joinRoom(room, me.name)
                     return;
@@ -684,6 +732,7 @@ export const janusHelpers = {
     },
 
     joinRoom(room, name) {
+        console.log(room, name)
         console.log("=> Joining room")
         store.getters.users[0].pluginHandle.send({
             message: {
@@ -698,7 +747,5 @@ export const janusHelpers = {
             }
         });
     },
-    registerUsername() {
-        janusHelpers.createRoom();
-    }
+
 };

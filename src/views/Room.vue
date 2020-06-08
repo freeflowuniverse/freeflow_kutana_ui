@@ -39,12 +39,16 @@
       </div>
     </div>
 
-    <TheMainUserControls :grid="isGrid" :minimal="isMobile" id="TheMainUserControls" class="grey lighten-4"/>
+    <TheMainUserControls
+      :grid="isGrid"
+      :minimal="isMobile"
+      id="TheMainUserControls"
+      class="grey lighten-4"
+    />
     <div class="sidebar" v-if="showSidebar" ref="sidebar">
       <p class="resizer" ref="rez" @mousedown="startDrag"></p>
-      <TheSidebar  />
+      <TheSidebar />
     </div>
-
   </div>
 </template>
 
@@ -55,6 +59,8 @@ import TheSelectedUser from "../components/TheSelectedUser";
 import UserList from "../components/UserList";
 import TheSidebar from "../components/TheSidebar";
 import TheMainUserControls from "../components/TheControlStrip";
+import { janusHelpers } from "@/services/Janusservice";
+
 // TODO: margin right when in grid && no
 export default {
   components: {
@@ -74,17 +80,28 @@ export default {
     };
   },
   beforeMount() {
+    if (this.inputSelection != this.$route.params.token) {
+      //check if the current room has approved input selection
+      this.$router.push({
+        name: "joinRoom",
+        params: { token: this.$route.params.token }
+      });
+      return
+    }
     this.isGrid = this.isGridView;
-    this.join(this.$route.params.token);
+    this.join(this.$route.params.token); // join in py backend
     this.getTeamInfo();
   },
   mounted() {
+    if (this.inputSelection != this.$route.params.token) { // dont do anything if we need to do input selection first
+      return;
+    }
     if (this.account && this.account.name && this.teamName) {
       this.setRoomId(Math.abs(this.hashString(this.teamName)));
     }
 
     this.$root.$on("toggleGridPresentation", () => {
-      this.changeViewStyle(this.isGrid ? 'Default' : 'Grid')
+      this.changeViewStyle(this.isGrid ? "Default" : "Grid");
       this.isGrid = !this.isGrid;
     });
 
@@ -101,7 +118,14 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["setSnackbarMessage", "initializeJanus", "getTeamInfo", "join", "setRoomId", "changeViewStyle"]),
+    ...mapActions([
+      "setSnackbarMessage",
+      "initializeJanus",
+      "getTeamInfo",
+      "join",
+      "setRoomId",
+      "changeViewStyle"
+    ]),
     hashString(str) {
       let hash = 0;
       for (let i = 0; i < str.length; i++) {
@@ -124,19 +148,23 @@ export default {
         });
     },
     startDrag(e) {
-      e.disable
-      this.startX = e.clientX
-      this.startWidth = parseInt(document.defaultView.getComputedStyle(this.$refs.sidebar).width, 10);
-      document.addEventListener('mousemove', this.doDrag, false);
-      document.addEventListener('mouseup', this.stopDrag, false);
+      e.disable;
+      this.startX = e.clientX;
+      this.startWidth = parseInt(
+        document.defaultView.getComputedStyle(this.$refs.sidebar).width,
+        10
+      );
+      document.addEventListener("mousemove", this.doDrag, false);
+      document.addEventListener("mouseup", this.stopDrag, false);
     },
     stopDrag() {
-      document.removeEventListener('mousemove', this.doDrag, false);
-      document.removeEventListener('mouseup', this.stopDrag, false);
+      document.removeEventListener("mousemove", this.doDrag, false);
+      document.removeEventListener("mouseup", this.stopDrag, false);
     },
     doDrag(e) {
-      console.log(e)
-      this.$refs.sidebar.style.width = (this.startWidth + this.startX - e.clientX) + 'px';
+      console.log(e);
+      this.$refs.sidebar.style.width =
+        this.startWidth + this.startX - e.clientX + "px";
     }
   },
   computed: {
@@ -147,7 +175,8 @@ export default {
       "account",
       "screenShare",
       "selectedUser",
-      "isGridView"
+      "isGridView",
+      "inputSelection"
     ]),
     isMobile() {
       return this.$vuetify.breakpoint.mdAndDown;
@@ -186,8 +215,8 @@ export default {
         if (val) this.showSidebar = false;
       }
     },
-    users (val) {
-      this.showUserList = val && val.length > 2
+    users(val) {
+      this.showUserList = val && val.length > 2;
     },
     screenShare(val) {
       if (val) {
@@ -252,7 +281,7 @@ export default {
 
   width: 100vw;
   display: grid;
-  grid-template-rows:  1fr minmax(0px, auto) 60px;
+  grid-template-rows: 1fr minmax(0px, auto) 60px;
   grid-template-areas: "selected" "userList" "controls";
   gap: 8px 0px;
   .hide-video-list {
@@ -266,7 +295,7 @@ export default {
     width: 25%;
     height: auto;
   }
-  #selectedStream{
+  #selectedStream {
     background: white;
   }
   &.show-sidebar {
@@ -308,9 +337,9 @@ export default {
   max-width: 900px;
   position: relative;
 
-  .resizer{
+  .resizer {
     width: 10px;
-    left:-5px;
+    left: -5px;
     height: 100%;
     background: #000;
     position: absolute;
