@@ -6570,9 +6570,9 @@ istanbul-reports@^2.2.6:
   dependencies:
     html-escaper "^2.0.0"
 
-"janus-gateway@git://github.com/threefoldtech/freeflowconnect_janus.git":
+"janus-gateway@git://github.com/meetecho/janus-gateway.git":
   version "0.7.5"
-  resolved "git://github.com/threefoldtech/freeflowconnect_janus.git#704e20ce4045db1005951b1e50321429528b71dd"
+  resolved "git://github.com/meetecho/janus-gateway.git#5d56572c3029244d82b6f29f0e7dcc7df196819c"
   dependencies:
     webrtc-adapter "6.4.0"
 

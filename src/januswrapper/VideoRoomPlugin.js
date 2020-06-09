@@ -25,9 +25,13 @@ export class VideoRoomPlugin {
         this.myRoom = null;
         this.myUsername = null;
         this.myStream = null;
+        this.droidCamDeviceId = null;
+        this.myWebcamDeviceId = null;
     }
 
     attach() {
+
+
         return {
             plugin: "janus.plugin.videoroom",
             opaqueId: this.opaqueId,
@@ -135,6 +139,22 @@ export class VideoRoomPlugin {
 
     onAttachSucces(pluginHandle) {
         this.pluginHandle = pluginHandle;
+
+        Janus.listDevices((devices) => {
+            for (let device of devices) {
+
+
+                console.log(device)
+            }
+            // console.log("Devices: ", devices)
+        });
+
+        // Webcam
+        // 7994d5c6644367e3ccfede53b5447077476b8a5eb0d03f3f2a385397cb3a3ca1
+
+        // Droidcam
+        // c04640b4b138b120bd2c4b68abf31dbe90ea896ea70cbc1ba9c2bbc35c9a2622
+
         this.emitEvent("pluginAttached", pluginHandle);
     }
 
@@ -157,6 +177,18 @@ export class VideoRoomPlugin {
         // if(msg.leaving) {
         //     console.log("Got leaving msg")
         // }
+
+
+        if (jsep) {
+            console.group("[onMessage, handleRemoteJsep]");
+            this.pluginHandle.handleRemoteJsep({
+                jsep: jsep,
+                success: () => {
+                    console.log("handleRemoteJsep => success")
+                    console.groupEnd()
+                }
+            });
+        }
 
         if(msg.videoroom === "joined") {
             this.myPrivateId = msg.private_id;
@@ -189,35 +221,14 @@ export class VideoRoomPlugin {
 
         }
 
-        if (!jsep) {
-            return;
-        }
-
-        console.group("[onMessage, handleRemoteJsep]");
-        this.pluginHandle.handleRemoteJsep({
-            jsep: jsep,
-            success: () => {
-                console.log("handleRemoteJsep => success")
-                console.groupEnd()
-            }
-        });
     }
 
     async publishOwnFeed() {
         console.group("[publishOwnFeed]")
 
-        this.myStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+        // this.myStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
 
         this.pluginHandle.createOffer({
-            media: {
-                audioRecv: false,
-                videoRecv: false,
-                audioSend: true,
-                videoSend: true
-            },
-            simulcast: false,
-            simulcast2: false,
-            stream: this.myStream,
             success: jsep => {
                 console.log(" * createOffer => success");
                 const publish = { request: "configure", audio: true, video: true };
@@ -240,6 +251,123 @@ export class VideoRoomPlugin {
                 console.groupEnd()
             }
         });
+    }
+
+    restartCapture() {
+        // Negotiate WebRTC
+        let body = { audio: true, video: true };
+
+        // if(acodec)
+        //     body["audiocodec"] = acodec;
+        // if(vcodec)
+        //     body["videocodec"] = vcodec;
+        // if(vprofile)
+        //     body["videoprofile"] = vprofile;
+
+        this.pluginHandle.send({ message: body });
+
+        let replaceAudio = true;
+        let audioDeviceId = "000ea9620537cf15ce7de8c8afac38d4218a9d920af4e28c3c369ffa660a6850";
+
+        let replaceVideo = true;
+        let videoDeviceId = "d62d1b4a1a234733a244a06c09c9618094fd090c05da137440c8585dd045507f";
+
+        this.pluginHandle.createOffer(
+            {
+                media: {
+                    audio: {
+                        deviceId: {
+                            exact: audioDeviceId
+                        }
+                    },
+                    replaceAudio: replaceAudio,
+                    video: {
+                        deviceId: {
+                            exact: videoDeviceId
+                        }
+                    },
+                    replaceVideo: replaceVideo,
+                },
+                success: (jsep) => {
+                    Janus.debug("Got SDP!", jsep);
+                    this.pluginHandle.send({ message: body, jsep: jsep });
+                },
+                error: function(error) {
+                    Janus.error("WebRTC error:", error);
+                }
+            });
+    }
+
+    async republishToScreenshare() {
+
+        // this.restartCapture()
+
+
+        let body = { audio: true, video: true };
+
+        // if(acodec)
+        //     body["audiocodec"] = acodec;
+        // if(vcodec)
+        //     body["videocodec"] = vcodec;
+        // if(vprofile)
+        //     body["videoprofile"] = vprofile;
+
+        this.pluginHandle.send({ message: body });
+
+        let replaceAudio = true;
+        let audioDeviceId = "000ea9620537cf15ce7de8c8afac38d4218a9d920af4e28c3c369ffa660a6850";
+
+        let replaceVideo = true;
+        let videoDeviceId = "d62d1b4a1a234733a244a06c09c9618094fd090c05da137440c8585dd045507f";
+
+        this.pluginHandle.createOffer(
+            {
+                media: {
+                    removeVideo: true,
+                },
+                success: (jsep) => {
+                    Janus.debug("Got SDP!", jsep);
+                    this.pluginHandle.send({ message: body, jsep: jsep });
+                },
+                error: function(error) {
+                    Janus.error("WebRTC error:", error);
+                }
+            });
+
+    }
+
+    async anotherButton() {
+
+        let body = { audio: true, video: true };
+
+        // if(acodec)
+        //     body["audiocodec"] = acodec;
+        // if(vcodec)
+        //     body["videocodec"] = vcodec;
+        // if(vprofile)
+        //     body["videoprofile"] = vprofile;
+
+        this.pluginHandle.send({ message: body });
+
+        let replaceAudio = true;
+        let audioDeviceId = "000ea9620537cf15ce7de8c8afac38d4218a9d920af4e28c3c369ffa660a6850";
+
+        let replaceVideo = true;
+        let videoDeviceId = "d62d1b4a1a234733a244a06c09c9618094fd090c05da137440c8585dd045507f";
+
+        this.pluginHandle.createOffer(
+            {
+                media: {
+                    addVideo: true,
+                },
+                success: (jsep) => {
+                    Janus.debug("Got SDP!", jsep);
+                    this.pluginHandle.send({ message: body, jsep: jsep });
+                },
+                error: function(error) {
+                    Janus.error("WebRTC error:", error);
+                }
+            });
     }
 
     onLocalStream(stream) {
@@ -352,33 +480,6 @@ export class VideoRoomPlugin {
                 console.log(jsep)
                 console.groupEnd()
 
-                const event = msg["videoroom"];
-                if (event) {
-                    switch (event) {
-                        case "attached":
-                            for (let i = 1; i < 16; i++) {
-                                if (
-                                    this.feeds[i] === undefined ||
-                                    this.feeds[i] === null
-                                ) {
-                                    this.feeds[i] = pluginHandle;
-                                    pluginHandle.rfindex = i;
-                                    break;
-                                }
-                            }
-                            pluginHandle.rfid = msg["id"];
-                            pluginHandle.rfdisplay = msg["display"];
-                            break;
-                        case "event":
-                            if (msg["substream"] || msg["temporal"]) {
-                                if (!pluginHandle.simulcastStarted) {
-                                    pluginHandle.simulcastStarted = true;
-                                }
-                            }
-                            break;
-                    }
-                }
-
                 if (jsep !== undefined && jsep !== null) {
                     console.group("[attachSubscriber, onmessage, createAnswer]");
                     pluginHandle.createAnswer({
@@ -408,32 +509,43 @@ export class VideoRoomPlugin {
                         }
                     });
                 }
+
+                const event = msg["videoroom"];
+
+                if (event) {
+                    switch (event) {
+                        case "attached":
+                            for (let i = 1; i < 16; i++) {
+                                if (
+                                    this.feeds[i] === undefined ||
+                                    this.feeds[i] === null
+                                ) {
+                                    this.feeds[i] = pluginHandle;
+                                    pluginHandle.rfindex = i;
+                                    break;
+                                }
+                            }
+                            pluginHandle.rfid = msg["id"];
+                            pluginHandle.rfdisplay = msg["display"];
+                            break;
+                        case "event":
+                            if (msg["substream"] || msg["temporal"]) {
+                                if (!pluginHandle.simulcastStarted) {
+                                    pluginHandle.simulcastStarted = true;
+                                }
+                            }
+                            break;
+                    }
+                }
+
+
             },
             onremotestream: stream => {
-                // this.determineSpeaker(stream, pluginHandle, id);
-
-                // console.group("[onremotestream]");
-                // console.log(stream)
-                // console.log(stream.getVideoTracks())
-                // console.log(stream.getAudioTracks())
-                // console.log(stream.id)
-                // console.log(stream.active)
-                // console.log(stream.ended)
-                // console.groupEnd()
-
                 this.emitEvent("userJoined", {id: pluginHandle.rfid, username: pluginHandle.rfdisplay, room: room, stream: stream})
-
-                // let filteredUser = store.getters.users.find(
-                //     user => user.username === pluginHandle.rfdisplay
-                // );
-
-                // setTimeout(() => {
-                //     store.commit("setSelectedUser", newUser);
-                // }, 500);
             },
             oncleanup: () => {
-                console.log("[attachSubscriber, oncleanup]: # Got a cleanup: " + id)
-                console.log("[attachSubscriber, oncleanup]: # End of cleanup")
+                console.log("[oncleanup]: ", pluginHandle.rfid)
+                this.emitEvent("userLeft", {id: pluginHandle.rfid, username: pluginHandle.rfdisplay, room: room, stream: null})
             }
         };
     }
