@@ -1,15 +1,23 @@
 <template>
     <div>
-        <p>because ...</p>
-        <button v-on:click="republish">Republish</button>
-        <button v-on:click="anotherButton">button2</button>
-        <video :src-object.prop.camel="ownUserStream" muted autoplay playsinline></video>
-<!--        <audio :src-object.prop.camel="ownUserStream" autoplay></audio>-->
+        <div class="buttons" style="padding-bottom: 10px;">
+            <v-btn v-on:click="startScreenshare">start screenshare</v-btn>
+            <v-btn v-on:click="startCamera">start camera</v-btn>
+            <v-btn v-on:click="startMicrophone">start microphone</v-btn>
 
-        <div v-for="user of users" :key="user.id">
-            <video :src-object.prop.camel="user.stream" muted autoplay playsinline></video>
-<!--            <audio :src-object.prop.camel="user.stream" autoplay></audio>-->
+            <v-btn v-on:click="stopScreenshare">stop screenshare</v-btn>
+            <v-btn v-on:click="stopCamera">stop camera</v-btn>
+            <v-btn v-on:click="stopMicrophone">stop microphone</v-btn>
         </div>
+
+        <video :src-object.prop.camel="ownUserStream" autoplay muted playsinline></video>
+        <audio :src-object.prop.camel="ownUserStream" autoplay muted></audio>
+
+        <div :key="user.id" v-for="user of users">
+            <video :src-object.prop.camel="user.stream" autoplay muted playsinline></video>
+            <audio :src-object.prop.camel="user.stream" autoplay></audio>
+        </div>
+
     </div>
 </template>
 
@@ -22,7 +30,8 @@
             return {
                 ownUserStream: null,
                 users: [],
-                videoRoomPlugin: null
+                videoRoomPlugin: null,
+                isVideoAuthorised: false
             };
         },
         async mounted() {
@@ -37,16 +46,11 @@
             })
 
             this.videoRoomPlugin.addEventListener("ownUserJoined", (user) => {
-                console.log("[ownUserJoined]: ", user)
                 this.ownUserStream = user.stream;
+                this.updateLocalPreferences(user.stream);
             })
 
             this.videoRoomPlugin.addEventListener("userJoined", (user) => {
-                console.log("userJoined: ", user.stream.getVideoTracks())
-
-                window.testme = user.stream;
-
-
                 const userIndex = this.users.findIndex(u => u.id === user.id);
 
                 if (userIndex === -1) {
@@ -58,10 +62,7 @@
             })
 
             this.videoRoomPlugin.addEventListener("userLeft", (user) => {
-                console.log("User left: ", user.id)
-
                 if (this.users.some(u => u.id === user.id)) {
-                    console.log("Removing user: ", user);
                     this.users = this.users.filter(u => u.id !== user.id);
                 }
             })
@@ -69,9 +70,6 @@
             const janus = await janusBuilder
                 .addPlugin(this.videoRoomPlugin)
                 .build();
-
-            console.log(janus);
-
         },
 
         methods: {
@@ -82,6 +80,48 @@
             async anotherButton() {
                 console.log("bttn ...")
                 await this.videoRoomPlugin.anotherButton()
+            },
+            async startScreenshare() {
+                const stream = await navigator.mediaDevices.getDisplayMedia();
+                await this.videoRoomPlugin.publishTrack(stream.getVideoTracks()[0]);
+            },
+            async startCamera() {
+                const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false})
+                this.isVideoAuthorised = true
+                await this.videoRoomPlugin.publishTrack(stream.getVideoTracks()[0]);
+            },
+            async startMicrophone() {
+                const stream = await navigator.mediaDevices.getUserMedia({video: false, audio: true})
+                await this.videoRoomPlugin.publishTrack(stream.getAudioTracks()[0]);
+            },
+            stopScreenshare() {
+                this.ownUserStream.getVideoTracks()[0].stop();
+            },
+            stopCamera() {
+                this.ownUserStream.getVideoTracks()[0].stop();
+                this.isVideoAuthorised = false
+            },
+            stopMicrophone() {
+                this.ownUserStream.getAudioTracks()[0].stop();
+            },
+            updateLocalPreferences(userStream) {
+                userStream.getTracks().forEach((track) => {
+                    const kind = track.kind;
+
+                    if (kind !== "video") {
+                        return;
+                    }
+
+                    track.onended = async (event) => {
+                        if (!this.isVideoAuthorised) {
+                            return;
+                        }
+
+                        const stream = await navigator.mediaDevices.getUserMedia({video: true})
+                        await this.videoRoomPlugin.publishTrack(stream.getTracks()[0]);
+
+                    }
+                });
             }
         }
     };
