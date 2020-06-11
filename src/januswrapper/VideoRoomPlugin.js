@@ -121,6 +121,7 @@ export class VideoRoomPlugin {
     }
 
     emitEvent(eventMessage, msg) {
+        console.log({eventMessage})
         const events = this.listeners[eventMessage];
 
         if (!events) {

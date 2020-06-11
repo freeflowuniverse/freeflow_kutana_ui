@@ -16,7 +16,7 @@
           </v-row>
         </v-card-title>
         <v-card-text class="pt-5">
-          <v-sliderpublishOwnFeed
+          <v-slider
             :tick-labels="qualityOptions"
             :max="3"
             step="1"
@@ -25,7 +25,7 @@
             :tick-size="4"
             v-model="quality"
             @change="saveQualityOption"
-          ></v-sliderpublishOwnFeed>
+          ></v-slider>
           <v-divider class="my-5"></v-divider>
           <v-col align="center" justify="center">
             <p class="text-center">Currently logged in as <b>{{localUser.name}}</b></p>

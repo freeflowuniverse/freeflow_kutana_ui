@@ -8,7 +8,6 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
     let initialJoin = true;
 
     videoRoomPlugin.addEventListener("pluginAttached", async (room) => {
-        console.log("PLUGIN ATTACHTED")
         const roomCreationResult = await videoRoomPlugin.createRoom(roomName);
         await videoRoomPlugin.joinRoom(roomCreationResult.room, userName);
     });
@@ -16,7 +15,6 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
     const isVideoAuthorised = false;
 
     videoRoomPlugin.addEventListener("ownUserJoined", (user) => {
-        console.log("OWNUSERJOINED")
         if (initialJoin) {
             initialJoin = false;
             stream.getTracks().forEach(async (track) => {
@@ -46,6 +44,9 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
     });
 
     videoRoomPlugin.addEventListener("userJoined", (user) => {
+        if (user === store.getters.localUser){
+            return;
+        }
         store.commit("addRemoteUser", user);
     });
 
