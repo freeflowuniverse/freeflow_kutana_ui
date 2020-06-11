@@ -36,8 +36,9 @@
             .user:nth-child(1) {
                 position: absolute;
                 width: 30vw;
-                right: 10%;
-                top: 5%;
+                height: 20vh;
+                right: 16px;
+                top: 16px;
                 z-index: 100;
             }
 
