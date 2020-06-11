@@ -1,7 +1,7 @@
 <template>
-    <div class="grid" :data-useramount="users.length">
-        <div class="user" v-for="user of users" v-bind:key="user.id">
-            <JanusVideo :stream="user.stream" :label="user.username"></JanusVideo>
+    <div :data-useramount="users.length > 4 ? '>4' : users.length" class="grid">
+        <div class="user" v-bind:key="user.id" v-for="user of users">
+            <JanusVideo :cover="true" :label="user.username" :stream="user.stream"></JanusVideo>
         </div>
     </div>
 </template>
@@ -21,18 +21,69 @@
     }
 </script>
 <style lang="scss" scoped>
-    .grid{
-        height: 100vh;
-        &[data-useramount="1"]{
+    .grid {
+        height: calc(var(--vh) * 100);
 
-        }
-        &[data-useramount="2"]{
-            position: relative;
-            .user:nth-child(1){
-                position: absolute;
+        &[data-useramount="1"] {
+            .user{
+                height: 100%;
             }
-            .user:nth-child(2){
-                padding-bottom: 50px;
+        }
+
+        &[data-useramount="2"] {
+            position: relative;
+
+            .user:nth-child(1) {
+                position: absolute;
+                width: 30vw;
+                right: 10%;
+                top: 5%;
+                z-index: 100;
+            }
+
+            .user:nth-child(2) {
+                height: 100%;
+                z-index: 110;
+            }
+        }
+
+        &[data-useramount="3"] {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            grid-template-areas: "user-1 user-1" "user-2 user-3";
+
+            .user:nth-child(1) {
+                grid-area: user-1;
+            }
+
+            .user:nth-child(2) {
+                grid-area: user-2;
+            }
+
+            .user:nth-child(3) {
+                grid-area: user-3;
+            }
+        }
+
+        &[data-useramount="4"] {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+        }
+        &[data-useramount=">4"] {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(50px,1fr));;
+            grid-template-rows: 34fr 100px 13fr;
+            grid-template-areas: "." "user-list" ".";
+            .user:not(:nth-child(1)){
+                grid-row: 2/3;
+            }
+            .user:nth-child(1) {
+                /*display: none;*/
+                position: absolute;
+                height: 100%;
             }
         }
     }

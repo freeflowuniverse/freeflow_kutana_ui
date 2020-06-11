@@ -24,6 +24,7 @@ export default {
   },
   mounted() {
     let vh = window.innerHeight * 0.01;
+
     // Then we set the value in the --vh custom property to the root of the document
     document.documentElement.style.setProperty("--vh", `${vh}px`);
     window.addEventListener("resize", () => {
@@ -45,6 +46,11 @@ export default {
 };
 </script>
 <style lang="scss">
+  .v-application--wrap{
+    height: 100%;
+    /*fix for mobile 100vh*/
+    min-height: unset !important;
+  }
 .v-application .title.ttl,
 .ttl {
   font-family: "Bebas Neue", cursive !important;
@@ -59,9 +65,6 @@ export default {
 }
 .video-main video.noScreenshare {
   transform: rotateY(180deg);
-}
-video {
-  margin-bottom: -6px;
 }
 .mobile-room-grid {
   #selectedStream{

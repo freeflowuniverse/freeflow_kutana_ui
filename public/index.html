@@ -1,7 +1,17 @@
-<!DOCTYPE html>
+<!DOCTYPE html >
 <html lang="en">
 
+<style>
+  /* dirty fix to make sure there is no scrolling on mobile (1 --vh is not 1vh) i hate it */
+  html,
+  body {
+    height: 100%;
+    width: 100%;
+    /*overflow: hidden;*/
+  }
+</style>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">

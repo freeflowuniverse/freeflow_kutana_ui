@@ -1,33 +1,34 @@
 <template>
     <div
-            ref="videoAndMore"
+            class="janus-video"
+            :class="classes"
             @fullscreenchange="fullScreenChanged"
-            :class="this.$props.stream.getVideoTracks().length ? 'video-present janus-video' : 'video-not-present janus-video'"
+            ref="videoAndMore"
     >
-        <span class="video-label">{{label}}</span>
-        <v-btn
-                fab
-                small
-                :absolute="!isFullScreen"
-                :fixed="isFullScreen"
-                text
-                right
-                class="semiBlack mt-3"
-                @click="toggleFullscreen"
-        >
-            <v-icon color="white" v-if="!isFullScreen">fullscreen</v-icon>
-            <v-icon color="white" v-else>fullscreen_exit</v-icon>
-        </v-btn>
+<!--        <span class="video-label">{{label}}</span>-->
+<!--        <v-btn-->
+<!--                :absolute="!isFullScreen"-->
+<!--                :fixed="isFullScreen"-->
+<!--                @click="toggleFullscreen"-->
+<!--                class="semiBlack mt-3"-->
+<!--                fab-->
+<!--                right-->
+<!--                small-->
+<!--                text-->
+<!--        >-->
+<!--            <v-icon color="white" v-if="!isFullScreen">fullscreen</v-icon>-->
+<!--            <v-icon color="white" v-else>fullscreen_exit</v-icon>-->
+<!--        </v-btn>-->
         <video
-                ref="video"
-                :src-object.prop.camel="stream"
                 :class="isFullScreen ? 'fullScreen' : ''"
+                :src-object.prop.camel="stream"
                 autoplay
-                playsinline
                 muted
+                playsinline
+                ref="video"
         ></video>
         <!-- @todo fixme -->
-        <v-row align="center" justify="center" class="video-cam-off">
+        <v-row align="center" class="video-cam-off" justify="center">
             <v-icon color="white">videocam_off</v-icon>
         </v-row>
     </div>
@@ -43,12 +44,29 @@
             label: {
                 type: String,
                 required: false,
+            },
+            cover: {
+                type: Boolean,
+                required: false,
+                default: false
             }
         },
         data() {
             return {
                 isFullScreen: false
             };
+        },
+        computed: {
+            classes() {
+                const videopresent = this.$props.stream.getVideoTracks().length
+
+                return {
+                    'cover': this.$props.cover,
+                    'video-present': videopresent,
+                    'video-not-present': !videopresent
+                }
+
+            }
         },
         methods: {
             fullScreenChanged() {
@@ -77,7 +95,7 @@
                 if (elem.msRequestFullscreen) {
                     /* IE/Edge */
                     elem.msRequestFullscreen();
-                    return;
+
                 }
             }
         }
@@ -85,18 +103,12 @@
 </script>
 
 <style lang="scss" scoped>
-    .semiBlack {
-        background: rgba(0, 0, 0, 0.5);
+    .janus-video{
+        width: 100%;
+        height: 100%;
     }
-
     video.fullScreen {
         object-fit: contain;
-    }
-
-    .janus-video {
-        height: 100%;
-        width: 100%;
-        position: relative;
     }
 
     video {
@@ -118,12 +130,10 @@
         display: none;
     }
 
-    .video-label {
-        color: white;
-        position: absolute;
-        padding: 5px;
-        background: #000000;
-        bottom: 0;
-        left: 0;
+    .cover {
+        video:not(.screenshare) {
+            display: block;
+            object-fit: cover;
+        }
     }
 </style>

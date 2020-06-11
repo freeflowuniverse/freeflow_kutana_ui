@@ -1,9 +1,9 @@
 <template>
-    <div class="room">
-        <UserGrid v-if="view === 'grid'" :users="allUsers.slice(0, 2)"></UserGrid>
+    <div class="room" v-if="localUser">
+        <UserGrid :users="users" v-if="view === 'grid'"></UserGrid>
         <ControlStrip></ControlStrip>
         <div class="userSound">
-            <audio :src-object.prop.camel="user.stream" :muted="user.muted" :key="user.id"
+            <audio :key="user.id" :muted="user.muted" :src-object.prop.camel="user.stream"
                    v-for="user of remoteUsers"></audio>
         </div>
     </div>
@@ -15,6 +15,7 @@
     import ControlStrip from "../components/ControlStrip";
     import {initializeJanus} from "../services/JanusService";
     import config from "../../public/config";
+    import times from 'lodash/times'
 
     export default {
         components: {
@@ -56,7 +57,8 @@
             //@todo fixme
             const userName = localStorage.getItem("account").name;
 
-            await initializeJanus(config.janusServer, "123", userName || 'test', this.hashString(this.teamName), stream);
+            const roomName = this.hashString(this.teamName);
+            await initializeJanus(config.janusServer, "1235", userName || 'test', roomName || 'test', stream);
         },
         methods: {
             ...mapActions(["setSnackbarMessage", "getTeamInfo", "join", "changeViewStyle"]),
@@ -134,6 +136,10 @@
                     baseUrl += "/";
                 }
                 return `${baseUrl}`;
+            },
+            users() {
+                // return this.allUsers
+                return times(3, () => this.localUser);
             }
         },
         watch: {
@@ -149,15 +155,11 @@
 
 <style lang="scss" scoped>
     .room {
-        height: 100vh;
-        overflow: hidden;
+        height: calc(var(--vh) * 100);
+        /*overflow: hidden;*/
         display: grid;
         grid-template-columns: 1fr;
         grid-template-rows: 1fr auto;
-        gap: 1px 1px;
         grid-template-areas: "grid" "control-strip";
-    }
-    UserGrid{
-        display: none;
     }
 </style>
