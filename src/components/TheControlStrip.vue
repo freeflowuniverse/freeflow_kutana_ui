@@ -28,7 +28,7 @@
           ></v-sliderpublishOwnFeed>
           <v-divider class="my-5"></v-divider>
           <v-col align="center" justify="center">
-            <p class="text-center">Currently logged in as <b>{{account.name}}</b></p>
+            <p class="text-center">Currently logged in as <b>{{localUser.name}}</b></p>
             <v-btn color="error" text @click="logout">Log out</v-btn>
           </v-col>
         </v-card-text>
@@ -58,12 +58,12 @@
       <v-btn @click="hangUp" dark icon class="red mx-2 endCall">
         <v-icon>call_end</v-icon>
       </v-btn>
-      <v-btn @click="enableScreenShare" v-if="canScreenShare && screenShare === null" icon class="ml-1">
-        <v-icon>screen_share</v-icon>
-      </v-btn>
-      <v-btn @click="disableScreenShare" v-else-if="canScreenShare" icon class="ml-1">
-        <v-icon>stop_screen_share</v-icon>
-      </v-btn>
+<!--      <v-btn @click="enableScreenShare" v-if="canScreenShare && screenShare === null" icon class="ml-1">-->
+<!--        <v-icon>screen_share</v-icon>-->
+<!--      </v-btn>-->
+<!--      <v-btn @click="disableScreenShare" v-else-if="canScreenShare" icon class="ml-1">-->
+<!--        <v-icon>stop_screen_share</v-icon>-->
+<!--      </v-btn>-->
       <v-spacer></v-spacer>
       <v-btn v-if="minimal" icon class="ml-1" @click="$root.$emit('toggleUserList')">
         <v-icon>group</v-icon>
@@ -98,7 +98,7 @@ export default {
     this.$root.$on("showInviteUser", this.showAddUserDialog);
   },
   computed: {
-    ...mapGetters(["users", "teamName", "account", "screenShareRole", "screenShare"]),
+    ...mapGetters(["localUser"]),
     inviteLink() {
       let baseUrl = window.location.href;
       if (baseUrl.charAt(baseUrl.length - 1) != "/") {
@@ -108,7 +108,6 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["shareScreen", "stopScreenShare", "setSnackbarMessage", "clearStorage"]),
     canScreenShare: function() {
       return !!navigator.mediaDevices.getDisplayMedia;
     },
@@ -120,104 +119,36 @@ export default {
       this.showExtraSettings = !this.showExtraSettings;
     },
     toggleMute: function() {
-      this.muted = this.users[0].pluginHandle.isAudioMuted();
-      Janus.log((this.muted ? "Unmuting" : "Muting") + " local stream...");
 
-      this.setSnackbarMessage({
-        text: `You are ${this.muted ? "un" : ""}muted`
-      });
-      if (this.muted) {
-        this.users[0].pluginHandle.unmuteAudio();
-      } else {
-        this.users[0].pluginHandle.muteAudio();
-      }
-      this.muted = this.users[0].pluginHandle.isAudioMuted();
     },
 
     saveQualityOption() {
-      this.setSnackbarMessage({
-        text: `Quality set to ${this.qualityOptions[this.quality]}`
-      });
-      this.users[0].pluginHandle.send({
-        message: { request: "configure", bitrate: 128000 * this.quality }
-      });
+      // this.setSnackbarMessage({
+      //   text: `Quality set to ${this.qualityOptions[this.quality]}`
+      // });
+      // this.users[0].pluginHandle.send({
+      //   message: { request: "configure", bitrate: 128000 * this.quality }
+      // });
     },
 
     unpublishOwnFeed: function() {
-      this.users[0].pluginHandle.hangUp();
-      this.published = false;
+
     },
 
     publishOwnFeed: function() {
-      this.users[0].pluginHandle.createOffer({
-        media: {
-          audioRecv: false,
-          videoRecv: false,
-          audioSend: true,
-          videoSend: true
-        },
-        simulcast: false,
-        simulcast2: false,
-        success: function(jsep) {
-          Janus.debug("Got publisher SDP!");
-          Janus.debug(jsep);
-          var publish = { request: "configure", audio: false, video: true };
-          this.users[0].pluginHandle.send({ message: publish, jsep: jsep });
-          this.published = true;
-        },
-        error: function(error) {
-          Janus.error("WebRTC error:", error);
-        }
-      });
+
     },
 
-    // This function could be improved. @TODO @SingleCore
     hangUp: function() {
-      console.log("Hanging up call")
-      this.users[0].pluginHandle.hangup();
 
-      console.log("Detaching pluginHandle")
-      this.users[0].pluginHandle.detach();
-
-      console.log("Clearing localstorage")
-      // localStorage.clear()
-      localStorage.removeItem("teamName");
-      localStorage.removeItem("state");
-      localStorage.removeItem("tempKeys");
-
-      console.log("Redirecting home")
-      this.$router.push({ name: "home" });
-
-      console.log("Forcing reload")
-      location.reload()
     },
 
     enableScreenShare: function() {
-      if (this.screenShare) {
-        this.setSnackbarMessage({
-          type: "",
-          text: `Screenshare already in progress, only one screenshare per room!`
-        });
-        return;
-      }
 
-      this.shareScreen();
     },
 
     disableScreenShare: function() {
-      if (this.screenShareRole !== 'publisher') {
-        if (this.screenShare) {
-          this.setSnackbarMessage({
-            type: "",
-            text: `Screenshare already in progress, only one screenshare per room!`
-          });
-          return;
-        }
-        return;
-      }
 
-      console.log("A publisher woooo ... ", this.screenShareRole)
-      this.stopScreenShare();
     },
     showAddUserDialog() {
       this.addUserDialog = true;

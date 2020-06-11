@@ -1,8 +1,7 @@
 <template>
   <div class="stream">
-    <JanusVideo :class="isMobile? 'mobileMainUserStream' : ''" v-if="stream" :stream="stream" muted></JanusVideo>
+    <JanusVideo :class="isMobile? 'mobileMainUserStream' : ''" v-if="localUser.stream" :stream="localUser.stream" muted></JanusVideo>
   </div>
-
 </template>
 
 <script>
@@ -15,27 +14,8 @@ export default {
   },
   mounted() {},
   computed: {
-    ...mapGetters(["users"]),
+    ...mapGetters(["localUser"]),
 
-    stream() {
-      return this.userScreenshareStream ? this.userScreenshareStream : this.userVideoStream;
-    },
-
-    userVideoStream() {
-      if (!this.users) {
-        return false;
-      }
-
-      return this.users[0].stream;
-    },
-
-    userScreenshareStream() {
-      if (!this.users) {
-        return false;
-      }
-
-      return this.users[0].screenShareStream;
-    },
     isMobile () {
       return this.$vuetify.breakpoint.mdAndDown
     },

@@ -27,10 +27,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["users", "selectedUser"]),
+    ...mapGetters(["remoteUsers", "allUsers"]),
 
     usersToShow() {
-      return this.grid ? this.users : this.users.slice(1);
+      return this.grid ? this.allUsers : this.remoteUsers;
     },
     isMobile () {
       return this.$vuetify.breakpoint.mdAndDown
@@ -41,6 +41,7 @@ export default {
 
     selectStream(user) {
       if (this.grid) return;
+
       if (this.isSelected(user) && this.selectedUser.pinned) {
         this.selectUser({
           ...user,
@@ -58,7 +59,7 @@ export default {
     isSelected(user) {
       return (
         this.selectedUser !== null &&
-        this.selectedUser.username === user.username
+        this.selectedUser.username === user.name
       );
     }
   }

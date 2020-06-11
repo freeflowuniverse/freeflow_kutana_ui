@@ -17,7 +17,6 @@
             <video :src-object.prop.camel="user.stream" autoplay muted playsinline></video>
             <audio :src-object.prop.camel="user.stream" autoplay></audio>
         </div>
-
     </div>
 </template>
 
@@ -73,14 +72,6 @@
         },
 
         methods: {
-            async republish() {
-                console.log("Republishing ...")
-                await this.videoRoomPlugin.republishToScreenshare();
-            },
-            async anotherButton() {
-                console.log("bttn ...")
-                await this.videoRoomPlugin.anotherButton()
-            },
             async startScreenshare() {
                 const stream = await navigator.mediaDevices.getDisplayMedia();
                 await this.videoRoomPlugin.publishTrack(stream.getVideoTracks()[0]);

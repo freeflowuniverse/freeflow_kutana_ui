@@ -1,16 +1,14 @@
 <template>
-  <section
-    :class="isMobile ? `userListItemMobile ma-1 ml-1 ${isSelected ? 'selected' : ''}` : `userListItem ${isSelected ? 'selected' : ''}  ${inGrid? 'inGrid': ''}`"
-  >
+  <section>
     <v-card class="stream">
       <div :id="`user${userIndex}`" :class="`wrapper black ${!inGrid? 'clickable' : ''}`">
         <JanusVideo
-          v-if="userVideoStream && userVideoStream.active"
-          :stream="userVideoStream"
+          v-if="user.stream && user.stream.active"
+          :stream="user.stream"
           :muted="isMine || muted"
           :positionStatic="inGrid"
           @click="$emit('click')"
-          :label="isMine ? me.name : user.username"
+          :label="user.name"
         ></JanusVideo>
         <v-row v-else align="center" justify="center" class="content">
           <v-icon color="white">videocam_off</v-icon>
@@ -47,14 +45,13 @@ export default {
   computed: {
     ...mapGetters({
       selectedUser: "selectedUser",
-      me: "account",
-      users: "users"
+      localUser: "localUser",
     }),
     isMobile() {
       return this.$vuetify.breakpoint.mdAndDown;
     },
     isMine() {
-      return this.user == this.users[0];
+      return this.user == this.localUser;
     },
     userVideoStream() {
       if (!this.$props.user || !this.$props.user.stream) {
@@ -62,14 +59,8 @@ export default {
       }
       return this.$props.user.stream;
     },
-    isSelected() {
-      return (
-        this.selectedUser !== null &&
-        this.selectedUser.username === this.user.username
-      );
-    },
     isPinned() {
-      return this.isSelected && this.selectedUser.pinned;
+      return false;
     }
   }
 };

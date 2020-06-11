@@ -188,7 +188,6 @@ export class VideoRoomPlugin {
 
     }
 
-
     generateDummyMediaStream(width = 640, height = 480) {
         let canvas = Object.assign(document.createElement("canvas"), {width, height});
         canvas.getContext('2d').fillRect(0, 0, width, height);
@@ -320,7 +319,7 @@ export class VideoRoomPlugin {
 
         let pluginHandle = {};
 
-        let room = 1733824855;
+        let room = this.myRoom;
 
         return {
             plugin: "janus.plugin.videoroom",
