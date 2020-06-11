@@ -5,7 +5,6 @@
             @fullscreenchange="fullScreenChanged"
             ref="videoAndMore"
     >
-<!--        <span class="video-label">{{label}}</span>-->
 <!--        <v-btn-->
 <!--                :absolute="!isFullScreen"-->
 <!--                :fixed="isFullScreen"-->
@@ -27,6 +26,8 @@
                 playsinline
                 ref="video"
         ></video>
+        <span class="video-label">{{label}}</span>
+
         <!-- @todo fixme -->
         <v-row align="center" class="video-cam-off" justify="center">
             <v-icon color="white">videocam_off</v-icon>
@@ -106,6 +107,7 @@
     .janus-video{
         width: 100%;
         height: 100%;
+        position: relative;
     }
     video.fullScreen {
         object-fit: contain;
@@ -134,6 +136,18 @@
         video:not(.screenshare) {
             display: block;
             object-fit: cover;
+            width: 100%;
+            height: 100%;
+            position: absolute;
         }
+    }
+
+    .video-label {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        padding: 0 4px;
+        background: #000;
+        color: #ffffff;
     }
 </style>

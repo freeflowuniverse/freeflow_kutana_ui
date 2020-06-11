@@ -1,7 +1,10 @@
 <template>
-    <div class="room" v-if="localUser">
+    <div class="room" v-if="localUser" @click="showControl">
         <UserGrid :users="users" v-if="view === 'grid'"></UserGrid>
-        <ControlStrip></ControlStrip>
+        <transition name="fade">
+            <ControlStrip v-if="show"></ControlStrip>
+        </transition>
+
         <div class="userSound">
             <audio :key="user.id" :muted="user.muted" :src-object.prop.camel="user.stream"
                    v-for="user of remoteUsers"></audio>
@@ -15,7 +18,6 @@
     import ControlStrip from "../components/ControlStrip";
     import {initializeJanus} from "../services/JanusService";
     import config from "../../public/config";
-    import times from 'lodash/times'
 
     export default {
         components: {
@@ -29,7 +31,9 @@
                 showUserList: true,
                 startX: null,
                 dragging: false,
-                view: 'grid'
+                view: 'grid',
+                show: false,
+                timeout: null,
             };
         },
         beforeMount() {
@@ -56,9 +60,11 @@
 
             //@todo fixme
             const userName = localStorage.getItem("account").name;
+            // const roomName = this.hashString(this.teamName);
 
-            const roomName = this.hashString(this.teamName);
-            await initializeJanus(config.janusServer, "1235", userName || 'test', roomName || 'test', stream);
+            const roomName = this.hashString('test');
+            const tempUser = `test- ${Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}`;
+            await initializeJanus(config.janusServer, "1235", userName || tempUser, roomName, stream);
         },
         methods: {
             ...mapActions(["setSnackbarMessage", "getTeamInfo", "join", "changeViewStyle"]),
@@ -97,6 +103,14 @@
             doDrag(e) {
                 console.log(e)
                 this.$refs.sidebar.style.width = (this.startWidth + this.startX - e.clientX) + 'px';
+            },
+            showControl() {
+                this.show = true
+                clearTimeout(this.timeout)
+                this.timeout =  window.setTimeout(
+                    () => {
+                        this.show = false
+                    }, 4000);
             }
         },
         computed: {
@@ -138,8 +152,8 @@
                 return `${baseUrl}`;
             },
             users() {
-                // return this.allUsers
-                return times(3, () => this.localUser);
+                return this.allUsers
+                // return times(3, () => this.localUser);
             }
         },
         watch: {
@@ -161,5 +175,13 @@
         grid-template-columns: 1fr;
         grid-template-rows: 1fr auto;
         grid-template-areas: "grid" "control-strip";
+    }
+
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .5s;
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
+    {
+        opacity: 0;
     }
 </style>

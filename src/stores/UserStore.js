@@ -8,6 +8,11 @@ export default {
       state.localUser = user;
     },
     addRemoteUser(state, user) {
+
+      if (state.localUser && state.localUser.id === user.id){
+        return;
+      }
+
       const userIndex = state.remoteUsers.findIndex(u => u.id === user.id);
 
       if (userIndex === -1) {
