@@ -10,86 +10,70 @@
             <v-btn v-on:click="stopMicrophone">stop microphone</v-btn>
         </div>
 
-        <video :src-object.prop.camel="ownUserStream" autoplay muted playsinline></video>
-        <audio :src-object.prop.camel="ownUserStream" autoplay muted></audio>
-
-        <div :key="user.id" v-for="user of users">
-            <video :src-object.prop.camel="user.stream" autoplay muted playsinline></video>
-            <audio :src-object.prop.camel="user.stream" autoplay></audio>
+        <div v-if="localUser">
+            <video :src-object.prop.camel="localUser.stream" autoplay muted playsinline></video>
+<!--            <audio :src-object.prop.camel="localUser.stream" autoplay muted></audio>-->
         </div>
+
+        <div v-if="remoteUsers">
+            <div :key="user.id" v-for="user of remoteUsers">
+                <video :src-object.prop.camel="user.stream" autoplay muted playsinline></video>
+<!--                <audio :src-object.prop.camel="user.stream" autoplay></audio>-->
+            </div>
+        </div>
+
     </div>
 </template>
 
 <script>
-    import {JanusBuilder} from "../januswrapper/JanusBuilder";
-    import {VideoRoomPlugin} from "../januswrapper/VideoRoomPlugin";
+    import {initializeJanus} from "../services/JanusService";
+    import config from "../../public/config";
+    import { mapActions, mapGetters } from "vuex";
+    import store from "../plugins/vuex";
 
     export default {
         data() {
             return {
-                ownUserStream: null,
-                users: [],
-                videoRoomPlugin: null,
-                isVideoAuthorised: false
+                janusFunctions: null
             };
         },
+        computed: {
+            ...mapGetters(["localUser", "remoteUsers"]),
+        },
         async mounted() {
-            const janusBuilder = new JanusBuilder("https://janus.staging.jimber.org/janus", false);
+            const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
 
-            this.videoRoomPlugin = new VideoRoomPlugin("123");
-            const me = JSON.parse(window.localStorage.getItem("account")).name
+            const userName = localStorage.getItem("account").name;
+            const teamName = localStorage.getItem("teamName");
+            const opaqueId = "123";
 
-            this.videoRoomPlugin.addEventListener("pluginAttached", async (room) => {
-                const roomCreationResult = await this.videoRoomPlugin.createRoom(1733824855);
-                await this.videoRoomPlugin.joinRoom(roomCreationResult.room, me)
-            })
-
-            this.videoRoomPlugin.addEventListener("ownUserJoined", (user) => {
-                this.ownUserStream = user.stream;
-                this.updateLocalPreferences(user.stream);
-            })
-
-            this.videoRoomPlugin.addEventListener("userJoined", (user) => {
-                const userIndex = this.users.findIndex(u => u.id === user.id);
-
-                if (userIndex === -1) {
-                    this.users.push(user);
-                    return
-                }
-
-                this.users.splice(userIndex, 1, user);
-            })
-
-            this.videoRoomPlugin.addEventListener("userLeft", (user) => {
-                if (this.users.some(u => u.id === user.id)) {
-                    this.users = this.users.filter(u => u.id !== user.id);
-                }
-            })
-
-            const janus = await janusBuilder
-                .addPlugin(this.videoRoomPlugin)
-                .build();
+            this.janusFunctions = await initializeJanus(config.janusServer, opaqueId, userName || 'test', this.hashString(teamName), stream);
         },
 
         methods: {
+            hashString(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
+                    hash = hash & hash;
+                }
+                return Math.abs(hash);
+            },
             async startScreenshare() {
-                const stream = await navigator.mediaDevices.getDisplayMedia();
-                await this.videoRoomPlugin.publishTrack(stream.getVideoTracks()[0]);
+                await this.janusFunctions.startScreenShare();
             },
             async startCamera() {
-                const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false})
-                this.isVideoAuthorised = true
-                await this.videoRoomPlugin.publishTrack(stream.getVideoTracks()[0]);
+                await this.janusFunctions.startCamera();
             },
             async startMicrophone() {
                 const stream = await navigator.mediaDevices.getUserMedia({video: false, audio: true})
                 await this.videoRoomPlugin.publishTrack(stream.getAudioTracks()[0]);
             },
             stopScreenshare() {
-                this.ownUserStream.getVideoTracks()[0].stop();
+                this.localUser.stream.getVideoTracks()[0].stop();
             },
             stopCamera() {
-                this.ownUserStream.getVideoTracks()[0].stop();
+                this.localUser.stream.getVideoTracks()[0].stop();
                 this.isVideoAuthorised = false
             },
             stopMicrophone() {

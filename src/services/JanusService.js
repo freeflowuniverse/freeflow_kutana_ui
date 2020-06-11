@@ -55,4 +55,19 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
     });
 
     const janus = await janusBuilder.addPlugin(videoRoomPlugin).build();
+
+    return {
+        startScreenShare: async () => {
+            const stream = await navigator.mediaDevices.getDisplayMedia();
+            await videoRoomPlugin.publishTrack(stream.getVideoTracks()[0]);
+        },
+        startCamera: async () => {
+            const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false})
+            // this.isVideoAuthorised = true
+            await videoRoomPlugin.publishTrack(stream.getVideoTracks()[0]);
+        },
+        stopStream: async () => {
+
+        }
+    }
 }
