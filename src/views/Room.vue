@@ -157,7 +157,7 @@
             },
             users() {
                 // return this.allUsers
-                return times(3, () => this.localUser);
+                return times(6, () => this.localUser);
             }
         },
         watch: {

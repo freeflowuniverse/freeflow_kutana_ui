@@ -78,18 +78,33 @@
             grid-template-rows: 1fr 1fr;
         }
         &[data-useramount=">4"] {
-            position: relative;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(50px,1fr));;
-            grid-template-rows: 34fr 100px 13fr;
-            grid-template-areas: "." "user-list" ".";
-            .user:not(:nth-child(1)){
-                grid-row: 2/3;
+
+            @media (max-aspect-ratio: 1/1) {
+                grid-template-columns: repeat(auto-fit, minmax(50px,1fr));
+                grid-template-rows: 34fr 100px 13fr;
+
+                .user:not(:nth-child(1)){
+                    grid-row: 2/3;
+                }
+                .user:nth-child(1) {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                }
             }
-            .user:nth-child(1) {
-                height: calc(var(--vh) * 100);
-                position: absolute;
+            @media (min-aspect-ratio: 1/1) {
+                grid-template-rows: 1fr 1fr;
+                grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
+                grid-auto-flow: column dense;
+                grid-auto-columns: auto;
+                .user:nth-child(1) {
+                    grid-row: 1/3;
+                    grid-column: 1/3;
+                }
             }
+
+
         }
     }
 </style>
