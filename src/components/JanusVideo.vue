@@ -26,7 +26,7 @@
                 playsinline
                 ref="video"
         ></video>
-        <span class="video-label">{{label}}</span>
+<!--        <span class="video-label">{{label}}</span>-->
 
         <!-- @todo fixme -->
         <v-row align="center" class="video-cam-off" justify="center">

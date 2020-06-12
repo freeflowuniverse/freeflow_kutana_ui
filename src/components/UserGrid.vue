@@ -1,5 +1,5 @@
 <template>
-    <div :data-useramount="users.length > 4 ? '>4' : users.length" class="grid">
+    <div :data-useramount="users.length > 4 ? '>4' : users.length" :data-useramount-even="users.length % 2 ? 'false' : 'true'" class="grid">
         <div class="user" v-bind:key="user.id" v-for="user of users">
             <JanusVideo :cover="true" :label="user.username" :stream="user.stream"></JanusVideo>
         </div>
@@ -25,7 +25,7 @@
         height: calc(var(--vh) * 100);
 
         &[data-useramount="1"] {
-            .user{
+            .user {
                 height: 100%;
             }
         }
@@ -77,14 +77,15 @@
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
         }
+
         &[data-useramount=">4"] {
             display: grid;
 
             @media (max-aspect-ratio: 1/1) {
-                grid-template-columns: repeat(auto-fit, minmax(50px,1fr));
+                grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
                 grid-template-rows: 34fr 100px 13fr;
 
-                .user:not(:nth-child(1)){
+                .user:not(:nth-child(1)) {
                     grid-row: 2/3;
                 }
                 .user:nth-child(1) {
@@ -92,15 +93,19 @@
                     width: 100%;
                     height: 100%;
                 }
+
             }
             @media (min-aspect-ratio: 1/1) {
                 grid-template-rows: 1fr 1fr;
-                grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
                 grid-auto-flow: column dense;
                 grid-auto-columns: auto;
                 .user:nth-child(1) {
                     grid-row: 1/3;
                     grid-column: 1/3;
+                }
+                &[data-useramount-even='true'] .user:nth-last-child(2){
+                    grid-column: span 2;
                 }
             }
 
