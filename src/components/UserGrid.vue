@@ -52,6 +52,11 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
+
+            @media (min-aspect-ratio: 1/1) {
+                grid-template-areas: "user-1 user-2" "user-1 user-3";
+            }
+
             grid-template-areas: "user-1 user-1" "user-2 user-3";
 
             .user:nth-child(1) {
@@ -82,9 +87,8 @@
                 grid-row: 2/3;
             }
             .user:nth-child(1) {
-                /*display: none;*/
+                height: calc(var(--vh) * 100);
                 position: absolute;
-                height: 100%;
             }
         }
     }

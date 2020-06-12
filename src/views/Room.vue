@@ -18,6 +18,7 @@
     import ControlStrip from "../components/ControlStrip";
     import {initializeJanus} from "../services/JanusService";
     import config from "../../public/config";
+    import {times} from "lodash";
 
     export default {
         components: {
@@ -55,6 +56,9 @@
                 this.showUserList = !this.showUserList;
             });
 
+            if (this.localUser){
+                return
+            }
             //@todo get from prejoin room
             const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
 
@@ -63,7 +67,7 @@
             // const roomName = this.hashString(this.teamName);
 
             const roomName = this.hashString('test');
-            const tempUser = `test- ${Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}`;
+            const tempUser = `test-${Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}`;
             await initializeJanus(config.janusServer, "1235", userName || tempUser, roomName, stream);
         },
         methods: {
@@ -152,8 +156,8 @@
                 return `${baseUrl}`;
             },
             users() {
-                return this.allUsers
-                // return times(3, () => this.localUser);
+                // return this.allUsers
+                return times(3, () => this.localUser);
             }
         },
         watch: {
