@@ -2,22 +2,23 @@
     <div class="grid">
         <div class="selectedUser">
             <JanusVideo :cover="true" :label="selectedUser.username" :stream="selectedUser.stream"></JanusVideo>
-            <v-btn class="back" @click="$emit('back')" large icon color="#ffffff">
+            <v-btn @click="$emit('back')" class="back" color="#ffffff" icon large>
                 <v-icon>arrow_back</v-icon>
             </v-btn>
         </div>
         <div class="chat" ref="chat" v-autoScroll>
             <template v-for="(message, index) in messages">
                 <div :key="`${index}_divider`" class="text-center px-4" v-if="showDivider(message, index)">
-          <span
-                  class="grey--text text--lighten-1 font-weight-light overline"
-          >{{ message.createdAt | parseToTime }}</span>
-                    <v-divider class="mb-2"></v-divider>
+                    <span class="grey--text text--lighten-1 font-weight-light overline">
+                        {{ message.createdAt | parseToTime }}
+                    </span>
+                    <v-divider class="mb-1"></v-divider>
                 </div>
                 <div :key="index">
                     <TheChatMessage
                             :dense="message && messages[index - 1] && message.sender == messages[index - 1].sender"
-                            :message="message"/>
+                            :message="message"
+                    />
                 </div>
             </template>
 

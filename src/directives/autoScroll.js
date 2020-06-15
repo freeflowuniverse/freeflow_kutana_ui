@@ -1,9 +1,9 @@
 import Vue from 'vue'
 
 export default {
-  update: function (el) {
-    Vue.nextTick().then(function () {
-      el.scrollTop = el.scrollHeight
-    })
-  }
+    update: el => {
+        Vue.nextTick().then(() => {
+            el.scrollTop = el.scrollHeight
+        })
+    }
 }
