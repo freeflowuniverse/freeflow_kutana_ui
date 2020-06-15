@@ -1,5 +1,5 @@
 <template>
-    <v-row align="center" justify="center" class="landing px-5">
+    <v-row align="center" class="landing px-5" justify="center">
         <v-col cols="12" md="6">
             <v-card>
                 <v-card-title>
@@ -7,28 +7,28 @@
                 </v-card-title>
                 <v-card-text>
                     <v-row align="center" justify="space-around">
-                        <v-col cols="12" md="5" align="center">
+                        <v-col align="center" cols="12" md="5">
                             <v-form @submit.prevent="joinRoom" v-model="valid">
                                 <v-text-field
-                                        id="roomId"
+                                        :rules="inviteUrlRules"
                                         filled
+                                        hint="Paste the link or room ID you've received"
+                                        id="roomId"
                                         label="Invite link or room ID"
                                         persistent-hint
-                                        v-model="inviteUrl"
-                                        hint="Paste the link or room ID you've received"
-                                        :rules="inviteUrlRules"
                                         required
+                                        v-model="inviteUrl"
                                 >
                                     <template v-slot:append>
-                                        <v-btn id="joinBtn" :disabled="!valid" small text type="submit">Join room
+                                        <v-btn :disabled="!valid" id="joinBtn" small text type="submit">Join room
                                         </v-btn>
                                     </template>
                                 </v-text-field>
                             </v-form>
                         </v-col>
                         <v-divider :vertical="$vuetify.breakpoint.mdAndUp"></v-divider>
-                        <v-col cols="12" md="5" align="center">
-                            <v-btn id="createRoomBtn" text @click="create">Create room</v-btn>
+                        <v-col align="center" cols="12" md="5">
+                            <v-btn @click="create" id="createRoomBtn" text>Create room</v-btn>
                         </v-col>
                     </v-row>
                 </v-card-text>
