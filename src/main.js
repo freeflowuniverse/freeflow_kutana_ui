@@ -11,6 +11,9 @@ import './registerServiceWorker'
 
 Vue.config.productionTip = false
 
+import AsyncComputed from 'vue-async-computed'
+Vue.use(AsyncComputed);
+
 export default new Vue({
   vuetify,
   router,

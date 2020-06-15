@@ -22,6 +22,9 @@
     import {initializeJanus} from "../services/JanusService";
     import config from "../../public/config";
     import {times} from "lodash";
+    import router from "../plugins/router";
+    import store from "../plugins/vuex";
+
 
     export default {
         components: {
@@ -41,6 +44,14 @@
             };
         },
         beforeMount() {
+            if (!store.getters.localStream) {
+                router.push({
+                    name: "joinRoom",
+                    params: {token: this.$route.params.token}
+                });
+                return;
+            }
+
             this.isGrid = this.isGridView;
             this.join(this.$route.params.token);
             this.getTeamInfo();
@@ -63,7 +74,9 @@
                 return
             }
             //@todo get from prejoin room
-            const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
+            // const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
+            const stream = store.getters.localStream;
+            store.commit('setLocalStream', null);
 
             //@todo fixme
             const userName = localStorage.getItem("account").name;

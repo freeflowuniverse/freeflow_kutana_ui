@@ -1,5 +1,5 @@
 <template>
-  <v-row align="center" justify="center">
+  <v-row class="guestlogin" align="center" justify="center">
     <v-col cols="12" md="6">
       <v-form @submit.prevent="continueLogin" class="mx-5" v-model="valid">
         <v-card :loading="$route.query.callback">
@@ -49,3 +49,9 @@ export default {
   }
 };
 </script>
+<style lang="scss">
+  .guestlogin{
+    background: #f5f5f5;
+    height: calc(var(--vh) * 100);
+  }
+</style>

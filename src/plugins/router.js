@@ -2,6 +2,7 @@ import VueRouter from "vue-router";
 import Vue from "vue";
 
 import Landing from "../views/Landing.vue";
+import JoinRoom from "../views/JoinRoom.vue";
 import Room from "../views/Room.vue";
 import Login from "../views/Login.vue";
 import Dev from "../views/Dev.vue";
@@ -17,5 +18,6 @@ export default new VueRouter({
     { path: "/login", name: 'login', component: Login, meta: { requiresAuth: false } },
     { path: "/dev", name: 'login', component: Dev, meta: { requiresAuth: false } },
     { path: "/room/:token", name: 'room', component: Room, meta: { requiresAuth: true } },
+    { path: "/room/:token/join", name: 'joinRoom', component: JoinRoom, meta: { requiresAuth: true } },
   ]
 });
