@@ -2,6 +2,9 @@
     <div class="grid">
         <div class="selectedUser">
             <JanusVideo :cover="true" :label="selectedUser.username" :stream="selectedUser.stream"></JanusVideo>
+            <v-btn class="back" @click="$emit('back')" large icon color="#ffffff">
+                <v-icon>arrow_back</v-icon>
+            </v-btn>
         </div>
         <div class="chat" ref="chat" v-autoScroll>
             <template v-for="(message, index) in messages">
@@ -79,5 +82,15 @@
             grid-area: chat;
             overflow-y: scroll;
         }
+    }
+
+    .back {
+        z-index: 500;
+        color: #ffffff;
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: rgba(0, 0, 0, 0.30);
+
     }
 </style>

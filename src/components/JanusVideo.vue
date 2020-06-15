@@ -4,20 +4,21 @@
             :class="classes"
             @fullscreenchange="fullScreenChanged"
             ref="videoAndMore"
+            :style="`background-color:#${(Math.random()*0xFFFFFF<<0).toString(16)};`"
     >
-<!--        <v-btn-->
-<!--                :absolute="!isFullScreen"-->
-<!--                :fixed="isFullScreen"-->
-<!--                @click="toggleFullscreen"-->
-<!--                class="semiBlack mt-3"-->
-<!--                fab-->
-<!--                right-->
-<!--                small-->
-<!--                text-->
-<!--        >-->
-<!--            <v-icon color="white" v-if="!isFullScreen">fullscreen</v-icon>-->
-<!--            <v-icon color="white" v-else>fullscreen_exit</v-icon>-->
-<!--        </v-btn>-->
+        <v-btn
+                :absolute="!isFullScreen"
+                :fixed="isFullScreen"
+                @click="toggleFullscreen"
+                class="semiBlack mt-3"
+                fab
+                right
+                small
+                text
+        >
+            <v-icon color="white" v-if="!isFullScreen">fullscreen</v-icon>
+            <v-icon color="white" v-else>fullscreen_exit</v-icon>
+        </v-btn>
         <video
                 :class="isFullScreen ? 'fullScreen' : ''"
                 :src-object.prop.camel="stream"
@@ -25,6 +26,7 @@
                 muted
                 playsinline
                 ref="video"
+                v-if="true"
         ></video>
 <!--        <span class="video-label">{{label}}</span>-->
 
@@ -98,7 +100,7 @@
                     elem.msRequestFullscreen();
 
                 }
-            }
+            },
         }
     };
 </script>
@@ -117,6 +119,7 @@
         width: 100%;
         height: 100%;
         object-fit: contain;
+        position: absolute;
     }
 
     video.screenshare {
@@ -136,9 +139,6 @@
         video:not(.screenshare) {
             display: block;
             object-fit: cover;
-            width: 100%;
-            height: 100%;
-            position: absolute;
         }
     }
 

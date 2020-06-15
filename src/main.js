@@ -7,6 +7,7 @@ import store from './plugins/vuex';
 import './plugins/socketio';
 import './middleware/auth'
 import './filters'
+import './registerServiceWorker'
 
 Vue.config.productionTip = false
 

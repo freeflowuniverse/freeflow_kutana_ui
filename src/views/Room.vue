@@ -1,9 +1,10 @@
 <template>
     <div @click="showControl" class="room" v-if="localUser">
         <UserGrid :users="users" v-if="view === 'grid'"></UserGrid>
-        <ChatGrid :selectedUser="localUser" v-if="view === 'chat'"></ChatGrid>
-        <transition name="fade">
-            <ControlStrip v-if="show || !isMobile()"></ControlStrip>
+        <ChatGrid :selectedUser="localUser" v-if="view === 'chat'" v-on:back="view= 'grid'"></ChatGrid>
+        <transition name="fade" v-if="view === 'grid'">
+            <ControlStrip v-if="show  || !isMobile()"
+                          v-on:toggleChat="view === 'chat' ? view = 'grid' : view = 'chat'"></ControlStrip>
         </transition>
 
         <div class="userSound">
@@ -163,8 +164,10 @@
                 return `${baseUrl}`;
             },
             users() {
-                return this.allUsers
-                // return times(5, () => this.localUser);
+                // return this.allUsers
+                return times(3, () => {
+                    return {id: Math.random().toString(36), ...this.localUser}
+                });
             }
         },
         watch: {
@@ -181,7 +184,6 @@
 <style lang="scss" scoped>
     .room {
         height: calc(var(--vh) * 100);
-        /*overflow: hidden;*/
         display: grid;
         grid-template-columns: 1fr;
         grid-template-rows: 1fr auto;

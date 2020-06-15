@@ -1,7 +1,11 @@
 <template>
-    <div :data-useramount="users.length > 4 ? '>4' : users.length" :data-useramount-even="users.length % 2 ? 'false' : 'true'" class="grid">
+    <div
+            :data-useramount="users.length > 4 ? '>4' : users.length"
+            :data-useramount-even="users.length % 2 ? 'false' : 'true'"
+            class="grid"
+    >
         <div class="user" v-bind:key="user.id" v-for="user of users">
-            <JanusVideo :cover="true" :label="user.username" :stream="user.stream"></JanusVideo>
+            <JanusVideo :cover="cover" :label="user.username" :stream="user.stream"></JanusVideo>
         </div>
     </div>
 </template>
@@ -16,12 +20,20 @@
             users: {
                 required: true
             }
-        }
+        },
 
+        data: () => {
+            return {cover: true}
+        }
     }
 </script>
 <style lang="scss" scoped>
     .grid {
+
+        .user {
+            background: #000;
+        }
+
         height: calc(var(--vh) * 100);
 
         &[data-useramount="1"] {
@@ -104,7 +116,7 @@
                     grid-row: 1/3;
                     grid-column: 1/3;
                 }
-                &[data-useramount-even='true'] .user:nth-last-child(2){
+                &[data-useramount-even='true'] .user:nth-last-child(2) {
                     grid-column: span 2;
                 }
             }
