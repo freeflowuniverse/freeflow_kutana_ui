@@ -41,8 +41,10 @@ production_build:
     variables:
         ENVIRONMENT: production
     stage: build
+    only:
+        - /^v(\d+\.)?(\d+\.)?(\*|\d+)$/
     tags:
-        - builder
+        - ffcbuilder
     script:
         - echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
         - echo "Building ffc production."
@@ -55,6 +57,8 @@ production_deploy:
         ENVIRONMENT: production
     stage: deploy
     when: manual
+    only:
+        - /^v(\d+\.)?(\d+\.)?(\*|\d+)$/
     tags:
         - ffcproduction
     script:
