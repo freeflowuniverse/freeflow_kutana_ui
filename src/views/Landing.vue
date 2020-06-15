@@ -87,5 +87,6 @@
 <style lang="scss" scoped>
     .landing {
         background: #f5f5f5;
+        height: calc(var(--vh) * 100);
     }
 </style>
