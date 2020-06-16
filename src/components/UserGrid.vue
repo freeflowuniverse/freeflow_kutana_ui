@@ -96,7 +96,7 @@
             @media (max-aspect-ratio: 1/1) {
                 grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
                 grid-template-rows: 34fr 100px 13fr;
-
+                grid-gap: 5px;
                 .user:not(:nth-child(1)) {
                     grid-row: 2/3;
                 }

@@ -1,5 +1,5 @@
 <template>
-    <div @click="showControl" class="room" v-if="localUser">
+    <div @click="showControl" class="room mobile" v-if="localUser">
         <UserGrid :users="users" v-if="view === 'grid'"></UserGrid>
         <ChatGrid :selectedUser="localUser" v-if="view === 'chat'" v-on:back="view= 'grid'"></ChatGrid>
         <transition name="fade" v-if="view === 'grid'">
@@ -8,14 +8,14 @@
         </transition>
 
         <div class="userSound">
-            <audio :key="user.id" :muted="user.muted" :src-object.prop.camel="user.stream"
+            <audio autoplay :key="user.id" :muted="user.muted" :src-object.prop.camel="user.stream"
                    v-for="user of remoteUsers"></audio>
         </div>
     </div>
 </template>
 
 <script>
-    import {mapActions, mapGetters} from "vuex";
+    import {mapActions, mapGetters, mapMutations} from "vuex";
     import UserGrid from "../components/UserGrid";
     import ChatGrid from "../components/ChatGrid";
     import ControlStrip from "../components/ControlStrip";
@@ -57,6 +57,13 @@
             this.getTeamInfo();
         },
         async mounted() {
+            if (!store.getters.localStream) {
+                router.push({
+                    name: "joinRoom",
+                    params: {token: this.$route.params.token}
+                });
+                return;
+            }
             this.$root.$on("toggleGridPresentation", () => {
                 this.changeViewStyle(this.isGrid ? 'Default' : 'Grid')
                 this.isGrid = !this.isGrid;
@@ -84,10 +91,12 @@
 
             const roomName = this.hashString('test');
             const tempUser = `test-${Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}`;
-            await initializeJanus(config.janusServer, "1235", userName || tempUser, roomName, stream);
+            const userControl = await initializeJanus(config.janusServer, "1235", userName || tempUser, roomName, stream);
+            this.setUserControl(userControl)
         },
         methods: {
             ...mapActions(["setSnackbarMessage", "getTeamInfo", "join", "changeViewStyle"]),
+            ...mapMutations(["setUserControl"]),
             hashString(str) {
                 let hash = 0;
                 for (let i = 0; i < str.length; i++) {
@@ -178,7 +187,8 @@
             },
             users() {
                 // return this.allUsers
-                return times(3, () => {
+                return times(7
+                    , () => {
                     return {id: Math.random().toString(36), ...this.localUser}
                 });
             }
