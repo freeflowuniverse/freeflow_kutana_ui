@@ -1,48 +1,68 @@
 <template>
-    <section class="mainControls">
-        <v-btn @click="toggleCam" color="blue" dark fab>
-            <v-icon>{{localUser.stream.getVideoTracks()[0].readyState === 'live' ? 'videocam':'videocam_off'}}</v-icon>
-        </v-btn>
-        <v-btn color="blue" dark fab>
-            <v-icon>{{localUser.stream.getAudioTracks()[0].readyState === 'live' ? 'mic':'mic_off'}}</v-icon>
-        </v-btn>
-        <v-btn color="red" dark fab>
-            <v-icon>call_end</v-icon>
-        </v-btn>
-        <v-btn @click="$emit('toggleChat')" color="blue" dark fab>
-            <v-icon>chat_bubble</v-icon>
-        </v-btn>
-        <v-btn class="btn-settings" color="#3A6DAD" dark fab>
-            <v-icon>settings</v-icon>
-        </v-btn>
-    </section>
+    <div class="controlStrip">
+        <section class="mainControls">
+            <v-btn @click="toggleCam" color="blue" dark fab>
+                <v-icon>{{camEnabled ?'videocam_off':'videocam'}}
+                </v-icon>
+            </v-btn>
+            <v-btn color="blue" dark fab>
+                <v-icon>{{micEnabled ?'mic_off':'mic'}}</v-icon>
+            </v-btn>
+            <v-btn @click="screen" color="blue" dark fab>
+                <v-icon>{{screenShareEnabled ? 'stop_screen_share':'screen_share'}}
+                </v-icon>
+            </v-btn>
+            <v-btn color="red" dark fab>
+                <v-icon>call_end</v-icon>
+            </v-btn>
+            <v-btn @click="$emit('toggleChat')" color="blue" dark fab>
+                <v-icon>chat_bubble</v-icon>
+            </v-btn>
+            <v-btn class="btn-settings" color="#3A6DAD" dark fab>
+                <v-icon>settings</v-icon>
+            </v-btn>
+        </section>
+    </div>
 </template>
 <script>
-    import {mapGetters} from "vuex";
+    import { mapGetters } from 'vuex';
 
     export default {
         computed: {
-            ...mapGetters(['userControl', 'localUser'])
+            ...mapGetters(['userControl', 'localUser', 'localScreenUser']),
+            camEnabled() {
+                return true;
+            },
+
+            micEnabled() {
+                return true;
+            },
+            screenShareEnabled() {
+                return false;
+            },
         },
         methods: {
             async toggleCam() {
-                if (this.localUser.stream.getVideoTracks()[0].readyState === "live") {
-                    this.userControl.stopVideoTrack()
+                if (this.localUser.stream.getVideoTracks()[0].readyState === 'live') {
+                    this.userControl.stopVideoTrack();
                     return;
                 }
-                const stream = await navigator.mediaDevices.getUserMedia({video: true})
-                await this.userControl.publishTrack(stream.getVideoTracks()[0])
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                await this.userControl.publishTrack(stream.getVideoTracks()[0]);
             },
             async toggleMic() {
-                if (this.localUser.stream.getAudioTracks()[0].readyState === "live") {
-                    this.userControl.stopAudioTrack()
+                if (this.localUser.stream.getAudioTracks()[0].readyState === 'live') {
+                    this.userControl.stopAudioTrack();
                     return;
                 }
-                const stream = await navigator.mediaDevices.getUserMedia({audio: true})
-                await this.userControl.publishTrack(stream.getAudioTracks()[0])
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                await this.userControl.publishTrack(stream.getAudioTracks()[0]);
+            },
+            screen() {
+                this.userControl.startScreenShare();
             },
         },
-    }
+    };
 
 </script>
 <style lang="scss" scoped>
@@ -58,6 +78,7 @@
         }
 
     }
+
     .desktop {
         .mainControls {
             position: fixed;

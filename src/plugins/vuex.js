@@ -8,6 +8,7 @@ import MainStore from '../stores/MainStore'
 import TeamStore from '../stores/TeamStore'
 import SocketStore from '../stores/SocketStore'
 import UserStore from "../stores/UserStore";
+import ScreenShareStore from "../stores/ScreenShareStore";
 
 Vue.use(Vuex)
 
@@ -19,6 +20,7 @@ export default new Vuex.Store({
         MainStore,
         TeamStore,
         SocketStore,
-        UserStore
+        UserStore,
+        ScreenShareStore,
     }
 })

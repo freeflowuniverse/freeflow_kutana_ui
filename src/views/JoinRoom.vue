@@ -107,7 +107,7 @@
         },
         data: function () {
             return {
-                video: false,
+                video: true,
                 audio: true,
                 devices: [],
                 videoDevice: null,

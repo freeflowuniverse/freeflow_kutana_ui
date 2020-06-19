@@ -24,7 +24,7 @@
     import {times} from "lodash";
     import router from "../plugins/router";
     import store from "../plugins/vuex";
-
+    import { v4 as uuidv4 } from 'uuid';
 
     export default {
         components: {
@@ -58,10 +58,15 @@
         },
         async mounted() {
             if (!store.getters.localStream) {
-                router.push({
-                    name: "joinRoom",
-                    params: {token: this.$route.params.token}
-                });
+                try {
+                    await router.push({
+                        name: "joinRoom",
+                        params: {token: this.$route.params.token}
+                    });
+                } catch (e) {
+
+                }
+
                 return;
             }
             this.$root.$on("toggleGridPresentation", () => {
@@ -86,12 +91,12 @@
             store.commit('setLocalStream', null);
 
             //@todo fixme
-            const userName = localStorage.getItem("account").name;
+            const userName = localStorage.getItem("account").name || `test-${Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}`;
             // const roomName = this.hashString(this.teamName);
 
-            const roomName = this.hashString('test');
-            const tempUser = `test-${Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}`;
-            const userControl = await initializeJanus(config.janusServer, "1235", userName || tempUser, roomName, stream);
+            const roomName = this.hashString(this.$route.params.token);
+            const opaqueId = uuidv4();
+            const userControl = await initializeJanus(config.janusServer, opaqueId, `${uuidv4()}-${userName}`, roomName, stream);
             this.setUserControl(userControl)
         },
         methods: {
@@ -103,7 +108,7 @@
                     hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
                     hash = hash & hash;
                 }
-                return hash;
+                return Math.abs(hash);
             },
             copyUrl() {
                 navigator.clipboard
@@ -157,7 +162,8 @@
                 "account",
                 "isGridView",
                 "localUser",
-                "allUsers"
+                "allUsers",
+                "allScreenUsers",
             ]),
             roomClass() {
                 let theClass = "room ";
@@ -186,11 +192,10 @@
                 return `${baseUrl}`;
             },
             users() {
-                // return this.allUsers
-                return times(7
-                    , () => {
-                    return {id: Math.random().toString(36), ...this.localUser}
-                });
+                // @todo move this mapping of screenshare to somewhere else
+                return this.allUsers.map(u => {
+                   return { ...u, screenShareStream :this.allScreenUsers.find(su => su.uuid === u.uuid).stream}
+                })
             }
         },
         watch: {

@@ -54,12 +54,41 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
         store.commit("deleteRemoteUser", user);
     });
 
-    const janus = await janusBuilder.addPlugin(videoRoomPlugin).build();
+    // SCREENSHARE
+    const screenShareRoomPlugin = new VideoRoomPlugin(opaqueId + '-screenshare');
+
+    screenShareRoomPlugin.addEventListener("pluginAttached", async (room) => {
+        const roomPadding = 13516416;
+        const roomCreationResult = await screenShareRoomPlugin.createRoom(roomName + roomPadding);
+        await screenShareRoomPlugin.joinRoom(roomCreationResult.room, userName);
+    });
+
+    screenShareRoomPlugin.addEventListener("ownUserJoined", (screenUser) => {
+        store.commit("setLocalScreenUser", screenUser);
+    });
+
+    screenShareRoomPlugin.addEventListener("userJoined", (screenUser) => {
+        if (screenUser === store.getters.localScreenUser) {
+            return;
+        }
+        store.commit("addRemoteScreenUser", screenUser);
+    });
+
+    screenShareRoomPlugin.addEventListener("userLeft", (screenUser) => {
+        store.commit("deleteRemoteScreenUser", screenUser);
+    });
+
+    const janus = await janusBuilder
+        .addPlugin(screenShareRoomPlugin)
+        .addPlugin(videoRoomPlugin)
+        .build();
+
+    window.janusshizzle = {screenShareRoomPlugin, videoRoomPlugin}
 
     return {
         startScreenShare: async () => {
             const stream = await navigator.mediaDevices.getDisplayMedia();
-            await videoRoomPlugin.publishTrack(stream.getVideoTracks()[0]);
+            await screenShareRoomPlugin.publishTrack(stream.getVideoTracks()[0]);
         },
         startCamera: async () => {
             const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false})

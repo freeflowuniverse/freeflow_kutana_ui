@@ -5,7 +5,16 @@
             class="grid"
     >
         <div class="user" v-bind:key="user.id" v-for="user of users">
-            <JanusVideo :cover="cover" :label="user.username" :stream="user.stream"></JanusVideo>
+            <JanusVideo v-if="user.screenShareStream.getVideoTracks()[0].readyState !== 'live'"
+                        :cover="cover"
+                        :label="user.username"
+                        :stream="user.stream"
+            ></JanusVideo>
+            <JanusVideo :cover="false"
+                        :label="user.username"
+                        :stream="user.screenShareStream"
+                        v-if="user.screenShareStream.getVideoTracks()[0].readyState === 'live'"
+            ></JanusVideo>
         </div>
     </div>
 </template>

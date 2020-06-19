@@ -195,12 +195,14 @@ export class VideoRoomPlugin {
 
         let stream = canvas.captureStream();
         let emptyVideo = Object.assign(stream.getVideoTracks()[0], {enabled: false});
+        emptyVideo.stop()
 
         let ctx = new AudioContext(), oscillator = ctx.createOscillator();
         let dst = oscillator.connect(ctx.createMediaStreamDestination());
 
         oscillator.start();
         let emptyAudio = Object.assign(dst.stream.getAudioTracks()[0], {enabled: false})
+        emptyAudio.stop()
 
         return new MediaStream([emptyVideo, emptyAudio])
     }
@@ -240,18 +242,23 @@ export class VideoRoomPlugin {
         this.myStream.getTracks().find(t => t.kind === track.kind).stop();
 
         this.myStream = new MediaStream([track, this.myStream.getTracks().find(t => t.kind !== track.kind)])
-        this.emitEvent("ownUserJoined", {
-            id: this.myId,
-            username: this.myUsername,
-            room: this.myRoom,
-            stream: this.myStream
-        })
+        this.emitEvent("ownUserJoined", this.buildUser(this.myStream, this.myId, this.myUsername))
     }
 
     //  await this.publishTrack((await navigator.mediaDevices.getDisplayMedia()).getVideoTracks()[0]);
 
     onLocalStream(stream) {
-        this.emitEvent("ownUserJoined", {id: this.myId, username: this.myUsername, room: this.myRoom, stream: stream})
+        this.emitEvent("ownUserJoined", this.buildUser(stream, this.myId, this.myUsername))
+    }
+
+    buildUser(stream, id, username = this.myUsername) {
+        return {
+            id: id,
+            uuid: username.slice(0, 36),
+            username: username.slice(37),
+            room: this.myRoom,
+            stream: stream
+        };
     }
 
     async createRoom(roomName) {
@@ -279,7 +286,8 @@ export class VideoRoomPlugin {
                             room: roomName,
                             permanent: false,
                             description: "Super room!",
-                            bitrate: 128000,
+                            bitrate_cap: false,
+                            require_pvtid: true,
                             publishers: 16,
                             transport_wide_cc_ext: true,
                             fir_freq: 10,
@@ -421,21 +429,12 @@ export class VideoRoomPlugin {
 
             },
             onremotestream: stream => {
-                this.emitEvent("userJoined", {
-                    id: pluginHandle.rfid,
-                    username: pluginHandle.rfdisplay,
-                    room: room,
-                    stream: stream
-                })
+                console.log({pluginHandle})
+                this.emitEvent("userJoined", this.buildUser(stream, pluginHandle.rfid, pluginHandle.rfdisplay))
             },
             oncleanup: () => {
                 console.log("[oncleanup]: ", pluginHandle.rfid)
-                this.emitEvent("userLeft", {
-                    id: pluginHandle.rfid,
-                    username: pluginHandle.rfdisplay,
-                    room: room,
-                    stream: null
-                })
+                this.emitEvent("userLeft", this.buildUser(null, pluginHandle.rfid, pluginHandle.rfdisplay))
             }
         };
     }
