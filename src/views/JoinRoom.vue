@@ -56,56 +56,60 @@
 </template>
 
 <script>
-    import router from "../plugins/router";
-    import {mapMutations} from "vuex";
+    import router from '../plugins/router';
+    import { mapMutations } from 'vuex';
 
 
     export default {
-        name: "JoinRoom",
+        name: 'JoinRoom',
         methods: {
             ...mapMutations(['setLocalStream']),
             joinRoom() {
-                if (!this.localStream){
-                 return;
+                if (!this.localStream) {
+                    return;
                 }
-                this.setLocalStream(this.localStream)
+                this.setLocalStream(this.localStream);
 
                 router.push({
-                    name: "room",
-                    params: {token: this.$route.params.token}
+                    name: 'room',
+                    params: { token: this.$route.params.token },
                 });
             },
             async updateLocalStream() {
-                const audioConstraint = this.audioDevice && this.audio ? {deviceId: {exact: this.audioDevice}} : this.audio;
-                const videoConstraint = this.videoDevice && this.video ? {deviceId: {exact: this.videoDevice}} : this.video;
+                const audioConstraint = this.audioDevice && this.audio ? { deviceId: { exact: this.audioDevice } } : this.audio;
+                const videoConstraint = this.videoDevice && this.video ? { deviceId: { exact: this.videoDevice } } : this.video;
                 const constraints = {
                     audio: audioConstraint,
-                    video: videoConstraint
+                    video: videoConstraint,
                 };
                 try {
                     // @todo: fix so that replaces track instead of full stream
-                    this.localStream = await navigator.mediaDevices.getUserMedia(constraints)
+                    this.localStream = await navigator.mediaDevices.getUserMedia(constraints);
                 } catch (e) {
                     this.localStream = null;
                 }
 
             },
             changeVideoDevice() {
-                this.video = true
+                this.video = true;
                 this.updateLocalStream();
             },
             changeAudioDevice() {
-                this.audio = true
+                this.audio = true;
                 this.updateLocalStream();
-            }
+            },
         },
         mounted() {
             navigator.mediaDevices.enumerateDevices().then(devices => {
-                this.devices = devices
+                this.devices = devices;
                 this.updateLocalStream()
+                    //debug remove this
+                    .then(() => {
+                        this.joinRoom();
+                    });
             });
         },
-        data: function () {
+        data: function() {
             return {
                 video: true,
                 audio: true,
@@ -113,20 +117,20 @@
                 videoDevice: null,
                 audioDevice: null,
                 localStream: null,
-            }
+            };
         },
         computed: {
             videoInputDevices() {
-                return this.devices.filter(d => d.kind === "videoinput" && d.label)
+                return this.devices.filter(d => d.kind === 'videoinput' && d.label);
             },
             audioInputDevices() {
-                return this.devices.filter(d => d.kind === "audioinput" && d.label)
+                return this.devices.filter(d => d.kind === 'audioinput' && d.label);
             },
             audioOutputDevices() {
-                return this.devices.filter(d => d.kind === "audiooutput" && d.label)
+                return this.devices.filter(d => d.kind === 'audiooutput' && d.label);
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>

@@ -1,81 +1,79 @@
-import {JanusBuilder} from "../januswrapper/JanusBuilder";
-import {VideoRoomPlugin} from "../januswrapper/VideoRoomPlugin";
-import store from "../plugins/vuex";
+import { JanusBuilder } from '../januswrapper/JanusBuilder';
+import { VideoRoomPlugin } from '../januswrapper/VideoRoomPlugin';
+import store from '../plugins/vuex';
 
 export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, stream) => {
     const janusBuilder = new JanusBuilder(serverUrl, true);
     const videoRoomPlugin = new VideoRoomPlugin(opaqueId);
     let initialJoin = true;
 
-    videoRoomPlugin.addEventListener("pluginAttached", async (room) => {
+    videoRoomPlugin.addEventListener('pluginAttached', async (room) => {
         const roomCreationResult = await videoRoomPlugin.createRoom(roomName);
         await videoRoomPlugin.joinRoom(roomCreationResult.room, userName);
     });
 
     const isVideoAuthorised = false;
 
-    videoRoomPlugin.addEventListener("ownUserJoined", (user) => {
+    videoRoomPlugin.addEventListener('ownUserJoined', (user) => {
         if (initialJoin) {
             initialJoin = false;
             stream.getTracks().forEach(async (track) => {
                 await videoRoomPlugin.publishTrack(track);
-            })
+            });
         }
 
-        store.commit("setLocalUser", user);
+        store.commit('setLocalUser', user);
 
-        user.stream.getTracks().forEach((track) => {
-            const kind = track.kind;
-
-            if (kind !== "video") {
+        user.stream.getVideoTracks()[0].onended = async (event) => {
+            debugger
+            if (!isVideoAuthorised) {
                 return;
             }
 
-            track.onended = async (event) => {
-                if (!isVideoAuthorised) {
-                    return;
-                }
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            await videoRoomPlugin.publishTrack(stream.getTracks()[0]);
 
-                const stream = await navigator.mediaDevices.getUserMedia({video: true})
-                await videoRoomPlugin.publishTrack(stream.getTracks()[0]);
-
-            }
-        });
+        };
     });
 
-    videoRoomPlugin.addEventListener("userJoined", (user) => {
+    videoRoomPlugin.addEventListener('userJoined', (user) => {
         if (user === store.getters.localUser) {
             return;
         }
-        store.commit("addRemoteUser", user);
+        user.stream.getVideoTracks().forEach((track) => {
+            track.onended = async (event) => {
+                debugger
+            };
+        });
+        store.commit('addRemoteUser', user);
     });
 
-    videoRoomPlugin.addEventListener("userLeft", (user) => {
-        store.commit("deleteRemoteUser", user);
+    videoRoomPlugin.addEventListener('userLeft', (user) => {
+        store.commit('deleteRemoteUser', user);
     });
 
     // SCREENSHARE
     const screenShareRoomPlugin = new VideoRoomPlugin(opaqueId + '-screenshare');
 
-    screenShareRoomPlugin.addEventListener("pluginAttached", async (room) => {
+    screenShareRoomPlugin.addEventListener('pluginAttached', async (room) => {
         const roomPadding = 13516416;
         const roomCreationResult = await screenShareRoomPlugin.createRoom(roomName + roomPadding);
         await screenShareRoomPlugin.joinRoom(roomCreationResult.room, userName);
     });
 
-    screenShareRoomPlugin.addEventListener("ownUserJoined", (screenUser) => {
-        store.commit("setLocalScreenUser", screenUser);
+    screenShareRoomPlugin.addEventListener('ownUserJoined', (screenUser) => {
+        store.commit('setLocalScreenUser', screenUser);
     });
 
-    screenShareRoomPlugin.addEventListener("userJoined", (screenUser) => {
+    screenShareRoomPlugin.addEventListener('userJoined', (screenUser) => {
         if (screenUser === store.getters.localScreenUser) {
             return;
         }
-        store.commit("addRemoteScreenUser", screenUser);
+        store.commit('addRemoteScreenUser', screenUser);
     });
 
-    screenShareRoomPlugin.addEventListener("userLeft", (screenUser) => {
-        store.commit("deleteRemoteScreenUser", screenUser);
+    screenShareRoomPlugin.addEventListener('userLeft', (screenUser) => {
+        store.commit('deleteRemoteScreenUser', screenUser);
     });
 
     const janus = await janusBuilder
@@ -83,7 +81,7 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
         .addPlugin(videoRoomPlugin)
         .build();
 
-    window.janusshizzle = {screenShareRoomPlugin, videoRoomPlugin}
+    window.janusshizzle = { screenShareRoomPlugin, videoRoomPlugin };
 
     return {
         startScreenShare: async () => {
@@ -91,7 +89,7 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
             await screenShareRoomPlugin.publishTrack(stream.getVideoTracks()[0]);
         },
         startCamera: async () => {
-            const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false})
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
             // this.isVideoAuthorised = true
             await videoRoomPlugin.publishTrack(stream.getVideoTracks()[0]);
         },
@@ -99,11 +97,11 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
             await videoRoomPlugin.publishTrack(track);
         },
         stopVideoTrack: () => {
-            videoRoomPlugin.myStream.getVideoTracks()[0].stop()
+            videoRoomPlugin.myStream.getVideoTracks()[0].stop();
         },
         stopAudioTrack: () => {
-            videoRoomPlugin.myStream.getAudioTracks()[0].stop()
+            videoRoomPlugin.myStream.getAudioTracks()[0].stop();
 
         },
-    }
-}
+    };
+};

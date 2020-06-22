@@ -306,6 +306,7 @@ export class VideoRoomPlugin {
     }
 
     async joinRoom(roomName, username) {
+        this.myUsername = username;
         return new Promise((resolve, reject) => {
             this.pluginHandle.send({
                 message: {
@@ -315,7 +316,6 @@ export class VideoRoomPlugin {
                     display: username
                 },
                 success: () => {
-                    this.myUsername = username;
                     resolve()
                 }
             });
