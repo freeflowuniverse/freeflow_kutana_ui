@@ -69,6 +69,7 @@
             :disabled="audioOutputDevices.length <= 0"
           ></v-select> -->
           <v-file-input
+            v-if="isBackgroundRemovalPossible"
             dense
             v-model="wallpaperFile"
             prepend-icon="image"
@@ -94,18 +95,15 @@
     <!-- <v-card class="secondary pa-1" dark v-else> -->
     <v-row class="mx-2" justify="center" align="center" style="height:60px">
       <v-btn @click="toggleCamera" icon class="mr-1">
-        <v-icon v-if="videoPublished">videocam</v-icon>
-        <v-icon v-else>videocam_off</v-icon>
+        <v-icon>{{videoPublished ? 'videocam' : 'videocam_off'}}</v-icon>
       </v-btn>
 
       <v-btn @click="toggleMute" icon class="mr-0">
-        <v-icon v-if="micEnabled">mic</v-icon>
-        <v-icon v-else>mic_off</v-icon>
+        <v-icon>{{micEnabled ? 'mic' : 'mic_off'}}</v-icon>
       </v-btn>
       <v-spacer></v-spacer>
       <v-btn icon class="mx-1" @click="$root.$emit('toggleGridPresentation')">
-        <v-icon v-if="grid">grid_off</v-icon>
-        <v-icon v-else>grid_on</v-icon>
+        <v-icon>{{grid ? 'grid_off' : 'grid_on'}}</v-icon>
       </v-btn>
       <v-btn @click="hangUp" dark icon class="red mx-2 endCall">
         <v-icon>call_end</v-icon>
@@ -122,16 +120,9 @@
         <v-icon>stop_screen_share</v-icon>
       </v-btn>
       <!-- Virtual background button -->
-      <v-btn
-        @click="toggleWallpaper"
-        v-if="!wallpaperEnabled"
-        icon
-        class="ml-2"
-      >
-        <v-icon>image</v-icon>
-      </v-btn>
-      <v-btn @click="toggleWallpaper" v-else-if="wallpaperEnabled" icon class="ml-1">
-        <span class="material-icons">broken_image</span>
+
+      <v-btn @click="toggleWallpaper" icon class="ml-1" v-if="isBackgroundRemovalPossible">
+        <span class="material-icons">{{wallpaperEnabled ? 'broken_image' : 'image'}}</span>
       </v-btn>
       <!-- End virtual background button -->
       <v-spacer></v-spacer>
@@ -169,7 +160,8 @@ export default {
     };
   },
   mounted() {
-    this.videoDevice = this.activeVideoDevice.deviceId;
+    console.log(this.activeVideoDevice)
+    this.videoDevice = (this.activeVideoDevice ? this.activeVideoDevice.deviceId : null);
     this.$root.$on("showInviteUser", this.showAddUserDialog);
     this.refreshDevices();
   },
@@ -188,7 +180,8 @@ export default {
       "activeAudioOutputDevice",
       "videoPublished",
       "micEnabled",
-      "wallpaperEnabled"
+      "wallpaperEnabled",
+      "isBackgroundRemovalPossible"
     ]),
     inviteLink() {
       let baseUrl = window.location.href;
@@ -332,6 +325,7 @@ export default {
 
       if(this.wallpaperFile === undefined){
         janusHelpers.changeWallpaper(undefined) // go to default wallpaper
+        return
       }
       if(this.wallpaperFile.name.split('.').pop() != "jpeg" && this.wallpaperFile.name.split('.').pop() != "jpg" && this.wallpaperFile.name.split('.').pop() != "png"){
         alert("Please use PNG or JPG image")

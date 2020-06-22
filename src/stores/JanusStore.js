@@ -12,7 +12,6 @@ export default {
     screenShareRoom: null,
     myPrivateId: null,
     roomId: null,
-    inputSelection: null, //for which room did you do input selection
     feeds: [],
     opaqueId: "videoroom-" + Janus.randomString(12),
     selectedUser: null,
@@ -69,9 +68,6 @@ export default {
     selectUser(state, user) {
       state.selectedUser = user;
     }, 
-    setInputSelection(state, room) {
-      state.inputSelection = room;
-    },
     shareScreen() {
       console.log("shareScreen")
       janusHelpers.screenShare.onJanusCreateSuccess(janusHelpers.screenShare.shareAndPublishScreen);
@@ -140,9 +136,6 @@ export default {
     },
     setRoomId(context, roomId) {
       context.commit("setRoomId", roomId);
-    },
-    setInputSelection(context, room) {
-      context.commit("setInputSelection", room);
     }
   },
   getters: {
@@ -158,7 +151,6 @@ export default {
     opaqueId: state => state.opaqueId,
     selectedUser: state => state.selectedUser,
     users: state => state.users,
-    screenShare: state => state.screenShare,
-    inputSelection: state => state.inputSelection
+    screenShare: state => state.screenShare
   }
 };

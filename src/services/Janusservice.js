@@ -6,7 +6,7 @@ import store from "../plugins/vuex";
 import * as localForage from "localforage";
 import StreamFilterService from "./streamFilterService"
 let inThrottle;
-
+let backgroundRemovalActive = store.getters.isBackgroundRemovalPossible
 
 const hashString = str => {
     let hash = 0;
@@ -435,6 +435,7 @@ export const janusHelpers = {
         }
     },
     async changeWallpaper(wallpaperDataUrl) {
+        if (!backgroundRemovalActive) { return }
         if (wallpaperDataUrl === undefined) {
             wallpaperDataUrl = "/default_background.png"
         }
@@ -444,7 +445,9 @@ export const janusHelpers = {
     },
     async changeDevice(isCameraActive, isAudioActive, newAudioDeviceId, newVideoDeviceId, wallpaperEnabled) {
         if (!isCameraActive) {
-            this.streamFilterService.changeSettings(isCameraActive, isAudioActive, wallpaperEnabled)
+            if (backgroundRemovalActive) {
+                this.streamFilterService.changeSettings(isCameraActive, isAudioActive, wallpaperEnabled)
+            }
             setTimeout(() => {
                 this.currentVideo.stop()
                 this.mediaStream.removeTrack(this.currentVideo) // This will stop the camera led, do it 200ms later or get race condition
@@ -457,11 +460,12 @@ export const janusHelpers = {
         })
 
         this.currentVideo = tempStream.getVideoTracks()[0]
-        setTimeout(() => {
-
-            this.streamFilterService.startVideo(tempStream)
-            this.streamFilterService.changeSettings(isCameraActive, isAudioActive, wallpaperEnabled)
-        }, 200)
+        if (backgroundRemovalActive) { 
+            setTimeout(() => {
+                this.streamFilterService.startVideo(tempStream)
+                this.streamFilterService.changeSettings(isCameraActive, isAudioActive, wallpaperEnabled)
+            }, 500)
+        }
     },
     async publishOwnFeed() {
         this.wallpaperEnabled = store.getters.wallpaperEnabled
@@ -476,10 +480,12 @@ export const janusHelpers = {
         }
 
         const useAudio = !!this.mediaStream.getAudioTracks().length
-        this.streamFilterService = new StreamFilterService(this.mediaStream, "/default_background.png", store.getters.videoPublished, store.getters.micEnabled, this.wallpaperEnabled)
-        this.stream = await this.streamFilterService.getResultStream()
-        this.streamFilterService.start()
-
+        if (backgroundRemovalActive) {
+            this.streamFilterService = new StreamFilterService(this.mediaStream, "/default_background.png", store.getters.videoPublished, store.getters.micEnabled, this.wallpaperEnabled)
+            this.stream = await this.streamFilterService.getResultStream()
+            this.streamFilterService.start()
+        }
+            
         /* use the stream */
         store.getters.users[0].pluginHandle.createOffer({
             simulcast: false,

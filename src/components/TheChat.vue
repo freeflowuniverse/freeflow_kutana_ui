@@ -39,6 +39,7 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
+      if(!this.$refs || !this.$refs.chat) return
       this.$refs.chat.scrollTop = this.$refs.chat.clientHeight;
     });
   },
