@@ -3,7 +3,7 @@ import { VideoRoomPlugin } from '../januswrapper/VideoRoomPlugin';
 import store from '../plugins/vuex';
 
 export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, stream) => {
-    const janusBuilder = new JanusBuilder(serverUrl, true);
+    const janusBuilder = new JanusBuilder(serverUrl, false);
     const videoRoomPlugin = new VideoRoomPlugin(opaqueId);
     let initialJoin = true;
 
@@ -25,7 +25,7 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
         store.commit('setLocalUser', user);
 
         user.stream.getVideoTracks()[0].onended = async (event) => {
-            debugger
+            console.log('ended local')
             if (!isVideoAuthorised) {
                 return;
             }
@@ -42,7 +42,7 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
         }
         user.stream.getVideoTracks().forEach((track) => {
             track.onended = async (event) => {
-                debugger
+                console.log('ended')
             };
         });
         store.commit('addRemoteUser', user);
@@ -62,12 +62,20 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
     });
 
     screenShareRoomPlugin.addEventListener('ownUserJoined', (screenUser) => {
+        const videoTrack = screenUser.stream.getVideoTracks()[0];
+        screenUser.stream.onended = () => {
+            videoTrack.dispatchEvent(new Event("ended"))
+        }
         store.commit('setLocalScreenUser', screenUser);
     });
 
     screenShareRoomPlugin.addEventListener('userJoined', (screenUser) => {
         if (screenUser === store.getters.localScreenUser) {
             return;
+        }
+        const videoTrack = screenUser.stream.getVideoTracks()[0];
+        screenUser.stream.onended = () => {
+            videoTrack.dispatchEvent(new Event("ended"))
         }
         store.commit('addRemoteScreenUser', screenUser);
     });
@@ -86,7 +94,11 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
     return {
         startScreenShare: async () => {
             const stream = await navigator.mediaDevices.getDisplayMedia();
-            await screenShareRoomPlugin.publishTrack(stream.getVideoTracks()[0]);
+            const videoTrack = stream.getVideoTracks()[0];
+            stream.onended = () => {
+                videoTrack.dispatchEvent(new Event("ended"))
+            }
+            await screenShareRoomPlugin.publishTrack(videoTrack);
         },
         startCamera: async () => {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
@@ -98,10 +110,11 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
         },
         stopVideoTrack: () => {
             videoRoomPlugin.myStream.getVideoTracks()[0].stop();
+            videoRoomPlugin.myStream.getVideoTracks()[0].dispatchEvent(new Event("ended"));
         },
         stopAudioTrack: () => {
             videoRoomPlugin.myStream.getAudioTracks()[0].stop();
-
+            videoRoomPlugin.myStream.getAudioTracks()[0].dispatchEvent(new Event("ended"));
         },
     };
 };

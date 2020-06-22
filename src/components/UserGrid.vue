@@ -4,26 +4,15 @@
             :data-useramount-even="users.length % 2 ? 'false' : 'true'"
             class="grid"
     >
-        <div class="user" v-bind:key="user.id" v-for="user of users">
-            <JanusVideo v-if="user.stream.getVideoTracks()[0].readyState === 'live'"
-                        :cover="cover"
-                        :label="user.username"
-                        :stream="user.stream"
-            ></JanusVideo>
-            <JanusVideo :cover="false"
-                        :label="user.username"
-                        :stream="user.screenShareStream"
-                        v-if="user.screenShareStream.getVideoTracks()[0].readyState === 'live'"
-            ></JanusVideo>
-        </div>
+        <UserGridItem class="user" v-for="user of users" v-bind:key="user.uuid" :user="user"/>
     </div>
 </template>
 <script>
-    import JanusVideo from "./JanusVideo";
+    import UserGridItem from './UserGridItem';
 
     export default {
         components: {
-            JanusVideo
+            UserGridItem
         },
         props: {
             users: {

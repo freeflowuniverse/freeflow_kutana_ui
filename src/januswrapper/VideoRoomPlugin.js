@@ -41,14 +41,14 @@ export class VideoRoomPlugin {
                 this.onLocalStream(stream)
             },
             onremotestream: (stream) => {
-                console.log("ON REMOTE STREAM: ", stream)
+                // console.log("ON REMOTE STREAM: ", stream)
             }
         }
     }
 
     determineSpeaker(stream, remoteFeed, id) {
         if (!window.audioContext) {
-            console.log("Creating AudioContext ...")
+            // console.log("Creating AudioContext ...")
             var _AudioContext = window.AudioContext || window.webkitAudioContext;
             window.audioContext = new _AudioContext();
         }
@@ -121,7 +121,7 @@ export class VideoRoomPlugin {
     }
 
     emitEvent(eventMessage, msg) {
-        console.log({eventMessage})
+        // console.log({eventMessage})
         const events = this.listeners[eventMessage];
 
         if (!events) {
@@ -139,19 +139,19 @@ export class VideoRoomPlugin {
     }
 
     onError(error) {
-        console.log("[onError]")
-        console.log(error)
+        // console.log("[onError]")
+        // console.log(error)
         this.emitEvent("error", error)
     }
 
     async onMessage(msg, jsep) {
         if (jsep) {
-            console.group("[onMessage, handleRemoteJsep]");
+            // console.group("[onMessage, handleRemoteJsep]");
             this.pluginHandle.handleRemoteJsep({
                 jsep: jsep,
                 success: () => {
-                    console.log("handleRemoteJsep => success")
-                    console.groupEnd()
+                    // console.log("handleRemoteJsep => success")
+                    // console.groupEnd()
                 }
             });
         }
@@ -196,6 +196,7 @@ export class VideoRoomPlugin {
         let stream = canvas.captureStream();
         let emptyVideo = Object.assign(stream.getVideoTracks()[0], {enabled: false});
         emptyVideo.stop()
+        emptyVideo.dispatchEvent(new Event("ended"));
 
         let ctx = new AudioContext(), oscillator = ctx.createOscillator();
         let dst = oscillator.connect(ctx.createMediaStreamDestination());
@@ -203,6 +204,7 @@ export class VideoRoomPlugin {
         oscillator.start();
         let emptyAudio = Object.assign(dst.stream.getAudioTracks()[0], {enabled: false})
         emptyAudio.stop()
+        emptyAudio.dispatchEvent(new Event("ended"));
 
         return new MediaStream([emptyVideo, emptyAudio])
     }
@@ -219,15 +221,15 @@ export class VideoRoomPlugin {
                     message: publish,
                     jsep: jsep,
                     success: () => {
-                        console.log("CreateOffer configure success")
+                        // console.log("CreateOffer configure success")
                     },
                     error: () => {
-                        console.log("CreateOffer configure error: ", error)
+                        // console.log("CreateOffer configure error: ", error)
                     }
                 });
             },
             error: error => {
-                console.log("CreateOffer error:", error);
+                // console.log("CreateOffer error:", error);
             }
         });
     }
@@ -239,7 +241,9 @@ export class VideoRoomPlugin {
         const rtcpSender = senders.find(sender => sender.track.kind === track.kind);
         await rtcpSender.replaceTrack(track);
 
-        this.myStream.getTracks().find(t => t.kind === track.kind).stop();
+        const streamTrack = this.myStream.getTracks().find(t => t.kind === track.kind);
+        streamTrack.stop();
+        streamTrack.dispatchEvent(new Event("ended"));
 
         this.myStream = new MediaStream([track, this.myStream.getTracks().find(t => t.kind !== track.kind)])
         this.emitEvent("ownUserJoined", this.buildUser(this.myStream, this.myId, this.myUsername))
@@ -262,7 +266,7 @@ export class VideoRoomPlugin {
     }
 
     async createRoom(roomName) {
-        console.group("[createRoom]: ", roomName);
+        // console.group("[createRoom]: ", roomName);
 
         return new Promise(((resolve, reject) => {
             this.pluginHandle.send({
@@ -271,10 +275,10 @@ export class VideoRoomPlugin {
                     room: roomName
                 },
                 success: (result) => {
-                    console.log(" * exists => success: ", result.exists);
+                    // console.log(" * exists => success: ", result.exists);
 
                     if (result.exists) {
-                        console.groupEnd();
+                        // console.groupEnd();
                         resolve(result)
                         return;
                     }
@@ -295,8 +299,8 @@ export class VideoRoomPlugin {
                             notify_joining: true
                         },
                         success: (result) => {
-                            console.log(" * create => success: ", result.exists);
-                            console.groupEnd();
+                            // console.log(" * create => success: ", result.exists);
+                            // console.groupEnd();
                             resolve(result)
                         }
                     });
@@ -323,8 +327,8 @@ export class VideoRoomPlugin {
     }
 
     attachSubscriber(id, display, audio, video) {
-        console.group("[attachSubscriber]");
-        console.log(" * params => ", id, display, audio, video);
+        // console.group("[attachSubscriber]");
+        // console.log(" * params => ", id, display, audio, video);
 
         let pluginHandle = {};
 
@@ -334,7 +338,7 @@ export class VideoRoomPlugin {
             plugin: "janus.plugin.videoroom",
             opaqueId: this.opaqueId,
             success: succesHandle => {
-                console.log(" * attach => success");
+                // console.log(" * attach => success");
                 pluginHandle = succesHandle;
                 pluginHandle.simulcastStarted = false;
 
@@ -346,35 +350,35 @@ export class VideoRoomPlugin {
                     private_id: this.myPrivateId
                 };
 
-                console.log(" * subscribe => ", subscribe);
+                // console.log(" * subscribe => ", subscribe);
 
                 pluginHandle.videoCodec = video;
                 pluginHandle.send({
                     message: subscribe,
                     success: () => {
-                        console.log(" * join => success");
-                        console.groupEnd();
+                        // console.log(" * join => success");
+                        // console.groupEnd();
                     }
                 });
             },
             error: error => {
-                console.log(" * attach => error");
-                console.log(error);
-                console.groupEnd();
+                // console.log(" * attach => error");
+                // console.log(error);
+                // console.groupEnd();
             },
             onmessage: (msg, jsep) => {
-                console.group("[attachSubscriber, onmessage]");
-                console.log(msg)
-                console.log(jsep)
-                console.groupEnd()
+                // console.group("[attachSubscriber, onmessage]");
+                // console.log(msg)
+                // console.log(jsep)
+                // console.groupEnd()
 
                 if (jsep !== undefined && jsep !== null) {
-                    console.group("[attachSubscriber, onmessage, createAnswer]");
+                    // console.group("[attachSubscriber, onmessage, createAnswer]");
                     pluginHandle.createAnswer({
                         jsep: jsep,
                         stream: this.myStream,
                         success: jsep => {
-                            console.log("[attachSubscriber, onmessage, createAnswer] => success");
+                            // console.log("[attachSubscriber, onmessage, createAnswer] => success");
 
                             const body = {
                                 request: "start",
@@ -385,15 +389,15 @@ export class VideoRoomPlugin {
                                 message: body,
                                 jsep: jsep,
                                 success: () => {
-                                    console.log("[attachSubscriber, onmessage, start] => success");
-                                    console.groupEnd();
+                                    // console.log("[attachSubscriber, onmessage, start] => success");
+                                    // console.groupEnd();
                                 }
                             });
                         },
                         error: error => {
-                            console.log("[attachSubscriber, onmessage, start] => WebRTC error");
-                            console.log(error)
-                            console.groupEnd();
+                            // console.log("[attachSubscriber, onmessage, start] => WebRTC error");
+                            // console.log(error)
+                            // console.groupEnd();
                         }
                     });
                 }
@@ -429,11 +433,11 @@ export class VideoRoomPlugin {
 
             },
             onremotestream: stream => {
-                console.log({pluginHandle})
+                // console.log({pluginHandle})
                 this.emitEvent("userJoined", this.buildUser(stream, pluginHandle.rfid, pluginHandle.rfdisplay))
             },
             oncleanup: () => {
-                console.log("[oncleanup]: ", pluginHandle.rfid)
+                // console.log("[oncleanup]: ", pluginHandle.rfid)
                 this.emitEvent("userLeft", this.buildUser(null, pluginHandle.rfid, pluginHandle.rfdisplay))
             }
         };

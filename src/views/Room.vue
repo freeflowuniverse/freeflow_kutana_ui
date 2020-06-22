@@ -3,13 +3,20 @@
         <UserGrid :users="users" v-if="view === 'grid'"></UserGrid>
         <ChatGrid :selectedUser="localUser" v-if="view === 'chat'" v-on:back="view= 'grid'"></ChatGrid>
         <transition name="fade" v-if="view === 'grid'">
-            <ControlStrip v-if="show  || !isMobile()"
-                          v-on:toggleChat="view === 'chat' ? view = 'grid' : view = 'chat'"></ControlStrip>
+            <ControlStrip
+                    v-if="show  || !isMobile()"
+                    v-on:toggleChat="view === 'chat' ? view = 'grid' : view = 'chat'"
+            ></ControlStrip>
         </transition>
 
         <div class="userSound">
-            <audio :key="user.id" :muted="user.muted" :src-object.prop.camel="user.stream" autoplay
-                   v-for="user of remoteUsers"></audio>
+            <audio
+                    :key="user.id"
+                    :muted="user.muted"
+                    :src-object.prop.camel="user.stream"
+                    autoplay
+                    v-for="user of remoteUsers"
+            ></audio>
         </div>
     </div>
 </template>
@@ -24,6 +31,8 @@
     import router from '../plugins/router';
     import store from '../plugins/vuex';
     import { v4 as uuidv4 } from 'uuid';
+    import { reject } from 'lodash/collection';
+    import { isNull } from 'lodash/lang';
 
     export default {
         components: {
@@ -174,16 +183,22 @@
                 if (!(this.allUsers.length && this.allScreenUsers.length)) {
                     return [];
                 }
-                console.log(this.allUsers)
-                console.log(this.allScreenUsers)
-                // @todo move this mapping of screenshare to somewhere else
-                return this.allUsers.map(u => {
-                    return {
-                        ...u, screenShareStream: this.allScreenUsers.find(su => {
+                return reject(
+                    this.allUsers.map(u => {
+                        const screenUser = this.allScreenUsers.find(su => {
                             return su.uuid === u.uuid;
-                        }).stream,
-                    };
-                });
+                        });
+
+                        if (!screenUser) {
+                            return null;
+                        }
+
+                        return {
+                            ...u, screenShareStream: screenUser.stream,
+                        };
+                    }),
+                    isNull,
+                );
             },
         },
     };

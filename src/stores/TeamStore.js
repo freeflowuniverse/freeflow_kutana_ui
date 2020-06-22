@@ -21,7 +21,6 @@ export default {
       context.commit("setTeamName", random.stringGenerator(15));
     },
     getTeamInfo(context) {
-      console.log(`context.getters.teamName`, context.getters.teamName)
       ffcService.getTeamInfo(context.getters.teamName).then((result) => {
         let data = result.data;
         context.commit("setMessages", data.messages);

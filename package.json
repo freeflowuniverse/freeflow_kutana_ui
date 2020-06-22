@@ -21,6 +21,7 @@
     "libsodium-wrappers": "^0.7.6",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
+    "random-avatar-generator": "^2.0.0",
     "register-service-worker": "^1.7.1",
     "socket.io-client": "^2.3.0",
     "tweetnacl-util": "^0.15.1",

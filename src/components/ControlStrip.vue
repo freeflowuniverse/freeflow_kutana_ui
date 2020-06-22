@@ -45,21 +45,38 @@
             async toggleCam() {
                 if (this.localUser.stream.getVideoTracks()[0].readyState === 'live') {
                     this.userControl.stopVideoTrack();
+                    setTimeout(() => {
+                        this.$forceUpdate();
+                    }, 100);
                     return;
                 }
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 await this.userControl.publishTrack(stream.getVideoTracks()[0]);
+                setTimeout(() => {
+                    this.$forceUpdate();
+                }, 100);
+
             },
             async toggleMic() {
                 if (this.localUser.stream.getAudioTracks()[0].readyState === 'live') {
                     this.userControl.stopAudioTrack();
+                    setTimeout(() => {
+                        this.$forceUpdate();
+                    }, 100);
+
                     return;
                 }
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 await this.userControl.publishTrack(stream.getAudioTracks()[0]);
+                setTimeout(() => {
+                    this.$forceUpdate();
+                }, 100);
             },
             screen() {
                 this.userControl.startScreenShare();
+                setTimeout(() => {
+                    this.$forceUpdate();
+                }, 100);
             },
         },
     };
