@@ -41,7 +41,12 @@ export default {
     getters: {
         localScreenUser: state => state.localScreenUser,
         remoteScreenUsers: state => state.remoteScreenUsers,
-        allScreenUsers: state => [state.localScreenUser, ...state.remoteScreenUsers],
+        allScreenUsers: state => {
+            if (!state.localScreenUser ){
+                return state.remoteScreenUsers
+            }
+            return [state.localScreenUser, ...state.remoteScreenUsers];
+        },
         screenUserControl: state => state.screenUserControl,
     }
 };

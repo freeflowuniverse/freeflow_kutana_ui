@@ -40,7 +40,12 @@ export default {
     getters: {
         localUser: state => state.localUser,
         remoteUsers: state => state.remoteUsers,
-        allUsers: state => [state.localUser, ...state.remoteUsers],
+        allUsers: state => {
+            if (!state.localUser){
+                return state.remoteUsers
+            }
+            return [state.localUser, ...state.remoteUsers];
+        },
         userControl: state => state.userControl,
     }
 };

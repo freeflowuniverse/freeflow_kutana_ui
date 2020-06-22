@@ -5,7 +5,7 @@
             class="grid"
     >
         <div class="user" v-bind:key="user.id" v-for="user of users">
-            <JanusVideo v-if="user.screenShareStream.getVideoTracks()[0].readyState !== 'live'"
+            <JanusVideo v-if="user.stream.getVideoTracks()[0].readyState === 'live'"
                         :cover="cover"
                         :label="user.username"
                         :stream="user.stream"
