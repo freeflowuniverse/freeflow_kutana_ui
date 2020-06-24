@@ -16,7 +16,7 @@ export default new VueRouter({
     { path: "/", name: 'home', component: Landing, meta: { requiresAuth: false } },
     { path: "/guestlogin", name: 'GuestLogin', component: GuestLogin, meta: { requiresAuth: false } },
     { path: "/login", name: 'login', component: Login, meta: { requiresAuth: false } },
-    { path: "/dev", name: 'login', component: Dev, meta: { requiresAuth: false } },
+    { path: "/dev", name: 'dev', component: Dev, meta: { requiresAuth: false } },
     { path: "/room/:token", name: 'room', component: Room, meta: { requiresAuth: true } },
     { path: "/room/:token/join", name: 'joinRoom', component: JoinRoom, meta: { requiresAuth: true } },
   ]

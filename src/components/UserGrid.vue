@@ -4,7 +4,7 @@
             :data-useramount-even="users.length % 2 ? 'false' : 'true'"
             class="grid"
     >
-        <UserGridItem class="user" v-for="user of users" v-bind:key="user.uuid" :user="user"/>
+        <UserGridItem :user="user" class="user" v-bind:key="user.uuid" v-for="user of users"/>
     </div>
 </template>
 <script>
@@ -12,35 +12,29 @@
 
     export default {
         components: {
-            UserGridItem
+            UserGridItem,
         },
         props: {
             users: {
-                required: true
-            }
+                required: true,
+            },
         },
 
         data: () => {
-            return {cover: true}
-        }
-    }
+            return { cover: true };
+        },
+    };
 </script>
 <style lang="scss" scoped>
     .grid {
 
         .user {
-            background: #000;
+            background: rgba(0, 0, 0, 0.4);
         }
 
         height: calc(var(--vh) * 100);
 
-        &[data-useramount="1"] {
-            .user {
-                height: 100%;
-            }
-        }
-
-        &[data-useramount="2"] {
+        &[data-useramount="2"], &[data-useramount="1"] {
             position: relative;
 
             .user:nth-child(1) {

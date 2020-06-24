@@ -5,7 +5,7 @@
                 :label="user.username"
                 :stream="user.stream"
                 class="main"
-                v-if="camlive"
+                v-if="this.$props.user.stream.getVideoTracks()[0].readyState === 'live'"
         ></JanusVideo>
         <JanusVideo
                 :cover="false"
@@ -14,8 +14,8 @@
                 class="screen"
                 v-if="screenLive"
         ></JanusVideo>
-        <div class="avatar" v-if="!camlive && !screenLive">
-            <img :src="avatar" :alt="user.username">
+        <div class="avatar" v-if="!(this.$props.user.stream.getVideoTracks()[0].readyState === 'live') && !screenLive">
+            <img :alt="user.username" :src="avatar">
         </div>
     </div>
 </template>
@@ -34,19 +34,19 @@
         },
         mounted() {
             this.$props.user.stream.getVideoTracks()[0].onended = () => {
-                console.log('ey')
-                setTimeout(()=> {
-                    this.$forceUpdate()
+                console.log('ey');
+                setTimeout(() => {
+                    this.$forceUpdate();
 
-                }, 100)
-            }
+                }, 100);
+            };
             this.$props.user.screenShareStream.getVideoTracks()[0].onended = () => {
-                console.log('ey')
-                setTimeout(()=> {
-                    this.$forceUpdate()
+                console.log('ey');
+                setTimeout(() => {
+                    this.$forceUpdate();
 
-                }, 100)
-            }
+                }, 100);
+            };
         },
         computed: {
             avatar() {
@@ -54,21 +54,27 @@
                 return generator.generateRandomAvatar(this.$props.user.username);
             },
             camlive() {
-                return this.$props.user.stream.getVideoTracks()[0].readyState === 'live'
+                return this.$props.user.stream.getVideoTracks()[0].readyState === 'live';
             },
             screenLive() {
-                return this.$props.user.screenShareStream.getVideoTracks()[0].readyState === 'live'
-            }
-        }
+                return this.$props.user.screenShareStream.getVideoTracks()[0].readyState === 'live';
+            },
+        },
     };
 </script>
 <style lang="scss" scoped>
     .user-grid-item {
         .main + .screen {
         }
-        .avatar{
+
+        .avatar {
             width: 100%;
             height: 100%;
+
+            img {
+                width: 100%;
+                height: 100%;
+            }
         }
     }
 </style>
