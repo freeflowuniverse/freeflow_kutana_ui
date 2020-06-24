@@ -5,7 +5,7 @@
                 :label="user.username"
                 :stream="user.stream"
                 class="main"
-                v-if="this.$props.user.stream.getVideoTracks()[0].readyState === 'live'"
+                v-if="this.$props.user.stream.getVideoTracks()[0] && this.$props.user.stream.getVideoTracks()[0].readyState === 'live'"
         ></JanusVideo>
         <JanusVideo
                 :cover="false"
@@ -14,7 +14,8 @@
                 class="screen"
                 v-if="screenLive"
         ></JanusVideo>
-        <div class="avatar" v-if="!(this.$props.user.stream.getVideoTracks()[0].readyState === 'live') && !screenLive">
+        <div class="avatar"
+             v-if="!(this.$props.user.stream.getVideoTracks()[0] && this.$props.user.stream.getVideoTracks()[0].readyState === 'live') && !screenLive">
             <img :alt="user.username" :src="avatar">
         </div>
     </div>
@@ -33,20 +34,33 @@
             },
         },
         mounted() {
-            this.$props.user.stream.getVideoTracks()[0].onended = () => {
-                console.log('ey');
-                setTimeout(() => {
-                    this.$forceUpdate();
 
-                }, 100);
-            };
-            this.$props.user.screenShareStream.getVideoTracks()[0].onended = () => {
-                console.log('ey');
-                setTimeout(() => {
-                    this.$forceUpdate();
+            //@todo: check if this is not a memmory leak
+            //preload image
+            const img=new Image();
+            img.src=this.avatar();
 
-                }, 100);
-            };
+            const videoTrack = this.$props.user.stream.getVideoTracks()[0];
+            if (videoTrack) {
+                videoTrack.onended = () => {
+                    console.log('ey');
+                    setTimeout(() => {
+                        this.$forceUpdate();
+
+                    }, 100);
+                };
+            }
+
+            const screenshareTrack = this.$props.user.screenShareStream.getVideoTracks()[0];
+            if (screenshareTrack) {
+                screenshareTrack.onended = () => {
+                    console.log('ey');
+                    setTimeout(() => {
+                        this.$forceUpdate();
+
+                    }, 100);
+                };
+            }
         },
         computed: {
             avatar() {

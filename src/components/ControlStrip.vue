@@ -5,7 +5,7 @@
                 <v-icon>{{camEnabled ?'videocam_off':'videocam'}}
                 </v-icon>
             </v-btn>
-            <v-btn color="blue" dark fab>
+            <v-btn @click="toggleMic" color="blue" dark fab>
                 <v-icon>{{micEnabled ?'mic_off':'mic'}}</v-icon>
             </v-btn>
             <v-btn @click="screen" color="blue" dark fab>

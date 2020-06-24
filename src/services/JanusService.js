@@ -24,16 +24,19 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
 
         store.commit('setLocalUser', user);
 
-        user.stream.getVideoTracks()[0].onended = async (event) => {
-            console.log('ended local');
-            if (!isVideoAuthorised) {
-                return;
-            }
+        const videoTrack = user.stream.getVideoTracks()[0];
+        if (videoTrack) {
+            videoTrack.onended = async (event) => {
+                console.log('ended local');
+                if (!isVideoAuthorised) {
+                    return;
+                }
 
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            await videoRoomPlugin.publishTrack(stream.getTracks()[0]);
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                await videoRoomPlugin.publishTrack(stream.getTracks()[0]);
 
-        };
+            };
+        }
     });
 
     videoRoomPlugin.addEventListener('userJoined', (user) => {
@@ -125,9 +128,30 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
             await videoRoomPlugin.publishTrack(track);
         },
         stopVideoTrack: () => {
+            //@todo: move this
             videoRoomPlugin.myStream.getVideoTracks()[0].stop();
             videoRoomPlugin.myStream.getVideoTracks()[0].dispatchEvent(new Event('ended'));
             window.janusshizzle.videoRoomPlugin.pluginHandle.hangup();
+            const audio = videoRoomPlugin.myStream.getAudioTracks()[0];
+            if (audio && audio.readyState === 'live') {
+                window.janusshizzle.videoRoomPlugin.pluginHandle.createOffer({
+                    stream: new MediaStream([audio]),
+                    success: jsep => {
+                        const publish = { request: 'configure', audio: true, video: false };
+
+                        window.janusshizzle.videoRoomPlugin.pluginHandle.send({
+                            message: publish,
+                            jsep: jsep,
+                            success: () => {
+                            },
+                            error: () => {
+                            },
+                        });
+                    },
+                    error: error => {
+                    },
+                });
+            }
         },
         stopAudioTrack: () => {
             videoRoomPlugin.myStream.getAudioTracks()[0].stop();
