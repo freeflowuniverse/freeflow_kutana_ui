@@ -9,7 +9,7 @@
           <v-col
             cols="8"
             :class="isMobile ? 'subtitle' : 'title'"
-            class="py-0 ttl"
+            class="py-0 ttl text-truncate"
             align="center"
           >{{isMine ? me.name : user.username}}</v-col>
           <v-col cols="2" class="py-0" align="end">
@@ -25,6 +25,7 @@
           :stream="userVideoStream"
           :muted="isMine || muted"
           :positionStatic="inGrid"
+          :class="isMine ? 'myvideo' : ''"
           @click="$emit('click')"
         ></JanusVideo>
         <v-row v-else align="center" justify="center" class="content">
@@ -63,11 +64,9 @@ export default {
     ...mapGetters({
       selectedUser: "selectedUser",
       me: "account",
-      users: "users"
+      users: "users",
+      isMobile: "isMobile"
     }),
-    isMobile() {
-      return this.$vuetify.breakpoint.mdAndDown;
-    },
     isMine() {
       return this.user == this.users[0];
     },

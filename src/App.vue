@@ -57,7 +57,8 @@ export default {
     color: white;
   }
 }
-.video-main video.noScreenshare {
+.video-main video.noScreenshare,
+.myvideo {
   transform: rotateY(180deg);
 }
 video {

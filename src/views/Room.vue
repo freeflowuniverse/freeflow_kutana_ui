@@ -1,10 +1,10 @@
 <template>
   <div :class="roomClass">
     <div class="video-list">
-      <UserList :grid="isGrid" :class="!showUserList ? 'hide-video-list' : ''" />
+      <UserList :grid="isGrid" />
     </div>
 
-    <div class="video-selected" v-if="!isGrid">
+    <div class="video-selected" v-if="!isGrid && !isMobile">
       <TheSelectedUser v-if="users.length > 1 && selectedUser" />
       <v-row align="center" justify="center" v-else-if="users.length === 1" class="fill-height">
         <v-col cols="12" md="8" lg="6">
@@ -33,7 +33,7 @@
       </v-row>
     </div>
 
-    <div class="video-main" v-if="!isGrid">
+    <div class="video-main" v-if="!isGrid && !isMobile">
       <div class="video-main__container black">
         <TheMainUser />
       </div>
@@ -74,7 +74,6 @@ export default {
     return {
       isGrid: false,
       showSidebar: !this.isMobile,
-      showUserList: true,
       startX: null,
       dragging: false
     };
@@ -86,16 +85,21 @@ export default {
         name: "joinRoom",
         params: { token: this.$route.params.token }
       });
-      return
+      return;
+    }
+  },
+  mounted() {
+    if (this.inputSelection != this.$route.params.token) {
+      // dont do anything if we need to do input selection first
+      return;
+    }
+    if (this.isMobile) {
+      document.body.requestFullscreen();
     }
     this.isGrid = this.isGridView;
     this.join(this.$route.params.token); // join in py backend
     this.getTeamInfo();
-  },
-  mounted() {
-    if (this.inputSelection != this.$route.params.token) { // dont do anything if we need to do input selection first
-      return;
-    }
+
     if (this.account && this.account.name && this.teamName) {
       this.setRoomId(Math.abs(this.hashString(this.teamName)));
     }
@@ -176,11 +180,9 @@ export default {
       "screenShare",
       "selectedUser",
       "isGridView",
-      "inputSelection"
+      "inputSelection",
+      "isMobile"
     ]),
-    isMobile() {
-      return this.$vuetify.breakpoint.mdAndDown;
-    },
     roomClass() {
       let theClass = "room ";
       console.log(`this.isMobile`, this.isMobile);
@@ -281,12 +283,8 @@ export default {
 
   width: 100vw;
   display: grid;
-  grid-template-rows: 1fr minmax(0px, auto) 60px;
-  grid-template-areas: "selected" "userList" "controls";
-  gap: 8px 0px;
-  .hide-video-list {
-    display: none !important;
-  }
+  grid-template-rows: 1fr 60px;
+  grid-template-areas: "userList" "controls";
   .video-main {
     position: fixed;
     top: 8px;

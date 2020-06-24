@@ -10,7 +10,7 @@
               ref="localStream"
               :src-object.prop.camel="localStream"
               autoplay
-              class="videoStream mine" muted
+              class="videoStream myvideo" muted
             ></video>
           </v-row>
           <v-select

@@ -1,5 +1,5 @@
 <template>
-  <section :class="`${isMobile ? 'mobile-user-list' : ''} ${grid ? 'grid grid-' + usersToShow.length:''}`">
+  <section :class="`${isMobile ? 'mobile-user-list grid-' + usersToShow.length : grid ? 'grid' :''} grid-'${usersToShow.length}`">
     <UserListItem
       :class="isMobile ? 'mobile-user' : ''"
       v-for="(user, index) in usersToShow"
@@ -27,14 +27,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["users", "selectedUser"]),
+    ...mapGetters(["users", "selectedUser", "isMobile"]),
 
     usersToShow() {
-      return this.grid ? this.users : this.users.slice(1);
-    },
-    isMobile () {
-      return this.$vuetify.breakpoint.mdAndDown
-    },
+      return this.grid || this.isMobile ? this.users : this.users.slice(1);
+    }
   },
   methods: {
     ...mapActions(["selectUser", "setSnackbarMessage"]),
@@ -157,13 +154,129 @@ export default {
   }
 }
 .mobile-user-list {
-  display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-
-  .mobile-user {
-    flex-shrink: 0;
-    width: 35%;
+  display: grid;
+  height: 100%;
+  grid-template-rows: repeat(12, 1fr);
+  grid-template-columns: repeat(12, 1fr);
+  &.grid-1 {
+    * {
+      grid-row: span 12;
+      grid-column: 12 span;
+    }
+  }
+  &.grid-2 {
+    * {
+      grid-row: span 6;
+      grid-column: 12 span;
+    }
+  }
+  &.grid-3 {
+    * {
+      grid-row: span 4;
+      grid-column: 12 span;
+    }
+  }
+  &.grid-4 {
+    * {
+      grid-column: span 6;
+      grid-row: span 6;
+    }
+  }
+  &.grid-5 {
+    * {
+      grid-row: span 6;
+      grid-column: span 4;
+    }
+    *:nth-child(-n + 2) {
+      grid-column: span 6;
+    }
+  }
+  &.grid-6 {
+    * {
+      grid-column: span 6;
+      grid-row: span 4;
+    }
+  }
+  &.grid-7 {
+    * {
+      grid-column: span 4;
+    grid-row: span 4;
+    }
+    *:nth-child(-n + 4) {
+      grid-column: span 6;
+    }
+  }
+  &.grid-8 {
+    * {
+      grid-column: span 4;
+    grid-row: span 4;
+    }
+    *:nth-child(-n + 2) {
+      grid-column: span 6;
+    }
+  }
+  &.grid-9 {
+    * {
+      grid-column: span 4;
+    grid-row: span 4;
+    }
+  }
+  &.grid-10 {
+    * {
+      grid-column: span 3;
+      grid-row: span 4;
+    }
+    *:nth-child(-n + 6) {
+      grid-column: span 4;
+    }
+  }
+  &.grid-11 {
+    * {
+      grid-column: span 3;
+      grid-row: span 4;
+    }
+    *:nth-child(-n + 3) {
+      grid-column: span 4;
+    }
+  }
+  &.grid-12 {
+    * {
+      grid-column: span 4;
+      grid-row: span 3;
+    }
+  }
+  &.grid-13 {
+    * {
+      grid-column: span 3;
+      grid-row: span 3;
+    }
+    *:nth-child(-n + 9) {
+      grid-column: span 4;
+    }
+  }
+  &.grid-14 {
+    * {
+      grid-column: span 3;
+      grid-row: span 3;
+    }
+    *:nth-child(-n + 6) {
+      grid-column: span 4;
+    }
+  }
+  &.grid-15 {
+    * {
+      grid-column: span 3;
+      grid-row: span 3;
+    }
+    *:nth-child(-n + 3) {
+      grid-column: span 4;
+    }
+  }
+  &.grid-16 {
+    * {
+      grid-column: span 3;
+      grid-row: span 3;
+    }
   }
 }
 </style>
