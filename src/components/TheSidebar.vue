@@ -25,14 +25,13 @@
 
 <script type="javascript">
 import TheChat from "./TheChat";
+import { mapGetters } from 'vuex';
 export default {
   components: {
     TheChat
   },
   computed: {
-    isMobile() {
-      return this.$vuetify.breakpoint.mdAndDown;
-    }
+    ...mapGetters(['isMobile'])
   }
 };
 </script>

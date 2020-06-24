@@ -21,7 +21,7 @@ export default {
         stream: null,
         pluginHandle: null,
         screenSharePluginHandle: null
-      }
+      },
     ],
     screenShare: null
   },

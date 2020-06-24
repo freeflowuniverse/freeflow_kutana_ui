@@ -56,6 +56,8 @@ class StreamFilterService {
 
         this.mirrorCanvas = document.createElement("canvas");
         this.resultCanvas = document.createElement("canvas");
+        this.mirrorCanvas.style.display = 'none'
+        this.resultCanvas.style.display = 'none'
         document.body.appendChild(this.resultCanvas)
         this.mirrorCanvas.width = this.width
         this.mirrorCanvas.height = this.height
@@ -63,6 +65,7 @@ class StreamFilterService {
         this.resultCanvas.width = this.width
         this.resultCanvas.height = this.height
 
+        
         this.mirrorContext = this.mirrorCanvas.getContext("2d")
         this.resultContext = this.resultCanvas.getContext("2d")
         //When not using fakevideo, stream will stop if we dont capture frame every x milliseconds

@@ -25,7 +25,7 @@
               </v-form>
             </v-col>
             <v-divider :vertical="$vuetify.breakpoint.mdAndUp"></v-divider>
-            <v-col cols="12" md="5" align="center">
+            <v-col cols="12" md="5" align="center" v-if="!inviteUrl">
               <v-btn text @click="create">Create room</v-btn>
             </v-col>
           </v-row>

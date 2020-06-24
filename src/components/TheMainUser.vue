@@ -15,7 +15,7 @@ export default {
   },
   mounted() {},
   computed: {
-    ...mapGetters(["users"]),
+    ...mapGetters(["users", "isMobile"]),
 
     stream() {
       return this.userScreenshareStream ? this.userScreenshareStream : this.userVideoStream;
@@ -35,10 +35,7 @@ export default {
       }
 
       return this.users[0].screenShareStream;
-    },
-    isMobile () {
-      return this.$vuetify.breakpoint.mdAndDown
-    },
+    }
   }
 };
 </script>

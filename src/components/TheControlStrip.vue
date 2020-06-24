@@ -40,36 +40,8 @@
             hide-details
             :disabled="videoInputDevices.length <= 0"
           ></v-select>
-          <!-- <v-select
-            v-model="audioInputDevice"
-            dense
-            prepend-icon="mic"
-            :items="audioInputDevices"
-            :label="audioInputDevices.length <= 0 ? 'No Audio input device' : 'Audio input device'"
-            item-text="label"
-            item-value="deviceId"
-            outlined
-            @change="changeDevice"
-            class="my-4"
-            hide-details
-            :disabled="audioInputDevices.length <= 0"
-          ></v-select>
-          <v-select
-            v-model="audioOutputDevice"
-            dense
-            prepend-icon="headset"
-            :items="audioOutputDevices"
-            :label="audioOutputDevices.length <= 0 ? 'No Audio output device' : 'Audio output device'"
-            item-text="label"
-            item-value="deviceId"
-            outlined
-            @change="changeAudioOutputDevice"
-            class="my-4"
-            hide-details
-            :disabled="audioOutputDevices.length <= 0"
-          ></v-select> -->
           <v-file-input
-            v-if="isBackgroundRemovalPossible"
+            v-if="isBackgroundRemovalPossible && !isMobile"
             dense
             v-model="wallpaperFile"
             prepend-icon="image"
@@ -93,49 +65,101 @@
       </v-card>
     </v-dialog>
     <!-- <v-card class="secondary pa-1" dark v-else> -->
-    <v-row class="mx-2" justify="center" align="center" style="height:60px">
-      <v-btn @click="toggleCamera" icon class="mr-1">
-        <v-icon>{{videoPublished ? 'videocam' : 'videocam_off'}}</v-icon>
-      </v-btn>
+    <v-row class="mx-2" style="height:60px">
+      <v-col>
+        <v-row>
+          <v-btn @click="toggleCamera" icon class="mr-1">
+            <v-icon>{{videoPublished ? 'videocam' : 'videocam_off'}}</v-icon>
+          </v-btn>
 
-      <v-btn @click="toggleMute" icon class="mr-0">
-        <v-icon>{{micEnabled ? 'mic' : 'mic_off'}}</v-icon>
-      </v-btn>
-      <v-spacer></v-spacer>
-      <v-btn icon class="mx-1" @click="$root.$emit('toggleGridPresentation')">
-        <v-icon>{{grid ? 'grid_off' : 'grid_on'}}</v-icon>
-      </v-btn>
-      <v-btn @click="hangUp" dark icon class="red mx-2 endCall">
-        <v-icon>call_end</v-icon>
-      </v-btn>
-      <v-btn
-        @click="enableScreenShare"
-        v-if="canScreenShare && screenShare === null"
-        icon
-        class="ml-1"
-      >
-        <v-icon>screen_share</v-icon>
-      </v-btn>
-      <v-btn @click="disableScreenShare" v-else-if="canScreenShare" icon class="ml-1">
-        <v-icon>stop_screen_share</v-icon>
-      </v-btn>
-      <!-- Virtual background button -->
+          <v-btn @click="toggleMute" icon class="mr-0">
+            <v-icon>{{micEnabled ? 'mic' : 'mic_off'}}</v-icon>
+          </v-btn>
+        </v-row>
+      </v-col>
 
-      <v-btn @click="toggleWallpaper" icon class="ml-1" v-if="isBackgroundRemovalPossible">
-        <span class="material-icons">{{wallpaperEnabled ? 'broken_image' : 'image'}}</span>
-      </v-btn>
-      <!-- End virtual background button -->
-      <v-spacer></v-spacer>
-      <v-btn v-if="minimal" icon class="ml-1" @click="$root.$emit('toggleUserList')">
-        <v-icon>group</v-icon>
-      </v-btn>
-      <v-btn icon class="mx-1" @click="$root.$emit('toggleSidebar')">
-        <v-icon>chat_bubble</v-icon>
-      </v-btn>
-      <v-btn icon class="mx-1" @click="toggleSettings">
-        <v-icon>settings</v-icon>
-      </v-btn>
+      <v-col>
+        <v-row justify="center" align="center">
+          <v-btn v-if="!isMobile" icon class="mx-1" @click="$root.$emit('toggleGridPresentation')">
+            <v-icon>{{grid ? 'grid_off' : 'grid_on'}}</v-icon>
+          </v-btn>
+          <v-btn @click="hangUp" dark icon class="red mx-2 endCall">
+            <v-icon>call_end</v-icon>
+          </v-btn>
+          <v-btn
+            @click="enableScreenShare"
+            v-if="canScreenShare && screenShare === null && !isMobile"
+            icon
+            class="ml-1"
+          >
+            <v-icon>screen_share</v-icon>
+          </v-btn>
+          <v-btn
+            @click="disableScreenShare"
+            v-else-if="canScreenShare && !isMobile"
+            icon
+            class="ml-1"
+          >
+            <v-icon>stop_screen_share</v-icon>
+          </v-btn>
+          <!-- Virtual background button -->
+
+          <v-btn
+            @click="toggleWallpaper"
+            icon
+            class="ml-1"
+            v-if="isBackgroundRemovalPossible && !isMobile"
+          >
+            <span class="material-icons">{{wallpaperEnabled ? 'broken_image' : 'image'}}</span>
+          </v-btn>
+          <!-- End virtual background button -->
+        </v-row>
+      </v-col>
+
+      <v-col>
+        <v-row justify="end" align="center">
+          <v-btn v-if="minimal" icon class="ml-1" @click="showAddUserDialog">
+            <v-icon>person_add</v-icon>
+          </v-btn>
+          <v-btn icon class="mx-1" @click="$root.$emit('toggleSidebar')">
+            <v-icon>chat_bubble</v-icon>
+          </v-btn>
+          <v-btn icon class="mx-1" @click="toggleSettings">
+            <v-icon>settings</v-icon>
+          </v-btn>
+        </v-row>
+      </v-col>
     </v-row>
+
+    <v-dialog width="500" v-model="addUserDialog">
+      <v-card>
+        <v-card-title>
+          <v-row class="mx-0">
+            Add member
+            <v-spacer></v-spacer>
+            <v-btn icon text @click="addUserDialog = false">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-row>
+        </v-card-title>
+        <v-card-text>
+          <v-text-field
+            filled
+            label="Invite url"
+            persistent-hint
+            readonly
+            hint="Invite people by sharing this url"
+            :value="inviteLink"
+          >
+            <template v-slot:append>
+              <v-btn small icon text @click="copyUrl">
+                <v-icon>file_copy</v-icon>
+              </v-btn>
+            </template>
+          </v-text-field>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </section>
 </template>
 
@@ -160,8 +184,10 @@ export default {
     };
   },
   mounted() {
-    console.log(this.activeVideoDevice)
-    this.videoDevice = (this.activeVideoDevice ? this.activeVideoDevice.deviceId : null);
+    console.log(this.activeVideoDevice);
+    this.videoDevice = this.activeVideoDevice
+      ? this.activeVideoDevice.deviceId
+      : null;
     this.$root.$on("showInviteUser", this.showAddUserDialog);
     this.refreshDevices();
   },
@@ -181,14 +207,11 @@ export default {
       "videoPublished",
       "micEnabled",
       "wallpaperEnabled",
-      "isBackgroundRemovalPossible"
+      "isBackgroundRemovalPossible",
+      "isMobile"
     ]),
     inviteLink() {
-      let baseUrl = window.location.href;
-      if (baseUrl.charAt(baseUrl.length - 1) != "/") {
-        baseUrl += "/";
-      }
-      return `${baseUrl}`;
+      return  window.location.href;
     }
   },
   methods: {
@@ -203,9 +226,7 @@ export default {
       "setMicEnabled",
       "setWallPaperEnabled"
     ]),
-    ...mapMutations([
-      "setVideoDevice"
-    ]),
+    ...mapMutations(["setVideoDevice"]),
     canScreenShare: function() {
       return !!navigator.mediaDevices.getDisplayMedia;
     },
@@ -215,7 +236,7 @@ export default {
     },
     toggleSettings: function() {
       this.refreshDevices();
-      this.setVideoDevice(this.videoDevice)
+      this.setVideoDevice(this.videoDevice);
       this.audioInputDevice = this.activeAudioDevice.deviceId;
       if (this.activeAudioOutputDevice)
         this.audioOutputDevice = this.activeAudioOutputDevice.deviceId;
@@ -318,23 +339,26 @@ export default {
       this.stopScreenShare();
     },
     toggleWallpaper: function() {
-      this.setWallPaperEnabled(!this.wallpaperEnabled)
+      this.setWallPaperEnabled(!this.wallpaperEnabled);
       this.changeDevice();
     },
     setWallPaper: function() {
-
-      if(this.wallpaperFile === undefined){
-        janusHelpers.changeWallpaper(undefined) // go to default wallpaper
-        return
+      if (this.wallpaperFile === undefined) {
+        janusHelpers.changeWallpaper(undefined); // go to default wallpaper
+        return;
       }
-      if(this.wallpaperFile.name.split('.').pop() != "jpeg" && this.wallpaperFile.name.split('.').pop() != "jpg" && this.wallpaperFile.name.split('.').pop() != "png"){
-        alert("Please use PNG or JPG image")
-        return
+      if (
+        this.wallpaperFile.name.split(".").pop() != "jpeg" &&
+        this.wallpaperFile.name.split(".").pop() != "jpg" &&
+        this.wallpaperFile.name.split(".").pop() != "png"
+      ) {
+        alert("Please use PNG or JPG image");
+        return;
       }
       var reader = new FileReader();
       reader.readAsDataURL(this.wallpaperFile);
       reader.onload = function() {
-        janusHelpers.changeWallpaper(reader.result)
+        janusHelpers.changeWallpaper(reader.result);
       };
     },
     showAddUserDialog() {
