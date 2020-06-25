@@ -52,6 +52,7 @@
             @change="setWallPaper"
             class="my-4"
             hide-details
+            accept="image/x-png,image/gif,image/jpeg"
           ></v-file-input>
           <v-divider class="my-5"></v-divider>
           <v-col align="center" justify="center">
