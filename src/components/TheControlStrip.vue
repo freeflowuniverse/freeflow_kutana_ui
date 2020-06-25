@@ -68,7 +68,7 @@
     <v-row class="mx-2" style="height:60px">
       <v-col>
         <v-row>
-          <v-btn @click="toggleCamera" icon class="mr-1">
+          <v-btn @click="toggleCamera" icon class="mr-1" :disabled="isChangingCameraEnableState">
             <v-icon>{{videoPublished ? 'videocam' : 'videocam_off'}}</v-icon>
           </v-btn>
 
@@ -180,11 +180,11 @@ export default {
       videoDevice: undefined,
       audioInputDevice: undefined,
       audioOutputDevice: undefined,
-      wallpaperFile: undefined
+      wallpaperFile: undefined,
+      isChangingCameraEnableState: false
     };
   },
   mounted() {
-    console.log(this.activeVideoDevice);
     this.videoDevice = this.activeVideoDevice
       ? this.activeVideoDevice.deviceId
       : null;
@@ -211,7 +211,7 @@ export default {
       "isMobile"
     ]),
     inviteLink() {
-      return  window.location.href;
+      return window.location.href;
     }
   },
   methods: {
@@ -280,34 +280,35 @@ export default {
 
     toggleCamera: function() {
       //todo check if camera can be activated.
-      this.setVideoPublished(!this.videoPublished);
-      Janus.log(
-        (this.videoPublished ? "Disabling" : "Enabling") + " local camera..."
-      );
-      this.setSnackbarMessage({
-        text: `Camera ${this.videoPublished ? "enabled" : "disabled"}`
-      });
-      this.changeDevice();
+      if (!this.isChangingCameraEnableState) {
+        this.isChangingCameraEnableState = true
+        this.setVideoPublished(!this.videoPublished);
+        Janus.log(
+          (this.videoPublished ? "Disabling" : "Enabling") + " local camera..."
+        );
+        this.setSnackbarMessage({
+          text: `Camera ${this.videoPublished ? "enabled" : "disabled"}`
+        });
+        this.changeDevice();
+        setTimeout(() => {
+          this.isChangingCameraEnableState = false
+        },1000);
+      }
     },
 
     // This function could be improved. @TODO @SingleCore
     hangUp: function() {
-      console.log("Hanging up call");
       this.users[0].pluginHandle.hangup();
 
-      console.log("Detaching pluginHandle");
       this.users[0].pluginHandle.detach();
 
-      console.log("Clearing localstorage");
       // localStorage.clear()
       localStorage.removeItem("teamName");
       localStorage.removeItem("state");
       localStorage.removeItem("tempKeys");
 
-      console.log("Redirecting home");
       this.$router.push({ name: "home" });
 
-      console.log("Forcing reload");
       location.reload();
     },
 
