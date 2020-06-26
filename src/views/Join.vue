@@ -53,10 +53,10 @@
       </v-card>
     </v-col>
     <template>
-      <v-dialog v-model="permissionError" width="500">
+      <v-dialog :value="permissionError" width="500">
         <v-card>
           <v-card-title class="text-uppercase">Device access is denied</v-card-title>
-          <v-card-text>Instructions can be found....</v-card-text>
+          <v-card-text>Couldn't get permission to some of the devices.</v-card-text>
         </v-card>
       </v-dialog>
     </template>
