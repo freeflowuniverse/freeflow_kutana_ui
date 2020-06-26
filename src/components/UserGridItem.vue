@@ -1,27 +1,26 @@
 <template>
     <div
-            :data-cam="this.$props.user.stream.getVideoTracks()[0] && this.$props.user.stream.getVideoTracks()[0].readyState === 'live'"
-            :data-screen="this.$props.user.screenShareStream.getVideoTracks()[0] && this.$props.user.screenShareStream.getVideoTracks()[0].readyState === 'live'"
+            :data-cam="user.cam"
+            :data-screen="user.screen"
             class="user-grid-item"
     >
+        <div class="avatar">
+            <img :alt="user.username" :src="avatar">
+        </div>
         <JanusVideo
                 :cover="false"
                 :label="user.username"
                 :stream="user.screenShareStream"
                 class="screen"
-                v-if="this.$props.user.screenShareStream.getVideoTracks()[0] && this.$props.user.screenShareStream.getVideoTracks()[0].readyState === 'live'"
+                v-if="user.screen"
         ></JanusVideo>
         <JanusVideo
                 :cover="true"
                 :label="user.username"
                 :stream="user.stream"
                 class="main"
-                v-if="this.$props.user.stream.getVideoTracks()[0] && this.$props.user.stream.getVideoTracks()[0].readyState === 'live'"
+                v-if="user.cam"
         ></JanusVideo>
-        <div class="avatar"
-             v-if="!(this.$props.user.stream.getVideoTracks()[0] && this.$props.user.stream.getVideoTracks()[0].readyState === 'live') && !(this.$props.user.screenShareStream.getVideoTracks()[0] && this.$props.user.screenShareStream.getVideoTracks()[0].readyState === 'live')">
-            <img :alt="user.username" :src="avatar">
-        </div>
     </div>
 </template>
 <script>
@@ -95,6 +94,9 @@
         }
 
         .avatar {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
 

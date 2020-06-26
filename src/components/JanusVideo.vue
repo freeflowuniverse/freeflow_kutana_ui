@@ -1,7 +1,6 @@
 <template>
     <div
             :class="classes"
-            :style="`background-color:#${(Math.random()*0xFFFFFF<<0).toString(16)};`"
             @fullscreenchange="fullScreenChanged"
             class="janus-video"
             ref="videoAndMore"
@@ -125,6 +124,7 @@
         width: 100%;
         height: 100%;
         position: relative;
+        background: #000000;
     }
 
     video.fullScreen {

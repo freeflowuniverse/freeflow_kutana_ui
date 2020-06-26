@@ -270,6 +270,8 @@ export class VideoRoomPlugin {
             username: username.slice(37),
             room: this.myRoom,
             stream: stream,
+            cam: false,
+            screen: false,
             extra,
         };
     }

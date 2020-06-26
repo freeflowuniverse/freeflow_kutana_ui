@@ -7,7 +7,8 @@ export default {
     mutations: {
         setLocalUser(state, user) {
             state.localUser = user;
-        }, setUserControl(state, userControl) {
+        },
+        setUserControl(state, userControl) {
             state.userControl = userControl;
         },
         addRemoteUser(state, user) {

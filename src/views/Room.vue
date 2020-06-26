@@ -195,7 +195,7 @@
                         }
 
                         return {
-                            ...u, screenShareStream: screenUser.stream,
+                            ...u, screenShareStream: screenUser.stream, screen: screenUser.screen,
                         };
                     }),
                     isNull,

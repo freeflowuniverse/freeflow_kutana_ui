@@ -2,7 +2,7 @@
     <div class="controlStrip">
         <section class="mainControls">
             <v-btn @click="toggleCam" color="blue" dark fab>
-                <v-icon>{{camEnabled ?'videocam_off':'videocam'}}
+                <v-icon>{{localUser.cam ?'videocam_off':'videocam'}}
                 </v-icon>
             </v-btn>
             <v-btn @click="toggleMic" color="blue" dark fab>
@@ -15,7 +15,7 @@
                     dark
                     fab
             >
-                <v-icon>{{screenShareEnabled ? 'stop_screen_share':'screen_share'}}
+                <v-icon>{{localScreenUser.screen ? 'stop_screen_share':'screen_share'}}
                 </v-icon>
             </v-btn>
             <v-btn color="red" dark fab>
@@ -36,16 +36,9 @@
     export default {
         computed: {
             ...mapGetters(['userControl', 'localUser', 'localScreenUser', 'isMobile']),
-            camEnabled() {
-                const videoTrack = this.localUser.stream.getVideoTracks()[0];
-                return videoTrack && videoTrack.readyState === 'live';
-            },
 
             micEnabled() {
                 return true;
-            },
-            screenShareEnabled() {
-                return false;
             },
         },
         methods: {
