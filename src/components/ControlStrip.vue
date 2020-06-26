@@ -8,7 +8,13 @@
             <v-btn @click="toggleMic" color="blue" dark fab>
                 <v-icon>{{micEnabled ?'mic_off':'mic'}}</v-icon>
             </v-btn>
-            <v-btn @click="screen" color="blue" dark fab>
+            <v-btn
+                    v-if="!isMobile"
+                    @click="screen"
+                    color="blue"
+                    dark
+                    fab
+            >
                 <v-icon>{{screenShareEnabled ? 'stop_screen_share':'screen_share'}}
                 </v-icon>
             </v-btn>
@@ -29,7 +35,7 @@
 
     export default {
         computed: {
-            ...mapGetters(['userControl', 'localUser', 'localScreenUser']),
+            ...mapGetters(['userControl', 'localUser', 'localScreenUser', 'isMobile']),
             camEnabled() {
                 const videoTrack = this.localUser.stream.getVideoTracks()[0];
                 return videoTrack && videoTrack.readyState === 'live';
@@ -83,40 +89,48 @@
 
 </script>
 <style lang="scss" scoped>
-    .mobile {
-        .mainControls {
-            position: fixed;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            /*padding: 0 10vw;*/
-            bottom: 0;
-            padding: 2% 20vw;
-        }
-
-    }
-
-    .desktop {
-        .mainControls {
-            position: fixed;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            /*padding: 0 10vw;*/
-            bottom: 0;
-            padding: 2% 20vw;
-        }
-
-    }
-
     @media screen and (min-width: 600px) {
+
+        .desktop {
+            .mainControls {
+                opacity: 0;
+                transition: opacity .5s ease-in-out;
+
+            }
+
+            &.room:hover {
+                .mainControls {
+                    opacity: 1;
+                }
+            }
+        }
+
+        .mainControls {
+            position: fixed;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            /*padding: 0 10vw;*/
+            bottom: 0;
+            padding: 20vh 2%;
+        }
 
     }
 
     @media screen and (max-width: 600px) {
+        .mainControls {
+            position: fixed;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            /*padding: 0 10vw;*/
+            bottom: 0;
+            padding: 2% 10vw;
+        }
         .v-btn {
-            height: 36px;
-            width: 36px;
+            height: 44px;
+            width: 44px;
         }
     }
 </style>

@@ -1,20 +1,22 @@
 <template>
     <div
-            class="janus-video"
             :class="classes"
-            @fullscreenchange="fullScreenChanged"
-            ref="videoAndMore"
             :style="`background-color:#${(Math.random()*0xFFFFFF<<0).toString(16)};`"
+            @fullscreenchange="fullScreenChanged"
+            class="janus-video"
+            ref="videoAndMore"
+            @click="showFullscreen"
     >
         <v-btn
                 :absolute="!isFullScreen"
                 :fixed="isFullScreen"
                 @click="toggleFullscreen"
-                class="semiBlack mt-3"
+                class="fullscreen semiBlack mt-3"
                 fab
                 right
                 small
                 text
+                v-if="!isMobile || show || isFullScreen"
         >
             <v-icon color="white" v-if="!isFullScreen">fullscreen</v-icon>
             <v-icon color="white" v-else>fullscreen_exit</v-icon>
@@ -28,7 +30,7 @@
                 ref="video"
                 v-if="true"
         ></video>
-<!--        <span class="video-label">{{label}}</span>-->
+                <span class="video-label" v-if="label">{{label}}</span>
 
         <!-- @todo fixme -->
         <v-row align="center" class="video-cam-off" justify="center">
@@ -38,11 +40,13 @@
 </template>
 
 <script type="javascript">
+    import { mapGetters } from 'vuex';
+
     export default {
         props: {
             stream: {
                 type: MediaStream,
-                required: true
+                required: true,
             },
             label: {
                 type: String,
@@ -51,25 +55,28 @@
             cover: {
                 type: Boolean,
                 required: false,
-                default: false
-            }
+                default: false,
+            },
         },
         data() {
             return {
-                isFullScreen: false
+                isFullScreen: false,
+                show: false,
+                timeout: null,
             };
         },
         computed: {
+            ...mapGetters(['isMobile']),
             classes() {
-                const videopresent = this.$props.stream.getVideoTracks().length
+                const videopresent = this.$props.stream.getVideoTracks().length;
 
                 return {
                     'cover': this.$props.cover,
                     'video-present': videopresent,
-                    'video-not-present': !videopresent
-                }
+                    'video-not-present': !videopresent,
+                };
 
-            }
+            },
         },
         methods: {
             fullScreenChanged() {
@@ -83,7 +90,7 @@
                 const elem = this.$refs.videoAndMore;
                 if (elem.requestFullscreen) {
                     elem.requestFullscreen();
-                    return
+                    return;
                 }
                 if (elem.mozRequestFullScreen) {
                     /* Firefox */
@@ -101,16 +108,25 @@
 
                 }
             },
-        }
+            showFullscreen() {
+                this.show = true;
+                clearTimeout(this.timeout);
+                this.timeout = window.setTimeout(
+                    () => {
+                        this.show = false;
+                    }, 4000);
+            },
+        },
     };
 </script>
 
 <style lang="scss" scoped>
-    .janus-video{
+    .janus-video {
         width: 100%;
         height: 100%;
         position: relative;
     }
+
     video.fullScreen {
         object-fit: contain;
     }
@@ -149,5 +165,18 @@
         padding: 0 4px;
         background: #000;
         color: #ffffff;
+    }
+
+    .desktop {
+        .fullscreen {
+            opacity: 0;
+        }
+
+        .janus-video:hover {
+            .fullscreen {
+                opacity: 1;
+            }
+        }
+
     }
 </style>
