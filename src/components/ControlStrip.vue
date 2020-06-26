@@ -31,7 +31,8 @@
         computed: {
             ...mapGetters(['userControl', 'localUser', 'localScreenUser']),
             camEnabled() {
-                return true;
+                const videoTrack = this.localUser.stream.getVideoTracks()[0];
+                return videoTrack && videoTrack.readyState === 'live';
             },
 
             micEnabled() {
@@ -43,13 +44,12 @@
         },
         methods: {
             async toggleCam() {
-                if (this.localUser.stream.getVideoTracks()[0].readyState === 'live') {
+                const videoTrack = this.localUser.stream.getVideoTracks()[0];
+                if (videoTrack && videoTrack.readyState === 'live') {
                     this.userControl.stopVideoTrack();
-                    setTimeout(() => {
-                        this.$forceUpdate();
-                    }, 100);
                     return;
                 }
+                // @todo go back to previous video track
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 await this.userControl.publishTrack(stream.getVideoTracks()[0]);
                 setTimeout(() => {

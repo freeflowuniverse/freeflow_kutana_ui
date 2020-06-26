@@ -1,5 +1,16 @@
 <template>
-    <div class="user-grid-item">
+    <div
+            :data-cam="this.$props.user.stream.getVideoTracks()[0] && this.$props.user.stream.getVideoTracks()[0].readyState === 'live'"
+            :data-screen="this.$props.user.screenShareStream.getVideoTracks()[0] && this.$props.user.screenShareStream.getVideoTracks()[0].readyState === 'live'"
+            class="user-grid-item"
+    >
+        <JanusVideo
+                :cover="false"
+                :label="user.username"
+                :stream="user.screenShareStream"
+                class="screen"
+                v-if="this.$props.user.screenShareStream.getVideoTracks()[0] && this.$props.user.screenShareStream.getVideoTracks()[0].readyState === 'live'"
+        ></JanusVideo>
         <JanusVideo
                 :cover="true"
                 :label="user.username"
@@ -7,15 +18,8 @@
                 class="main"
                 v-if="this.$props.user.stream.getVideoTracks()[0] && this.$props.user.stream.getVideoTracks()[0].readyState === 'live'"
         ></JanusVideo>
-        <JanusVideo
-                :cover="false"
-                :label="user.username"
-                :stream="user.screenShareStream"
-                class="screen"
-                v-if="screenLive"
-        ></JanusVideo>
         <div class="avatar"
-             v-if="!(this.$props.user.stream.getVideoTracks()[0] && this.$props.user.stream.getVideoTracks()[0].readyState === 'live') && !screenLive">
+             v-if="!(this.$props.user.stream.getVideoTracks()[0] && this.$props.user.stream.getVideoTracks()[0].readyState === 'live') && !(this.$props.user.screenShareStream.getVideoTracks()[0] && this.$props.user.screenShareStream.getVideoTracks()[0].readyState === 'live')">
             <img :alt="user.username" :src="avatar">
         </div>
     </div>
@@ -37,8 +41,8 @@
 
             //@todo: check if this is not a memmory leak
             //preload image
-            const img=new Image();
-            img.src=this.avatar();
+            const img = new Image();
+            img.src = this.avatar;
 
             const videoTrack = this.$props.user.stream.getVideoTracks()[0];
             if (videoTrack) {
@@ -53,9 +57,10 @@
 
             const screenshareTrack = this.$props.user.screenShareStream.getVideoTracks()[0];
             if (screenshareTrack) {
-                screenshareTrack.onended = () => {
+                screenshareTrack.oninactive = () => {
                     console.log('ey');
                     setTimeout(() => {
+                        alert('update');
                         this.$forceUpdate();
 
                     }, 100);
@@ -78,7 +83,15 @@
 </script>
 <style lang="scss" scoped>
     .user-grid-item {
-        .main + .screen {
+        position: relative;
+        &[data-cam='true'][data-screen="true"] {
+            .main{
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 10vw;
+                height: 10vh;
+            }
         }
 
         .avatar {

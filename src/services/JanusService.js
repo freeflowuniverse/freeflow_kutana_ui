@@ -77,7 +77,9 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
     screenShareRoomPlugin.addEventListener('ownUserJoined', (screenUser) => {
         const videoTrack = screenUser.stream.getVideoTracks()[0];
         screenUser.stream.onended = () => {
+            debugger
             videoTrack.dispatchEvent(new Event('ended'));
+            screenUser.stream.dispatchEvent(new Event('ended'));
         };
         store.commit('setLocalScreenUser', screenUser);
     });
@@ -88,7 +90,10 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
         }
         const videoTrack = screenUser.stream.getVideoTracks()[0];
         screenUser.stream.onended = () => {
+            debugger
+
             videoTrack.dispatchEvent(new Event('ended'));
+            screenUser.stream.dispatchEvent(new Event('ended'));
         };
         store.commit('addRemoteScreenUser', screenUser);
     });
@@ -114,8 +119,12 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
         startScreenShare: async () => {
             const stream = await navigator.mediaDevices.getDisplayMedia();
             const videoTrack = stream.getVideoTracks()[0];
-            stream.onended = () => {
+            debugger
+
+            stream.oninactive = () => {
+                window.janusshizzle.screenShareRoomPlugin.pluginHandle.hangup()
                 videoTrack.dispatchEvent(new Event('ended'));
+                stream.dispatchEvent(new Event('ended'));
             };
             await screenShareRoomPlugin.publishTrack(videoTrack);
         },

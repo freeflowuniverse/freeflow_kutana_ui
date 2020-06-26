@@ -34,7 +34,13 @@
 
         height: calc(var(--vh) * 100);
 
-        &[data-useramount="2"], &[data-useramount="1"] {
+        &[data-useramount="1"] {
+            .user {
+                height: 100%;
+            }
+        }
+
+        &[data-useramount="2"]{
             position: relative;
 
             .user:nth-child(1) {
@@ -48,7 +54,6 @@
 
             .user:nth-child(2) {
                 height: 100%;
-                z-index: 110;
             }
         }
 
