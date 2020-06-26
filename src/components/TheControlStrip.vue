@@ -238,7 +238,9 @@ export default {
     toggleSettings: function() {
       this.refreshDevices();
       this.setVideoDevice(this.videoDevice);
-      this.audioInputDevice = this.activeAudioDevice.deviceId;
+      if (this.activeAudioDevice) {
+        this.audioInputDevice = this.activeAudioDevice.deviceId;
+      } 
       if (this.activeAudioOutputDevice)
         this.audioOutputDevice = this.activeAudioOutputDevice.deviceId;
       this.showExtraSettings = !this.showExtraSettings;
