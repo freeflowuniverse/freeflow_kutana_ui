@@ -107,8 +107,7 @@
             store.commit('setLocalStream', null);
 
             //@todo fixme
-            const userName = localStorage.getItem('account').name || `test-${Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}`;
-            // const roomName = this.hashString(this.teamName);
+            const userName = this.account.name || localStorage.getItem('account').name || `test-${Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}`;
 
             const roomName = this.hashString(this.$route.params.token);
             const opaqueId = uuidv4();
@@ -161,7 +160,7 @@
                     () => {
                         this.show = false;
                     }, 4000);
-            }
+            },
         },
         computed: {
             ...mapGetters([
@@ -171,7 +170,8 @@
                 'localUser',
                 'allUsers',
                 'allScreenUsers',
-                'isMobile'
+                'isMobile',
+                'account',
             ]),
             inviteLink() {
                 let baseUrl = window.location.href;
