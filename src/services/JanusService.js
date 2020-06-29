@@ -4,7 +4,7 @@ import store from '../plugins/vuex';
 
 export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, stream) => {
     const janusBuilder = new JanusBuilder(serverUrl, false);
-    const videoRoomPlugin = new VideoRoomPlugin(opaqueId);
+    const videoRoomPlugin = new VideoRoomPlugin(opaqueId, true);
     let initialJoin = true;
 
     videoRoomPlugin.addEventListener('pluginAttached', async (room) => {
@@ -46,14 +46,14 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
         user.stream.getVideoTracks().forEach((track) => {
             track.onended = async (event) => {
                 console.log('ended');
-                const newUser = store.dispatch('findUserById', user.id)
+                const newUser = store.dispatch('findUserById', user.id);
                 newUser.cam = false;
                 store.commit('addRemoteUser', newUser);
             };
         });
         const videoTrack = user?.stream?.getVideoTracks()[0];
-        if (videoTrack && videoTrack.readyState === 'live'){
-            user.cam = true
+        if (videoTrack && videoTrack.readyState === 'live') {
+            user.cam = true;
         }
         store.commit('addRemoteUser', user);
     });
@@ -71,7 +71,7 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
     });
 
     // SCREENSHARE
-    const screenShareRoomPlugin = new VideoRoomPlugin(opaqueId + '-screenshare', 'screen');
+    const screenShareRoomPlugin = new VideoRoomPlugin(opaqueId + '-screenshare', false, 'screen');
 
     screenShareRoomPlugin.addEventListener('pluginAttached', async (room) => {
         const roomPadding = 13516416;
@@ -102,13 +102,13 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
         screenUser.stream.onended = () => {
             videoTrack.dispatchEvent(new Event('ended'));
             screenUser.stream.dispatchEvent(new Event('ended'));
-            const newScreenUser = store.dispatch('findScreenUserById', screenUser.id)
+            const newScreenUser = store.dispatch('findScreenUserById', screenUser.id);
             newScreenUser.screen = false;
             store.commit('addRemoteScreenUser', newScreenUser);
         };
 
-        if (videoTrack && videoTrack.readyState === 'live'){
-            screenUser.screen = true
+        if (videoTrack && videoTrack.readyState === 'live') {
+            screenUser.screen = true;
         }
         store.commit('addRemoteScreenUser', screenUser);
     });
@@ -184,6 +184,17 @@ export const initializeJanus = async (serverUrl, opaqueId, userName, roomName, s
         stopAudioTrack: () => {
             videoRoomPlugin.myStream.getAudioTracks()[0].stop();
             videoRoomPlugin.myStream.getAudioTracks()[0].dispatchEvent(new Event('ended'));
+        },
+        hangUp: () => {
+
+            videoRoomPlugin?.myStream?.getTracks().forEach(t => {
+                t.stop();
+            });
+            screenShareRoomPlugin?.myStream?.getTracks().forEach(t => {
+                t.stop();
+            });
+            videoRoomPlugin.pluginHandle.hangup();
+            screenShareRoomPlugin.pluginHandle.hangup();
         },
     };
 };

@@ -2,7 +2,8 @@ import store from '../plugins/vuex';
 
 export class VideoRoomPlugin {
 
-    constructor(opaqueId, test = 'video') {
+    constructor(opaqueId, bitrateCap = false, test = 'video') {
+        this.bitrateCap = bitrateCap;
         this.test = test;
         this.pluginHandle = null;
         this.opaqueId = opaqueId;
@@ -237,8 +238,8 @@ export class VideoRoomPlugin {
 
     async publishTrack(track) {
         let peerConnection = this.pluginHandle.webrtcStuff.pc;
-        if (!peerConnection){
-            await this.publishOwnFeed()
+        if (!peerConnection) {
+            await this.publishOwnFeed();
             peerConnection = this.pluginHandle.webrtcStuff.pc;
         }
         const senders = peerConnection.getSenders();
@@ -290,20 +291,26 @@ export class VideoRoomPlugin {
                     }
 
 
+                    const message = {
+                        request: 'create',
+                        room: roomName,
+                        permanent: false,
+                        description: 'Super room!',
+                        bitrate_cap: this.bitrateCap,
+                        require_pvtid: true,
+                        publishers: 16,
+                        transport_wide_cc_ext: true,
+                        fir_freq: 10,
+                        is_private: true,
+                        notify_joining: true,
+                    };
+
+                    if (this.bitrateCap) {
+                        message.bitrate= 128000
+                    }
+
                     this.pluginHandle.send({
-                        message: {
-                            request: 'create',
-                            room: roomName,
-                            permanent: false,
-                            description: 'Super room!',
-                            bitrate_cap: false,
-                            require_pvtid: true,
-                            publishers: 16,
-                            transport_wide_cc_ext: true,
-                            fir_freq: 10,
-                            is_private: true,
-                            notify_joining: true,
-                        },
+                        message,
                         success: (result) => {
                             resolve(result);
                         },

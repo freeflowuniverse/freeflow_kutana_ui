@@ -18,7 +18,7 @@
                 <v-icon>{{localScreenUser.screen ? 'stop_screen_share':'screen_share'}}
                 </v-icon>
             </v-btn>
-            <v-btn color="red" dark fab>
+            <v-btn @click="hangUp" color="red" dark fab>
                 <v-icon>call_end</v-icon>
             </v-btn>
             <v-btn @click="$emit('toggleChat')" color="blue" dark fab>
@@ -77,6 +77,13 @@
                     this.$forceUpdate();
                 }, 100);
             },
+            async hangUp() {
+                this.userControl.hangUp()
+                await this.$router.push({ name: "home" });
+
+                console.log("Forcing reload")
+                // location.reload()
+            }
         },
     };
 
