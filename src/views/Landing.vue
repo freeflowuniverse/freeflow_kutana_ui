@@ -1,5 +1,5 @@
 <template>
-    <v-row align="center" class="landing px-5" justify="center">
+    <v-row align="center" class="landing" justify="center">
         <v-col cols="12" md="6">
             <v-card>
                 <v-card-title>

@@ -1,12 +1,15 @@
 <template>
   <v-app :style="cssProps">
     <router-view></router-view>
+    <Account v-if="$route.name !== 'room'"></Account>
     <v-snackbar top v-model="showSnackbar" :color="snackbarMessage.type">{{snackbarMessage.text}}</v-snackbar>
   </v-app>
 </template>
 <script>
 import { mapGetters } from "vuex";
+import Account from './components/Account';
 export default {
+  components: { Account },
   data() {
     return {
       showSnackbar: false
