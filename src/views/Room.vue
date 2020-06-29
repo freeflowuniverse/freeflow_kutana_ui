@@ -18,7 +18,7 @@
                 label="Invite link"
                 persistent-hint
                 readonly
-                hint="Invite people by sharing this url"
+                hint="Invite people by sharing this link"
                 :value="inviteLink"
               >
                 <template v-slot:append>
@@ -93,7 +93,7 @@ export default {
       // dont do anything if we need to do input selection first
       return;
     }
-    if (this.isMobile) {
+    if (this.isMobile && navigator.userAgent.toLowerCase().indexOf('safari') == -1) {
       document.body.requestFullscreen();
     }
     this.isGrid = this.isGridView;
