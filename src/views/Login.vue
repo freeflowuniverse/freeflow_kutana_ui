@@ -7,9 +7,10 @@
         <span v-else>
           <v-card-text>Please login using 3Bot Connect or continue as guest.</v-card-text>
           <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn @click="guestLogin" text>Continue as Guest</v-btn>
-            <v-btn @click="threebotConnectLogin" text>Use 3Bot Connect</v-btn>
+            <v-row align="center" justify="end">
+              <v-btn @click="guestLogin" text>Continue as Guest</v-btn>
+              <v-btn @click="threebotConnectLogin" text>Use 3Bot Connect</v-btn>
+            </v-row>
           </v-card-actions>
         </span>
       </v-card>

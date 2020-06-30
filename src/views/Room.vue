@@ -93,7 +93,7 @@ export default {
       // dont do anything if we need to do input selection first
       return;
     }
-    if (this.isMobile && navigator.userAgent.toLowerCase().indexOf('safari') == -1) {
+    if (this.isMobile && this.isChrome) {
       document.body.requestFullscreen();
     }
     this.isGrid = this.isGridView;
@@ -181,7 +181,8 @@ export default {
       "selectedUser",
       "isGridView",
       "inputSelection",
-      "isMobile"
+      "isMobile",
+      "isChrome"
     ]),
     roomClass() {
       let theClass = "room ";

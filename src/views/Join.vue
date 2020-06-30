@@ -1,19 +1,22 @@
 <template>
   <v-row align="center" justify="center">
-    <v-col cols="12" md="6" class="mx-5">
-      <v-card>
+    <v-col cols="12" md="6" class="mx-5 pa-0 pb-5">
+      <v-card class="mx-0 fill mb-5">
         <v-card-title>Join room</v-card-title>
-        <v-card-text>
+        <v-card-text class="scrollable">
           <v-row align="center" justify="center">
             <video
               v-if="video && localStream && localStream.getVideoTracks().length > 0"
               ref="localStream"
               :src-object.prop.camel="localStream"
               autoplay
-              class="videoStream myvideo" muted
+              playsinline
+              muted
+              class="videoStream myvideo"
             ></video>
           </v-row>
           <v-select
+            v-if="isChrome"
             v-model="videoDevice"
             dense
             prepend-icon="videocam"
@@ -28,6 +31,7 @@
             :disabled="videoInputDevices.length <= 0 || !video"
           />
           <v-select
+            v-if="isChrome"
             v-model="audioDevice"
             dense
             prepend-icon="mic"
@@ -42,14 +46,26 @@
             :disabled="audioInputDevices.length <= 0 || !audio"
           />
           <v-row justify="center">
-            <v-switch v-model="video" class="pa-2" label="Webcam" @change="changeDevice" />
-            <v-switch v-model="audio" class="pa-2" label="Microphone" @change="changeDevice" />
+            <v-switch
+              v-model="video"
+              class="pa-2"
+              label="Webcam"
+              @change="changeDevice"
+              v-if="isChrome"
+            />
+            <v-switch
+              v-model="audio"
+              class="pa-2"
+              label="Microphone"
+              @change="changeDevice"
+              v-if="isChrome"
+            />
+          </v-row>
+          <v-row>
+            <v-spacer />
+            <v-btn text @click="joinRoom">Join Room</v-btn>
           </v-row>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click="joinRoom">Join Room</v-btn>
-        </v-card-actions>
       </v-card>
     </v-col>
     <template>
@@ -85,7 +101,8 @@ export default {
       "audioInputDevices",
       "localStream",
       "activeVideoDevice",
-      "permissionError"
+      "permissionError",
+      "isChrome"
     ])
   },
   methods: {
@@ -99,7 +116,6 @@ export default {
       "setInputSelection"
     ]),
     async changeDevice() {
-
       await this.initialiseDevices({
         audio: this.audio,
         video: this.video,
@@ -156,7 +172,12 @@ export default {
 
 <style lang="scss" scoped>
 .videoStream {
-  height: 50%;
+  height: auto;
   width: 50%;
+}
+.fill {
+  height: 100%;
+  width: 100%;
+  position: relative;
 }
 </style>>

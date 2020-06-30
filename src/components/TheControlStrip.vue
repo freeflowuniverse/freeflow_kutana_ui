@@ -27,6 +27,7 @@
             @change="saveQualityOption"
           ></v-slider>
           <v-select
+            v-if="isChrome"
             v-model="videoDevice"
             dense
             prepend-icon="videocam"
@@ -52,7 +53,7 @@
             @change="setWallPaper"
             class="my-4"
             hide-details
-            accept="image/x-png,image/gif,image/jpeg"
+            accept="image/x-png, image/gif, image/jpeg"
           ></v-file-input>
           <v-divider class="my-5"></v-divider>
           <v-col align="center" justify="center">
@@ -67,13 +68,18 @@
     </v-dialog>
     <!-- <v-card class="secondary pa-1" dark v-else> -->
     <v-row class="mx-2" style="height:60px">
-      <v-col>
+      <v-col cols="5">
         <v-row>
-          <v-btn @click="toggleCamera" icon class="mr-1" :disabled="isChangingCameraEnableState">
+          <v-btn
+            @click="toggleCamera"
+            icon
+            class="mr-1"
+            :disabled="isChangingCameraEnableState || !isChrome"
+          >
             <v-icon>{{videoPublished ? 'videocam' : 'videocam_off'}}</v-icon>
           </v-btn>
 
-          <v-btn @click="toggleMute" icon class="mr-0">
+          <v-btn @click="toggleMute" icon class="mr-0" :disabled="!isChrome">
             <v-icon>{{micEnabled ? 'mic' : 'mic_off'}}</v-icon>
           </v-btn>
         </v-row>
@@ -117,7 +123,7 @@
         </v-row>
       </v-col>
 
-      <v-col>
+      <v-col cols="5">
         <v-row justify="end" align="center">
           <v-btn v-if="minimal" icon class="ml-1" @click="showAddUserDialog">
             <v-icon>person_add</v-icon>
@@ -149,7 +155,7 @@
             label="Invite url"
             persistent-hint
             readonly
-            hint="Invite people by sharing this url"
+            hint="Invite people by sharing this link"
             :value="inviteLink"
           >
             <template v-slot:append>
@@ -209,7 +215,8 @@ export default {
       "micEnabled",
       "wallpaperEnabled",
       "isBackgroundRemovalPossible",
-      "isMobile"
+      "isMobile",
+      "isChrome"
     ]),
     inviteLink() {
       return window.location.href;
@@ -282,7 +289,7 @@ export default {
     toggleCamera: function() {
       //todo check if camera can be activated.
       if (!this.isChangingCameraEnableState) {
-        this.isChangingCameraEnableState = true
+        this.isChangingCameraEnableState = true;
         this.setVideoPublished(!this.videoPublished);
         Janus.log(
           (this.videoPublished ? "Disabling" : "Enabling") + " local camera..."
@@ -292,8 +299,8 @@ export default {
         });
         this.changeDevice();
         setTimeout(() => {
-          this.isChangingCameraEnableState = false
-        },1000);
+          this.isChangingCameraEnableState = false;
+        }, 1000);
       }
     },
 
