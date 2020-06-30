@@ -80,6 +80,7 @@
                     }
                 })
 
+                // @todo get usercontrol object instead of janusshizzle
                 await window.janusshizzle.videoRoomPlugin.publishTrack(stream.getVideoTracks()[0])
             },
             async changeAudioDevice(value) {
