@@ -1,12 +1,17 @@
 <template>
   <v-app :style="cssProps">
+    <supportedDialog />
     <router-view></router-view>
     <v-snackbar top v-model="showSnackbar" :color="snackbarMessage.type">{{snackbarMessage.text}}</v-snackbar>
   </v-app>
 </template>
 <script>
 import { mapGetters } from "vuex";
+import supportedDialog from './components/SupportedDialog'
 export default {
+  components: {
+    supportedDialog
+  },
   data() {
     return {
       showSnackbar: false
