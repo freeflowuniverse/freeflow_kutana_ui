@@ -9,11 +9,11 @@
                 <v-icon>{{micEnabled ?'mic_off':'mic'}}</v-icon>
             </v-btn>
             <v-btn
-                    v-if="!isMobile"
                     @click="screen"
                     color="blue"
                     dark
                     fab
+                    v-if="!isMobile"
             >
                 <v-icon>{{localScreenUser.screen ? 'stop_screen_share':'screen_share'}}
                 </v-icon>
@@ -24,7 +24,7 @@
             <v-btn @click="$emit('toggleChat')" color="blue" dark fab>
                 <v-icon>chat_bubble</v-icon>
             </v-btn>
-            <v-btn class="btn-settings" color="#3A6DAD" dark fab>
+            <v-btn @click="$emit('openSettings')" class="btn-settings" color="#3A6DAD" dark fab>
                 <v-icon>settings</v-icon>
             </v-btn>
         </section>
@@ -78,12 +78,12 @@
                 }, 100);
             },
             async hangUp() {
-                this.userControl.hangUp()
-                await this.$router.push({ name: "home" });
+                this.userControl.hangUp();
+                await this.$router.push({ name: 'home' });
 
-                console.log("Forcing reload")
+                console.log('Forcing reload');
                 // location.reload()
-            }
+            },
         },
     };
 

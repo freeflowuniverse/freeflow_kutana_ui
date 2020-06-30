@@ -1,7 +1,7 @@
 <template>
   <v-app :style="cssProps">
     <router-view></router-view>
-    <Account v-if="$route.name !== 'room'"></Account>
+    <Account v-if="!$route.meta.hideAccount"></Account>
     <v-snackbar top v-model="showSnackbar" :color="snackbarMessage.type">{{snackbarMessage.text}}</v-snackbar>
   </v-app>
 </template>

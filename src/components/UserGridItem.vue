@@ -9,14 +9,14 @@
         </div>
         <JanusVideo
                 :cover="false"
-                :label="user.username"
+                :label="account.name !== user.username ? user.username : null"
                 :stream="user.screenShareStream"
                 class="screen"
                 v-if="user.screen"
         ></JanusVideo>
         <JanusVideo
                 :cover="true"
-                :label="user.username"
+                :label="account.name !== user.username ? user.username : null"
                 :stream="user.stream"
                 class="main"
                 v-if="user.cam"
@@ -27,6 +27,7 @@
 
     import { AvatarGenerator } from 'random-avatar-generator';
     import JanusVideo from './JanusVideo';
+    import { mapGetters } from 'vuex';
 
     export default {
         name: 'UserGridItem',
@@ -54,9 +55,9 @@
                 };
             }
 
-            const screenshareTrack = this.$props.user.screenShareStream.getVideoTracks()[0];
-            if (screenshareTrack) {
-                screenshareTrack.oninactive = () => {
+            const screenShareTrack = this.$props.user.screenShareStream.getVideoTracks()[0];
+            if (screenShareTrack) {
+                screenShareTrack.oninactive = () => {
                     console.log('ey');
                     setTimeout(() => {
                         alert('update');
@@ -67,6 +68,7 @@
             }
         },
         computed: {
+            ...mapGetters(['account']),
             avatar() {
                 const generator = new AvatarGenerator();
                 return generator.generateRandomAvatar(this.$props.user.username);
@@ -83,8 +85,9 @@
 <style lang="scss" scoped>
     .user-grid-item {
         position: relative;
+
         &[data-cam='true'][data-screen="true"] {
-            .main{
+            .main {
                 position: absolute;
                 top: 0;
                 left: 0;

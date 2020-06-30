@@ -14,6 +14,7 @@
             <ControlStrip
                     v-if="show  || !isMobile"
                     v-on:toggleChat="view === 'chat' ? view = 'grid' : view = 'chat'"
+                    v-on:openSettings="showSettings = true"
             ></ControlStrip>
         </transition>
 
@@ -26,6 +27,7 @@
                     v-for="user of remoteUsers"
             ></audio>
         </div>
+        <Settings v-model="showSettings"></Settings>
     </div>
 </template>
 
@@ -41,9 +43,12 @@
     import { v4 as uuidv4 } from 'uuid';
     import { reject } from 'lodash/collection';
     import { isNull } from 'lodash/lang';
+    import Settings from '../components/Settings';
 
     export default {
+        name:"Room",
         components: {
+            Settings,
             UserGrid,
             ControlStrip,
             ChatGrid,
@@ -57,6 +62,7 @@
                 view: 'grid',
                 show: false,
                 timeout: null,
+                showSettings: false,
             };
         },
         beforeMount() {
