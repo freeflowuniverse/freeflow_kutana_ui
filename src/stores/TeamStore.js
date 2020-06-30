@@ -41,10 +41,17 @@ export default {
       context.dispatch("join");
     },
     joinScreenShare(context, message) {
-      context.commit("setSnackbarMessage", {
-        text: `Screenshare started`,
-      });
-      
+      if (!context.getters.isChrome) {
+        context.commit("setSnackbarMessage", {
+          text: `Screenshare started but your browser is not supported`,
+          type: 'warning'
+        });
+
+      } else {
+        context.commit("setSnackbarMessage", {
+          text: `Screenshare started`,
+        });  
+      }
       context.commit("joinScreen", message.content)
     },
     stopScreenShare(context) {
