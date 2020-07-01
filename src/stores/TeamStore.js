@@ -7,11 +7,11 @@ export default {
     teamName: window.localStorage.getItem("teamName") || null,
   },
   mutations: {
-     setAccepted(state, accepted) {
+    setAccepted(state, accepted) {
       state.isAccepted = accepted;
     },
     setTeamName(state, teamName) {
-      if (teamName.length < 15) teamName = teamName.toLowerCase()
+      if (teamName.length < 15) teamName = teamName.toLowerCase();
       window.localStorage.setItem("teamName", teamName);
       state.teamName = teamName;
     },
@@ -21,7 +21,7 @@ export default {
       context.commit("setTeamName", random.stringGenerator(15));
     },
     getTeamInfo(context) {
-      console.log(`context.getters.teamName`, context.getters.teamName)
+      console.log(`context.getters.teamName`, context.getters.teamName);
       ffcService.getTeamInfo(context.getters.teamName).then((result) => {
         let data = result.data;
         context.commit("setMessages", data.messages);
@@ -41,25 +41,17 @@ export default {
       context.dispatch("join");
     },
     joinScreenShare(context, message) {
-      if (!context.getters.isChrome) {
-        context.commit("setSnackbarMessage", {
-          text: `Screenshare started but your browser is not supported`,
-          type: 'warning'
-        });
-
-      } else {
-        context.commit("setSnackbarMessage", {
-          text: `Screenshare started`,
-        });  
-      }
-      context.commit("joinScreen", message.content)
+      context.commit("setSnackbarMessage", {
+        text: `Screenshare started`,
+      });
+      context.commit("joinScreen", message.content);
     },
     stopScreenShare(context) {
       context.commit("setSnackbarMessage", {
         text: `Screenshare stopped`,
       });
 
-      context.commit("stopScreenShare")
+      context.commit("stopScreenShare");
     },
   },
   getters: {

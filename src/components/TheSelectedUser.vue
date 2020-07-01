@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 import JanusVideo from "./JanusVideo";
 
 export default {
@@ -46,9 +46,6 @@ export default {
 
       return this.screenShare;
     }
-  },
-  methods: {
-    ...mapActions(["joinScreen"])
   }
 };
 </script>
