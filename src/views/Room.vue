@@ -1,5 +1,5 @@
 <template>
-  <div :class="roomClass">
+  <div :class="roomClass" :style="{height: document.documentElement.clientHeight}">
     <div class="video-list">
       <UserList :grid="isGrid" />
     </div>
