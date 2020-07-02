@@ -1,5 +1,5 @@
 <template>
-  <v-row align="end" class="chat">
+  <v-row align="end" class="chat red" :style="{height: window.document.documentElement.clientHeight}">
     <div ref="chat" class="messages" v-autoScroll>
       <template v-for="(message, index) in messages">
         <div v-if="showDivider(message, index)" :key="`${index}_divider`" class="text-center px-4">
