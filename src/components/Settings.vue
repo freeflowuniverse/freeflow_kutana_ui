@@ -3,7 +3,7 @@
         <v-dialog v-model="show">
             <v-card>
                 <v-toolbar color="primary" dark>
-                    <v-btn @click="dialog = false" dark icon>
+                    <v-btn @click="$emit('input', false);" dark icon>
                         <v-icon>close</v-icon>
                     </v-btn>
                     <v-toolbar-title>Settings</v-toolbar-title>
