@@ -1,24 +1,39 @@
 <template>
-  <section :class="`${isMobile ? 'mobile-user-list grid-' + usersToShow.length : grid ? 'grid' :''} grid-${usersToShow.length}`">
-    <UserListItem
-      :class="isMobile ? 'mobile-user' : ''"
-      v-for="(user, index) in usersToShow"
-      @click.native="selectStream(user)"
-      :user="user"
-      :userIndex="index"
-      :key="index"
-      :inGrid="grid"
-    />
-  </section>
+  <div :class="screenShare && isMobile ? 'mobile-wrapper-screeenshare' : 'mobile-wrapper'">
+    <div id="screenShare">
+      <JanusVideo
+        v-if="screenShare && isMobile"
+        :stream="screenShare"
+        :muted="true"
+        :isScreenShare="true"
+        class="black"
+      ></JanusVideo>
+    </div>
+    <section
+      :class="`${isMobile ? 'mobile-user-list grid-' + usersToShow.length : grid ? 'grid' :''} grid-${usersToShow.length}`"
+    >
+      <UserListItem
+        :class="isMobile ? 'mobile-user' : ''"
+        v-for="(user, index) in usersToShow"
+        @click.native="selectStream(user)"
+        :user="user"
+        :userIndex="index"
+        :key="index"
+        :inGrid="grid"
+      />
+    </section>
+  </div>
 </template>
 
 <script type="javascript">
 import { mapGetters, mapActions } from "vuex";
 import UserListItem from "./UserListItem";
+import JanusVideo from "./JanusVideo";
 
 export default {
   components: {
-    UserListItem
+    UserListItem,
+    JanusVideo
   },
   props: {
     grid: {
@@ -27,7 +42,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["users", "selectedUser", "isMobile"]),
+    ...mapGetters(["users", "selectedUser", "isMobile", "screenShare"]),
 
     usersToShow() {
       return this.grid || this.isMobile ? this.users : this.users.slice(1);
@@ -153,6 +168,28 @@ export default {
     }
   }
 }
+.mobile-wrapper-screeenshare {
+  height: calc(100vh - 60px);
+  position: relative;
+  #screenShare {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-height: 50%;
+    overflow: hidden;
+    > * {
+      height: 100%;
+    }
+  }
+  .mobile-user-list {
+    position: absolute;
+    height: 50%;
+    bottom: 0;
+  }
+}
+.mobile-wrapper {
+  height: 100%;
+}
 .mobile-user-list {
   display: grid;
   height: 100%;
@@ -200,7 +237,7 @@ export default {
   &.grid-7 {
     * {
       grid-column: span 4;
-    grid-row: span 4;
+      grid-row: span 4;
     }
     *:nth-child(-n + 4) {
       grid-column: span 6;
@@ -209,7 +246,7 @@ export default {
   &.grid-8 {
     * {
       grid-column: span 4;
-    grid-row: span 4;
+      grid-row: span 4;
     }
     *:nth-child(-n + 2) {
       grid-column: span 6;
@@ -218,7 +255,7 @@ export default {
   &.grid-9 {
     * {
       grid-column: span 4;
-    grid-row: span 4;
+      grid-row: span 4;
     }
   }
   &.grid-10 {

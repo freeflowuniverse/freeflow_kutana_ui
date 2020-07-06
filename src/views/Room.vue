@@ -1,5 +1,5 @@
 <template>
-  <div :class="roomClass">
+  <div :class="roomClass" :style="roomStyle">
     <div class="video-list">
       <UserList :grid="isGrid" />
     </div>
@@ -209,6 +209,9 @@ export default {
         baseUrl += "/";
       }
       return `${baseUrl}`;
+    },
+    roomStyle() {
+      return { height: window.document.documentElement.clientHeight };
     }
   },
   watch: {
