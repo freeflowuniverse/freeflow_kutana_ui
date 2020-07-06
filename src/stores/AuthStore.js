@@ -15,7 +15,7 @@ export default {
   },
   actions: {
     logout(context) {
-      context.commit("(setAccount", null);
+      context.commit("setAccount", null);
     },
     async generateLoginUrl(context, queryParams) {
       context.dispatch("clearStorage");
