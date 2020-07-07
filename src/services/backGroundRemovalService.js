@@ -73,7 +73,7 @@ const initRenderLoop = async (canvas, resultCanvas, bodypixNet, imageCapture, co
             return frame;
         } catch (e) {
             failureCount++;
-            if (failureCount > 3000) {
+            if (failureCount > 300) {
                 running = false;
                 throw new Error('failed grabbing frame');
             }
