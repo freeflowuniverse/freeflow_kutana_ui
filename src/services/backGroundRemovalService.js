@@ -8,7 +8,7 @@ import Worker from 'worker-loader!../worker/removeBackgroundWorker';
 
 
 // @todo move to webworker with offscreen rendering
-export const removeBackground = async (videoTrack, image = '/img/test-pattern.png') => {
+export const removeBackground = async (videoTrack, image = '/img/test-pattern.png', failFunction = ()=>{}) => {
 
     // await tf.setBackend('wasm')
     await timeout(20);
@@ -54,14 +54,14 @@ export const removeBackground = async (videoTrack, image = '/img/test-pattern.pn
     backgroundImage.src = image;
 
     const imageCapture = new ImageCapture(videoTrack);
-    const stopFn = await initRenderLoop(canvas, resultCanvas, bodypixNet, imageCapture, canvas.getContext('2d'), resultCanvas.getContext('2d'), backgroundImage);
+    const stopFn = await initRenderLoop(canvas, resultCanvas, bodypixNet, imageCapture, canvas.getContext('2d'), resultCanvas.getContext('2d'), backgroundImage, failFunction);
 
     const captureStream = resultCanvas.captureStream(60);
     return { stop: stopFn, track: captureStream.getVideoTracks()[0] };
 };
 
 
-const initRenderLoop = async (canvas, resultCanvas, bodypixNet, imageCapture, context, resultContext, backgroundImage) => {
+const initRenderLoop = async (canvas, resultCanvas, bodypixNet, imageCapture, context, resultContext, backgroundImage, failFunction) => {
     let running = true;
 
     let failureCount = 0;
@@ -128,6 +128,8 @@ const initRenderLoop = async (canvas, resultCanvas, bodypixNet, imageCapture, co
             } catch (e){
                 worker.terminate()
                 running = false;
+                failFunction()
+                break;
             }
 
             const tempImage = await createImageBitmap(capture);

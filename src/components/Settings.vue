@@ -117,13 +117,13 @@
                   this.stopBackgroundRemove();
                   this.stopBackgroundRemove = () => {};
                   const stream = await navigator.mediaDevices.getUserMedia({ video: true })
-
-                  // @todo get usercontrol object instead of janusshizzle
                   await this.userControl.publishTrack(stream.getVideoTracks()[0])
                   return;
               }
               const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-              const { stop, track } = await removeBackground(stream.getVideoTracks()[0])
+              const { stop, track } = await removeBackground(stream.getVideoTracks()[0], '/img/test-pattern.png', () =>{
+                this.backgroundRemove = false
+              })
               this.stopBackgroundRemove = stop
               window.track = track
               await this.userControl.publishTrack(track);
