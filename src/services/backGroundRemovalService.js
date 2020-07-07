@@ -8,7 +8,7 @@ import Worker from 'worker-loader!../worker/removeBackgroundWorker';
 
 
 // @todo move to webworker with offscreen rendering
-export const removeBackground = async (videoTrack, image = 'https://blog.johnverbiest.be/assets/test-pattern.png') => {
+export const removeBackground = async (videoTrack, image = '/img/test-pattern.png') => {
 
     // await tf.setBackend('wasm')
     await timeout(20);
@@ -37,7 +37,7 @@ export const removeBackground = async (videoTrack, image = 'https://blog.johnver
     if (!document.querySelector('#bgremovalresultcanvas')) {
         const htmlResultCanvasElement = document.createElement('canvas');
         htmlResultCanvasElement.id = 'bgremovalresultcanvas';
-        // htmlResultCanvasElement.style.display = 'none';
+        htmlResultCanvasElement.style.display = 'none';
         htmlResultCanvasElement.style.position = 'fixed';
         htmlResultCanvasElement.style.top = '0';
         htmlResultCanvasElement.style.left = '0';
@@ -57,25 +57,28 @@ export const removeBackground = async (videoTrack, image = 'https://blog.johnver
     const stopFn = await initRenderLoop(canvas, resultCanvas, bodypixNet, imageCapture, canvas.getContext('2d'), resultCanvas.getContext('2d'), backgroundImage);
 
     const captureStream = resultCanvas.captureStream(60);
-    return captureStream.getVideoTracks()[0];
+    return { stop: stopFn, track: captureStream.getVideoTracks()[0] };
 };
 
 
 const initRenderLoop = async (canvas, resultCanvas, bodypixNet, imageCapture, context, resultContext, backgroundImage) => {
-
-
     let running = true;
 
-    let time = performance.now();
-    let newTime;
-
+    let failureCount = 0;
     const grabFrame = async () => {
         try {
-            return await imageCapture.grabFrame();
+            const frame = await imageCapture.grabFrame();
+            failureCount = 0;
 
-        }catch (e) {
-            await timeout(1)
-            return grabFrame()
+            return frame;
+        } catch (e) {
+            failureCount++;
+            if (failureCount > 3000) {
+                running = false;
+                throw new Error('failed grabbing frame');
+            }
+            await timeout(1);
+            return grabFrame();
         }
     };
 
@@ -120,8 +123,12 @@ const initRenderLoop = async (canvas, resultCanvas, bodypixNet, imageCapture, co
 
         while (running) {
 
-            newTime = performance.now();
-            capture = await grabFrame(capture);
+            try {
+                capture = await grabFrame();
+            } catch (e){
+                worker.terminate()
+                running = false;
+            }
 
             const tempImage = await createImageBitmap(capture);
             image = await createImageBitmap(capture);
@@ -140,21 +147,14 @@ const initRenderLoop = async (canvas, resultCanvas, bodypixNet, imageCapture, co
             resultContext.drawImage(image, 0, 0);
             resultContext.globalCompositeOperation = 'destination-over';
 
-            fps = Math.round(1 / ((newTime - time) / 1000));
-            time = newTime;
-            resultContext.fillText(`${test} ${fps} fps`, 10, 30);
-
             drawImageScaled(backgroundImage, resultContext);
-            // let personSegmentation = await bodypixNet.segmentPerson(canvas, true);
-
 
             await timeout(10);
         }
+        worker.terminate()
     };
+    loop('main');
 
-    for (let i = 0; i < 2; i++) {
-        loop(i.toString())
-    }
 
     return () => {
         running = false;

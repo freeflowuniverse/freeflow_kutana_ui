@@ -35,18 +35,31 @@
                         </v-list-item-content>
                     </v-list-item>
                 </v-list>
+              <v-list subheader three-line>
+                <v-subheader class="red--text">Experimental</v-subheader>
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-list-item-title>Remove background</v-list-item-title>
+                    <v-switch v-model="backgroundRemove" @change="toggleBackgroundRemoval"></v-switch>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
             </v-card>
         </v-dialog>
     </div>
 </template>
 
 <script>
+    import { removeBackground } from '../services/backGroundRemovalService';
+    import { mapGetters } from 'vuex';
+
     export default {
         name: 'Settings',
         props: {
             value: Boolean,
         },
         computed: {
+          ...mapGetters(['userControl']),
             show: {
                 get() {
                     return this.value;
@@ -61,7 +74,9 @@
                 videoDevices: [],
                 audioDevices: [],
                 selectedVideo: null,
-                selectedAudio: null
+                selectedAudio: null,
+                backgroundRemove: false,
+                stopBackgroundRemove: ()=>{},
             };
         },
         mounted() {
@@ -81,7 +96,7 @@
                 })
 
                 // @todo get usercontrol object instead of janusshizzle
-                await window.janusshizzle.videoRoomPlugin.publishTrack(stream.getVideoTracks()[0])
+                await this.userControl.publishTrack(stream.getVideoTracks()[0])
             },
             async changeAudioDevice(value) {
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -90,8 +105,29 @@
                     }
                 })
 
-                await window.janusshizzle.videoRoomPlugin.publishTrack(stream.getAudioTracks()[0])
-            }
+                await this.userControl.publishTrack(stream.getAudioTracks()[0])
+            },
+          async toggleBackgroundRemoval() {
+
+          }
+        },
+        watch:{
+            backgroundRemove: async function(newBackgroundRemove){
+              if (!newBackgroundRemove) {
+                  this.stopBackgroundRemove();
+                  this.stopBackgroundRemove = () => {};
+                  const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+
+                  // @todo get usercontrol object instead of janusshizzle
+                  await this.userControl.publishTrack(stream.getVideoTracks()[0])
+                  return;
+              }
+              const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+              const { stop, track } = await removeBackground(stream.getVideoTracks()[0])
+              this.stopBackgroundRemove = stop
+              window.track = track
+              await this.userControl.publishTrack(track);
+            },
         }
     };
 </script>

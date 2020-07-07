@@ -27,9 +27,6 @@
             <v-btn @click="$emit('openSettings')" class="btn-settings" color="#3A6DAD" dark fab>
                 <v-icon>settings</v-icon>
             </v-btn>
-            <v-btn @click="test" class="btn-settings" color="#3A6DAD" dark fab>
-                TEST
-            </v-btn>
         </section>
     </div>
 </template>
@@ -88,16 +85,6 @@
                 console.log('Forcing reload');
                 // location.reload()
             },
-            async test() {
-              const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-              const track = await removeBackground(stream.getVideoTracks()[0])
-              // window.track = track
-              // await this.userControl.publishTrack(track);
-
-              setTimeout(() => {
-                this.$forceUpdate();
-              }, 100);
-            }
         },
     };
 

@@ -12,9 +12,9 @@ self.addEventListener('message', async (event) =>{
         await tf.ready();
         bodypixNet = await bodyPix.load({
             architecture: 'MobileNetV1',
-            outputStride: 8,
-            multiplier: 0.5,
-            quantBytes: 2,
+            outputStride: 16,
+            multiplier: 0.75,
+            quantBytes: 2
 
         });
 
