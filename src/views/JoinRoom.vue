@@ -89,6 +89,10 @@
                     this.localStream = null;
                 }
 
+
+              this.videoDevice = this.devices.find(d => d.label === this.localStream?.getVideoTracks()[0]?.label)?.deviceId
+              this.audioDevice = this.devices.find(d => d.label === this.localStream?.getAudioTracks()[0]?.label)?.deviceId
+
             },
             changeVideoDevice() {
                 this.video = true;
@@ -104,9 +108,9 @@
                 this.devices = devices;
                 this.updateLocalStream()
                     //debug remove this
-                    .then(() => {
-                        this.joinRoom();
-                    });
+                    // .then(() => {
+                    //     this.joinRoom();
+                    // });
             });
         },
         data: function() {
@@ -137,5 +141,9 @@
     .joinroom {
         background: #f5f5f5;
         height: calc(var(--vh) * 100);
+    }
+    .mine {
+      max-width: 100%;
+      padding: 1rem;
     }
 </style>

@@ -4,6 +4,8 @@ export default {
         snackbarMessage: '',
         alertUser: null,
         localStream: null,
+        camId: null,
+        micId: null,
     },
     mutations: {
         setSnackbarMessage(state, message) {
@@ -18,6 +20,12 @@ export default {
         },
         setLocalStream(state, stream) {
             state.localStream = stream;
+        },
+        setCamId(state, id){
+            state.camId = id
+        },
+        setMicId(state, id) {
+            state.micId = id
         },
     },
     actions: {
@@ -43,5 +51,7 @@ export default {
         snackbarMessage: state => state.snackbarMessage,
         alertUser: state => state.alertUser,
         localStream: state => state.localStream,
+        camId: state => state.camId,
+        micId: state => state.micId,
     },
 };
