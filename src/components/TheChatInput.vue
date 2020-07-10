@@ -1,5 +1,5 @@
 <template>
-  <section class="theChatInput grey lighten-3">
+  <section class="theChatInput mx-0">
     <v-divider class="py-2" horizontal></v-divider>
     <v-form @submit.prevent="forwardMessage">
       <input type="file" ref="fileUpper" @change="fileUploaded" style="display:none" />
