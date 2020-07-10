@@ -142,7 +142,7 @@
       <v-card>
         <v-card-title>
           <v-row class="mx-0">
-            Add member
+            Add members
             <v-spacer></v-spacer>
             <v-btn icon text @click="addUserDialog = false">
               <v-icon>close</v-icon>
@@ -174,6 +174,7 @@
 import { Janus } from "janus-gateway";
 import { mapGetters, mapActions, mapMutations } from "vuex";
 import { janusHelpers } from "@/services/Janusservice";
+import clipboard from "../common/clipboard";
 
 export default {
   props: ["grid", "minimal"],
@@ -247,7 +248,7 @@ export default {
       this.setVideoDevice(this.videoDevice);
       if (this.activeAudioDevice) {
         this.audioInputDevice = this.activeAudioDevice.deviceId;
-      } 
+      }
       if (this.activeAudioOutputDevice)
         this.audioOutputDevice = this.activeAudioOutputDevice.deviceId;
       this.showExtraSettings = !this.showExtraSettings;
@@ -373,7 +374,14 @@ export default {
       };
     },
     showAddUserDialog() {
-      this.addUserDialog = true;
+      try {
+        navigator.share({
+          title: "Join our freeflowconnect meeting",
+          text: `Navigate to ${this.inviteLink} to join our freeflowconnect meeting`
+        });
+      } catch (e) {
+        this.addUserDialog = true;
+      }
     },
     copyUrl() {
       navigator.clipboard
@@ -381,7 +389,7 @@ export default {
         .then(() => {
           this.setSnackbarMessage({
             type: "",
-            text: `Link copied to clipboard`
+            text: "Link copied to clipboard"
           });
         })
         .catch(e => {
