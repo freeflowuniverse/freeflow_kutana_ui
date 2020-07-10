@@ -247,7 +247,7 @@ export default {
       this.setVideoDevice(this.videoDevice);
       if (this.activeAudioDevice) {
         this.audioInputDevice = this.activeAudioDevice.deviceId;
-      } 
+      }
       if (this.activeAudioOutputDevice)
         this.audioOutputDevice = this.activeAudioOutputDevice.deviceId;
       this.showExtraSettings = !this.showExtraSettings;
@@ -363,7 +363,11 @@ export default {
         this.wallpaperFile.name.split(".").pop() != "jpg" &&
         this.wallpaperFile.name.split(".").pop() != "png"
       ) {
-        alert("Please use PNG or JPG image");
+        this.setSnackbarMessage({
+          type: "warning",
+          text: "Please use PNG, GIF or JPG image"
+        });
+        this.wallpaperFile = null;
         return;
       }
       var reader = new FileReader();
