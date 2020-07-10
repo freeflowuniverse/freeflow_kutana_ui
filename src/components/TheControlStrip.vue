@@ -174,7 +174,6 @@
 import { Janus } from "janus-gateway";
 import { mapGetters, mapActions, mapMutations } from "vuex";
 import { janusHelpers } from "@/services/Janusservice";
-import clipboard from "../common/clipboard";
 
 export default {
   props: ["grid", "minimal"],
