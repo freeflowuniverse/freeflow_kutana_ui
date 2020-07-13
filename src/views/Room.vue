@@ -47,7 +47,7 @@
     />
     <div class="sidebar" v-if="showSidebar" ref="sidebar">
       <p class="resizer" ref="rez" @mousedown="startDrag"></p>
-      <TheSidebar />
+      <TheChat />
     </div>
   </div>
 </template>
@@ -57,7 +57,7 @@ import { mapGetters, mapActions } from "vuex";
 import TheMainUser from "../components/TheMainUser";
 import TheSelectedUser from "../components/TheSelectedUser";
 import UserList from "../components/UserList";
-import TheSidebar from "../components/TheSidebar";
+import TheChat from "../components/TheChat";
 import TheMainUserControls from "../components/TheControlStrip";
 import { janusHelpers } from "@/services/Janusservice";
 
@@ -66,9 +66,9 @@ export default {
   components: {
     TheMainUser,
     TheSelectedUser,
-    TheSidebar,
     TheMainUserControls,
-    UserList
+    UserList,
+    TheChat
   },
   data() {
     return {
