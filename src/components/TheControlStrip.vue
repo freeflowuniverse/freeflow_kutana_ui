@@ -27,7 +27,7 @@
             @change="saveQualityOption"
           ></v-slider>
           <v-select
-            v-if="isChrome"
+            v-if="isChrome && !isMobile"
             v-model="videoDevice"
             dense
             prepend-icon="videocam"
