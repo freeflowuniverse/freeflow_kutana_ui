@@ -101,7 +101,7 @@ export default {
     this.getTeamInfo();
 
     if (this.account && this.account.name && this.teamName) {
-      this.setRoomId(Math.abs(this.hashString(this.teamName)));
+      this.setRoomId(this.hashString(this.teamName));
     }
 
     this.$root.$on("toggleGridPresentation", () => {
@@ -131,12 +131,13 @@ export default {
       "changeViewStyle"
     ]),
     hashString(str) {
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) {
-        hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
-        hash = hash & hash;
+      var hash = 0, i, chr;
+      for (i = 0; i < str.length; i++) {
+        chr   = str.charCodeAt(i);
+        hash  = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
       }
-      return hash;
+      return Math.abs(hash);
     },
     copyUrl() {
       navigator.clipboard
