@@ -33,7 +33,7 @@ function drawImageScaled(img, ctx) {
 
 class StreamFilterService {
 
-    constructor(mediaStream, defaultWallpaper, videoPublished, audioEnabled, wallpaperEnabled) {
+    constructor(mediaStream, defaultWallpaper, videoPublished, audioEnabled, wallpaperEnabled, width = 640, height = 480) {
 
         this.mediaStream = mediaStream
         if (this.mediaStream.getAudioTracks().length > 0) {
@@ -42,8 +42,8 @@ class StreamFilterService {
 
         }
 
-        this.width = 640
-        this.height = 480
+        this.width = width
+        this.height = height
 
         if (this.mediaStream.getVideoTracks().length > 0) {
             this.startVideo(this.mediaStream)
@@ -146,9 +146,9 @@ class StreamFilterService {
             return
         }
         //Draw only avatar 
-        this.resultContext.clearRect(0, 0, this.width, this.height);
+        this.resultContext.clearRect(0, 0, this.resultCanvas.width, this.resultCanvas.height);
         this.resultContext.globalCompositeOperation = "source-over";
-        this.resultContext.drawImage(this.person, this.width / 2 - this.person.width / 2, this.height / 2 - this.person.height / 2, this.person.width, this.person.height)
+        this.resultContext.drawImage(this.person, this.resultCanvas.width / 2 - this.person.width / 2, this.resultCanvas.height / 2 - this.person.height / 2, this.person.width, this.person.height)
 
         setTimeout(function () { self.renderLoop.bind(self)() }, 200)
 
