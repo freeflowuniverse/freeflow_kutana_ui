@@ -26,7 +26,6 @@ export default {
     };
   },
   mounted() {
-    if (!localStorage.getItem('unsupportedWarning')) {
     var isAndroid = navigator.userAgent.toLowerCase().indexOf("android") > -1;
     this.isIos =
       /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -39,12 +38,10 @@ export default {
       !/mercury/.test(navigator.userAgent);
     this.showDialog =
       (this.isIos && !isSafari) || (!isAndroid && !this.isIos && !isChrome);
-    }
   },
   methods: {
     closeDialog() {
       this.showDialog = false;
-      localStorage.setItem("unsupportedWarning", "accepted");
     }
   }
 };
