@@ -74,12 +74,19 @@
             @click="toggleCamera"
             icon
             class="mr-1"
-            :disabled="isChangingCameraEnableState || !isChrome"
+            :loading="isChangingCameraOrMicEnableState"
+            :disabled="!isChrome"
           >
             <v-icon>{{videoPublished ? 'videocam' : 'videocam_off'}}</v-icon>
           </v-btn>
 
-          <v-btn @click="toggleMute" icon class="mr-0" :disabled="!isChrome">
+          <v-btn
+            @click="toggleMute"
+            icon
+            class="mr-0"
+            :loading="isChangingCameraOrMicEnableState"
+            :disabled="!isChrome"
+          >
             <v-icon>{{micEnabled ? 'mic' : 'mic_off'}}</v-icon>
           </v-btn>
         </v-row>
@@ -188,7 +195,7 @@ export default {
       audioInputDevice: undefined,
       audioOutputDevice: undefined,
       wallpaperFile: undefined,
-      isChangingCameraEnableState: false
+      isChangingCameraOrMicEnableState: false
     };
   },
   mounted() {
@@ -265,18 +272,21 @@ export default {
       this.setAudioOutputDevice(this.audioOutputDevice);
     },
     toggleMute: function() {
-      Janus.log((this.micEnabled ? "Muting" : "Unmuting") + " local stream...");
+      if (!this.isChangingCameraOrMicEnableState) {
+        this.isChangingCameraOrMicEnableState = true;
+        Janus.log(
+          (this.micEnabled ? "Muting" : "Unmuting") + " local stream..."
+        );
 
-      this.setMicEnabled(!this.micEnabled);
-      this.setSnackbarMessage({
-        text: `You are ${!this.micEnabled ? "" : "un"}muted`
-      });
-      // if (this.micEnabled) {
-      //   this.users[0].pluginHandle.unmuteAudio();
-      // } else {
-      //   this.users[0].pluginHandle.muteAudio();
-      // }
-      this.changeDevice();
+        this.setMicEnabled(!this.micEnabled);
+        this.setSnackbarMessage({
+          text: `You are ${!this.micEnabled ? "" : "un"}muted`
+        });
+        this.changeDevice();
+        setTimeout(() => {
+          this.isChangingCameraOrMicEnableState = false;
+        }, 1000);
+      }
     },
 
     saveQualityOption: function() {
@@ -290,8 +300,8 @@ export default {
 
     toggleCamera: function() {
       //todo check if camera can be activated.
-      if (!this.isChangingCameraEnableState) {
-        this.isChangingCameraEnableState = true;
+      if (!this.isChangingCameraOrMicEnableState) {
+        this.isChangingCameraOrMicEnableState = true;
         this.setVideoPublished(!this.videoPublished);
         Janus.log(
           (this.videoPublished ? "Disabling" : "Enabling") + " local camera..."
@@ -301,7 +311,7 @@ export default {
         });
         this.changeDevice();
         setTimeout(() => {
-          this.isChangingCameraEnableState = false;
+          this.isChangingCameraOrMicEnableState = false;
         }, 1000);
       }
     },
