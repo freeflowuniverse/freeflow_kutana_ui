@@ -246,6 +246,7 @@ export default {
       return !!navigator.mediaDevices.getDisplayMedia;
     },
     logout: function() {
+      this.hangUp();
       this.clearStorage();
       this.$router.push({ name: "home" });
     },
