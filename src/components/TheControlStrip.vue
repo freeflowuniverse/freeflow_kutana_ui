@@ -15,6 +15,7 @@
             </v-col>
           </v-row>
         </v-card-title>
+        <div class="test" @click="sfggd()"></div>
         <v-card-text class="pt-5">
           <v-slider
             :tick-labels="qualityOptions"
@@ -150,9 +151,7 @@ export default {
     disableScreenShare: function() {
 
     },
-    showAddUserDialog() {
-      this.addUserDialog = true;
-    },
+
     copyUrl() {
       navigator.clipboard
         .writeText(this.inviteLink)
@@ -165,6 +164,8 @@ export default {
         .catch(e => {
           console.error(e);
         });
+    },
+      sfggd() {
     }
   }
 };

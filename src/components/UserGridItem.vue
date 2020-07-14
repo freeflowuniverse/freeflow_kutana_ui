@@ -19,6 +19,9 @@
                 :label="account.name !== user.username ? user.username : null"
                 :stream="user.stream"
                 class="main"
+                :class="{
+                    mine: account.name == user.username
+                }"
                 v-if="user.cam"
         ></JanusVideo>
     </div>

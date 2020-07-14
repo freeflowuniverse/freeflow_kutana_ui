@@ -1,27 +1,26 @@
 <template>
-    <section class="theChatInput">
+    <section class="theChatInput pa-4">
         <v-form @submit.prevent="forwardMessage" class="form px-2">
+            <v-row align="center">
+
             <input @change="fileUploaded" ref="fileUpper" style="display:none" type="file"/>
             <v-textarea
                     @keydown.enter.prevent
                     @keydown.enter.shift.exact="message += '\n'"
                     @keyup.enter.exact="forwardMessage"
                     autocomplete="none"
-                    background-color="transparent"
-                    class="message"
-                    clearable
                     color="black"
-                    flat
                     hide-details
                     label="Write a message ..."
                     no-resize
                     rows="1"
-                    solo
                     v-model="message"
+                    outlined
             />
             <v-btn @click="forwardMessage" icon>
                 <v-icon>send</v-icon>
             </v-btn>
+            </v-row>
         </v-form>
     </section>
 </template>
@@ -90,14 +89,4 @@
 </script>
 
 <style lang="scss" scoped>
-
-    .theChatInput {
-        background: lightsteelblue;
-        color: #000;
-    }
-
-    .form {
-        display: flex;
-        align-items: center;
-    }
 </style>

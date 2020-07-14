@@ -74,4 +74,7 @@ export default {
     background: white;
   }
 }
+.mine video {
+  transform: rotateY(180deg);
+}
 </style>
