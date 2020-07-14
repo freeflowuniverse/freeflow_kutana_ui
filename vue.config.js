@@ -5,6 +5,7 @@ module.exports = {
   "transpileDependencies": [
     "vuetify"
   ],
+
   configureWebpack: {
     plugins: [
       // janus.js does not use 'import' to access to the functionality of webrtc-adapter,
@@ -57,7 +58,12 @@ module.exports = {
       disableHostCheck: true
     }
   },
+
   css: {
     sourceMap: true,
   },
+
+  pwa: {
+    workboxPluginMode: 'InjectManifest'
+  }
 }

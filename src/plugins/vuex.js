@@ -1,16 +1,17 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from 'vue';
+import Vuex from 'vuex';
 
-import ExampleStore from '../stores/ExampleStore'
-import MessageStore from '../stores/MessageStore'
-import AuthStore from '../stores/AuthStore'
-import MainStore from '../stores/MainStore'
-import TeamStore from '../stores/TeamStore'
-import SocketStore from '../stores/SocketStore'
-import UserStore from "../stores/UserStore";
-import ScreenShareStore from "../stores/ScreenShareStore";
+import ExampleStore from '../stores/ExampleStore';
+import MessageStore from '../stores/MessageStore';
+import AuthStore from '../stores/AuthStore';
+import MainStore from '../stores/MainStore';
+import TeamStore from '../stores/TeamStore';
+import SocketStore from '../stores/SocketStore';
+import UserStore from '../stores/UserStore';
+import ScreenShareStore from '../stores/ScreenShareStore';
+import UserMediaStore from '../stores/UserMediaStore';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
     modules: {
@@ -22,5 +23,6 @@ export default new Vuex.Store({
         SocketStore,
         UserStore,
         ScreenShareStore,
-    }
-})
+        UserMediaStore,
+    },
+});

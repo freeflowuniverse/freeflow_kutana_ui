@@ -1,7 +1,6 @@
 import store from '../plugins/vuex';
 
 export class VideoRoomPlugin {
-
     constructor(opaqueId, bitrateCap = false, test = 'video') {
         this.bitrateCap = bitrateCap;
         this.test = test;
@@ -10,17 +9,17 @@ export class VideoRoomPlugin {
         this.inThrottle = null;
         this.feeds = [];
         this.listeners = {
-            'error': [],
-            'localUserJoined': [],
-            'userJoined': [],
-            'userLeft': [],
-            'userUpdated': [],
-            'attach': [],
-            'roomAvailable': [],
-            'pluginAttached': [],
-            'ownUserJoined': [],
-            'attachSubscriberPlugin': [],
-            'cleanupUser': [],
+            error: [],
+            localUserJoined: [],
+            userJoined: [],
+            userLeft: [],
+            userUpdated: [],
+            attach: [],
+            roomAvailable: [],
+            pluginAttached: [],
+            ownUserJoined: [],
+            attachSubscriberPlugin: [],
+            cleanupUser: [],
         };
         this.myId = null;
         this.myPrivateId = null;
@@ -33,31 +32,37 @@ export class VideoRoomPlugin {
         return {
             plugin: 'janus.plugin.videoroom',
             opaqueId: this.opaqueId,
-            success: (pluginHandle) => {
+            success: pluginHandle => {
                 this.onAttachSucces(pluginHandle);
             },
             error: this.onError,
             onmessage: async (msg, jsep) => {
                 await this.onMessage(msg, jsep);
             },
-            onlocalstream: (stream) => {
+            onlocalstream: stream => {
                 this.onLocalStream(stream);
             },
-            onremotestream: (stream) => {
-            },
+            onremotestream: stream => {},
         };
     }
 
     determineSpeaker(stream, remoteFeed, id) {
         if (!window.audioContext) {
-            var _AudioContext = window.AudioContext || window.webkitAudioContext;
+            var _AudioContext =
+                window.AudioContext || window.webkitAudioContext;
             window.audioContext = new _AudioContext();
         }
 
         if (window.audioContext) {
             let analyser = window.audioContext.createAnalyser();
-            let microphone = window.audioContext.createMediaStreamSource(stream);
-            let javascriptNode = window.audioContext.createScriptProcessor(2048, 1, 1);
+            let microphone = window.audioContext.createMediaStreamSource(
+                stream
+            );
+            let javascriptNode = window.audioContext.createScriptProcessor(
+                2048,
+                1,
+                1
+            );
 
             analyser.smoothingTimeConstant = 0.8;
             analyser.fftSize = 1024;
@@ -78,7 +83,11 @@ export class VideoRoomPlugin {
                 const average = values / length;
                 if (
                     !store.getters.selectedUser ||
-                    (store.getters.selectedUser && !store.getters.selectedUser.pinned && average > 20 && remoteFeed.rfdisplay !== store.getters.selectedUser.username)
+                    (store.getters.selectedUser &&
+                        !store.getters.selectedUser.pinned &&
+                        average > 20 &&
+                        remoteFeed.rfdisplay !==
+                            store.getters.selectedUser.username)
                 ) {
                     if (!this.inThrottle) {
                         this.inThrottle = true;
@@ -147,8 +156,7 @@ export class VideoRoomPlugin {
         if (jsep) {
             this.pluginHandle.handleRemoteJsep({
                 jsep: jsep,
-                success: () => {
-                },
+                success: () => {},
             });
         }
 
@@ -156,20 +164,50 @@ export class VideoRoomPlugin {
             this.myPrivateId = msg.private_id;
             this.myId = msg.id;
             this.myRoom = msg.room;
-            this.emitEvent('ownUserJoined', this.buildUser(this.generateDummyMediaStream(), this.myId, this.myUsername, {
-                pluginHandle: this.pluginHandle,
-            }));
+            this.emitEvent(
+                'ownUserJoined',
+                this.buildUser(
+                    this.generateDummyMediaStream(),
+                    this.myId,
+                    this.myUsername,
+                    {
+                        pluginHandle: this.pluginHandle,
+                    }
+                )
+            );
 
             console.log({ test: this.test, msg });
             if (msg.publishers) {
                 msg.publishers.forEach(element => {
-                    this.emitEvent('attachSubscriberPlugin', this.attachSubscriber(element['id'], element['display'], element['audio_codec'], element['video_codec']));
-                    this.emitEvent('userJoined', this.buildUser(this.generateDummyMediaStream(), element['id'], element['display']));
+                    this.emitEvent(
+                        'attachSubscriberPlugin',
+                        this.attachSubscriber(
+                            element['id'],
+                            element['display'],
+                            element['audio_codec'],
+                            element['video_codec']
+                        )
+                    );
+                    this.emitEvent(
+                        'userJoined',
+                        this.buildUser(
+                            this.generateDummyMediaStream(),
+                            element['id'],
+                            element['display']
+                        )
+                    );
                 });
             }
             if (msg.attendees) {
                 msg.attendees.forEach(element => {
-                    this.emitEvent('userJoined', this.buildUser(this.generateDummyMediaStream(), element['id'], element['display']));
+                    this.emitEvent(
+                        'userJoined',
+                        this.buildUser(
+                            this.generateDummyMediaStream(),
+                            element['id'],
+                            element['display']
+                        )
+                    );
                 });
             }
             return;
@@ -178,90 +216,140 @@ export class VideoRoomPlugin {
         if (msg.videoroom === 'event') {
             if (msg.publishers) {
                 msg.publishers.forEach(element => {
-                    this.emitEvent('attachSubscriberPlugin', this.attachSubscriber(element['id'], element['display'], element['audio_codec'], element['video_codec']));
+                    this.emitEvent(
+                        'attachSubscriberPlugin',
+                        this.attachSubscriber(
+                            element['id'],
+                            element['display'],
+                            element['audio_codec'],
+                            element['video_codec']
+                        )
+                    );
                 });
             }
             if (msg.leaving) {
-                this.emitEvent('userLeft', this.buildUser(this.generateDummyMediaStream(), msg.leaving, 'left'));
-
+                this.emitEvent(
+                    'userLeft',
+                    this.buildUser(
+                        this.generateDummyMediaStream(),
+                        msg.leaving,
+                        'left'
+                    )
+                );
             }
         }
 
         if (msg.joining) {
-            this.emitEvent('userJoined', this.buildUser(this.generateDummyMediaStream(), msg.joining.id, msg.joining.display));
+            this.emitEvent(
+                'userJoined',
+                this.buildUser(
+                    this.generateDummyMediaStream(),
+                    msg.joining.id,
+                    msg.joining.display
+                )
+            );
+        }
+    }
 
+    generateDummyMediaStream(
+        video = true,
+        audio = true,
+        width = 640,
+        height = 480
+    ) {
+        const mediaStream = new MediaStream();
+
+        if (video) {
+            let canvas = Object.assign(document.createElement('canvas'), {
+                width,
+                height,
+            });
+            canvas.getContext('2d').fillRect(0, 0, width, height);
+
+            let stream = canvas.captureStream();
+            let emptyVideo = Object.assign(stream.getVideoTracks()[0], {
+                enabled: false,
+            });
+            emptyVideo.stop();
+            emptyVideo.dispatchEvent(new Event('ended'));
+            mediaStream.addTrack(emptyVideo);
         }
 
+        if (audio) {
+            let ctx = new AudioContext(),
+                oscillator = ctx.createOscillator();
+            let dst = oscillator.connect(ctx.createMediaStreamDestination());
+
+            oscillator.start();
+            let emptyAudio = Object.assign(dst.stream.getAudioTracks()[0], {
+                enabled: false,
+            });
+            emptyAudio.stop();
+            emptyAudio.dispatchEvent(new Event('ended'));
+            mediaStream.addTrack(emptyAudio);
+        }
+
+        return mediaStream;
     }
 
-    generateDummyMediaStream(width = 640, height = 480) {
-        let canvas = Object.assign(document.createElement('canvas'), { width, height });
-        canvas.getContext('2d').fillRect(0, 0, width, height);
-
-        let stream = canvas.captureStream();
-        let emptyVideo = Object.assign(stream.getVideoTracks()[0], { enabled: false });
-        emptyVideo.stop();
-        emptyVideo.dispatchEvent(new Event('ended'));
-
-        let ctx = new AudioContext(), oscillator = ctx.createOscillator();
-        let dst = oscillator.connect(ctx.createMediaStreamDestination());
-
-        oscillator.start();
-        let emptyAudio = Object.assign(dst.stream.getAudioTracks()[0], { enabled: false });
-        emptyAudio.stop();
-        emptyAudio.dispatchEvent(new Event('ended'));
-
-        return new MediaStream([emptyVideo, emptyAudio]);
-    }
-
-    async publishOwnFeed() {
-        this.myStream = this.generateDummyMediaStream();
+    async publishOwnFeed(video, audio) {
+        this.myStream = this.generateDummyMediaStream(video, audio);
 
         this.pluginHandle.createOffer({
             stream: this.myStream,
             success: jsep => {
-                const publish = { request: 'configure', audio: true, video: true };
+                const publish = { request: 'configure', audio, video };
 
                 this.pluginHandle.send({
                     message: publish,
                     jsep: jsep,
-                    success: () => {
-                    },
-                    error: () => {
-                    },
+                    success: () => {},
+                    error: () => {},
                 });
             },
-            error: error => {
-            },
+            error: error => {},
         });
     }
 
-    async publishTrack(track) {
+    async publishTrack(track, video = true, audio = true) {
         let peerConnection = this.pluginHandle.webrtcStuff.pc;
         if (!peerConnection) {
-            await this.publishOwnFeed();
+            await this.publishOwnFeed(video, audio);
             peerConnection = this.pluginHandle.webrtcStuff.pc;
         }
         const senders = peerConnection.getSenders();
 
-        const rtcpSender = senders.find(sender => sender.track.kind === track.kind);
+        const rtcpSender = senders.find(
+            sender => sender.track.kind === track.kind
+        );
         await rtcpSender.replaceTrack(track);
 
-        const streamTrack = this.myStream.getTracks().find(t => t.kind === track.kind);
+        const streamTrack = this.myStream
+            .getTracks()
+            .find(t => t.kind === track.kind);
         streamTrack.stop();
         streamTrack.dispatchEvent(new Event('ended'));
 
-        this.myStream = new MediaStream([track, this.myStream.getTracks().find(t => t.kind !== track.kind)]);
-        this.emitEvent('ownUserJoined', this.buildUser(this.myStream, this.myId, this.myUsername, {
-            peerConnection,
-            pluginHandle: this.pluginHandle,
-        }));
+        this.myStream = new MediaStream([
+            track,
+            this.myStream.getTracks().find(t => t.kind !== track.kind),
+        ]);
+        this.emitEvent(
+            'ownUserJoined',
+            this.buildUser(this.myStream, this.myId, this.myUsername, {
+                peerConnection,
+                pluginHandle: this.pluginHandle,
+            })
+        );
     }
 
     //  await this.publishTrack((await navigator.mediaDevices.getDisplayMedia()).getVideoTracks()[0]);
 
     onLocalStream(stream) {
-        this.emitEvent('ownUserJoined', this.buildUser(stream, this.myId, this.myUsername));
+        this.emitEvent(
+            'ownUserJoined',
+            this.buildUser(stream, this.myId, this.myUsername)
+        );
     }
 
     buildUser(stream, id, username = this.myUsername, extra = {}) {
@@ -272,24 +360,24 @@ export class VideoRoomPlugin {
             room: this.myRoom,
             stream: stream,
             cam: false,
+            mic: false,
             screen: false,
             extra,
         };
     }
 
     async createRoom(roomName) {
-        return new Promise(((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             this.pluginHandle.send({
                 message: {
                     request: 'exists',
                     room: roomName,
                 },
-                success: (result) => {
+                success: result => {
                     if (result.exists) {
                         resolve(result);
                         return;
                     }
-
 
                     const message = {
                         request: 'create',
@@ -306,18 +394,18 @@ export class VideoRoomPlugin {
                     };
 
                     if (this.bitrateCap) {
-                        message.bitrate= 128000*2
+                        message.bitrate = 128000 * 2;
                     }
 
                     this.pluginHandle.send({
                         message,
-                        success: (result) => {
+                        success: result => {
                             resolve(result);
                         },
                     });
                 },
             });
-        }));
+        });
     }
 
     async joinRoom(roomName, username) {
@@ -360,12 +448,10 @@ export class VideoRoomPlugin {
                 pluginHandle.videoCodec = video;
                 pluginHandle.send({
                     message: subscribe,
-                    success: () => {
-                    },
+                    success: () => {},
                 });
             },
-            error: error => {
-            },
+            error: error => {},
             onmessage: (msg, jsep) => {
                 if (jsep !== undefined && jsep !== null) {
                     pluginHandle.createAnswer({
@@ -380,12 +466,10 @@ export class VideoRoomPlugin {
                             pluginHandle.send({
                                 message: body,
                                 jsep: jsep,
-                                success: () => {
-                                },
+                                success: () => {},
                             });
                         },
-                        error: error => {
-                        },
+                        error: error => {},
                     });
                 }
 
@@ -416,16 +500,28 @@ export class VideoRoomPlugin {
                             break;
                     }
                 }
-
-
             },
             onremotestream: stream => {
                 console.log({ stream, pluginHandle });
-                this.emitEvent('userJoined', this.buildUser(stream, pluginHandle.rfid, pluginHandle.rfdisplay));
+                this.emitEvent(
+                    'userJoined',
+                    this.buildUser(
+                        stream,
+                        pluginHandle.rfid,
+                        pluginHandle.rfdisplay
+                    )
+                );
             },
             oncleanup: () => {
                 console.log('[oncleanup]: ', pluginHandle.rfid);
-                this.emitEvent('cleanupUser', this.buildUser(this.generateDummyMediaStream(), pluginHandle.rfid, pluginHandle.rfdisplay));
+                this.emitEvent(
+                    'cleanupUser',
+                    this.buildUser(
+                        this.generateDummyMediaStream(),
+                        pluginHandle.rfid,
+                        pluginHandle.rfdisplay
+                    )
+                );
             },
         };
     }
