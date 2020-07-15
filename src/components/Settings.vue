@@ -113,7 +113,7 @@
         methods: {
             ...mapActions(['getVideoStream', 'getAudioStream']),
             async changeVideoDevice(value) {
-                const stream = this.getVideoStream(value);
+                const stream = await this.getVideoStream(value);
                 // @todo get usercontrol object instead of janusshizzle
                 await this.userControl.publishTrack(stream.getVideoTracks()[0]);
             },
