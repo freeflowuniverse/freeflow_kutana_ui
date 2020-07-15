@@ -100,13 +100,13 @@
                 this.selectedVideo = devices.find(
                     d =>
                         d.label ===
-                        window.janusshizzle.videoRoomPlugin.myStream.getVideoTracks()[0]
+                        window.janusshizzle.videoRoomPlugin.myStream?.getVideoTracks()[0]
                             ?.label
                 )?.deviceId;
                 this.selectedAudio = devices.find(
                     d =>
                         d.label ===
-                        window.janusshizzle.videoRoomPlugin.myStream.getAudioTracks()[0]
+                        window.janusshizzle.videoRoomPlugin.myStream?.getAudioTracks()[0]
                             ?.label
                 )?.deviceId;
             });
