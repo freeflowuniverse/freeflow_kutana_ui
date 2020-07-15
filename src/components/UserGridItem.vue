@@ -1,33 +1,28 @@
 <template>
-    <div
-            :data-cam="user.cam"
-            :data-screen="user.screen"
-            class="user-grid-item"
-    >
+    <div :data-cam="user.cam" :data-screen="user.screen" class="user-grid-item">
         <div class="avatar">
-            <img :alt="user.username" :src="avatar">
+            <img :alt="user.username" :src="avatar" />
         </div>
         <JanusVideo
-                :cover="false"
-                :label="account.name !== user.username ? user.username : null"
-                :stream="user.screenShareStream"
-                class="screen"
-                v-if="user.screen"
+            :cover="false"
+            :label="account.name !== user.username ? user.username : null"
+            :stream="user.screenShareStream"
+            class="screen"
+            v-if="user.screen"
         ></JanusVideo>
         <JanusVideo
-                :cover="true"
-                :label="account.name !== user.username ? user.username : null"
-                :stream="user.stream"
-                class="main"
-                :class="{
-                    mine: account.name == user.username
-                }"
-                v-if="user.cam"
+            :cover="true"
+            :label="account.name !== user.username ? user.username : null"
+            :stream="user.stream"
+            class="main"
+            :class="{
+                mine: account.name == user.username,
+            }"
+            v-if="user.cam"
         ></JanusVideo>
     </div>
 </template>
 <script>
-
     import { AvatarGenerator } from 'random-avatar-generator';
     import JanusVideo from './JanusVideo';
     import { mapGetters } from 'vuex';
@@ -41,7 +36,6 @@
             },
         },
         mounted() {
-
             //@todo: check if this is not a memmory leak
             //preload image
             const img = new Image();
@@ -53,7 +47,6 @@
                     console.log('ey');
                     setTimeout(() => {
                         this.$forceUpdate();
-
                     }, 100);
                 };
             }
@@ -65,7 +58,6 @@
                     setTimeout(() => {
                         alert('update');
                         this.$forceUpdate();
-
                     }, 100);
                 };
             }
@@ -74,13 +66,21 @@
             ...mapGetters(['account']),
             avatar() {
                 const generator = new AvatarGenerator();
-                return generator.generateRandomAvatar(this.user.username);
+                return generator.generateRandomAvatar(
+                    this.$props.user.username
+                );
             },
             camlive() {
-                return this.user.stream.getVideoTracks()[0].readyState === 'live';
+                return (
+                    this.$props.user.stream.getVideoTracks()[0].readyState ===
+                    'live'
+                );
             },
             screenLive() {
-                return this.user.screenShareStream.getVideoTracks()[0].readyState === 'live';
+                return (
+                    this.$props.user.screenShareStream.getVideoTracks()[0]
+                        .readyState === 'live'
+                );
             },
         },
     };
@@ -89,7 +89,7 @@
     .user-grid-item {
         position: relative;
 
-        &[data-cam='true'][data-screen="true"] {
+        &[data-cam='true'][data-screen='true'] {
             .main {
                 position: absolute;
                 top: 0;
@@ -100,6 +100,7 @@
         }
 
         .avatar {
+            pointer-events: none;
             position: absolute;
             top: 0;
             left: 0;
