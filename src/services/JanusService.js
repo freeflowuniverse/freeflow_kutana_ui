@@ -22,6 +22,7 @@ export const initializeJanus = async (
 
     videoRoomPlugin.addEventListener('ownUserJoined', user => {
         console.log('ownUserJoined');
+        console.log({ track: user.stream?.getAudioTracks()?.[0] });
 
         if (initialJoin) {
             initialJoin = false;
@@ -37,6 +38,20 @@ export const initializeJanus = async (
         if (videoTrack) {
             user.cam = true;
             videoTrack.onended = async event => {
+                const localUser = store.getters.localUser;
+                localUser.cam = false;
+                store.commit('setLocalUser', localUser);
+            };
+        }
+
+        const audioTrack = user.stream.getAudioTracks()[0];
+        //@todo: improve this by not using label
+        if (
+            audioTrack &&
+            audioTrack.label !== 'MediaStreamAudioDestinationNode'
+        ) {
+            user.mic = true;
+            audioTrack.onended = async event => {
                 const localUser = store.getters.localUser;
                 localUser.cam = false;
                 store.commit('setLocalUser', localUser);
