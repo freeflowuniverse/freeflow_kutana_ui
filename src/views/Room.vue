@@ -209,6 +209,7 @@
                 'allScreenUsers',
                 'isMobile',
                 'account',
+                'userControl',
             ]),
             inviteLink() {
                 let baseUrl = window.location.href;

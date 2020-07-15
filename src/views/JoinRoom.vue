@@ -84,7 +84,7 @@
 
 <script>
     import router from '../plugins/router';
-    import { mapActions, mapMutations } from 'vuex';
+    import { mapActions, mapGetters, mapMutations } from 'vuex';
 
     export default {
         name: 'JoinRoom',
@@ -145,6 +145,10 @@
             },
         },
         mounted() {
+            if (this.userControl) {
+                this.userControl.hangUp();
+                location.reload();
+            }
             navigator.mediaDevices.enumerateDevices().then(devices => {
                 this.devices = devices;
                 this.updateLocalStream();
@@ -166,6 +170,7 @@
         },
 
         computed: {
+            ...mapGetters(['userControl']),
             videoInputDevices() {
                 return this.devices.filter(
                     d => d.kind === 'videoinput' && d.label

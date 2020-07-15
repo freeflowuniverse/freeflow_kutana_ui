@@ -24,13 +24,11 @@ export const initializeJanus = async (
         console.log('ownUserJoined');
 
         if (initialJoin) {
+            console.log('initialJoin');
             initialJoin = false;
             stream.getTracks().forEach(async track => {
                 await videoRoomPlugin.publishTrack(track);
             });
-            if (stream.getAudioTracks().length) {
-                user.mic = true;
-            }
         }
 
         const videoTrack = user.stream.getVideoTracks()[0];
