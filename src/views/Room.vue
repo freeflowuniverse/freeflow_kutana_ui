@@ -40,6 +40,7 @@
             ></audio>
         </div>
         <Settings v-model="showSettings"></Settings>
+        <ChatMessageNotification class="notification" v-if="view != 'chat' " />
     </div>
 </template>
 
@@ -56,6 +57,7 @@
     import { reject } from 'lodash/collection';
     import { isNull } from 'lodash/lang';
     import Settings from '../components/Settings';
+    import ChatMessageNotification from '../components/ChatMessageNotification';
 
     export default {
         name: 'Room',
@@ -64,6 +66,7 @@
             UserGrid,
             ControlStrip,
             ChatGrid,
+            ChatMessageNotification
         },
         data() {
             return {

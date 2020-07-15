@@ -2,7 +2,6 @@ export default {
     state: {
         viewStyle: localStorage.getItem('view-style') || 'Default',
         snackbarMessage: '',
-        alertUser: null,
         localStream: null,
         camId: null,
         micId: null,
@@ -10,9 +9,6 @@ export default {
     mutations: {
         setSnackbarMessage(state, message) {
             state.snackbarMessage = message;
-        },
-        alertUser(state) {
-            state.alertUser = Math.random();
         },
         changeViewStyle(state, style) {
             state.viewStyle = style;
@@ -49,7 +45,6 @@ export default {
 
         },
         snackbarMessage: state => state.snackbarMessage,
-        alertUser: state => state.alertUser,
         localStream: state => state.localStream,
         camId: state => state.camId,
         micId: state => state.micId,

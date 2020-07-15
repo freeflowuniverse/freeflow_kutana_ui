@@ -43,7 +43,7 @@ export default {
     });
   },
   computed: {
-    ...mapGetters(["messages", "account", "alertUser"])
+    ...mapGetters(["messages", "account"])
   },
   methods: {
     showDivider(message, index) {
