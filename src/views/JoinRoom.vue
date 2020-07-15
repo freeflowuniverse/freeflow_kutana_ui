@@ -164,6 +164,7 @@
                 localStream: null,
             };
         },
+
         computed: {
             videoInputDevices() {
                 return this.devices.filter(
@@ -175,22 +176,10 @@
                     d => d.kind === 'audioinput' && d.label
                 );
             },
-            computed: {
-                videoInputDevices() {
-                    return this.devices.filter(
-                        d => d.kind === 'videoinput' && d.label
-                    );
-                },
-                audioInputDevices() {
-                    return this.devices.filter(
-                        d => d.kind === 'audioinput' && d.label
-                    );
-                },
-                audioOutputDevices() {
-                    return this.devices.filter(
-                        d => d.kind === 'audiooutput' && d.label
-                    );
-                },
+            audioOutputDevices() {
+                return this.devices.filter(
+                    d => d.kind === 'audiooutput' && d.label
+                );
             },
         },
     };
