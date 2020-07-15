@@ -22,7 +22,6 @@ export const initializeJanus = async (
 
     videoRoomPlugin.addEventListener('ownUserJoined', user => {
         console.log('ownUserJoined');
-        console.log({ track: user.stream?.getAudioTracks()?.[0] });
 
         if (initialJoin) {
             initialJoin = false;
