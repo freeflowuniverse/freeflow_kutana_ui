@@ -22,7 +22,7 @@
                             "
                         ></video>
                         <div class="avatar" v-else>
-                            <img :alt="account.username" :src="avatar" />
+                            <img :alt="account.name" :src="avatar" />
                         </div>
                     </v-row>
                     <v-select
@@ -180,7 +180,7 @@
             avatar() {
                 const generator = new AvatarGenerator();
                 return generator.generateRandomAvatar(
-                    this.$props.user.username
+                    this.account.name
                 );
             },
             videoInputDevices() {
