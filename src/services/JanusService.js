@@ -52,7 +52,7 @@ export const initializeJanus = async (
             user.mic = true;
             audioTrack.onended = async event => {
                 const localUser = store.getters.localUser;
-                localUser.cam = false;
+                localUser.mic = false;
                 store.commit('setLocalUser', localUser);
             };
         }
