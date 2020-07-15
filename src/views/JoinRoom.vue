@@ -21,8 +21,12 @@
                                     localStream.getVideoTracks().length > 0
                             "
                         ></video>
+                        <div class="avatar" v-else>
+                            <img :alt="account.username" :src="avatar" />
+                        </div>
                     </v-row>
                     <v-select
+                        :loading="videoInputDevices.length <= 0"
                         :disabled="videoInputDevices.length <= 0"
                         :items="videoInputDevices"
                         :label="
@@ -42,6 +46,7 @@
                     />
                     <v-select
                         :disabled="audioInputDevices.length <= 0"
+                        :loading="audioInputDevices.length <= 0"
                         :items="audioInputDevices"
                         :label="
                             audioInputDevices.length <= 0
@@ -84,7 +89,8 @@
 
 <script>
     import router from '../plugins/router';
-    import { mapActions, mapMutations } from 'vuex';
+    import { mapActions, mapGetters, mapMutations } from 'vuex';
+    import { AvatarGenerator } from 'random-avatar-generator';
 
     export default {
         name: 'JoinRoom',
@@ -145,6 +151,10 @@
             },
         },
         mounted() {
+            if (this.userControl) {
+                this.userControl.hangUp();
+                location.reload();
+            }
             navigator.mediaDevices.enumerateDevices().then(devices => {
                 this.devices = devices;
                 this.updateLocalStream();
@@ -166,6 +176,13 @@
         },
 
         computed: {
+            ...mapGetters(['userControl', 'account']),
+            avatar() {
+                const generator = new AvatarGenerator();
+                return generator.generateRandomAvatar(
+                    this.$props.user.username
+                );
+            },
             videoInputDevices() {
                 return this.devices.filter(
                     d => d.kind === 'videoinput' && d.label

@@ -213,6 +213,7 @@
                 'allScreenUsers',
                 'isMobile',
                 'account',
+                'userControl',
             ]),
             test () {
                 return this.$refs.controlstrip

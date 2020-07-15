@@ -312,16 +312,29 @@ export class VideoRoomPlugin {
     }
 
     async publishTrack(track, video = true, audio = true) {
+        console.log({ track });
         let peerConnection = this.pluginHandle.webrtcStuff.pc;
         if (!peerConnection) {
             await this.publishOwnFeed(video, audio);
             peerConnection = this.pluginHandle.webrtcStuff.pc;
         }
-        const senders = peerConnection.getSenders();
+        let senders = peerConnection.getSenders();
 
-        const rtcpSender = senders.find(
+        let rtcpSender = senders.find(
             sender => sender.track.kind === track.kind
         );
+
+        if (!rtcpSender) {
+            await this.publishOwnFeed(video, audio);
+            peerConnection = this.pluginHandle.webrtcStuff.pc;
+
+            senders = peerConnection.getSenders();
+
+            rtcpSender = senders.find(
+                sender => sender.track.kind === track.kind
+            );
+        }
+
         await rtcpSender.replaceTrack(track);
 
         const streamTrack = this.myStream
@@ -330,10 +343,11 @@ export class VideoRoomPlugin {
         streamTrack.stop();
         streamTrack.dispatchEvent(new Event('ended'));
 
-        this.myStream = new MediaStream([
+        const tracks = [
             track,
             this.myStream.getTracks().find(t => t.kind !== track.kind),
-        ]);
+        ];
+        this.myStream = new MediaStream(tracks.filter(t => t));
         this.emitEvent(
             'ownUserJoined',
             this.buildUser(this.myStream, this.myId, this.myUsername, {
