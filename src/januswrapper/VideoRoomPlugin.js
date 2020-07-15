@@ -260,7 +260,9 @@ export class VideoRoomPlugin {
         const mediaStream = new MediaStream();
 
         if (video) {
-            let canvas = Object.assign(document.createElement('canvas'), {
+            const target = document.createElement('canvas');
+            target.dataset.dummy = true;
+            let canvas = Object.assign(target, {
                 width,
                 height,
             });

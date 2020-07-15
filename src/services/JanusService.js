@@ -32,7 +32,13 @@ export const initializeJanus = async (
         }
 
         const videoTrack = user.stream.getVideoTracks()[0];
-        if (videoTrack) {
+        if (
+            videoTrack &&
+            !(
+                videoTrack instanceof CanvasCaptureMediaStreamTrack &&
+                videoTrack.canvas.dataset.dummy
+            )
+        ) {
             user.cam = true;
             videoTrack.onended = async event => {
                 const localUser = store.getters.localUser;
