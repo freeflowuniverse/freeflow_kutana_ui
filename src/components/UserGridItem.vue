@@ -47,7 +47,7 @@
             const img = new Image();
             img.src = this.avatar;
 
-            const videoTrack = this.$props.user.stream.getVideoTracks()[0];
+            const videoTrack = this.user.stream.getVideoTracks()[0];
             if (videoTrack) {
                 videoTrack.onended = () => {
                     console.log('ey');
@@ -58,7 +58,7 @@
                 };
             }
 
-            const screenShareTrack = this.$props.user.screenShareStream.getVideoTracks()[0];
+            const screenShareTrack = this.user.screenShareStream.getVideoTracks()[0];
             if (screenShareTrack) {
                 screenShareTrack.oninactive = () => {
                     console.log('ey');
@@ -74,13 +74,13 @@
             ...mapGetters(['account']),
             avatar() {
                 const generator = new AvatarGenerator();
-                return generator.generateRandomAvatar(this.$props.user.username);
+                return generator.generateRandomAvatar(this.user.username);
             },
             camlive() {
-                return this.$props.user.stream.getVideoTracks()[0].readyState === 'live';
+                return this.user.stream.getVideoTracks()[0].readyState === 'live';
             },
             screenLive() {
-                return this.$props.user.screenShareStream.getVideoTracks()[0].readyState === 'live';
+                return this.user.screenShareStream.getVideoTracks()[0].readyState === 'live';
             },
         },
     };

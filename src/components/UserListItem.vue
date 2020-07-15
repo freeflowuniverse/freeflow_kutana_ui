@@ -54,10 +54,10 @@ export default {
       return this.user == this.localUser;
     },
     userVideoStream() {
-      if (!this.$props.user || !this.$props.user.stream) {
+      if (!this.user || !this.user.stream) {
         return false;
       }
-      return this.$props.user.stream;
+      return this.user.stream;
     },
     isPinned() {
       return false;

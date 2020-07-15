@@ -67,10 +67,10 @@
         computed: {
             ...mapGetters(['isMobile']),
             classes() {
-                const videopresent = this.$props.stream.getVideoTracks().length;
+                const videopresent = this.stream.getVideoTracks().length;
 
                 return {
-                    'cover': this.$props.cover,
+                    'cover': this.cover,
                     'video-present': videopresent,
                     'video-not-present': !videopresent,
                 };
