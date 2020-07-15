@@ -179,9 +179,7 @@
             ...mapGetters(['userControl', 'account']),
             avatar() {
                 const generator = new AvatarGenerator();
-                return generator.generateRandomAvatar(
-                    this.account.name
-                );
+                return generator.generateRandomAvatar(this.account.name);
             },
             videoInputDevices() {
                 return this.devices.filter(
@@ -210,5 +208,9 @@
     .mine {
         max-width: 100%;
         padding: 1rem;
+    }
+    .avatar {
+        pointer-events: none;
+        user-select: none;
     }
 </style>

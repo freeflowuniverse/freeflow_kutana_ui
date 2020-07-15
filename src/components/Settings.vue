@@ -12,9 +12,9 @@
                     <v-subheader>Device controls</v-subheader>
                     <v-list-item>
                         <v-list-item-content>
-                            <v-list-item-title
-                                >Input Video Device</v-list-item-title
-                            >
+                            <v-list-item-title>
+                                Input Video Device
+                            </v-list-item-title>
                             <v-select
                                 :items="videoDevices"
                                 item-text="label"
@@ -26,9 +26,9 @@
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-content>
-                            <v-list-item-title
-                                >Input Audio Device</v-list-item-title
-                            >
+                            <v-list-item-title>
+                                Input Audio Device
+                            </v-list-item-title>
                             <v-select
                                 :items="audioDevices"
                                 item-text="label"
@@ -43,10 +43,11 @@
                     <v-subheader class="red--text">Experimental</v-subheader>
                     <v-list-item>
                         <v-list-item-content>
-                            <v-list-item-title
-                                >Remove background</v-list-item-title
-                            >
+                            <v-list-item-title>
+                                Remove background
+                            </v-list-item-title>
                             <v-switch
+                                class="pl-3"
                                 v-model="backgroundRemove"
                                 @change="toggleBackgroundRemoval"
                             ></v-switch>
@@ -99,13 +100,13 @@
                 this.selectedVideo = devices.find(
                     d =>
                         d.label ===
-                        window.janusshizzle.videoRoomPlugin.myStream.getVideoTracks()[0]
+                        window.janusshizzle.videoRoomPlugin.myStream?.getVideoTracks()[0]
                             ?.label
                 )?.deviceId;
                 this.selectedAudio = devices.find(
                     d =>
                         d.label ===
-                        window.janusshizzle.videoRoomPlugin.myStream.getAudioTracks()[0]
+                        window.janusshizzle.videoRoomPlugin.myStream?.getAudioTracks()[0]
                             ?.label
                 )?.deviceId;
             });
@@ -150,4 +151,8 @@
     };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+    * {
+        user-select: none;
+    }
+</style>
