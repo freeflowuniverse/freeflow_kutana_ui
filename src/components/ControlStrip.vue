@@ -1,5 +1,5 @@
 <template>
-    <v-row justify="center">
+    <v-row justify="center" ref="controlstrip" class="mb-5">
         <v-btn @click="toggleCam" class="primary mx-2" dark fab>
             <v-icon>{{ localUser.cam ? 'videocam_off' : 'videocam' }}</v-icon>
         </v-btn>

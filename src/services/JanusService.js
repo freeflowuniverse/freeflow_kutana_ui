@@ -43,6 +43,20 @@ export const initializeJanus = async (
             };
         }
 
+        const audioTrack = user.stream.getAudioTracks()[0];
+        //@todo: improve this by not using label
+        if (
+            audioTrack &&
+            audioTrack.label !== 'MediaStreamAudioDestinationNode'
+        ) {
+            user.mic = true;
+            audioTrack.onended = async event => {
+                const localUser = store.getters.localUser;
+                localUser.mic = false;
+                store.commit('setLocalUser', localUser);
+            };
+        }
+
         store.commit('setLocalUser', user);
     });
 

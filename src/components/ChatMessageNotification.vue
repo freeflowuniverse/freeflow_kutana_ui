@@ -1,7 +1,10 @@
 <template>
-    <div class="notification px-5 py-2 white ma-5">
-        <span class="from secondary--text font-weight-bold">From</span>: message
-    </div>
+    <section class="notifications">
+        <div class="notification px-5 py-2 white ma-5" v-for="message in messagesToShow" :key="message.createdAt">
+            <!-- TODO crop content -->
+            <span class="from secondary--text font-weight-bold">{{message.sender}}</span>: {{message.content}} 
+        </div>
+    </section>
 </template>
 <script>
 import { mapGetters } from 'vuex';
@@ -12,12 +15,19 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(['messages']),
+        ...mapGetters(['messages', 'account']),
     },
     watch: {
         messages(val) {
             // TODO check if chat is vissible
             // TODO check if overlapping with controls
+            const lastMessage = val[val.length -1]
+            if (lastMessage.sender != this.account.name) {
+                this.messagesToShow.push(lastMessage)
+            }
+            if (val.length > 3) {
+                this.messagesToShow = this.messagesToShow.slice(-3)
+            }
         },
     },
 };

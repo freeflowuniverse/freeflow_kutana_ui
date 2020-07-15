@@ -8,6 +8,7 @@
         class="room"
         v-if="allUsers.length && allScreenUsers.length"
     >
+<div class="test">{{test}}</div>
         <UserGrid :users="users" :showChat="view === 'chat'">
             <template v-slot:chat>
                 <ChatGrid
@@ -40,7 +41,7 @@
             ></audio>
         </div>
         <Settings v-model="showSettings"></Settings>
-        <ChatMessageNotification class="notification" v-if="view != 'chat' " />
+        <ChatMessageNotification class="notifications" v-if="view != 'chat'" />
     </div>
 </template>
 
@@ -213,6 +214,9 @@
                 'isMobile',
                 'account',
             ]),
+            test () {
+                return this.$refs.controlstrip
+            },
             inviteLink() {
                 let baseUrl = window.location.href;
                 if (baseUrl.charAt(baseUrl.length - 1) !== '/') {
@@ -252,5 +256,17 @@
 <style lang="scss" scoped>
     .room {
         height: calc(var(--vh) * 100);
+        .test {
+            top: 0;
+            width: 100%;
+            position: fixed;
+            z-index: 2;
+        }
+        .notifications {
+            position: fixed;
+            bottom: 0px;
+            right: 0;
+            z-index: 2;
+        }
     }
 </style>
