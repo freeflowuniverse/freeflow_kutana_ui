@@ -2,7 +2,7 @@
     <section class="notifications" @click="$emit('click')">
         <div class="notification px-5 py-2 white ma-5" v-for="message in messagesToShow" :key="message.createdAt">
             <!-- TODO crop content -->
-            <span class="from secondary--text font-weight-bold">{{message.sender}}</span>: {{message.content}} 
+            <span class="from secondary--text font-weight-bold">{{message.sender}}</span>: {{message.content | truncate(10)}} 
         </div>
     </section>
 </template>
@@ -24,7 +24,7 @@ export default {
             if (lastMessage.sender != this.account.name) {
                 lastMessage.timeout = setTimeout(() => {
                     this.messagesToShow = this.messagesToShow.filter(m => m != lastMessage)
-                }, 1000)
+                }, 3000)
                 this.messagesToShow.push(lastMessage)
             } 
             if (this.messagesToShow.length > 3) {
@@ -39,11 +39,16 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.notification {
-    opacity: 0.8;
-    border-radius: 5px;
-    box-shadow: 0px 0px 6px rgba(255, 255, 255, 0.48);
-    border-radius: 6px;
-    cursor: pointer;
+.notifications {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    .notification {
+        opacity: 0.8;
+        border-radius: 5px;
+        box-shadow: 0px 0px 6px rgba(255, 255, 255, 0.48);
+        border-radius: 6px;
+        cursor: pointer;
+    }
 }
 </style>
