@@ -211,5 +211,6 @@
     }
     .avatar {
         pointer-events: none;
+        user-select: none;
     }
 </style>

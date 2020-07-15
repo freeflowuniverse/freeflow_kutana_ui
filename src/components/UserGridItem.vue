@@ -101,6 +101,7 @@
 
         .avatar {
             pointer-events: none;
+            user-select: none;
             position: absolute;
             top: 0;
             left: 0;
