@@ -1,7 +1,6 @@
 <template>
-    <section class="notifications" @click="$emit('click')">
-        <div class="notification px-5 py-2 white ma-5" v-for="message in messagesToShow" :key="message.createdAt">
-            <!-- TODO crop content -->
+    <section class="notifications mb-5" @click="$emit('click')">
+        <div class="notification px-5 py-2 white ma-2" v-for="message in messagesToShow" :key="message.createdAt">
             <span class="from secondary--text font-weight-bold">{{message.sender}}</span>: {{message.content | truncate(10)}} 
         </div>
     </section>

@@ -8,12 +8,10 @@
         class="room"
         v-if="allUsers.length && allScreenUsers.length"
     >
-        <div class="test">{{test}}</div>
         <UserGrid :users="users" :showChat="view === 'chat'">
             <template v-slot:chat>
                 <ChatGrid
                     v-if="view === 'chat'"
-                    class="chat"
                     :selectedUser="localUser"
                     v-on:back="view = 'grid'"
                 ></ChatGrid>
@@ -167,25 +165,6 @@ export default {
                     console.error(e);
                 });
         },
-        startDrag(e) {
-            e.disable;
-            this.startX = e.clientX;
-            this.startWidth = parseInt(
-                document.defaultView.getComputedStyle(this.$refs.sidebar).width,
-                10
-            );
-            document.addEventListener('mousemove', this.doDrag, false);
-            document.addEventListener('mouseup', this.stopDrag, false);
-        },
-        stopDrag() {
-            document.removeEventListener('mousemove', this.doDrag, false);
-            document.removeEventListener('mouseup', this.stopDrag, false);
-        },
-        doDrag(e) {
-            console.log(e);
-            this.$refs.sidebar.style.width =
-                this.startWidth + this.startX - e.clientX + 'px';
-        },
         showControl() {
             this.showControls = true;
             clearTimeout(this.timeout);
@@ -206,9 +185,6 @@ export default {
             'account',
             'userControl',
         ]),
-        test() {
-            return this.$refs.controlstrip;
-        },
         inviteLink() {
             let baseUrl = window.location.href;
             if (baseUrl.charAt(baseUrl.length - 1) !== '/') {
@@ -248,12 +224,6 @@ export default {
 <style lang="scss" scoped>
 .room {
     height: calc(var(--vh) * 100);
-    .test {
-        top: 0;
-        width: 100%;
-        position: fixed;
-        z-index: 2;
-    }
     .notifications {
         position: fixed;
         bottom: 0px;

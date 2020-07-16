@@ -1,5 +1,5 @@
 <template>
-    <v-card class="chat">
+    <v-card class="chatGrid">
         <v-card-title class="primary header">
             <v-row align="center" justify="center" class="white--text px-2">
                 <v-col cols="2" class="py-0">
@@ -79,7 +79,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.chat {
+.chatGrid {
     display: grid;
     grid-template-rows: auto 1fr auto;
     grid-template-areas: 'header' 'inner' 'input';
