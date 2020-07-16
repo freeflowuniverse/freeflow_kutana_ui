@@ -1,7 +1,12 @@
 <template>
     <section class="notifications mb-5" @click="$emit('click')">
-        <div class="notification px-5 py-2 white ma-2" v-for="message in messagesToShow" :key="message.createdAt">
-            <span class="from secondary--text font-weight-bold">{{message.sender}}</span>: {{message.content | truncate(10)}} 
+        <div
+            class="notification px-5 py-2 white ma-2"
+            v-for="message in messagesToShow"
+            :key="message.createdAt"
+        >
+            <span class="from secondary--text font-weight-bold">{{message.sender}}</span>
+            : {{message.content | truncate(10)}}
         </div>
     </section>
 </template>
@@ -19,20 +24,29 @@ export default {
     watch: {
         messages(val) {
             // TODO check if overlapping with controls
-            const lastMessage = val[val.length -1]
+
+            const lastMessage = val[val.length - 1];
             if (lastMessage.sender != this.account.name) {
-                lastMessage.timeout = setTimeout(() => {
-                    this.messagesToShow = this.messagesToShow.filter(m => m != lastMessage)
-                }, 3000)
-                this.messagesToShow.push(lastMessage)
-            } 
-            if (this.messagesToShow.length > 3) {
-                this.messagesToShow.slice(0, this.messagesToShow.length -3).forEach(message => {
-                    clearTimeout(message.timeout)
-                });             
-                this.messagesToShow = this.messagesToShow.slice(-3)
+            if ('Notification' in window) {
+                new Notification(`New message from ${lastMessage.sender}`, {
+                    body: lastMessage.content,
+                });
             }
-            
+                lastMessage.timeout = setTimeout(() => {
+                    this.messagesToShow = this.messagesToShow.filter(
+                        m => m != lastMessage
+                    );
+                }, 3000);
+                this.messagesToShow.push(lastMessage);
+            }
+            if (this.messagesToShow.length > 3) {
+                this.messagesToShow
+                    .slice(0, this.messagesToShow.length - 3)
+                    .forEach(message => {
+                        clearTimeout(message.timeout);
+                    });
+                this.messagesToShow = this.messagesToShow.slice(-3);
+            }
         },
     },
 };

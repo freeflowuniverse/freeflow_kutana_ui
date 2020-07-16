@@ -8,7 +8,7 @@
         class="grid"
     >
         <UserGridItem :user="user" class="user" v-bind:key="user.uuid" v-for="user of users" />
-        <div :style="controlStripStyle">
+        <div class="controlstrip">
             <slot name="controlStrip"></slot>
         </div>
         <div class="chat" ref="chatSlot">
@@ -112,25 +112,35 @@ export default {
         }
     }
 
-    &:hover .controlStrip {
-        opacity: 0.9;
-        bottom: 0;
-        transition: all 300ms ease-in-out 0s;
-    }
-    .controlStrip {
-        bottom: -100%;
-        opacity: 0;
-        position: fixed;
-        width: 100%;
-        transition: all 300ms ease-in-out 2s;
-        align-content: center;
-    }
+    // &:hover .controlStrip {
+    //     opacity: 0.9;
+    //     bottom: 0;
+    //     transition: all 300ms ease-in-out 0s;
+    // }
+    // .controlStrip {
+    //     bottom: -100%;
+    //     opacity: 0;
+    //     position: fixed;
+    //     width: 100%;
+    //     transition: all 300ms ease-in-out 2s;
+    //     align-content: center;
+    // }
 
+    .controlstrip {
+        grid-column-start: start;
+        display: flex;
+        align-items: flex-end;
+    }
     &[data-orientation='landscape'] {
         grid-template-columns: [start] 9fr [one-quarter-chat] 3fr [one-quarter one-third-chat] 4fr [one-third] 2fr [middle-chat] 2fr 4fr [middle two-thirds-chat] 3fr [three-quarters-chat] 1fr 4fr [two-thirds] 4fr [three-quarters begin-chat] 12fr [end];
         grid-template-rows: [start] 3fr [one-quarter] 1fr [one-third] 1fr 1fr [middle] 1fr 1fr [two-thirds] 1fr [three-quarters] 3fr [end];
-
+        .controlstrip {
+            grid-row-end: end;
+        }
         &[data-showchat='false'] {
+            .controlstrip {
+                grid-column-end: end;
+            }
             .chat {
                 display: none;
             }
@@ -184,6 +194,9 @@ export default {
             }
         }
         &[data-showchat='true'] {
+            .controlstrip {
+                grid-column-end: begin-chat;
+            }
             .chat {
                 display: grid;
             }
@@ -236,8 +249,8 @@ export default {
                 grid-template-areas: 'user-1 user-5 user-5 user-5 user-8 user-8 user-8 user-12 user-12 user-12 localuser' 'user-2 user-5 user-5 user-5 user-9 user-9 user-9 user-13 user-13 user-13 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-13 user-13 user-13 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-13 user-13 user-13 chat' 'user-3 user-6 user-6 user-6 user-10 user-10 user-10 user-14 user-14 user-14 chat' 'user-3 user-6 user-6 user-6 user-10 user-10 user-10 user-14 user-14 user-14 chat' 'user-3 user-7 user-7 user-7 user-10 user-10 user-10 user-14 user-14 user-14 chat' 'user-4 user-7 user-7 user-7 user-11 user-11 user-11 user-15 user-15 user-15 chat';
             }
             &[data-ismobile='true'] {
-                grid-template-columns: 3fr repeat(6, 1fr) 3fr 12fr;
-                grid-template-rows: 3fr repeat(6, 1fr) 3fr;
+                grid-template-columns: [start] 3fr repeat(6, 1fr) 3fr [begin-chat] 12fr [end];
+                grid-template-rows: 3fr repeat(6, 1fr) 3fr [end];
                 &[data-useramount='1'] {
                     grid-template-areas: 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1 chat' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1 chat' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1 chat' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1 chat' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1 chat' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1 chat' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1 chat' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1 chat';
                 }
@@ -264,35 +277,41 @@ export default {
                 }
                 &[data-useramount='9'] {
                     grid-template-areas: 'user-1 user-1 user-4 user-4 user-4 user-4 user-7 user-7 chat' 'user-1 user-1 user-4 user-4 user-4 user-4 user-7 user-7 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-8 user-8 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-8 user-8 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-8 user-8 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-8 user-8 chat' 'user-3 user-3 user-6 user-6 user-6 user-6 user-9 user-9 chat' 'user-3 user-3 user-6 user-6 user-6 user-6 user-9 user-9 chat';
-                    &[data-useramount='10'] {
-                        grid-template-areas: 'user-1 user-4 user-4 user-4 user-7 user-7 user-7 user-8 chat' 'user-1 user-4 user-4 user-4 user-7 user-7 user-7 user-8 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-9 user-9 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-9 user-9 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-9 user-9 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-9 user-9 chat' 'user-3 user-3 user-6 user-6 user-6 user-6 user-10 user-10 chat' 'user-3 user-3 user-6 user-6 user-6 user-6 user-10 user-10 chat';
-                    }
-                    &[data-useramount='11'] {
-                        grid-template-areas: 'user-1 user-4 user-4 user-4 user-7 user-7 user-7 user-9 chat' 'user-1 user-4 user-4 user-4 user-7 user-7 user-7 user-9 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-10 user-10 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-10 user-10 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-10 user-10 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-10 user-10 chat' 'user-3 user-6 user-6 user-6 user-8 user-8 user-8 user-11 chat' 'user-3 user-6 user-6 user-6 user-8 user-8 user-8 user-11 chat';
-                    }
-                    &[data-useramount='12'] {
-                        grid-template-areas: 'user-1 user-4 user-4 user-4 user-7 user-7 user-7 user-10 chat' 'user-1 user-4 user-4 user-4 user-7 user-7 user-7 user-10 chat' 'user-2 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-2 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-2 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-2 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-3 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-3 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat';
-                    }
-                    &[data-useramount='13'] {
-                        grid-template-areas: 'user-1 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-2 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-3 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-3 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-3 user-7 user-7 user-7 user-10 user-10 user-10 user-13 chat' 'user-4 user-7 user-7 user-7 user-10 user-10 user-10 user-13 chat';
-                    }
-                    &[data-useramount='14'] {
-                        grid-template-areas: 'user-1 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-2 user-5 user-5 user-5 user-8 user-8 user-8 user-12 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-3 user-6 user-6 user-6 user-9 user-9 user-9 user-13 chat' 'user-3 user-6 user-6 user-6 user-9 user-9 user-9 user-13 chat' 'user-3 user-7 user-7 user-7 user-10 user-10 user-10 user-13 chat' 'user-4 user-7 user-7 user-7 user-10 user-10 user-10 user-14 chat';
-                    }
-                    &[data-useramount='15'] {
-                        grid-template-areas: 'user-1 user-5 user-5 user-5 user-9 user-9 user-9 user-12 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-13 chat' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-13 chat' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-13 chat' 'user-3 user-7 user-7 user-7 user-10 user-10 user-10 user-14 chat' 'user-3 user-7 user-7 user-7 user-10 user-10 user-10 user-14 chat' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-14 chat' 'user-4 user-8 user-8 user-8 user-11 user-11 user-11 user-15 chat';
-                    }
-                    &[data-useramount='16'] {
-                        grid-template-areas: 'user-1 user-5 user-5 user-5 user-9 user-9 user-9 user-13 chat' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-14 chat' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-14 chat' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-14 chat' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-15 chat' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-15 chat' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-15 chat' 'user-4 user-8 user-8 user-8 user-12 user-12 user-12 user-16 chat';
-                    }
+                }
+                &[data-useramount='10'] {
+                    grid-template-areas: 'user-1 user-4 user-4 user-4 user-7 user-7 user-7 user-8 chat' 'user-1 user-4 user-4 user-4 user-7 user-7 user-7 user-8 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-9 user-9 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-9 user-9 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-9 user-9 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-9 user-9 chat' 'user-3 user-3 user-6 user-6 user-6 user-6 user-10 user-10 chat' 'user-3 user-3 user-6 user-6 user-6 user-6 user-10 user-10 chat';
+                }
+                &[data-useramount='11'] {
+                    grid-template-areas: 'user-1 user-4 user-4 user-4 user-7 user-7 user-7 user-9 chat' 'user-1 user-4 user-4 user-4 user-7 user-7 user-7 user-9 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-10 user-10 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-10 user-10 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-10 user-10 chat' 'user-2 user-2 user-5 user-5 user-5 user-5 user-10 user-10 chat' 'user-3 user-6 user-6 user-6 user-8 user-8 user-8 user-11 chat' 'user-3 user-6 user-6 user-6 user-8 user-8 user-8 user-11 chat';
+                }
+                &[data-useramount='12'] {
+                    grid-template-areas: 'user-1 user-4 user-4 user-4 user-7 user-7 user-7 user-10 chat' 'user-1 user-4 user-4 user-4 user-7 user-7 user-7 user-10 chat' 'user-2 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-2 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-2 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-2 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-3 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-3 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat';
+                }
+                &[data-useramount='13'] {
+                    grid-template-areas: 'user-1 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-2 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-3 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-3 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-3 user-7 user-7 user-7 user-10 user-10 user-10 user-13 chat' 'user-4 user-7 user-7 user-7 user-10 user-10 user-10 user-13 chat';
+                }
+                &[data-useramount='14'] {
+                    grid-template-areas: 'user-1 user-5 user-5 user-5 user-8 user-8 user-8 user-11 chat' 'user-2 user-5 user-5 user-5 user-8 user-8 user-8 user-12 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-12 chat' 'user-3 user-6 user-6 user-6 user-9 user-9 user-9 user-13 chat' 'user-3 user-6 user-6 user-6 user-9 user-9 user-9 user-13 chat' 'user-3 user-7 user-7 user-7 user-10 user-10 user-10 user-13 chat' 'user-4 user-7 user-7 user-7 user-10 user-10 user-10 user-14 chat';
+                }
+                &[data-useramount='15'] {
+                    grid-template-areas: 'user-1 user-5 user-5 user-5 user-9 user-9 user-9 user-12 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-13 chat' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-13 chat' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-13 chat' 'user-3 user-7 user-7 user-7 user-10 user-10 user-10 user-14 chat' 'user-3 user-7 user-7 user-7 user-10 user-10 user-10 user-14 chat' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-14 chat' 'user-4 user-8 user-8 user-8 user-11 user-11 user-11 user-15 chat';
+                }
+                &[data-useramount='16'] {
+                    grid-template-areas: 'user-1 user-5 user-5 user-5 user-9 user-9 user-9 user-13 chat' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-14 chat' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-14 chat' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-14 chat' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-15 chat' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-15 chat' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-15 chat' 'user-4 user-8 user-8 user-8 user-12 user-12 user-12 user-16 chat';
                 }
             }
         }
     }
     &[data-orientation='portrait'] {
-        grid-template-columns: 3fr 1fr 1fr 1fr 1fr 1fr 1fr 3fr;
-        grid-template-rows: 3fr 1fr 1fr 1fr 1fr 1fr 1fr 3fr 3fr 3fr 3fr 3fr 3fr 9fr;
+        grid-template-columns: [start] 3fr 1fr 1fr 1fr 1fr 1fr 1fr 3fr [end];
+        grid-template-rows: [start] 3fr 1fr 1fr 1fr 1fr 1fr 1fr 3fr [begin-chat] 3fr 3fr 3fr 3fr 3fr 9fr [end];
+        .controlstrip {
+            grid-column-end: end;
+        }
         &[data-showchat='true'] {
+            .controlstrip {
+                grid-row-end: begin-chat;
+            }
             &[data-useramount='1'] {
                 grid-template-areas: 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'chat chat chat chat chat chat chat chat' 'chat chat chat chat chat chat chat chat' 'chat chat chat chat chat chat chat chat' 'chat chat chat chat chat chat chat chat' 'chat chat chat chat chat chat chat chat' 'chat chat chat chat chat chat chat chat';
             }
@@ -343,6 +362,9 @@ export default {
             }
         }
         &[data-showchat='false'] {
+            .controlstrip {
+                grid-row-end: end;
+            }
             &[data-useramount='1'] {
                 grid-template-areas: 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1' 'user-1 user-1 user-1 user-1 user-1 user-1 user-1 user-1';
             }

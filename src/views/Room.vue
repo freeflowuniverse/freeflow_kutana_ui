@@ -135,6 +135,12 @@ export default {
             stream
         );
         this.setUserControl(userControl);
+
+        if ('Notification' in window) {
+            if (Notification.permission !== 'denied') {
+                Notification.requestPermission();
+            }
+        }
     },
     methods: {
         ...mapActions([

@@ -1,25 +1,25 @@
 <template>
     <v-row justify="center" ref="controlstrip" class="mb-5">
-        <v-btn @click="toggleCam" class="primary mx-2" dark fab>
-            <v-icon>{{ localUser.cam ? 'videocam_off' : 'videocam' }}</v-icon>
+        <v-btn @click="toggleCam" class="primary mx-2" dark icon :fab="!isMobile">
+            <v-icon :small="isMobile">{{ localUser.cam ? 'videocam_off' : 'videocam' }}</v-icon>
         </v-btn>
-        <v-btn @click="toggleMic" class="primary mx-2" dark fab>
-            <v-icon>{{ localUser.mic ? 'mic_off' : 'mic' }}</v-icon>
+        <v-btn @click="toggleMic" class="primary mx-2" dark icon :fab="!isMobile">
+            <v-icon :small="isMobile">{{ localUser.mic ? 'mic_off' : 'mic' }}</v-icon>
         </v-btn>
-        <v-btn @click="screen" class="primary mx-2" dark fab v-if="!isMobile">
-            <v-icon>{{ localScreenUser.screen ? 'stop_screen_share' : 'screen_share' }}</v-icon>
+        <v-btn @click="screen" class="primary mx-2" dark icon :fab="!isMobile" v-if="!isMobile">
+            <v-icon :small="isMobile">{{ localScreenUser.screen ? 'stop_screen_share' : 'screen_share' }}</v-icon>
         </v-btn>
-        <v-btn @click="hangUp" class="red mx-2" dark fab>
-            <v-icon>call_end</v-icon>
+        <v-btn @click="hangUp" class="red mx-2" dark icon :fab="!isMobile">
+            <v-icon :small="isMobile">call_end</v-icon>
         </v-btn>
-        <v-btn @click="$emit('toggleChat')" class="primary mx-2" dark fab>
-            <v-icon>chat_bubble</v-icon>
+        <v-btn @click="$emit('toggleChat')" class="primary mx-2" dark icon :fab="!isMobile">
+            <v-icon :small="isMobile">chat_bubble</v-icon>
         </v-btn>
-        <v-btn disabled class="primary mx-2" dark fab>
-            <v-icon>broken_image</v-icon>
+        <v-btn disabled class="primary mx-2" dark icon :fab="!isMobile">
+            <v-icon :small="isMobile">broken_image</v-icon>
         </v-btn>
-        <v-btn @click="$emit('openSettings', $event)" class="btn-settings primary mx-2" dark fab>
-            <v-icon>settings</v-icon>
+        <v-btn @click="$emit('openSettings', $event)" class="btn-settings primary mx-2" dark icon :fab="!isMobile">
+            <v-icon :small="isMobile">settings</v-icon>
         </v-btn>
     </v-row>
 </template>
