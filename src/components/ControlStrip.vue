@@ -88,7 +88,7 @@ export default {
             await this.$router.push({ name: 'home' });
 
             console.log('Forcing reload');
-            // location.reload()
+            location.reload()
         },
     },
 };

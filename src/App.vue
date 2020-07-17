@@ -1,15 +1,12 @@
 <template>
   <v-app :style="cssProps">
     <router-view></router-view>
-    <Account v-if="!$route.meta.hideAccount"></Account>
     <v-snackbar top v-model="showSnackbar" :color="snackbarMessage.type">{{snackbarMessage.text}}</v-snackbar>
   </v-app>
 </template>
 <script>
 import { mapGetters } from "vuex";
-import Account from './components/Account';
 export default {
-  components: { Account },
   data() {
     return {
       showSnackbar: false
@@ -49,11 +46,6 @@ export default {
 };
 </script>
 <style lang="scss">
-  .v-application--wrap{
-    height: 100%;
-    /*fix for mobile 100vh*/
-    min-height: unset !important;
-  }
 .v-application .title.ttl,
 .ttl {
   font-family: "Bebas Neue", cursive !important;
@@ -74,7 +66,8 @@ export default {
     background: white;
   }
 }
-.mine video {
+.mine video,
+video.mine {
   transform: rotateY(180deg);
 }
 </style>
