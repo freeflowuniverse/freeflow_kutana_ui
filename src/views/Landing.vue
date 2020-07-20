@@ -91,7 +91,7 @@
                 ],
                 inviteUrl: null,
                 video: true,
-                audio: false,
+                audio: true,
                 devices: [],
                 videoDevice: null,
                 audioDevice: null,
