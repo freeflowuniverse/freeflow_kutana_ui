@@ -13,10 +13,10 @@
         </v-row>
         <v-row class="io mb-2" justify="center" align="center">
             <v-btn fab @click="toggleCam" class="primary mx-2" dark icon>
-                <v-icon>{{ video ? 'videocam_off' : 'videocam' }}</v-icon>
+                <v-icon>{{ video ? 'videocam' : 'videocam_off' }}</v-icon>
             </v-btn>
             <v-btn fab @click="toggleMic" class="primary mx-2" dark icon>
-                <v-icon>{{ audio ? 'mic_off' : 'mic' }}</v-icon>
+                <v-icon>{{ audio ? 'mic' : 'mic_off' }}</v-icon>
             </v-btn>
         </v-row>
         <v-row class="actions pa-2" justify="center" align="center">
