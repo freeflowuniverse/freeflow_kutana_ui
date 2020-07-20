@@ -1,6 +1,6 @@
 <template>
     <div class="settings">
-        <v-dialog origin="#dd" v-model="show">
+        <v-dialog origin="#dd" v-model="show" @input="calculateDevices">
             <v-card>
                 <v-toolbar color="primary" dark>
                     <v-btn @click="$emit('input', false)" dark icon>
@@ -69,9 +69,10 @@
             value: Boolean,
         },
         computed: {
-            ...mapGetters(['userControl']),
+            ...mapGetters(['userControl', 'localUser']),
             show: {
                 get() {
+                    this.calculateDevices();
                     return this.value;
                 },
                 set(value) {
@@ -89,8 +90,23 @@
                 stopBackgroundRemove: () => {},
             };
         },
+
         mounted() {
-            navigator.mediaDevices.enumerateDevices().then(devices => {
+            this.calculateDevices();
+        },
+        methods: {
+            ...mapActions(['getVideoStream', 'getAudioStream']),
+            async changeVideoDevice(value) {
+                const stream = await this.getVideoStream(value);
+                await this.userControl.publishTrack(stream.getVideoTracks()[0]);
+            },
+            async changeAudioDevice(value) {
+                const stream = await this.getAudioStream(value);
+                await this.userControl.publishTrack(stream.getAudioTracks()[0]);
+            },
+            async toggleBackgroundRemoval() {},
+            async calculateDevices() {
+                const devices = await navigator.mediaDevices.enumerateDevices();
                 this.videoDevices = devices.filter(
                     d => d.kind === 'videoinput'
                 );
@@ -100,29 +116,14 @@
                 this.selectedVideo = devices.find(
                     d =>
                         d.label ===
-                        window.janusshizzle.videoRoomPlugin.myStream?.getVideoTracks()[0]
-                            ?.label
+                        this.localUser?.stream?.getVideoTracks()[0]?.label
                 )?.deviceId;
                 this.selectedAudio = devices.find(
                     d =>
                         d.label ===
-                        window.janusshizzle.videoRoomPlugin.myStream?.getAudioTracks()[0]
-                            ?.label
+                        this.localUser?.stream?.getAudioTracks()[0]?.label
                 )?.deviceId;
-            });
-        },
-        methods: {
-            ...mapActions(['getVideoStream', 'getAudioStream']),
-            async changeVideoDevice(value) {
-                const stream = await this.getVideoStream(value);
-                // @todo get usercontrol object instead of janusshizzle
-                await this.userControl.publishTrack(stream.getVideoTracks()[0]);
             },
-            async changeAudioDevice(value) {
-                const stream = await this.getAudioStream(value);
-                await this.userControl.publishTrack(stream.getAudioTracks()[0]);
-            },
-            async toggleBackgroundRemoval() {},
         },
         watch: {
             backgroundRemove: async function(newBackgroundRemove) {
