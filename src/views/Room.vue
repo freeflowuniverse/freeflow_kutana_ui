@@ -61,6 +61,7 @@
     import { isNull } from 'lodash/lang';
     import Settings from '../components/Settings';
     import ChatMessageNotification from '../components/ChatMessageNotification';
+    import { uniqBy } from 'lodash/array';
 
     export default {
         name: 'Room',
@@ -107,6 +108,19 @@
 
                 return;
             }
+            //in entry point of your app (index.js)
+
+            const channel = new BroadcastChannel('tab');
+
+            channel.postMessage('another-tab');
+            // note that listener is added after posting the message
+
+            channel.addEventListener('message', msg => {
+                if (msg === 'another-tab') {
+                    // message received from 2nd tab
+                    alert('Cannot open multiple instances');
+                }
+            });
 
             if (this.localUser) {
                 return;
@@ -119,7 +133,6 @@
             //@todo fixme
             const userName =
                 this.account.name ||
-                localStorage.getItem('account').name ||
                 `test-${Math.random()
                     .toString(36)
                     .replace(/[^a-z]+/g, '')
@@ -127,10 +140,11 @@
 
             const roomName = this.hashString(this.$route.params.token);
             const opaqueId = uuidv4();
+            const userUuid = this.account.uuid || uuidv4();
             const userControl = await initializeJanus(
                 config.janusServer,
                 opaqueId,
-                `${uuidv4()}-${userName}`,
+                `${userUuid}-${userName}`,
                 roomName,
                 stream
             );
@@ -202,26 +216,25 @@
                 if (!(this.allUsers.length && this.allScreenUsers.length)) {
                     return [];
                 }
-                return reject(
-                    this.allUsers
-                        .map(u => {
-                            const screenUser = this.allScreenUsers.find(su => {
-                                return su.uuid === u.uuid;
-                            });
+                const users = reject(
+                    this.allUsers.map(u => {
+                        const screenUser = this.allScreenUsers.find(su => {
+                            return su.uuid === u.uuid;
+                        });
 
-                            if (!screenUser) {
-                                return null;
-                            }
+                        if (!screenUser) {
+                            return null;
+                        }
 
-                            return {
-                                ...u,
-                                screenShareStream: screenUser.stream,
-                                screen: screenUser.screen,
-                            };
-                        })
-                        .reverse(),
+                        return {
+                            ...u,
+                            screenShareStream: screenUser.stream,
+                            screen: screenUser.screen,
+                        };
+                    }),
                     isNull
                 );
+                return uniqBy(users, 'uuid').reverse();
             },
         },
     };

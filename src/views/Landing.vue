@@ -47,7 +47,8 @@
                     </v-text-field>
                 </v-form>
             </v-col>
-            <v-col cols="4" align="center">
+            <v-divider vertical></v-divider>
+            <v-col cols="4" align="center" v-if="!inviteUrl">
                 <v-btn @click="create" text color="primary">Create room</v-btn>
             </v-col>
         </v-row>
