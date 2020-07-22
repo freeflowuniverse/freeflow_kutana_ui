@@ -6,6 +6,7 @@ router.beforeEach((to, from, next) => {
     if (account && (!account.name || !account.uuid)) {
         store.commit('setAccount', null);
     }
+
     if (
         to.matched.some(record => record.meta.requiresAuth) &&
         !(store.getters.account && store.getters.account.name)
@@ -16,7 +17,8 @@ router.beforeEach((to, from, next) => {
                 redirect: to.fullPath,
             },
         });
-    } else {
-        next();
+        return;
     }
+
+    next();
 });
