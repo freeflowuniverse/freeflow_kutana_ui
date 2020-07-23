@@ -1,9 +1,9 @@
 import store from '../plugins/vuex';
 
 export class VideoRoomPlugin {
-    constructor(opaqueId, bitrateCap = false, test = 'video') {
+    constructor(opaqueId, bitrateCap = false, debugString = 'video') {
         this.bitrateCap = bitrateCap;
-        this.test = test;
+        this.debugString = debugString;
         this.pluginHandle = null;
         this.opaqueId = opaqueId;
         this.inThrottle = null;
@@ -176,7 +176,7 @@ export class VideoRoomPlugin {
                 )
             );
 
-            console.log({ test: this.test, msg });
+            console.log({ debugString: this.debugString, msg });
             if (msg.publishers) {
                 msg.publishers.forEach(element => {
                     this.emitEvent(
