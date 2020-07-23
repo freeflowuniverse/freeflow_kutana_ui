@@ -6,7 +6,7 @@
                 <h1 class="ttl">FreeFlowConnect</h1>
             </v-col>
             <v-col cols="1" align="end">
-                <v-btn icon @click="showSettings = true">
+                <v-btn icon class="pr-6" @click="showSettings = true">
                     <v-icon>settings</v-icon>
                 </v-btn>
             </v-col>
@@ -227,7 +227,7 @@
     .landing {
         display: grid;
         grid-template-rows: [start] 1fr [titleend] 12fr [iostart] 1fr [ioend actionsstart] 1fr [end];
-        height: calc(var(--vh) * 100);
+        height: 100%;
         width: 100vw;
         .title {
             grid-row-start: start;

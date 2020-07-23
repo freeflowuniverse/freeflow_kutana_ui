@@ -1,19 +1,40 @@
-<!DOCTYPE html >
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <meta name="mobile-web-app-capable" content="yes">
-  <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-  <title><%= htmlWebpackPlugin.options.title %></title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-</head>
+    <head>
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, user-scalable=no"
+        />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
+        <title><%= htmlWebpackPlugin.options.title %></title>
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            /* dirty fix to make sure there is no scrolling on mobile (1 --vh is not 1vh) i hate it */
+            html,
+            body,
+            .v-application--wrap,
+            .v-application {
+                height: 100% !important;
+                min-height: 100% !important;
+                max-height: 100% !important;
+                width: 100% !important;
+                overflow: hidden;
+            }
+        </style>
+    </head>
 
-<body>
-  <div id="app"></div>
-</body>
-
+    <body>
+        <div id="app"></div>
+    </body>
 </html>
