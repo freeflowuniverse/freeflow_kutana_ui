@@ -28,6 +28,9 @@ export class VideoRoomPlugin {
         this.myStream = null;
     }
 
+    /*
+      returns a attach object which is required for the januslib to initialize a januslib plugin
+     */
     attach() {
         return {
             plugin: 'janus.plugin.videoroom',
@@ -46,6 +49,10 @@ export class VideoRoomPlugin {
         };
     }
 
+    /*
+      not used yest
+      @todo: use or remove this
+     */
     determineSpeaker(stream, remoteFeed, id) {
         if (!window.audioContext) {
             var _AudioContext =
@@ -106,6 +113,9 @@ export class VideoRoomPlugin {
         }
     }
 
+    /*
+    @todo: move this to somewhere else maby utils, ... idk
+     */
     hashString(str) {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
@@ -115,6 +125,10 @@ export class VideoRoomPlugin {
         return hash;
     }
 
+    /*
+      not used yest
+      @todo: use or remove this
+    */
     detachFeed(detachRfid) {
         this.feeds = this.feeds.reduce((carry, feed) => {
             if (feed.rfid !== detachRfid) {
@@ -176,6 +190,7 @@ export class VideoRoomPlugin {
                 )
             );
 
+            // @todo: remove this
             console.log({ debugString: this.debugString, msg });
             if (msg.publishers) {
                 msg.publishers.forEach(element => {
@@ -251,6 +266,9 @@ export class VideoRoomPlugin {
         }
     }
 
+    /*
+      @todo: move this
+     */
     generateDummyMediaStream(
         video = true,
         audio = true,
@@ -314,7 +332,6 @@ export class VideoRoomPlugin {
     }
 
     async publishTrack(track, video = true, audio = true) {
-        console.log({ track });
         let peerConnection = this.pluginHandle.webrtcStuff.pc;
         if (!peerConnection) {
             await this.publishOwnFeed(video, audio);
@@ -358,8 +375,6 @@ export class VideoRoomPlugin {
             })
         );
     }
-
-    //  await this.publishTrack((await navigator.mediaDevices.getDisplayMedia()).getVideoTracks()[0]);
 
     onLocalStream(stream) {
         this.emitEvent(
