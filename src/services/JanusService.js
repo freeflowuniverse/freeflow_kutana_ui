@@ -7,7 +7,7 @@ export const initializeJanus = async (
     opaqueId,
     userName,
     roomName,
-    stream
+    initialStream
 ) => {
     const janusBuilder = new JanusBuilder(serverUrl, false);
     const videoRoomPlugin = new VideoRoomPlugin(opaqueId, true);
@@ -26,7 +26,7 @@ export const initializeJanus = async (
         if (initialJoin) {
             console.log('initialJoin');
             initialJoin = false;
-            stream.getTracks().forEach(async track => {
+            initialStream.getTracks().forEach(async track => {
                 await videoRoomPlugin.publishTrack(track);
             });
         }
@@ -158,6 +158,7 @@ export const initializeJanus = async (
         }
         store.commit('deleteRemoteScreenUser', screenUser);
     });
+
     const janus = await janusBuilder
         .addPlugin(videoRoomPlugin)
         .addPlugin(screenShareRoomPlugin)
