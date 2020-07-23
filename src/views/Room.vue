@@ -108,19 +108,6 @@
 
                 return;
             }
-            //in entry point of your app (index.js)
-
-            const channel = new BroadcastChannel('tab');
-
-            channel.postMessage('another-tab');
-            // note that listener is added after posting the message
-
-            channel.addEventListener('message', msg => {
-                if (msg === 'another-tab') {
-                    // message received from 2nd tab
-                    alert('Cannot open multiple instances');
-                }
-            });
 
             if (this.localUser) {
                 return;
