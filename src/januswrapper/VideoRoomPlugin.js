@@ -312,6 +312,9 @@ export class VideoRoomPlugin {
         return mediaStream;
     }
 
+    /*
+      dummy feed
+     */
     async publishOwnFeed(video, audio) {
         this.myStream = this.generateDummyMediaStream(video, audio);
 

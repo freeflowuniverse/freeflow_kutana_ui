@@ -104,6 +104,7 @@ export const initializeJanus = async (
     );
 
     screenShareRoomPlugin.addEventListener('pluginAttached', async room => {
+        // this is a random constant string
         const roomPadding = 13516416;
         const roomCreationResult = await screenShareRoomPlugin.createRoom(
             roomName + roomPadding
@@ -164,6 +165,7 @@ export const initializeJanus = async (
         .addPlugin(screenShareRoomPlugin)
         .build();
 
+    // @todo: remove this, is used in muiltiple places tho
     window.janusshizzle = { screenShareRoomPlugin, videoRoomPlugin };
 
     return {
@@ -171,6 +173,7 @@ export const initializeJanus = async (
             const stream = await navigator.mediaDevices.getDisplayMedia();
             const videoTrack = stream.getVideoTracks()[0];
             stream.oninactive = () => {
+                //@todo: use screenShareRoomPlugin
                 window.janusshizzle.screenShareRoomPlugin.pluginHandle.hangup();
                 videoTrack.dispatchEvent(new Event('ended'));
                 stream.dispatchEvent(new Event('ended'));

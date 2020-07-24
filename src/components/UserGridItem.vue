@@ -44,7 +44,6 @@
             const videoTrack = this.user.stream.getVideoTracks()[0];
             if (videoTrack) {
                 videoTrack.onended = () => {
-                    console.log('ey');
                     setTimeout(() => {
                         this.$forceUpdate();
                     }, 100);
@@ -54,7 +53,6 @@
             const screenShareTrack = this.user.screenShareStream.getVideoTracks()[0];
             if (screenShareTrack) {
                 screenShareTrack.oninactive = () => {
-                    console.log('ey');
                     setTimeout(() => {
                         alert('update');
                         this.$forceUpdate();
