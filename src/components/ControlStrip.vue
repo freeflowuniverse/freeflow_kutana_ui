@@ -1,9 +1,9 @@
 <template>
-    <v-row justify="center" ref="controlstrip" class="mb-5">
-        <v-btn @click="toggleCam" class="primary mx-2" dark icon :fab="!isMobile">
+    <v-row justify="center" ref="controlstrip" class="mb-5" style="z-index: 99999999999999999">
+        <v-btn @click="toggleCam" class="primary mx-2" dark icon :fab="!isMobile" :loading="isCamLoading">
             <v-icon :small="isMobile">{{ localUser.cam ? 'videocam_off' : 'videocam' }}</v-icon>
         </v-btn>
-        <v-btn @click="toggleMic" class="primary mx-2" dark icon :fab="!isMobile">
+        <v-btn @click="toggleMic" class="primary mx-2" dark icon :fab="!isMobile" :loading="isMicLoading">
             <v-icon :small="isMobile">{{ localUser.mic ? 'mic_off' : 'mic' }}</v-icon>
         </v-btn>
         <v-btn @click="screen" class="primary mx-2" dark icon :fab="!isMobile" v-if="!isMobile">
@@ -27,6 +27,12 @@
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
+    data: () => {
+        return {
+            isMicLoading: false,
+            isCamLoading: false
+        }
+    },
     computed: {
         ...mapGetters([
             'userControl',
@@ -40,11 +46,18 @@ export default {
     },
     methods: {
         ...mapActions(['getAudioStream', 'getVideoStream']),
+        setLoading(isLoading) {
+            //@TODO Make loading animation more good
+            this.isMicLoading = isLoading;
+            this.isCamLoading = isLoading; 
+        },
         async toggleCam() {
+            const micOn = this.localUser.mic;
+            this.setLoading(true);
             if (this.localUser.cam) {
                 this.userControl.stopVideoTrack();
                 this.localUser.cam = false;
-                if (this.localUser.mic) {
+                if (micOn) {
                     const stream = await this.getAudioStream();
                     await this.userControl.publishTrack(
                         stream.getAudioTracks()[0],
@@ -53,13 +66,33 @@ export default {
                     );
                     this.localUser.mic = true;
                 }
+                setTimeout(() => {
+                    this.$forceUpdate();
+                    this.setLoading(false);
+                }, 100);
                 return;
             }
             // @todo go back to previous video track
             const stream = await this.getVideoStream();
-            await this.userControl.publishTrack(stream.getVideoTracks()[0]);
+            await this.userControl.publishTrack(
+                stream.getVideoTracks()[0], 
+                true,
+                this.localUser.mic
+            );
+
+            if (micOn) {
+                const stream = await this.getAudioStream();
+                await this.userControl.publishTrack(
+                    stream.getAudioTracks()[0],
+                    true,
+                    true
+                );
+                this.localUser.mic = true;
+            }
+            
             setTimeout(() => {
                 this.$forceUpdate();
+                this.setLoading(false);
             }, 100);
         },
         async toggleMic() {
