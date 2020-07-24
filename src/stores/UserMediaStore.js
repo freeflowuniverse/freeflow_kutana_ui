@@ -2,6 +2,7 @@ export default {
     state: {
         videoDeviceId: null,
         audioDeviceId: null,
+        mediaDevices: []
     },
     mutations: {
         setVideoDeviceId(state, deviceId) {
@@ -10,8 +11,15 @@ export default {
         setAudioDeviceId(state, deviceId) {
             state.audioDeviceId = deviceId;
         },
+        refreshMediaDevices(state, devices) {
+            state.mediaDevices = devices;
+        }
     },
     actions: {
+        async refreshMediaDevices({ commit }) {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            commit('refreshMediaDevices', devices);
+        },
         async getVideoStream({ commit, getters, dispatch }, deviceId = null) {
             if (deviceId || (!deviceId && getters.videoDeviceId)) {
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -31,6 +39,7 @@ export default {
             });
 
             commit('setVideoDeviceId', newDeviceId);
+            dispatch('refreshMediaDevices');
 
             return stream;
         },
@@ -53,6 +62,7 @@ export default {
             });
 
             commit('setAudioDeviceId', newDeviceId);
+            dispatch('refreshMediaDevices');
 
             return stream;
         },
@@ -65,5 +75,6 @@ export default {
     getters: {
         videoDeviceId: state => state.videoDeviceId,
         audioDeviceId: state => state.audioDeviceId,
+        mediaDevices: state => state.mediaDevices,
     },
 };

@@ -96,7 +96,7 @@
         name: 'JoinRoom',
         methods: {
             ...mapMutations(['setLocalStream']),
-            ...mapActions(['getVideoStream', 'getAudioStream']),
+            ...mapActions(['getVideoStream', 'getAudioStream', 'refreshMediaDevices']),
             joinRoom() {
                 if (!this.localStream) {
                     return;
@@ -132,11 +132,11 @@
                 }
                 this.localStream = new MediaStream(tracks);
 
-                this.videoDevice = this.devices.find(
+                this.videoDevice = this.mediaDevices.find(
                     d =>
                         d.label === this.localStream?.getVideoTracks()[0]?.label
                 )?.deviceId;
-                this.audioDevice = this.devices.find(
+                this.audioDevice = this.mediaDevices.find(
                     d =>
                         d.label === this.localStream?.getAudioTracks()[0]?.label
                 )?.deviceId;
@@ -155,20 +155,14 @@
                 this.userControl.hangUp();
                 location.reload();
             }
-            navigator.mediaDevices.enumerateDevices().then(devices => {
-                this.devices = devices;
+            this.refreshMediaDevices().then(() => {
                 this.updateLocalStream();
-                //debug remove this
-                // .then(() => {
-                //     this.joinRoom();
-                // });
             });
         },
         data: function() {
             return {
                 video: true,
                 audio: true,
-                devices: [],
                 videoDevice: null,
                 audioDevice: null,
                 localStream: null,
@@ -176,23 +170,23 @@
         },
 
         computed: {
-            ...mapGetters(['userControl', 'account']),
+            ...mapGetters(['userControl', 'account', 'mediaDevices']),
             avatar() {
                 const generator = new AvatarGenerator();
                 return generator.generateRandomAvatar(this.account.name);
             },
             videoInputDevices() {
-                return this.devices.filter(
+                return this.mediaDevices.filter(
                     d => d.kind === 'videoinput' && d.label
                 );
             },
             audioInputDevices() {
-                return this.devices.filter(
+                return this.mediaDevices.filter(
                     d => d.kind === 'audioinput' && d.label
                 );
             },
             audioOutputDevices() {
-                return this.devices.filter(
+                return this.mediaDevices.filter(
                     d => d.kind === 'audiooutput' && d.label
                 );
             },
