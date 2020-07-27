@@ -67,6 +67,7 @@
         </div>
         <Settings
             v-model="showSettings"
+            :local="true"
             style="position: absolute; padding: 16px;"
         />
     </section>
@@ -101,15 +102,22 @@
                 showSettings: false,
             };
         },
-        mounted() {
-            navigator.mediaDevices.enumerateDevices().then(devices => {
-                this.devices = devices;
-                this.updateLocalStream();
-            });
-            this.getBackgroundOfMine();
+        async mounted() {
+          this.refreshMediaDevices().then(() => {
+            this.updateLocalStream();
+          });
+          this.getBackgroundOfMine();
+          this.$root.$on("updateLocalStream", this.updateLocalStream);
         },
         computed: {
-            ...mapGetters(['account', 'teamName', 'userControl']),
+            ...mapGetters([
+              'account',
+              'teamName',
+              'userControl',
+              'mediaDevices',
+              'videoDeviceId',
+              'audioDeviceId',
+            ]),
             avatar() {
                 const generator = new AvatarGenerator();
                 return generator.generateRandomAvatar(
@@ -139,44 +147,63 @@
                 'join',
                 'getVideoStream',
                 'getAudioStream',
+                'refreshMediaDevices',
             ]),
+            disableAudioStream() {
+                this.localStream?.getAudioTracks().forEach(audioTrack => {
+                    audioTrack.stop();
+                });
+            },
+            disableVideoStream() {
+                this.localStream?.getVideoTracks().forEach(videoTrack => {
+                    videoTrack.stop();
+                });
+            },
             async updateLocalStream() {
                 const tracks = [];
 
-                if (this.video) {
-                    const videoStream = await this.getVideoStream(
-                        this.videoDevice
-                    );
-                    tracks.push(videoStream.getVideoTracks()[0]);
-                }
+                tracks.push(await this.updateAudioStream());
+                tracks.push(await this.updateVideoStream());
 
-                if (this.audio) {
-                    const audioStream = await this.getAudioStream(
-                        this.audioDevice
-                    );
-                    tracks.push(audioStream.getAudioTracks()[0]);
-                }
+                const activeTracks = tracks.filter(
+                    track => track !== undefined
+                );
 
-                if (!tracks) {
+                if (activeTracks.length <= 0) {
                     this.localStream = null;
-
                     return;
                 }
-                this.localStream = new MediaStream(tracks);
 
-                this.videoDevice = this.devices.find(
+                this.localStream = new MediaStream(activeTracks);
+
+                this.videoDevice = this.mediaDevices.find(
                     d =>
                         d.label === this.localStream?.getVideoTracks()[0]?.label
                 )?.deviceId;
-                this.audioDevice = this.devices.find(
+                this.audioDevice = this.mediaDevices.find(
                     d =>
                         d.label === this.localStream?.getAudioTracks()[0]?.label
                 )?.deviceId;
-
-                if (!this.localStream) {
-                    return;
+            },
+            async updateAudioStream() {
+                if (!this.audio) {
+                  this.disableAudioStream();
+                  return undefined;
                 }
-                this.setLocalStream(this.localStream);
+                const audioStream = await this.getAudioStream(
+                    this.audioDeviceId
+                );
+                return audioStream?.getAudioTracks()[0];
+            },
+            async updateVideoStream() {
+                if (!this.video) {
+                  this.disableVideoStream();
+                  return undefined;
+                }
+                const videoStream = await this.getVideoStream(
+                    this.videoDeviceId
+                );
+                return videoStream?.getVideoTracks()[0];
             },
             toggleCam() {
                 this.video = !this.video;

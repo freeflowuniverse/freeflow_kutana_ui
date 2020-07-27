@@ -66,10 +66,11 @@
     export default {
         name: 'Settings',
         props: {
-            value: Boolean,
+          value: Boolean,
+          local: Boolean
         },
         computed: {
-            ...mapGetters(['userControl', 'localUser']),
+            ...mapGetters(['userControl', 'localUser', 'mediaDevices']),
             show: {
                 get() {
                     this.calculateDevices();
@@ -96,33 +97,40 @@
         },
         methods: {
             ...mapActions(['getVideoStream', 'getAudioStream']),
-            async changeVideoDevice(value) {
-                const stream = await this.getVideoStream(value);
+            async changeVideoDevice(videoDeviceId) {
+                const stream = await this.getVideoStream(videoDeviceId);
+                if (this.local) {
+                  this.$root.$emit('updateLocalStream');
+                  return;
+                }
                 await this.userControl.publishTrack(stream.getVideoTracks()[0]);
             },
-            async changeAudioDevice(value) {
-                const stream = await this.getAudioStream(value);
+            async changeAudioDevice(audiDeviceId) {
+                const stream = await this.getAudioStream(audiDeviceId);
+                if (this.local) {
+                  this.$root.$emit('updateLocalStream');
+                  return;
+                }
                 await this.userControl.publishTrack(stream.getAudioTracks()[0]);
             },
             async toggleBackgroundRemoval() {},
             async calculateDevices() {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                this.videoDevices = devices.filter(
+                this.videoDevices = this.mediaDevices.filter(
                     d => d.kind === 'videoinput'
                 );
-                this.audioDevices = devices.filter(
+                this.audioDevices = this.mediaDevices.filter(
                     d => d.kind === 'audioinput'
                 );
-                this.selectedVideo = devices.find(
+                this.selectedVideo = this.mediaDevices.find(
                     d =>
                         d.label ===
                         this.localUser?.stream?.getVideoTracks()[0]?.label
-                )?.deviceId;
-                this.selectedAudio = devices.find(
+                )?.deviceId || this.videoDevices[0];
+                this.selectedAudio = this.mediaDevices.find(
                     d =>
                         d.label ===
                         this.localUser?.stream?.getAudioTracks()[0]?.label
-                )?.deviceId;
+                )?.deviceId || this.audioDevices[0];
             },
         },
         watch: {
