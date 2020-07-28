@@ -155,25 +155,25 @@
                 this.updateLocalStream();
             },
             async updateAudioStream() {
-                if (!this.audio) {
-                    this.disableAudioStream();
-                    return undefined;
-                }
-                const audioStream = await this.getAudioStream(
-                    this.audioDevice
-                );
-                return audioStream?.getAudioTracks()[0];
+              this.disableAudioStream();
+              if (!this.audio) {
+                return undefined;
+              }
+              const audioStream = await this.getAudioStream(
+                  this.audioDevice
+              );
+              return audioStream?.getAudioTracks()[0];
             },
             async updateVideoStream() {
-                if (!this.video) {
-                    this.disableVideoStream();
-                    return undefined;
-                }
-                const videoStream = await this.getVideoStream(
-                    this.videoDevice
-                );
-                return videoStream?.getVideoTracks()[0];
-            }
+              this.disableVideoStream();
+              if (!this.video) {
+                return undefined;
+              }
+              const videoStream = await this.getVideoStream(
+                  this.videoDevice
+              );
+              return videoStream?.getVideoTracks()[0];
+            },
         },
         mounted() {
             if (this.userControl) {

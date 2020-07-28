@@ -17,6 +17,11 @@
                             </v-list-item-title>
                             <v-select
                                 :items="videoDevices"
+                                :label="
+                                  hasVideoError
+                                  ? mediaDeviceErrors['video']
+                                  : ''
+                                "
                                 item-text="label"
                                 item-value="deviceId"
                                 @change="changeVideoDevice"
@@ -31,6 +36,11 @@
                             </v-list-item-title>
                             <v-select
                                 :items="audioDevices"
+                                :label="
+                                  hasAudioError
+                                  ? mediaDeviceErrors['audio']
+                                  : ''
+                                "
                                 item-text="label"
                                 item-value="deviceId"
                                 @change="changeAudioDevice"
@@ -70,7 +80,12 @@
           local: Boolean
         },
         computed: {
-            ...mapGetters(['userControl', 'localUser', 'mediaDevices']),
+            ...mapGetters([
+                'userControl',
+                'localUser',
+                'mediaDevices',
+                'mediaDeviceErrors'
+            ]),
             show: {
                 get() {
                     this.calculateDevices();
@@ -80,6 +95,12 @@
                     this.$emit('input', value);
                 },
             },
+            hasAudioError() {
+              return this.mediaDeviceErrors.hasOwnProperty('audio');
+            },
+            hasVideoError() {
+              return this.mediaDeviceErrors.hasOwnProperty('video');
+            }
         },
         data: function() {
             return {
@@ -91,27 +112,33 @@
                 stopBackgroundRemove: () => {},
             };
         },
-
         mounted() {
             this.calculateDevices();
         },
         methods: {
-            ...mapActions(['getVideoStream', 'getAudioStream']),
+            ...mapActions([
+              'getVideoStream',
+              'getAudioStream',
+              'updateVideoDevice',
+              'updateAudioDevice'
+            ]),
             async changeVideoDevice(videoDeviceId) {
-                const stream = await this.getVideoStream(videoDeviceId);
-                if (this.local) {
-                  this.$root.$emit('updateLocalStream');
-                  return;
-                }
-                await this.userControl.publishTrack(stream.getVideoTracks()[0]);
+              this.updateVideoDevice(videoDeviceId);
+              if (this.local) {
+                this.$root.$emit('updateLocalStream');
+                return;
+              }
+              const stream = await this.getVideoStream();
+              await this.userControl.publishTrack(stream.getVideoTracks()[0]);
             },
             async changeAudioDevice(audiDeviceId) {
-                const stream = await this.getAudioStream(audiDeviceId);
-                if (this.local) {
-                  this.$root.$emit('updateLocalStream');
-                  return;
-                }
-                await this.userControl.publishTrack(stream.getAudioTracks()[0]);
+              this.updateAudioDevice(audiDeviceId);
+              if (this.local) {
+                this.$root.$emit('updateLocalStream');
+                return;
+              }
+              const stream = await this.getAudioStream();
+              await this.userControl.publishTrack(stream.getAudioTracks()[0]);
             },
             async toggleBackgroundRemoval() {},
             async calculateDevices() {

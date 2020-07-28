@@ -30,6 +30,16 @@ export default {
                 commit('setMediaDeviceError', e);
             }
         },
+        updateVideoDevice({ commit, getters }, deviceId) {
+            if (deviceId || (!deviceId && getters.videoDeviceId)) {
+                commit('setVideoDeviceId', deviceId);
+            }
+        },
+        updateAudioDevice({ commit, getters }, deviceId) {
+            if (deviceId || (!deviceId && getters.audioDeviceId)) {
+                commit('setAudioDeviceId', deviceId);
+            }
+        },
         async getVideoStream({ commit, getters, dispatch }, deviceId = null) {
             if (deviceId || (!deviceId && getters.videoDeviceId)) {
                 const stream = await navigator.mediaDevices.getUserMedia({

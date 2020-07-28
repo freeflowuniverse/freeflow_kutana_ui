@@ -186,18 +186,16 @@
                 )?.deviceId;
             },
             async updateAudioStream() {
-                if (!this.audio) {
-                  this.disableAudioStream();
-                  return undefined;
-                }
-                const audioStream = await this.getAudioStream(
-                    this.audioDeviceId
-                );
-                return audioStream?.getAudioTracks()[0];
+              this.disableAudioStream();
+              if (!this.audio) {
+                return undefined;
+              }
+              const audioStream = await this.getAudioStream();
+              return audioStream?.getAudioTracks()[0];
             },
             async updateVideoStream() {
+              this.disableVideoStream();
                 if (!this.video) {
-                  this.disableVideoStream();
                   return undefined;
                 }
                 const videoStream = await this.getVideoStream(
