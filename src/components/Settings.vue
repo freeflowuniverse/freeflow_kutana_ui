@@ -64,6 +64,11 @@
                         </v-list-item-content>
                     </v-list-item>
                 </v-list>
+                <div class="version">
+                  <p >
+                    Version: {{ version }}
+                  </p>
+                </div>
             </v-card>
         </v-dialog>
     </div>
@@ -71,6 +76,7 @@
 
 <script>
     import { removeBackground } from '../services/backGroundRemovalService';
+    import version from '../../public/version';
     import { mapActions, mapGetters } from 'vuex';
 
     export default {
@@ -110,6 +116,7 @@
                 selectedAudio: null,
                 backgroundRemove: false,
                 stopBackgroundRemove: () => {},
+                version: version,
             };
         },
         mounted() {
@@ -190,5 +197,10 @@
 <style lang="scss" scoped>
     * {
         user-select: none;
+    }
+    .version {
+      position: absolute;
+      right: 1rem;
+      bottom: 0;
     }
 </style>
