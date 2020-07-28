@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 import JanusVideo from "./JanusVideo";
 
 export default {
@@ -25,15 +25,12 @@ export default {
   },
   mounted() {},
   computed: {
-    ...mapGetters(["selectedUser", "screenShare"]),
+    ...mapGetters(["selectedUser", "screenShare", "isMobile"]),
 
     stream() {
       return this.userScreenshareStream
         ? this.userScreenshareStream
         : this.userVideoStream;
-    },
-    isMobile () {
-      return this.$vuetify.breakpoint.mdAndDown
     },
     userVideoStream() {
       if (!this.selectedUser) {
@@ -49,9 +46,6 @@ export default {
 
       return this.screenShare;
     }
-  },
-  methods: {
-    ...mapActions(["joinScreen"])
   }
 };
 </script>

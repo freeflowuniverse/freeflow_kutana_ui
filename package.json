@@ -5,9 +5,14 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "postinstall": "patch-package"
   },
   "dependencies": {
+    "@tensorflow-models/body-pix": "^2.0.5",
+    "@tensorflow/tfjs-converter": "^1.7.4",
+    "@tensorflow/tfjs-core": "^1.7.4",
+    "async-mutex": "^0.2.2",
     "axios": "^0.19.2",
     "bip39": "^3.0.2",
     "core-js": "^3.6.4",
@@ -15,7 +20,10 @@
     "janus-gateway": "git://github.com/threefoldtech/freeflowconnect_janus.git",
     "libsodium": "^0.7.6",
     "libsodium-wrappers": "^0.7.6",
+    "localforage": "^1.7.3",
     "moment": "^2.24.0",
+    "patch-package": "^6.2.2",
+    "postinstall-postinstall": "^2.1.0",
     "socket.io-client": "^2.3.0",
     "tweetnacl-util": "^0.15.1",
     "vue": "^2.6.11",
@@ -23,7 +31,8 @@
     "vue-router": "^3.1.6",
     "vue-socket.io": "^3.0.7",
     "vuetify": "^2.2.11",
-    "vuex": "^3.1.3"
+    "vuex": "^3.1.3",
+    "websocket-extensions": "^0.1.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.2.0",
@@ -49,14 +58,12 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
+      "plugin:vue/essential"
     ],
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {
-    }
+    "rules": {}
   },
   "browserslist": [
     "> 1%",

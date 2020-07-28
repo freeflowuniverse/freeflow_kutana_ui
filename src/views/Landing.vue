@@ -7,7 +7,7 @@
         </v-card-title>
         <v-card-text>
           <v-row align="center" justify="space-around">
-            <v-col cols="12" md="5" align="center">
+            <v-col cols="12" :md="inviteUrl?  '12' :'5'" align="center">
               <v-form @submit.prevent="joinRoom" v-model="valid">
                 <v-text-field
                   filled
@@ -24,8 +24,8 @@
                 </v-text-field>
               </v-form>
             </v-col>
-            <v-divider :vertical="$vuetify.breakpoint.mdAndUp"></v-divider>
-            <v-col cols="12" md="5" align="center">
+            <v-divider :vertical="$vuetify.breakpoint.mdAndUp" v-if="!inviteUrl"></v-divider>
+            <v-col cols="12" md="5" align="center" v-if="!inviteUrl">
               <v-btn text @click="create">Create room</v-btn>
             </v-col>
           </v-row>

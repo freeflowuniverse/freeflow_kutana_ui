@@ -1,10 +1,10 @@
 <template>
-  <div :class="roomClass">
+  <div :class="roomClass" :style="roomStyle">
     <div class="video-list">
-      <UserList :grid="isGrid" :class="!showUserList ? 'hide-video-list' : ''" />
+      <UserList :grid="isGrid" />
     </div>
 
-    <div class="video-selected" v-if="!isGrid">
+    <div class="video-selected" v-if="!isGrid && !isMobile">
       <TheSelectedUser v-if="users.length > 1 && selectedUser" />
       <v-row align="center" justify="center" v-else-if="users.length === 1" class="fill-height">
         <v-col cols="12" md="8" lg="6">
@@ -18,7 +18,7 @@
                 label="Invite link"
                 persistent-hint
                 readonly
-                hint="Invite people by sharing this url"
+                hint="Invite people by sharing this link"
                 :value="inviteLink"
               >
                 <template v-slot:append>
@@ -33,18 +33,22 @@
       </v-row>
     </div>
 
-    <div class="video-main" v-if="!isGrid">
+    <div class="video-main" v-if="!isGrid && !isMobile">
       <div class="video-main__container black">
         <TheMainUser />
       </div>
     </div>
 
-    <TheMainUserControls :grid="isGrid" :minimal="isMobile" id="TheMainUserControls" class="grey lighten-4"/>
+    <TheMainUserControls
+      :grid="isGrid"
+      :minimal="isMobile"
+      id="TheMainUserControls"
+      class="grey lighten-4"
+    />
     <div class="sidebar" v-if="showSidebar" ref="sidebar">
       <p class="resizer" ref="rez" @mousedown="startDrag"></p>
-      <TheSidebar  />
+      <TheChat />
     </div>
-
   </div>
 </template>
 
@@ -53,38 +57,55 @@ import { mapGetters, mapActions } from "vuex";
 import TheMainUser from "../components/TheMainUser";
 import TheSelectedUser from "../components/TheSelectedUser";
 import UserList from "../components/UserList";
-import TheSidebar from "../components/TheSidebar";
+import TheChat from "../components/TheChat";
 import TheMainUserControls from "../components/TheControlStrip";
+import { janusHelpers } from "@/services/Janusservice";
+
 // TODO: margin right when in grid && no
 export default {
   components: {
     TheMainUser,
     TheSelectedUser,
-    TheSidebar,
     TheMainUserControls,
-    UserList
+    UserList,
+    TheChat
   },
   data() {
     return {
       isGrid: false,
       showSidebar: !this.isMobile,
-      showUserList: true,
       startX: null,
       dragging: false
     };
   },
   beforeMount() {
-    this.isGrid = this.isGridView;
-    this.join(this.$route.params.token);
-    this.getTeamInfo();
+    if (this.inputSelection != this.$route.params.token) {
+      //check if the current room has approved input selection
+      this.$router.push({
+        name: "joinRoom",
+        params: { token: this.$route.params.token }
+      });
+      return;
+    }
   },
   mounted() {
+    if (this.inputSelection != this.$route.params.token) {
+      // dont do anything if we need to do input selection first
+      return;
+    }
+    if (this.isMobile && this.isChrome) {
+      document.body.requestFullscreen();
+    }
+    this.isGrid = this.isGridView;
+    this.join(this.$route.params.token); // join in py backend
+    this.getTeamInfo();
+
     if (this.account && this.account.name && this.teamName) {
-      this.setRoomId(Math.abs(this.hashString(this.teamName)));
+      this.setRoomId(this.hashString(this.teamName));
     }
 
     this.$root.$on("toggleGridPresentation", () => {
-      this.changeViewStyle(this.isGrid ? 'Default' : 'Grid')
+      this.changeViewStyle(this.isGrid ? "Default" : "Grid");
       this.isGrid = !this.isGrid;
     });
 
@@ -101,14 +122,22 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["setSnackbarMessage", "initializeJanus", "getTeamInfo", "join", "setRoomId", "changeViewStyle"]),
+    ...mapActions([
+      "setSnackbarMessage",
+      "initializeJanus",
+      "getTeamInfo",
+      "join",
+      "setRoomId",
+      "changeViewStyle"
+    ]),
     hashString(str) {
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) {
-        hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
-        hash = hash & hash;
+      var hash = 0, i, chr;
+      for (i = 0; i < str.length; i++) {
+        chr   = str.charCodeAt(i);
+        hash  = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
       }
-      return hash;
+      return Math.abs(hash);
     },
     copyUrl() {
       navigator.clipboard
@@ -124,19 +153,23 @@ export default {
         });
     },
     startDrag(e) {
-      e.disable
-      this.startX = e.clientX
-      this.startWidth = parseInt(document.defaultView.getComputedStyle(this.$refs.sidebar).width, 10);
-      document.addEventListener('mousemove', this.doDrag, false);
-      document.addEventListener('mouseup', this.stopDrag, false);
+      e.disable;
+      this.startX = e.clientX;
+      this.startWidth = parseInt(
+        document.defaultView.getComputedStyle(this.$refs.sidebar).width,
+        10
+      );
+      document.addEventListener("mousemove", this.doDrag, false);
+      document.addEventListener("mouseup", this.stopDrag, false);
     },
     stopDrag() {
-      document.removeEventListener('mousemove', this.doDrag, false);
-      document.removeEventListener('mouseup', this.stopDrag, false);
+      document.removeEventListener("mousemove", this.doDrag, false);
+      document.removeEventListener("mouseup", this.stopDrag, false);
     },
     doDrag(e) {
-      console.log(e)
-      this.$refs.sidebar.style.width = (this.startWidth + this.startX - e.clientX) + 'px';
+      console.log(e);
+      this.$refs.sidebar.style.width =
+        this.startWidth + this.startX - e.clientX + "px";
     }
   },
   computed: {
@@ -147,11 +180,11 @@ export default {
       "account",
       "screenShare",
       "selectedUser",
-      "isGridView"
+      "isGridView",
+      "inputSelection",
+      "isMobile",
+      "isChrome"
     ]),
-    isMobile() {
-      return this.$vuetify.breakpoint.mdAndDown;
-    },
     roomClass() {
       let theClass = "room ";
       console.log(`this.isMobile`, this.isMobile);
@@ -177,6 +210,9 @@ export default {
         baseUrl += "/";
       }
       return `${baseUrl}`;
+    },
+    roomStyle() {
+      return { height: window.document.documentElement.clientHeight };
     }
   },
   watch: {
@@ -186,8 +222,8 @@ export default {
         if (val) this.showSidebar = false;
       }
     },
-    users (val) {
-      this.showUserList = val && val.length > 2
+    users(val) {
+      this.showUserList = val && val.length > 2;
     },
     screenShare(val) {
       if (val) {
@@ -252,12 +288,8 @@ export default {
 
   width: 100vw;
   display: grid;
-  grid-template-rows:  1fr minmax(0px, auto) 60px;
-  grid-template-areas: "selected" "userList" "controls";
-  gap: 8px 0px;
-  .hide-video-list {
-    display: none !important;
-  }
+  grid-template-rows: 1fr 60px;
+  grid-template-areas: "userList" "controls";
   .video-main {
     position: fixed;
     top: 8px;
@@ -266,7 +298,7 @@ export default {
     width: 25%;
     height: auto;
   }
-  #selectedStream{
+  #selectedStream {
     background: white;
   }
   &.show-sidebar {
@@ -308,9 +340,9 @@ export default {
   max-width: 900px;
   position: relative;
 
-  .resizer{
+  .resizer {
     width: 10px;
-    left:-5px;
+    left: -5px;
     height: 100%;
     background: #000;
     position: absolute;

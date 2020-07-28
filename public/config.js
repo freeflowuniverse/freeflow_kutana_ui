@@ -1,10 +1,10 @@
 export default {
-    ffcBackend: 'http://localhost:5000/',
+    ffcBackend: 'https://ffc-api.jimber.org/',
     appId: window.location.host,
     scope: JSON.stringify({ doubleName: true }),
     redirect_url: `/login?callback=true`,
-    botFrontEnd: "https://login.staging.jimber.org/",
-    botBackend: "https://login.staging.jimber.org/",
+    botFrontEnd: "https://login.threefold.me/",
+    botBackend: "https://login.threefold.me/",
     debugJanus: false,
-    janusServer: "https://janus.staging.jimber.org/janus"
+    janusServer: "https://janus.jimber.org/janus"
 }
