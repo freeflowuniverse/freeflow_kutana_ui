@@ -144,7 +144,9 @@
                 this.$root.$emit('updateLocalStream');
                 return;
               }
-              const stream = await this.getAudioStream();
+              const stream = await this.getAudioStream(
+                  audiDeviceId
+              );
               await this.userControl.publishTrack(stream.getAudioTracks()[0]);
             },
             async toggleBackgroundRemoval() {},

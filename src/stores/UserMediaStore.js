@@ -41,20 +41,20 @@ export default {
             }
         },
         async getVideoStream({ commit, getters, dispatch }, deviceId = null) {
-            if (deviceId || (!deviceId && getters.videoDeviceId)) {
+            if ((deviceId || getters.videoDeviceId) || (!deviceId && getters.videoDeviceId)) {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         deviceId: deviceId ? deviceId : getters.videoDeviceId,
                     },
                 });
-                commit('setVideoDeviceId', deviceId);
+                commit('setVideoDeviceId', deviceId ? deviceId : getters.videoDeviceId);
                 return stream;
             }
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: true,
                 });
-                const newDeviceId = dispatch('findDeviceId', {
+                const newDeviceId = await dispatch('findDeviceId', {
                     kind: 'videoinput',
                     label: stream.getVideoTracks()[0].label,
                 });
@@ -67,20 +67,20 @@ export default {
             }
         },
         async getAudioStream({ commit, getters, dispatch }, deviceId = null) {
-            if (deviceId || (!deviceId && getters.audioDeviceId)) {
+            if ((deviceId || getters.audioDeviceId) || (!deviceId && getters.audioDeviceId)) {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: {
                         deviceId: deviceId ? deviceId : getters.audioDeviceId,
                     },
                 });
-                commit('setAudioDeviceId', deviceId);
+                commit('setAudioDeviceId', deviceId ? deviceId : getters.audioDeviceId);
                 return stream;
             }
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: true,
                 });
-                const newDeviceId = dispatch('findDeviceId', {
+                const newDeviceId = await dispatch('findDeviceId', {
                     kind: 'audioinput',
                     label: stream.getAudioTracks()[0].label,
                 });

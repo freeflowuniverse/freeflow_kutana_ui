@@ -114,9 +114,7 @@
               'account',
               'teamName',
               'userControl',
-              'mediaDevices',
-              'videoDeviceId',
-              'audioDeviceId',
+              'mediaDevices'
             ]),
             avatar() {
                 const generator = new AvatarGenerator();
@@ -198,9 +196,7 @@
                 if (!this.video) {
                   return undefined;
                 }
-                const videoStream = await this.getVideoStream(
-                    this.videoDeviceId
-                );
+                const videoStream = await this.getVideoStream();
                 return videoStream?.getVideoTracks()[0];
             },
             toggleCam() {

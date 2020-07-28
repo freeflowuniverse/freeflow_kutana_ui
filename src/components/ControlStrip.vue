@@ -39,6 +39,7 @@ export default {
             'localUser',
             'localScreenUser',
             'isMobile',
+            'videoDeviceId'
         ]),
         micEnabled() {
             return true;
@@ -67,12 +68,10 @@ export default {
                     this.localUser.mic = true;
                 }
                 setTimeout(() => {
-                    this.$forceUpdate();
                     this.setLoading(false);
                 }, 100);
                 return;
             }
-            // @todo go back to previous video track
             const stream = await this.getVideoStream();
             await this.userControl.publishTrack(
                 stream.getVideoTracks()[0], 
@@ -91,7 +90,6 @@ export default {
             }
             
             setTimeout(() => {
-                this.$forceUpdate();
                 this.setLoading(false);
             }, 100);
         },
