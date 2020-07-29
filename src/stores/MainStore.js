@@ -3,6 +3,7 @@ export default {
         viewStyle: localStorage.getItem('view-style') || 'Default',
         snackbarMessage: '',
         localStream: null,
+        wallpaperDataUrl: null,
         camId: null,
         micId: null,
     },
@@ -23,6 +24,9 @@ export default {
         setMicId(state, id) {
             state.micId = id
         },
+        setWallpaperDataUrl(state, wallpaperDataUrl) {
+            state.wallpaperDataUrl = wallpaperDataUrl;
+        }
     },
     actions: {
         setSnackbarMessage(context, message) {
@@ -31,6 +35,17 @@ export default {
         changeViewStyle(context, style) {
             console.log(style);
             context.commit('changeViewStyle', style);
+        },
+        changeCameraBackground({ commit }, wallpaperFile) {
+            if (!wallpaperFile) {
+                commit('setWallpaperDataUrl', null);
+                return;
+            }
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(wallpaperFile);
+            fileReader.onload = function() {
+                commit('setWallpaperDataUrl', fileReader.result);
+            }
         },
     },
     getters: {
@@ -46,6 +61,7 @@ export default {
         },
         snackbarMessage: state => state.snackbarMessage,
         localStream: state => state.localStream,
+        wallpaperDataUrl: state => state.wallpaperDataUrl,
         camId: state => state.camId,
         micId: state => state.micId,
     },

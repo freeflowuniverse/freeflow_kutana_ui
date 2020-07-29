@@ -52,12 +52,30 @@
                 <v-list subheader three-line>
                     <v-subheader class="red--text">Experimental</v-subheader>
                     <v-list-item>
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          Background wallpaper
+                        </v-list-item-title>
+                        <v-file-input
+                            dense
+                            v-model="wallpaperFile"
+                            prepend-icon="image"
+                            item-text="label"
+                            item-value="wallpaper"
+                            @change="changeWallpaper"
+                            class="my-4"
+                            hide-details
+                            accept="image/x-png, image/gif, image/jpeg"
+                        />
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item>
                         <v-list-item-content>
                             <v-list-item-title>
                                 Remove background
                             </v-list-item-title>
                             <v-switch
-                                class="pl-3"
+                                class="pl-3 ma-0"
                                 v-model="backgroundRemove"
                                 @change="toggleBackgroundRemoval"
                             ></v-switch>
@@ -66,7 +84,7 @@
                 </v-list>
                 <div class="version">
                   <p >
-                    Version: {{ version }}
+                    {{ version }}
                   </p>
                 </div>
             </v-card>
@@ -75,7 +93,7 @@
 </template>
 
 <script>
-    import { removeBackground } from '../services/backGroundRemovalService';
+    import { removeBackground } from '@/services/backGroundRemovalService';
     import version from '../../public/version';
     import { mapActions, mapGetters } from 'vuex';
 
@@ -90,7 +108,8 @@
                 'userControl',
                 'localUser',
                 'mediaDevices',
-                'mediaDeviceErrors'
+                'mediaDeviceErrors',
+                'wallpaperDataUrl'
             ]),
             show: {
                 get() {
@@ -106,6 +125,9 @@
             },
             hasVideoError() {
               return this.mediaDeviceErrors.hasOwnProperty('video');
+            },
+            getWallpaperImage() {
+              return this.wallpaperDataUrl ? this.wallpaperDataUrl : '/img/test-pattern.png';
             }
         },
         data: function() {
@@ -116,6 +138,7 @@
                 selectedAudio: null,
                 backgroundRemove: false,
                 stopBackgroundRemove: () => {},
+                wallpaperFile: null,
                 version: version,
             };
         },
@@ -127,7 +150,8 @@
               'getVideoStream',
               'getAudioStream',
               'updateVideoDevice',
-              'updateAudioDevice'
+              'updateAudioDevice',
+              'changeCameraBackground'
             ]),
             async changeVideoDevice(videoDeviceId) {
               this.updateVideoDevice(videoDeviceId);
@@ -144,12 +168,35 @@
                 this.$root.$emit('updateLocalStream');
                 return;
               }
-              const stream = await this.getAudioStream(
-                  audiDeviceId
-              );
+              const stream = await this.getAudioStream();
               await this.userControl.publishTrack(stream.getAudioTracks()[0]);
             },
-            async toggleBackgroundRemoval() {},
+            changeWallpaper() {
+              this.changeCameraBackground(this.wallpaperFile);
+              this.toggleBackgroundRemoval(this.backgroundRemove);
+            },
+            async toggleBackgroundRemoval(newBackgroundRemove) {
+              if (!newBackgroundRemove) {
+                this.stopBackgroundRemove();
+                this.stopBackgroundRemove = () => {};
+                const stream = await this.getVideoStream();
+                await this.userControl.publishTrack(
+                    stream.getVideoTracks()[0]
+                );
+                return;
+              }
+              const stream = await this.getVideoStream();
+              const { stop, track } = await removeBackground(
+                  stream.getVideoTracks()[0],
+                  this.getWallpaperImage,
+                  () => {
+                    this.backgroundRemove = false;
+                  }
+              );
+              this.stopBackgroundRemove = stop;
+              window.track = track;
+              await this.userControl.publishTrack(track);
+            },
             async calculateDevices() {
                 this.videoDevices = this.mediaDevices.filter(
                     d => d.kind === 'videoinput'
@@ -171,26 +218,7 @@
         },
         watch: {
             backgroundRemove: async function(newBackgroundRemove) {
-                if (!newBackgroundRemove) {
-                    this.stopBackgroundRemove();
-                    this.stopBackgroundRemove = () => {};
-                    const stream = await this.getVideoStream();
-                    await this.userControl.publishTrack(
-                        stream.getVideoTracks()[0]
-                    );
-                    return;
-                }
-                const stream = await this.getVideoStream();
-                const { stop, track } = await removeBackground(
-                    stream.getVideoTracks()[0],
-                    '/img/test-pattern.png',
-                    () => {
-                        this.backgroundRemove = false;
-                    }
-                );
-                this.stopBackgroundRemove = stop;
-                window.track = track;
-                await this.userControl.publishTrack(track);
+              await this.toggleBackgroundRemoval(newBackgroundRemove)
             },
         },
     };
