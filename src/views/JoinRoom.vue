@@ -26,11 +26,11 @@
                         </div>
                     </v-row>
                     <v-select
-                        :loading="videoInputDevices.length <= 0"
-                        :disabled="videoInputDevices.length <= 0"
+                        :loading="videoInputDevices.length <= 0 && !hasVideoError"
+                        :disabled="hasVideoError || !video"
                         :items="videoInputDevices"
                         :label="
-                            videoInputDevices.length <= 0
+                            videoInputDevices.length <= 0 || hasVideoError
                                 ? 'No video input device'
                                 : 'Video input device'
                         "
@@ -45,11 +45,11 @@
                         v-model="videoDevice"
                     />
                     <v-select
-                        :disabled="audioInputDevices.length <= 0"
-                        :loading="audioInputDevices.length <= 0"
+                        :disabled="hasAudioError || !audio"
+                        :loading="audioInputDevices.length <= 0 && !hasAudioError"
                         :items="audioInputDevices"
                         :label="
-                            audioInputDevices.length <= 0
+                            audioInputDevices.length <= 0 || hasAudioError
                                 ? 'No Audio input device'
                                 : 'Audio input device'
                         "
@@ -65,12 +65,14 @@
                     />
                     <v-row justify="center">
                         <v-switch
+                            :disabled="hasVideoError"
                             @change="updateLocalStream"
                             class="pa-2"
                             label="Webcam"
                             v-model="video"
                         />
                         <v-switch
+                            :disabled="hasAudioError"
                             @change="updateLocalStream"
                             class="pa-2"
                             label="Microphone"
@@ -108,29 +110,32 @@
                     params: { token: this.$route.params.token },
                 });
             },
+            disableAudioStream() {
+                this.localStream?.getAudioTracks().forEach(audioTrack => {
+                    audioTrack.stop();
+                });
+            },
+            disableVideoStream() {
+                this.localStream?.getVideoTracks().forEach(videoTrack => {
+                    videoTrack.stop();
+                });
+            },
             async updateLocalStream() {
                 const tracks = [];
 
-                if (this.video) {
-                    const videoStream = await this.getVideoStream(
-                        this.videoDevice
-                    );
-                    tracks.push(videoStream.getVideoTracks()[0]);
-                }
+                tracks.push(await this.updateAudioStream());
+                tracks.push(await this.updateVideoStream());
 
-                if (this.audio) {
-                    const audioStream = await this.getAudioStream(
-                        this.audioDevice
-                    );
-                    tracks.push(audioStream.getAudioTracks()[0]);
-                }
+                const activeTracks = tracks.filter(
+                    track => track !== undefined
+                );
 
-                if (!tracks) {
+                if (activeTracks.length <= 0) {
                     this.localStream = null;
-
                     return;
                 }
-                this.localStream = new MediaStream(tracks);
+
+                this.localStream = new MediaStream(activeTracks);
 
                 this.videoDevice = this.mediaDevices.find(
                     d =>
@@ -148,6 +153,26 @@
             changeAudioDevice() {
                 this.audio = true;
                 this.updateLocalStream();
+            },
+            async updateAudioStream() {
+              this.disableAudioStream();
+              if (!this.audio) {
+                return undefined;
+              }
+              const audioStream = await this.getAudioStream(
+                  this.audioDevice
+              );
+              return audioStream?.getAudioTracks()[0];
+            },
+            async updateVideoStream() {
+              this.disableVideoStream();
+              if (!this.video) {
+                return undefined;
+              }
+              const videoStream = await this.getVideoStream(
+                  this.videoDevice
+              );
+              return videoStream?.getVideoTracks()[0];
             },
         },
         mounted() {
@@ -170,7 +195,7 @@
         },
 
         computed: {
-            ...mapGetters(['userControl', 'account', 'mediaDevices']),
+            ...mapGetters(['userControl', 'account', 'mediaDevices', 'mediaDeviceErrors']),
             avatar() {
                 const generator = new AvatarGenerator();
                 return generator.generateRandomAvatar(this.account.name);
@@ -190,6 +215,12 @@
                     d => d.kind === 'audiooutput' && d.label
                 );
             },
+            hasAudioError() {
+                return this.mediaDeviceErrors.hasOwnProperty('audio');
+            },
+            hasVideoError() {
+                return this.mediaDeviceErrors.hasOwnProperty('video');
+            }
         },
     };
 </script>

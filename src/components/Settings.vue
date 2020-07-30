@@ -17,6 +17,11 @@
                             </v-list-item-title>
                             <v-select
                                 :items="videoDevices"
+                                :label="
+                                  hasVideoError
+                                  ? mediaDeviceErrors['video']
+                                  : ''
+                                "
                                 item-text="label"
                                 item-value="deviceId"
                                 @change="changeVideoDevice"
@@ -31,6 +36,11 @@
                             </v-list-item-title>
                             <v-select
                                 :items="audioDevices"
+                                :label="
+                                  hasAudioError
+                                  ? mediaDeviceErrors['audio']
+                                  : ''
+                                "
                                 item-text="label"
                                 item-value="deviceId"
                                 @change="changeAudioDevice"
@@ -42,34 +52,65 @@
                 <v-list subheader three-line>
                     <v-subheader class="red--text">Experimental</v-subheader>
                     <v-list-item>
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          Background wallpaper
+                        </v-list-item-title>
+                        <v-file-input
+                            dense
+                            v-model="wallpaperFile"
+                            prepend-icon="image"
+                            item-text="label"
+                            item-value="wallpaper"
+                            @change="changeWallpaper"
+                            class="my-4"
+                            hide-details
+                            accept="image/x-png, image/gif, image/jpeg"
+                        />
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item>
                         <v-list-item-content>
                             <v-list-item-title>
                                 Remove background
                             </v-list-item-title>
                             <v-switch
-                                class="pl-3"
+                                class="pl-3 ma-0"
                                 v-model="backgroundRemove"
                                 @change="toggleBackgroundRemoval"
                             ></v-switch>
                         </v-list-item-content>
                     </v-list-item>
                 </v-list>
+                <div class="version">
+                  <p >
+                    {{ version }}
+                  </p>
+                </div>
             </v-card>
         </v-dialog>
     </div>
 </template>
 
 <script>
-    import { removeBackground } from '../services/backGroundRemovalService';
+    import { removeBackground } from '@/services/backGroundRemovalService';
+    import version from '../../public/version';
     import { mapActions, mapGetters } from 'vuex';
 
     export default {
         name: 'Settings',
         props: {
-            value: Boolean,
+          value: Boolean,
+          local: Boolean
         },
         computed: {
-            ...mapGetters(['userControl', 'localUser']),
+            ...mapGetters([
+                'userControl',
+                'localUser',
+                'mediaDevices',
+                'mediaDeviceErrors',
+                'wallpaperDataUrl'
+            ]),
             show: {
                 get() {
                     this.calculateDevices();
@@ -79,6 +120,15 @@
                     this.$emit('input', value);
                 },
             },
+            hasAudioError() {
+              return this.mediaDeviceErrors.hasOwnProperty('audio');
+            },
+            hasVideoError() {
+              return this.mediaDeviceErrors.hasOwnProperty('video');
+            },
+            getWallpaperImage() {
+              return this.wallpaperDataUrl ? this.wallpaperDataUrl : '/img/test-pattern.png';
+            }
         },
         data: function() {
             return {
@@ -88,65 +138,87 @@
                 selectedAudio: null,
                 backgroundRemove: false,
                 stopBackgroundRemove: () => {},
+                wallpaperFile: null,
+                version: version,
             };
         },
-
         mounted() {
             this.calculateDevices();
         },
         methods: {
-            ...mapActions(['getVideoStream', 'getAudioStream']),
-            async changeVideoDevice(value) {
-                const stream = await this.getVideoStream(value);
-                await this.userControl.publishTrack(stream.getVideoTracks()[0]);
+            ...mapActions([
+              'getVideoStream',
+              'getAudioStream',
+              'updateVideoDevice',
+              'updateAudioDevice',
+              'changeCameraBackground'
+            ]),
+            async changeVideoDevice(videoDeviceId) {
+              this.updateVideoDevice(videoDeviceId);
+              if (this.local) {
+                this.$root.$emit('updateLocalStream');
+                return;
+              }
+              const stream = await this.getVideoStream();
+              await this.userControl.publishTrack(stream.getVideoTracks()[0]);
             },
-            async changeAudioDevice(value) {
-                const stream = await this.getAudioStream(value);
-                await this.userControl.publishTrack(stream.getAudioTracks()[0]);
+            async changeAudioDevice(audiDeviceId) {
+              this.updateAudioDevice(audiDeviceId);
+              if (this.local) {
+                this.$root.$emit('updateLocalStream');
+                return;
+              }
+              const stream = await this.getAudioStream();
+              await this.userControl.publishTrack(stream.getAudioTracks()[0]);
             },
-            async toggleBackgroundRemoval() {},
+            changeWallpaper() {
+              this.changeCameraBackground(this.wallpaperFile);
+              this.toggleBackgroundRemoval(this.backgroundRemove);
+            },
+            async toggleBackgroundRemoval(newBackgroundRemove) {
+              if (!newBackgroundRemove) {
+                this.stopBackgroundRemove();
+                this.stopBackgroundRemove = () => {};
+                const stream = await this.getVideoStream();
+                await this.userControl.publishTrack(
+                    stream.getVideoTracks()[0]
+                );
+                return;
+              }
+              const stream = await this.getVideoStream();
+              const { stop, track } = await removeBackground(
+                  stream.getVideoTracks()[0],
+                  this.getWallpaperImage,
+                  () => {
+                    this.backgroundRemove = false;
+                  }
+              );
+              this.stopBackgroundRemove = stop;
+              window.track = track;
+              await this.userControl.publishTrack(track);
+            },
             async calculateDevices() {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                this.videoDevices = devices.filter(
+                this.videoDevices = this.mediaDevices.filter(
                     d => d.kind === 'videoinput'
                 );
-                this.audioDevices = devices.filter(
+                this.audioDevices = this.mediaDevices.filter(
                     d => d.kind === 'audioinput'
                 );
-                this.selectedVideo = devices.find(
+                this.selectedVideo = this.mediaDevices.find(
                     d =>
                         d.label ===
                         this.localUser?.stream?.getVideoTracks()[0]?.label
-                )?.deviceId;
-                this.selectedAudio = devices.find(
+                )?.deviceId || this.videoDevices[0];
+                this.selectedAudio = this.mediaDevices.find(
                     d =>
                         d.label ===
                         this.localUser?.stream?.getAudioTracks()[0]?.label
-                )?.deviceId;
+                )?.deviceId || this.audioDevices[0];
             },
         },
         watch: {
             backgroundRemove: async function(newBackgroundRemove) {
-                if (!newBackgroundRemove) {
-                    this.stopBackgroundRemove();
-                    this.stopBackgroundRemove = () => {};
-                    const stream = await this.getVideoStream();
-                    await this.userControl.publishTrack(
-                        stream.getVideoTracks()[0]
-                    );
-                    return;
-                }
-                const stream = await this.getVideoStream();
-                const { stop, track } = await removeBackground(
-                    stream.getVideoTracks()[0],
-                    '/img/test-pattern.png',
-                    () => {
-                        this.backgroundRemove = false;
-                    }
-                );
-                this.stopBackgroundRemove = stop;
-                window.track = track;
-                await this.userControl.publishTrack(track);
+              await this.toggleBackgroundRemoval(newBackgroundRemove)
             },
         },
     };
@@ -155,5 +227,10 @@
 <style lang="scss" scoped>
     * {
         user-select: none;
+    }
+    .version {
+      position: absolute;
+      right: 1rem;
+      bottom: 0;
     }
 </style>
