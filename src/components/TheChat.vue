@@ -53,7 +53,6 @@ export default {
     TheChatMessage,
     TheChatInput,
   },
-  props: ["selectedUser"],
   computed: {
     ...mapGetters(["messages", "isMobile"]),
   },

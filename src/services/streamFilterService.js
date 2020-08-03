@@ -36,16 +36,15 @@ class StreamFilterService {
     constructor(mediaStream, defaultWallpaper, videoPublished, audioEnabled, wallpaperEnabled, width = 640, height = 480) {
 
         this.mediaStream = mediaStream
-        if (this.mediaStream.getAudioTracks().length > 0) {
+        if (this.mediaStream && this.mediaStream.getAudioTracks().length > 0) {
             this.audiotrack = this.mediaStream.getAudioTracks()[0]
             this.audiotrack.enabled = audioEnabled
-
         }
 
         this.width = width
         this.height = height
 
-        if (this.mediaStream.getVideoTracks().length > 0) {
+        if (this.mediaStream && this.mediaStream.getVideoTracks().length > 0) {
             this.startVideo(this.mediaStream)
         }
 
@@ -163,11 +162,13 @@ class StreamFilterService {
         this.publishVideo = videoPublished
         this.publishAudio = audioEnabled
         this.wallpaperEnabled = wallpaperEnabled
-        this.audiotrack.enabled = audioEnabled
+        if(this.audiotrack) {
+            this.audiotrack.enabled = audioEnabled
+        }
     }
     getResultStream() {
         var stream = this.resultCanvas.captureStream(60)
-        if (this.mediaStream.getAudioTracks().length > 0) {
+        if (this.mediaStream && this.mediaStream.getAudioTracks().length > 0) {
             stream.addTrack(this.audiotrack)
         }
         return stream

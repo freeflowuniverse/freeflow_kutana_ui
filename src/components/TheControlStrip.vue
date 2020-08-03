@@ -75,7 +75,7 @@
             icon
             class="mr-1"
             :loading="isChangingCameraOrMicEnableState"
-            :disabled="!isChrome"
+            :disabled="!isChrome || videoInputDevices.length <= 0"
           >
             <v-icon>{{videoPublished ? 'videocam' : 'videocam_off'}}</v-icon>
           </v-btn>
@@ -85,7 +85,7 @@
             icon
             class="mr-0"
             :loading="isChangingCameraOrMicEnableState"
-            :disabled="!isChrome"
+            :disabled="!isChrome || audioInputDevices.length <= 0"
           >
             <v-icon>{{micEnabled ? 'mic' : 'mic_off'}}</v-icon>
           </v-btn>
@@ -223,7 +223,7 @@ export default {
       "wallpaperEnabled",
       "isBackgroundRemovalPossible",
       "isMobile",
-      "isChrome"
+      "isChrome",
     ]),
     inviteLink() {
       return window.location.href;

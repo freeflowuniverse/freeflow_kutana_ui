@@ -52,8 +52,10 @@
               label="Webcam"
               @change="changeDevice"
               v-if="isChrome"
+              :disabled="videoInputDevices.length <= 0"
             />
             <v-switch
+              :disabled="audioInputDevices.length <= 0"
               v-model="audio"
               class="pa-2"
               label="Microphone"
@@ -89,10 +91,10 @@ export default {
       audioDevice: undefined,
       audio: true,
       video: true,
-      videoStream: undefined
+      videoStream: undefined,
     };
   },
-  mounted: function() {
+  mounted: function () {
     this.changeDevice();
   },
   computed: {
@@ -102,8 +104,10 @@ export default {
       "localStream",
       "activeVideoDevice",
       "permissionError",
-      "isChrome"
-    ])
+      "isChrome",
+      "micEnabled",
+      "videoPublished",
+    ]),
   },
   methods: {
     ...mapMutations(["stopTracks", "removeStream"]),
@@ -113,60 +117,70 @@ export default {
       "getTeamInfo",
       "setVideoPublished",
       "setMicEnabled",
-      "setInputSelection"
+      "setInputSelection",
     ]),
     async changeDevice() {
       await this.initialiseDevices({
         audio: this.audio,
         video: this.video,
         audioDevice: this.audioDevice,
-        videoDevice: this.videoDevice
+        videoDevice: this.videoDevice,
       });
     },
     joinRoom() {
       this.setInputSelection(this.$route.params.token);
       this.$router.push({
         name: "room",
-        params: { token: this.$route.params.token }
+        params: { token: this.$route.params.token },
       });
-    }
+    },
   },
   watch: {
     videoInputDevices(val) {
-      if (!this.videoDevice && val && val.length) {
+      if (this.video && !this.videoDevice && val && val.length) {
         this.videoDevice = val[0].deviceId;
+      } else if (!val || !val.length) {
+        this.video = false;
       }
     },
     audioInputDevices(val) {
-      if (!this.audioDevice && val && val.length) {
+      if (this.audio && !this.audioDevice && val && val.length) {
         this.audioDevice = val[0].deviceId;
+      } else if (!val || !val.length) {
+        this.audio = false;
       }
     },
     activeVideoDevice: {
       handler(newVal) {
         this.videoDevice = newVal.deviceId;
-      }
+      },
     },
     activeAudioDevice: {
       handler(newVal) {
         this.audioDevice = newVal.deviceId;
-      }
+      },
     },
-    video: function(newVideo) {
+    localStream(val) {
+    },
+    video: function (newVideo) {
       this.setVideoPublished(newVideo);
       if (!newVideo && this.localStream) {
         this.stopTracks();
-        this.removeStream();
       }
     },
-    audio: function(newAudio) {
+    audio: function (newAudio) {
       this.setMicEnabled(newAudio);
       if (!newAudio && this.localStream) {
         this.stopTracks();
-        this.removeStream();
       }
-    }
-  }
+    },
+    micEnabled(val) {
+      this.audio = val;
+    },
+    videoPublished(val) {
+      this.video = val;
+    },
+  },
 };
 </script>
 
