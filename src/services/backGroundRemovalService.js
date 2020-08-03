@@ -1,28 +1,25 @@
-import * as tf from '@tensorflow/tfjs-core';
-// import '@tensorflow/tfjs-backend-wasm';
 import '@tensorflow/tfjs-backend-webgl';
 import * as bodyPix from '@tensorflow-models/body-pix';
-// import { setWasmPath } from '@tensorflow/tfjs-backend-wasm';
-// setWasmPath('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@2.0.1/dist/tfjs-backend-wasm.wasm')
-import Worker from 'worker-loader!../worker/removeBackgroundWorker';
+import * as tf from '@tensorflow/tfjs-core';
+
+let bodyPixNet;
 
 // @todo move to webworker with offscreen rendering
 export const removeBackground = async (
     videoTrack,
     image = '/img/test-pattern.png',
-    failFunction = () => {}
 ) => {
-    // await tf.setBackend('wasm')
-    await timeout(20);
-    await tf.setBackend('webgl');
-    await tf.ready();
-    const bodypixNet = await bodyPix.load({
-        architecture: 'MobileNetV1',
-        outputStride: 8,
-        multiplier: 1,
-        quantBytes: 4,
-    });
+    if(!bodyPixNet){
+        await tf.setBackend('webgl');
+        await tf.ready();
+        bodyPixNet = await bodyPix.load({
+            architecture: 'MobileNetV1',
+            outputStride: 16,
+            multiplier: 0.75,
+            quantBytes: 2
 
+        });
+    }
     if (!document.querySelector('#bgremovalcanvas')) {
         const htmlCanvasElement = document.createElement('canvas');
         htmlCanvasElement.id = 'bgremovalcanvas';
@@ -32,7 +29,6 @@ export const removeBackground = async (
     const canvas = document.querySelector('#bgremovalcanvas');
     canvas.width = videoTrack.getSettings().width;
     canvas.height = videoTrack.getSettings().height;
-    document.body.appendChild(canvas);
 
     if (!document.querySelector('#bgremovalresultcanvas')) {
         const htmlResultCanvasElement = document.createElement('canvas');
@@ -49,145 +45,65 @@ export const removeBackground = async (
     resultCanvas.width = videoTrack.getSettings().width;
     resultCanvas.height = videoTrack.getSettings().height;
 
+
+    const imageCapture = new ImageCapture(videoTrack);
+
     const backgroundImage = new Image();
     backgroundImage.src = image;
 
-    const imageCapture = new ImageCapture(videoTrack);
-    const stopFn = await initRenderLoop(
-        canvas,
-        resultCanvas,
-        bodypixNet,
-        imageCapture,
-        canvas.getContext('2d'),
-        resultCanvas.getContext('2d'),
-        backgroundImage,
-        failFunction
-    );
-
     const captureStream = resultCanvas.captureStream(60);
-    return { stop: stopFn, track: captureStream.getVideoTracks()[0] };
+    return { renderLoop: startRenderLoop(canvas, canvas.getContext('2d'), resultCanvas, resultCanvas.getContext('2d'), backgroundImage, imageCapture), track: captureStream.getVideoTracks()[0] };
 };
 
-const initRenderLoop = async (
-    canvas,
-    resultCanvas,
-    bodypixNet,
-    imageCapture,
-    context,
-    resultContext,
-    backgroundImage,
-    failFunction
-) => {
-    let running = true;
+async function grabFrame(imageCapture) {
+    return await imageCapture.grabFrame();
+}
 
-    let failureCount = 0;
-    const grabFrame = async () => {
-        try {
-            const frame = await imageCapture.grabFrame();
-            failureCount = 0;
-
-            return frame;
-        } catch (e) {
-            failureCount++;
-            if (failureCount > 300) {
-                running = false;
-                throw new Error('failed grabbing frame');
-            }
-            await timeout(1);
-            return grabFrame();
-        }
-    };
-
-    let loop = async test => {
+function startRenderLoop(canvas, context, resultCanvas, resultContext, backgroundImage, imageCapture) {
+    return setInterval(async () => {
         let image = new Image(); // pre init
         let imageElement = new Image(640, 480);
-        //temp
-        // @todo: remove
         const canvas2 = document.createElement('canvas');
         canvas2.width = 480;
         canvas2.height = 640;
-        const offscreen = canvas2.transferControlToOffscreen();
-        let worker = new Worker();
-        let tempBool = true;
 
         const foregroundColor = { r: 0, g: 0, b: 0, a: 255 };
         const backgroundColor = { r: 0, g: 0, b: 0, a: 0 };
 
-        let personSegmentation;
         let segmentation;
         let capture;
-        let fps;
+
         const width = canvas.width;
         const height = canvas.height;
 
-        const getPersonSegmentation = async (bodypixNet, canvas, image) =>
-            new Promise((res, err) => {
-                if (tempBool) {
-                    worker.postMessage({ canvas: offscreen, image }, [
-                        offscreen,
-                        image,
-                    ]);
-                    tempBool = false;
-                } else {
-                    worker.postMessage({ image }, [image]);
-                }
+        capture = await grabFrame(imageCapture);
 
-                worker.addEventListener('message', event => {
-                    res(event.data);
-                });
+        image = await createImageBitmap(capture);
+        context.drawImage(image, 0, 0, width, height);
 
-                // return await bodypixNet.segmentPerson(canvas, true);
-            });
+        const personSegmentation = await bodyPixNet.segmentPerson(context.getImageData(0,0,640,480), true);
 
-        while (running) {
-            try {
-                capture = await grabFrame();
-            } catch (e) {
-                worker.terminate();
-                running = false;
-                failFunction();
-                break;
-            }
+        segmentation = bodyPix.toMask(
+            personSegmentation,
+            foregroundColor,
+            backgroundColor
+        );
 
-            const tempImage = await createImageBitmap(capture);
-            image = await createImageBitmap(capture);
-            context.drawImage(image, 0, 0, width, height);
+        await bodyPix.drawMask(
+            resultCanvas,
+            imageElement,
+            segmentation,
+            1,
+            3
+        );
+        resultContext.globalCompositeOperation = 'source-in';
 
-            const personSegmentation = await getPersonSegmentation(
-                bodypixNet,
-                canvas,
-                tempImage
-            );
-            segmentation = bodyPix.toMask(
-                personSegmentation,
-                foregroundColor,
-                backgroundColor
-            );
+        resultContext.drawImage(image, 0, 0);
+        resultContext.globalCompositeOperation = 'destination-over';
 
-            await bodyPix.drawMask(
-                resultCanvas,
-                imageElement,
-                segmentation,
-                1,
-                3
-            );
-            resultContext.globalCompositeOperation = 'source-in';
-
-            resultContext.drawImage(image, 0, 0);
-            resultContext.globalCompositeOperation = 'destination-over';
-
-            drawImageScaled(backgroundImage, resultContext);
-
-            await timeout(1);
-        }
-        worker.terminate();
-    };
-    loop('main');
-
-    return () => {
-        running = false;
-    };
-};
+        drawImageScaled(backgroundImage, resultContext);
+    }, 100);
+}
 
 const drawImageScaled = (img, ctx) => {
     let canvas = ctx.canvas;
@@ -207,7 +123,4 @@ const drawImageScaled = (img, ctx) => {
         img.width * ratio,
         img.height * ratio
     );
-};
-const timeout = ms => {
-    return new Promise(resolve => setTimeout(resolve, ms));
 };

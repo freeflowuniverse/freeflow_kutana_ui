@@ -137,7 +137,7 @@
                 selectedVideo: null,
                 selectedAudio: null,
                 backgroundRemove: false,
-                stopBackgroundRemove: () => {},
+                renderLoop: null,
                 wallpaperFile: null,
                 version: version,
             };
@@ -176,26 +176,27 @@
               this.toggleBackgroundRemoval(this.backgroundRemove);
             },
             async toggleBackgroundRemoval(newBackgroundRemove) {
+              const stream = await this.getVideoStream();
+              this.clearExistingBackground();
               if (!newBackgroundRemove) {
-                this.stopBackgroundRemove();
-                this.stopBackgroundRemove = () => {};
-                const stream = await this.getVideoStream();
                 await this.userControl.publishTrack(
                     stream.getVideoTracks()[0]
                 );
                 return;
               }
-              const stream = await this.getVideoStream();
-              const { stop, track } = await removeBackground(
+              const { renderLoop, track } = await removeBackground(
                   stream.getVideoTracks()[0],
-                  this.getWallpaperImage,
-                  () => {
-                    this.backgroundRemove = false;
-                  }
+                  this.getWallpaperImage
               );
-              this.stopBackgroundRemove = stop;
+              this.renderLoop = renderLoop;
               window.track = track;
               await this.userControl.publishTrack(track);
+            },
+            clearExistingBackground() {
+              if (this.renderLoop) {
+                window.track.stop();
+                clearInterval(this.renderLoop);
+              }
             },
             async calculateDevices() {
                 this.videoDevices = this.mediaDevices.filter(
