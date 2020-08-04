@@ -58,17 +58,6 @@ export default {
     setVideoDeviceId(state, videoDeviceId) {
       state.videoDeviceId = videoDeviceId;
     },
-    refreshDevices(state, devices) {
-      state.videoInputDevices = devices.filter(
-          (d) => d.kind === "videoinput" && d.label,
-      );
-      state.audioInputDevices = devices.filter(
-          (d) => d.kind === "audioinput" && d.label,
-      );
-      state.audioOutputDevices = devices.filter(
-          (d) => d.kind === "audiooutput" && d.label,
-      );
-    },
     refreshInputDevices(state, devices) {
       state.inputDevices = devices;
     },

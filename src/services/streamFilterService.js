@@ -108,7 +108,7 @@ class StreamFilterService {
             await this.init()
         }
 
-        if (!this.mediaStream.getVideoTracks().length && this.publishVideo) {
+        if (!this.mediaStream.getVideoTracks().length) {
             this.resultContext.clearRect(0, 0, this.resultCanvas.width, this.resultCanvas.height);
             this.resultContext.globalCompositeOperation = "source-over";
             this.resultContext.drawImage(this.person, this.resultCanvas.width / 2 - this.person.width / 2, this.resultCanvas.height / 2 - this.person.height / 2, this.person.width, this.person.height)
@@ -119,34 +119,36 @@ class StreamFilterService {
             return;
         }
 
-        var frame = await this.getFrameFromVideo()
-        this.mirrorContext.drawImage(frame, 0, 0, this.mirrorCanvas.width, this.mirrorCanvas.height)
+        if (this.publishVideo) {
+            var frame = await this.getFrameFromVideo()
+            this.mirrorContext.drawImage(frame, 0, 0, this.mirrorCanvas.width, this.mirrorCanvas.height)
 
-        if (this.wallpaperEnabled && this.publishVideo) {
-            const personSegmentation = await bodypixNet.segmentPerson(this.mirrorCanvas, true);
+            if (this.wallpaperEnabled && this.publishVideo) {
+                const personSegmentation = await bodypixNet.segmentPerson(this.mirrorCanvas, true);
 
-            const foregroundColor = { r: 0, g: 0, b: 0, a: 255 };
-            const backgroundColor = { r: 255, g: 0, b: 0, a: 0 };
-            var segmentation = bodyPix.toMask(
-                personSegmentation,
-                foregroundColor,
-                backgroundColor
-            );
-            await bodyPix.drawMask(this.resultCanvas, new Image(640, 480), segmentation, 1, 3);
+                const foregroundColor = { r: 0, g: 0, b: 0, a: 255 };
+                const backgroundColor = { r: 255, g: 0, b: 0, a: 0 };
+                var segmentation = bodyPix.toMask(
+                    personSegmentation,
+                    foregroundColor,
+                    backgroundColor
+                );
+                await bodyPix.drawMask(this.resultCanvas, new Image(640, 480), segmentation, 1, 3);
 
-            this.resultContext.globalCompositeOperation = "source-in";
-            this.resultContext.drawImage(frame, 0, 0); //Draw person with mask enabled
+                this.resultContext.globalCompositeOperation = "source-in";
+                this.resultContext.drawImage(frame, 0, 0); //Draw person with mask enabled
 
-            this.resultContext.globalCompositeOperation = "destination-over"
+                this.resultContext.globalCompositeOperation = "destination-over"
 
-            drawImageScaled(this.bg, this.resultContext)
+                drawImageScaled(this.bg, this.resultContext)
 
-            //this.resultContext.drawImage(this.bg, 0, 0, this.width, this.height / this.bg.width * this.width) // Draw wallpaper behind
-            //CONTINUE?
-            setTimeout(function() {
-                self.renderLoop.bind(self)()
-            }, 10);
-            return;
+                //this.resultContext.drawImage(this.bg, 0, 0, this.width, this.height / this.bg.width * this.width) // Draw wallpaper behind
+                //CONTINUE?
+                setTimeout(function() {
+                    self.renderLoop.bind(self)()
+                }, 10);
+                return;
+            }
         }
 
         //draw only person

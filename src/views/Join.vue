@@ -101,7 +101,6 @@ export default {
   },
   computed: {
     ...mapGetters([
-      "activeVideoDevice",
       "isChrome",
       "micEnabled",
       "videoPublished",
@@ -136,7 +135,6 @@ export default {
       "refreshInputDevices",
       "getVideoStream",
       "getAudioStream",
-      "initialiseDevices",
       "join",
       "getTeamInfo",
       "setVideoPublished",
@@ -221,6 +219,7 @@ export default {
       }
 
       this.setStream(this.localStream);
+      this.setVideoPublished(this.videoDevice !== undefined);
 
       this.setInputSelection(this.$route.params.token);
       this.$router.push({
