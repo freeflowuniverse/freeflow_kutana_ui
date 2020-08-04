@@ -495,6 +495,8 @@ export const janusHelpers = {
 
     this.mediaStream = store.getters.localStream;
 
+    console.log('mediaStream', this.mediaStream.getTracks())
+
     if (this.mediaStream && this.mediaStream.getVideoTracks().length > 0) {
       this.currentVideo = this.mediaStream.getVideoTracks()[0];
     }
@@ -502,25 +504,26 @@ export const janusHelpers = {
       this.currentAudio = this.mediaStream.getAudioTracks()[0];
     }
 
-    const useAudio =
-      this.mediaStream && this.mediaStream.getAudioTracks().length;
+    const useAudio = this.mediaStream && this.mediaStream.getAudioTracks().length;
+
     if (backgroundRemovalActive) {
-      this.streamFilterService = new StreamFilterService(
-        this.mediaStream,
+        this.streamFilterService = new StreamFilterService(
+            this.mediaStream,
         "/default_background.png",
-        store.getters.videoPublished,
-        store.getters.micEnabled,
-        this.wallpaperEnabled,
-      );
-      this.stream = await this.streamFilterService.getResultStream();
-      this.streamFilterService.start();
+            store.getters.videoPublished,
+            store.getters.micEnabled,
+            this.wallpaperEnabled,
+        );
+        console.log(this.mediaStream)
+        this.mediaStream = await this.streamFilterService.getResultStream();
+        this.streamFilterService.start();
     }
 
     /* use the stream */
     store.getters.users[0].pluginHandle.createOffer({
       simulcast: false,
       simulcast2: false,
-      stream: this.stream,
+      stream: this.mediaStream,
 
       success: (jsep) => {
         console.log({

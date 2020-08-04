@@ -21,12 +21,12 @@
             dense
             prepend-icon="videocam"
             :items="videoInputDevices"
-            :label="videoInputDevices.length <= 0 ? 'No video input device' : 'Video input device'"
+            :label="hasVideoError ? inputDeviceErrors['video'] : videoInputDevices.length <= 0 ? 'No video input device' : 'Video input device'"
             item-text="label"
             item-value="deviceId"
             outlined
             class="ma-5"
-            @change="changeDevice"
+            @change="changeVideoDevice"
             hide-details
             :disabled="videoInputDevices.length <= 0 || !video"
           />
@@ -36,11 +36,11 @@
             dense
             prepend-icon="mic"
             :items="audioInputDevices"
-            :label="audioInputDevices.length <= 0 ? 'No Audio input device' : 'Audio input device'"
+            :label="hasAudioError ? inputDeviceErrors['audio'] : audioInputDevices.length <= 0 ? 'No Audio input device' : 'Audio input device'"
             item-text="label"
             item-value="deviceId"
             outlined
-            @change="changeDevice"
+            @change="changeAudioDevice"
             class="my-5 ma-5"
             hide-details
             :disabled="audioInputDevices.length <= 0 || !audio"
@@ -50,7 +50,7 @@
               v-model="video"
               class="pa-2"
               label="Webcam"
-              @change="changeDevice"
+              @change="updateLocalStream"
               v-if="isChrome"
               :disabled="videoInputDevices.length <= 0"
             />
@@ -59,7 +59,7 @@
               v-model="audio"
               class="pa-2"
               label="Microphone"
-              @change="changeDevice"
+              @change="updateLocalStream"
               v-if="isChrome"
             />
           </v-row>
@@ -70,14 +70,14 @@
         </v-card-text>
       </v-card>
     </v-col>
-    <template>
+    <!-- <template>
       <v-dialog :value="permissionError" width="500">
         <v-card>
           <v-card-title class="text-uppercase">Device access is denied</v-card-title>
           <v-card-text>Couldn't get permission to some of the devices.</v-card-text>
         </v-card>
       </v-dialog>
-    </template>
+    </template> -->
   </v-row>
 </template>
 
@@ -91,27 +91,51 @@ export default {
       audioDevice: undefined,
       audio: true,
       video: true,
-      videoStream: undefined,
+      localStream: undefined,
     };
   },
-  mounted: function () {
-    this.changeDevice();
+  mounted: function() {
+    this.refreshInputDevices().then(() => {
+      this.updateLocalStream();
+    });
   },
   computed: {
     ...mapGetters([
-      "videoInputDevices",
-      "audioInputDevices",
-      "localStream",
       "activeVideoDevice",
-      "permissionError",
       "isChrome",
       "micEnabled",
       "videoPublished",
+      "inputDevices",
+      "inputDeviceErrors"
     ]),
+    videoInputDevices() {
+      return this.inputDevices.filter(
+          d => d.kind === 'videoinput' && d.label
+      );
+    },
+    audioInputDevices() {
+      return this.inputDevices.filter(
+          d => d.kind === 'audioinput' && d.label
+      );
+    },
+    audioOutputDevices() {
+      return this.inputDevices.filter(
+          d => d.kind === 'audiooutput' && d.label
+      );
+    },
+    hasAudioError() {
+      return this.inputDeviceErrors.hasOwnProperty('audio');
+    },
+    hasVideoError() {
+      return this.inputDeviceErrors.hasOwnProperty('video');
+    }
   },
   methods: {
-    ...mapMutations(["stopTracks", "removeStream"]),
+    ...mapMutations(["stopTracks", "removeStream", "setStream"]),
     ...mapActions([
+      "refreshInputDevices",
+      "getVideoStream",
+      "getAudioStream",
       "initialiseDevices",
       "join",
       "getTeamInfo",
@@ -119,6 +143,70 @@ export default {
       "setMicEnabled",
       "setInputSelection",
     ]),
+    disableAudioStream() {
+      this.localStream?.getAudioTracks().forEach(audioTrack => {
+        audioTrack.stop();
+      });
+    },
+    disableVideoStream() {
+      this.localStream?.getVideoTracks().forEach(videoTrack => {
+        videoTrack.stop();
+      });
+    },
+    async updateLocalStream() {
+      const tracks = [];
+
+      tracks.push(await this.updateAudioStream());
+      tracks.push(await this.updateVideoStream());
+
+      console.log(tracks);
+
+      const activeTracks = tracks.filter(
+          track => track !== undefined
+      );
+
+      if (activeTracks.length <= 0) {
+        this.localStream = null;
+        return;
+      }
+      this.localStream = new MediaStream(activeTracks);
+      this.videoDevice = this.inputDevices.find(
+          d =>
+              d.label === this.localStream?.getVideoTracks()[0]?.label
+      )?.deviceId;
+      this.audioDevice = this.inputDevices.find(
+          d =>
+              d.label === this.localStream?.getAudioTracks()[0]?.label
+      )?.deviceId;
+    },
+    changeVideoDevice() {
+      this.video = true;
+      this.updateLocalStream();
+    },
+    changeAudioDevice() {
+      this.audio = true;
+      this.updateLocalStream();
+    },
+    async updateAudioStream() {
+      this.disableAudioStream();
+      if (!this.audio) {
+        return undefined;
+      }
+      const audioStream = await this.getAudioStream(
+          this.audioDevice
+      );
+      return audioStream?.getAudioTracks()[0];
+    },
+    async updateVideoStream() {
+      this.disableVideoStream();
+      if (!this.video) {
+        return undefined;
+      }
+      const videoStream = await this.getVideoStream(
+          this.videoDevice
+      );
+      return videoStream?.getVideoTracks()[0];
+    },
     async changeDevice() {
       await this.initialiseDevices({
         audio: this.audio,
@@ -128,52 +216,20 @@ export default {
       });
     },
     joinRoom() {
+      if (!this.localStream) {
+        return;
+      }
+
+      this.setStream(this.localStream);
+
       this.setInputSelection(this.$route.params.token);
       this.$router.push({
         name: "room",
         params: { token: this.$route.params.token },
       });
-    },
+    }
   },
   watch: {
-    videoInputDevices(val) {
-      if (this.video && !this.videoDevice && val && val.length) {
-        this.videoDevice = val[0].deviceId;
-      } else if (!val || !val.length) {
-        this.video = false;
-      }
-    },
-    audioInputDevices(val) {
-      if (this.audio && !this.audioDevice && val && val.length) {
-        this.audioDevice = val[0].deviceId;
-      } else if (!val || !val.length) {
-        this.audio = false;
-      }
-    },
-    activeVideoDevice: {
-      handler(newVal) {
-        this.videoDevice = newVal.deviceId;
-      },
-    },
-    activeAudioDevice: {
-      handler(newVal) {
-        this.audioDevice = newVal.deviceId;
-      },
-    },
-    localStream(val) {
-    },
-    video: function (newVideo) {
-      this.setVideoPublished(newVideo);
-      if (!newVideo && this.localStream) {
-        this.stopTracks();
-      }
-    },
-    audio: function (newAudio) {
-      this.setMicEnabled(newAudio);
-      if (!newAudio && this.localStream) {
-        this.stopTracks();
-      }
-    },
     micEnabled(val) {
       this.audio = val;
     },

@@ -199,11 +199,9 @@ export default {
     };
   },
   mounted() {
-    this.videoDevice = this.activeVideoDevice
-      ? this.activeVideoDevice.deviceId
-      : null;
+    this.videoDevice = this.videoDeviceId;
     this.$root.$on("showInviteUser", this.showAddUserDialog);
-    this.refreshDevices();
+    this.refreshInputDevices();
   },
   computed: {
     ...mapGetters([
@@ -212,22 +210,29 @@ export default {
       "account",
       "screenShareRole",
       "screenShare",
-      "videoInputDevices",
-      "audioInputDevices",
-      "audioOutputDevices",
-      "activeAudioDevice",
-      "activeVideoDevice",
-      "activeAudioOutputDevice",
       "videoPublished",
       "micEnabled",
       "wallpaperEnabled",
       "isBackgroundRemovalPossible",
       "isMobile",
       "isChrome",
+      "audioDeviceId",
+      "videoDeviceId",
+      "inputDevices"
     ]),
     inviteLink() {
       return window.location.href;
-    }
+    },
+    videoInputDevices() {
+      return this.inputDevices.filter(
+          d => d.kind === 'videoinput' && d.label
+      );
+    },
+    audioInputDevices() {
+      return this.inputDevices.filter(
+          d => d.kind === 'audioinput' && d.label
+      );
+    },
   },
   methods: {
     ...mapActions([
@@ -235,13 +240,11 @@ export default {
       "stopScreenShare",
       "setSnackbarMessage",
       "clearStorage",
-      "refreshDevices",
-      "setAudioOutputDevice",
+      "refreshInputDevices",
       "setVideoPublished",
       "setMicEnabled",
       "setWallPaperEnabled"
     ]),
-    ...mapMutations(["setVideoDevice"]),
     canScreenShare: function() {
       return !!navigator.mediaDevices.getDisplayMedia;
     },
@@ -251,13 +254,7 @@ export default {
       this.$router.push({ name: "home" });
     },
     toggleSettings: function() {
-      this.refreshDevices();
-      this.setVideoDevice(this.videoDevice);
-      if (this.activeAudioDevice) {
-        this.audioInputDevice = this.activeAudioDevice.deviceId;
-      }
-      if (this.activeAudioOutputDevice)
-        this.audioOutputDevice = this.activeAudioOutputDevice.deviceId;
+      this.refreshInputDevices();
       this.showExtraSettings = !this.showExtraSettings;
     },
     changeDevice: function() {
@@ -268,9 +265,6 @@ export default {
         this.videoDevice,
         this.wallpaperEnabled
       );
-    },
-    changeAudioOutputDevice: function() {
-      this.setAudioOutputDevice(this.audioOutputDevice);
     },
     toggleMute: function() {
       if (!this.isChangingCameraOrMicEnableState) {

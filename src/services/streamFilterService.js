@@ -107,10 +107,21 @@ class StreamFilterService {
         if (!this.initialized) {
             await this.init()
         }
-        if (this.publishVideo) { //Get frame and put on mirror canvas
-            var frame = await this.getFrameFromVideo()
-            this.mirrorContext.drawImage(frame, 0, 0, this.mirrorCanvas.width, this.mirrorCanvas.height)
+
+        if (!this.mediaStream.getVideoTracks().length && this.publishVideo) {
+            this.resultContext.clearRect(0, 0, this.resultCanvas.width, this.resultCanvas.height);
+            this.resultContext.globalCompositeOperation = "source-over";
+            this.resultContext.drawImage(this.person, this.resultCanvas.width / 2 - this.person.width / 2, this.resultCanvas.height / 2 - this.person.height / 2, this.person.width, this.person.height)
+
+            setTimeout(function () {
+                self.renderLoop.bind(self)()
+            }, 200);
+            return;
         }
+
+        var frame = await this.getFrameFromVideo()
+        this.mirrorContext.drawImage(frame, 0, 0, this.mirrorCanvas.width, this.mirrorCanvas.height)
+
         if (this.wallpaperEnabled && this.publishVideo) {
             const personSegmentation = await bodypixNet.segmentPerson(this.mirrorCanvas, true);
 
@@ -132,25 +143,19 @@ class StreamFilterService {
 
             //this.resultContext.drawImage(this.bg, 0, 0, this.width, this.height / this.bg.width * this.width) // Draw wallpaper behind
             //CONTINUE?
-
-            setTimeout(function () { self.renderLoop.bind(self)() }, 10)
-            return
+            setTimeout(function() {
+                self.renderLoop.bind(self)()
+            }, 10);
+            return;
         }
-        if (this.publishVideo) {
-            //draw only person
-            this.resultContext.globalCompositeOperation = "source-over";
-            this.resultContext.drawImage(frame, 0, 0); //Draw person 
 
-            setTimeout(function () { self.renderLoop.bind(self)() }, 10)
-            return
-        }
-        //Draw only avatar 
-        this.resultContext.clearRect(0, 0, this.resultCanvas.width, this.resultCanvas.height);
+        //draw only person
         this.resultContext.globalCompositeOperation = "source-over";
-        this.resultContext.drawImage(this.person, this.resultCanvas.width / 2 - this.person.width / 2, this.resultCanvas.height / 2 - this.person.height / 2, this.person.width, this.person.height)
+        this.resultContext.drawImage(frame, 0, 0); //Draw person
 
-        setTimeout(function () { self.renderLoop.bind(self)() }, 200)
-
+        setTimeout(function() {
+            self.renderLoop.bind(self)()
+        }, 10);
     }
     toggleAudio() {
         this.publishAudio = !this.publishAudio
