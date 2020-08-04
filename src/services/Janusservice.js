@@ -532,8 +532,8 @@ export const janusHelpers = {
         });
         const publish = {
           request: "configure",
-          audio: store.getters.micEnabled,
-          video: store.getters.videoPublished,
+          audio: true,
+          video: true,
         };
         store.getters.users[0].pluginHandle.send({
           message: publish,

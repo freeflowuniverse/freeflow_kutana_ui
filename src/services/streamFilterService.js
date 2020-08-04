@@ -1,5 +1,6 @@
 
 import * as bodyPix from "@tensorflow-models/body-pix";
+import store from '@/plugins/vuex';
 
 const imageWaiter = (image) =>
     new Promise((resolve) => {
@@ -119,7 +120,7 @@ class StreamFilterService {
             return;
         }
 
-        if (this.publishVideo) {
+        if (store.getters.videoPublished) {
             var frame = await this.getFrameFromVideo()
             this.mirrorContext.drawImage(frame, 0, 0, this.mirrorCanvas.width, this.mirrorCanvas.height)
 
