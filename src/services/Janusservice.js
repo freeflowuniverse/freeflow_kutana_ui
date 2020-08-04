@@ -495,8 +495,6 @@ export const janusHelpers = {
 
     this.mediaStream = store.getters.localStream;
 
-    console.log('mediaStream', this.mediaStream.getTracks())
-
     if (this.mediaStream && this.mediaStream.getVideoTracks().length > 0) {
       this.currentVideo = this.mediaStream.getVideoTracks()[0];
     }
@@ -514,7 +512,6 @@ export const janusHelpers = {
             store.getters.micEnabled,
             this.wallpaperEnabled,
         );
-        console.log(this.mediaStream)
         this.mediaStream = await this.streamFilterService.getResultStream();
         this.streamFilterService.start();
     }

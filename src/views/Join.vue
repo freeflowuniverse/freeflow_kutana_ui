@@ -52,10 +52,10 @@
               label="Webcam"
               @change="updateLocalStream"
               v-if="isChrome"
-              :disabled="videoInputDevices.length <= 0"
+              :disabled="videoInputDevices.length <= 0 || hasVideoError"
             />
             <v-switch
-              :disabled="audioInputDevices.length <= 0"
+              :disabled="audioInputDevices.length <= 0 || hasAudioError"
               v-model="audio"
               class="pa-2"
               label="Microphone"
@@ -157,7 +157,8 @@ export default {
       tracks.push(await this.updateAudioStream());
       tracks.push(await this.updateVideoStream());
 
-      console.log(tracks);
+      this.audio = !this.hasAudioError
+      this.video = !this.hasVideoError
 
       const activeTracks = tracks.filter(
           track => track !== undefined
@@ -167,6 +168,7 @@ export default {
         this.localStream = null;
         return;
       }
+
       this.localStream = new MediaStream(activeTracks);
       this.videoDevice = this.inputDevices.find(
           d =>
