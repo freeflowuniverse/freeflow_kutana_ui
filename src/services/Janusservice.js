@@ -38,7 +38,7 @@ const determineSpeaker = (stream, remoteFeed, id) => {
     window.audioContext = new _AudioContext();
   }
 
-  if (window.audioContext) {
+  if (window.audioContext && stream.getAudioTracks().length) {
     let analyser = window.audioContext.createAnalyser();
     let microphone = window.audioContext.createMediaStreamSource(stream);
     let javascriptNode = window.audioContext.createScriptProcessor(2048, 1, 1);

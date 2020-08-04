@@ -125,7 +125,7 @@ export default {
 
         return stream;
       } catch (e) {
-        commit('setMediaDeviceError', { type: 'audio', message: e.message});
+        commit('setInputDeviceError', { type: 'audio', message: e.message});
       }
     },
     async findDeviceId(_, { kind, label }) {

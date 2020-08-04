@@ -109,7 +109,7 @@ class StreamFilterService {
             await this.init()
         }
 
-        if (!this.mediaStream.getVideoTracks().length) {
+        if (!store.getters.videoPublished) {
             this.resultContext.clearRect(0, 0, this.resultCanvas.width, this.resultCanvas.height);
             this.resultContext.globalCompositeOperation = "source-over";
             this.resultContext.drawImage(this.person, this.resultCanvas.width / 2 - this.person.width / 2, this.resultCanvas.height / 2 - this.person.height / 2, this.person.width, this.person.height)

@@ -299,7 +299,7 @@ export default {
         this.isChangingCameraOrMicEnableState = true;
         this.setVideoPublished(!this.videoPublished);
         Janus.log(
-          (this.videoPublished ? "Disabling" : "Enabling") + " local camera..."
+          (this.videoPublished ? "Enabling" : "Disabling") + " local camera..."
         );
         this.setSnackbarMessage({
           text: `Camera ${this.videoPublished ? "enabled" : "disabled"}`
