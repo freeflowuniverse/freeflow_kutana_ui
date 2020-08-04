@@ -213,9 +213,26 @@ export default {
         videoDevice: this.videoDevice,
       });
     },
+    createDummyMediaStream() {
+      const mediaStream = new MediaStream();
+      const ctx = new AudioContext();
+      const oscillator = ctx.createOscillator();
+      const dst = oscillator.connect(ctx.createMediaStreamDestination());
+      oscillator.start();
+
+      let emptyAudio = Object.assign(dst.stream.getAudioTracks()[0], {
+        enabled: false,
+      });
+      emptyAudio.stop();
+      emptyAudio.dispatchEvent(new Event("ended"));
+
+      mediaStream.addTrack(emptyAudio);
+
+      return mediaStream;
+    },
     joinRoom() {
       if (!this.localStream) {
-        return;
+        this.localStream = this.createDummyMediaStream();
       }
 
       this.setStream(this.localStream);
