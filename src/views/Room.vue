@@ -8,9 +8,9 @@
         class="room"
         v-if="allUsers.length && allScreenUsers.length"
     >
-      <div class="invite">
-        <InviteUsers v-if="users.length <= 1 && showInvitation"/>
-      </div>
+        <div :class="showInvitation ? 'invite': ''">
+          <InviteUsers v-if="users.length <= 1 && showInvitation"/>
+        </div>
         <UserGrid :users="users" :showChat="view === 'chat'">
             <template v-slot:chat>
                 <ChatGrid
