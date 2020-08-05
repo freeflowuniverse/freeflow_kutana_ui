@@ -1,5 +1,6 @@
 
 import * as bodyPix from "@tensorflow-models/body-pix";
+import store from '@/plugins/vuex';
 
 const imageWaiter = (image) =>
     new Promise((resolve) => {
@@ -107,50 +108,57 @@ class StreamFilterService {
         if (!this.initialized) {
             await this.init()
         }
-        if (this.publishVideo) { //Get frame and put on mirror canvas
+
+        if (!store.getters.videoPublished) {
+            this.resultContext.clearRect(0, 0, this.resultCanvas.width, this.resultCanvas.height);
+            this.resultContext.globalCompositeOperation = "source-over";
+            this.resultContext.drawImage(this.person, this.resultCanvas.width / 2 - this.person.width / 2, this.resultCanvas.height / 2 - this.person.height / 2, this.person.width, this.person.height)
+
+            setTimeout(function () {
+                self.renderLoop.bind(self)()
+            }, 200);
+            return;
+        }
+
+        if (store.getters.videoPublished) {
             var frame = await this.getFrameFromVideo()
             this.mirrorContext.drawImage(frame, 0, 0, this.mirrorCanvas.width, this.mirrorCanvas.height)
+
+            if (this.wallpaperEnabled && this.publishVideo) {
+                const personSegmentation = await bodypixNet.segmentPerson(this.mirrorCanvas, true);
+
+                const foregroundColor = { r: 0, g: 0, b: 0, a: 255 };
+                const backgroundColor = { r: 255, g: 0, b: 0, a: 0 };
+                var segmentation = bodyPix.toMask(
+                    personSegmentation,
+                    foregroundColor,
+                    backgroundColor
+                );
+                await bodyPix.drawMask(this.resultCanvas, new Image(640, 480), segmentation, 1, 3);
+
+                this.resultContext.globalCompositeOperation = "source-in";
+                this.resultContext.drawImage(frame, 0, 0); //Draw person with mask enabled
+
+                this.resultContext.globalCompositeOperation = "destination-over"
+
+                drawImageScaled(this.bg, this.resultContext)
+
+                //this.resultContext.drawImage(this.bg, 0, 0, this.width, this.height / this.bg.width * this.width) // Draw wallpaper behind
+                //CONTINUE?
+                setTimeout(function() {
+                    self.renderLoop.bind(self)()
+                }, 10);
+                return;
+            }
         }
-        if (this.wallpaperEnabled && this.publishVideo) {
-            const personSegmentation = await bodypixNet.segmentPerson(this.mirrorCanvas, true);
 
-            const foregroundColor = { r: 0, g: 0, b: 0, a: 255 };
-            const backgroundColor = { r: 255, g: 0, b: 0, a: 0 };
-            var segmentation = bodyPix.toMask(
-                personSegmentation,
-                foregroundColor,
-                backgroundColor
-            );
-            await bodyPix.drawMask(this.resultCanvas, new Image(640, 480), segmentation, 1, 3);
-
-            this.resultContext.globalCompositeOperation = "source-in";
-            this.resultContext.drawImage(frame, 0, 0); //Draw person with mask enabled
-
-            this.resultContext.globalCompositeOperation = "destination-over"
-
-            drawImageScaled(this.bg, this.resultContext)
-
-            //this.resultContext.drawImage(this.bg, 0, 0, this.width, this.height / this.bg.width * this.width) // Draw wallpaper behind
-            //CONTINUE?
-
-            setTimeout(function () { self.renderLoop.bind(self)() }, 10)
-            return
-        }
-        if (this.publishVideo) {
-            //draw only person
-            this.resultContext.globalCompositeOperation = "source-over";
-            this.resultContext.drawImage(frame, 0, 0); //Draw person 
-
-            setTimeout(function () { self.renderLoop.bind(self)() }, 10)
-            return
-        }
-        //Draw only avatar 
-        this.resultContext.clearRect(0, 0, this.resultCanvas.width, this.resultCanvas.height);
+        //draw only person
         this.resultContext.globalCompositeOperation = "source-over";
-        this.resultContext.drawImage(this.person, this.resultCanvas.width / 2 - this.person.width / 2, this.resultCanvas.height / 2 - this.person.height / 2, this.person.width, this.person.height)
+        this.resultContext.drawImage(frame, 0, 0); //Draw person
 
-        setTimeout(function () { self.renderLoop.bind(self)() }, 200)
-
+        setTimeout(function() {
+            self.renderLoop.bind(self)()
+        }, 10);
     }
     toggleAudio() {
         this.publishAudio = !this.publishAudio

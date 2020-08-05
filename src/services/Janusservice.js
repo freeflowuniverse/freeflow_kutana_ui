@@ -38,7 +38,7 @@ const determineSpeaker = (stream, remoteFeed, id) => {
     window.audioContext = new _AudioContext();
   }
 
-  if (window.audioContext) {
+  if (window.audioContext && stream.getAudioTracks().length) {
     let analyser = window.audioContext.createAnalyser();
     let microphone = window.audioContext.createMediaStreamSource(stream);
     let javascriptNode = window.audioContext.createScriptProcessor(2048, 1, 1);
@@ -502,25 +502,25 @@ export const janusHelpers = {
       this.currentAudio = this.mediaStream.getAudioTracks()[0];
     }
 
-    const useAudio =
-      this.mediaStream && this.mediaStream.getAudioTracks().length;
+    const useAudio = this.mediaStream && this.mediaStream.getAudioTracks().length;
+
     if (backgroundRemovalActive) {
-      this.streamFilterService = new StreamFilterService(
-        this.mediaStream,
+        this.streamFilterService = new StreamFilterService(
+            this.mediaStream,
         "/default_background.png",
-        store.getters.videoPublished,
-        store.getters.micEnabled,
-        this.wallpaperEnabled,
-      );
-      this.stream = await this.streamFilterService.getResultStream();
-      this.streamFilterService.start();
+            store.getters.videoPublished,
+            store.getters.micEnabled,
+            this.wallpaperEnabled,
+        );
+        this.mediaStream = await this.streamFilterService.getResultStream();
+        this.streamFilterService.start();
     }
 
     /* use the stream */
     store.getters.users[0].pluginHandle.createOffer({
       simulcast: false,
       simulcast2: false,
-      stream: this.stream,
+      stream: this.mediaStream,
 
       success: (jsep) => {
         console.log({
@@ -529,8 +529,8 @@ export const janusHelpers = {
         });
         const publish = {
           request: "configure",
-          audio: store.getters.micEnabled,
-          video: store.getters.videoPublished,
+          audio: true,
+          video: true,
         };
         store.getters.users[0].pluginHandle.send({
           message: publish,
