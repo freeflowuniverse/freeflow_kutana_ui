@@ -8,6 +8,9 @@
         class="room"
         v-if="allUsers.length && allScreenUsers.length"
     >
+      <div class="invite">
+        <InviteUsers v-if="users.length <= 1 && showInvitation"/>
+      </div>
         <UserGrid :users="users" :showChat="view === 'chat'">
             <template v-slot:chat>
                 <ChatGrid
@@ -62,10 +65,12 @@
     import Settings from '../components/Settings';
     import ChatMessageNotification from '../components/ChatMessageNotification';
     import { uniqBy } from 'lodash/array';
+    import InviteUsers from '@/components/InviteUsers';
 
     export default {
         name: 'Room',
         components: {
+          InviteUsers,
             Settings,
             UserGrid,
             ControlStrip,
@@ -82,6 +87,7 @@
                 showControls: false,
                 timeout: null,
                 showSettings: false,
+                showInvitation: true
             };
         },
         beforeMount() {
@@ -108,6 +114,10 @@
 
                 return;
             }
+
+            this.$root.$on("closeInvitations", () => {
+              this.showInvitation = false
+            });
 
             if (this.localUser) {
                 return;
@@ -159,19 +169,6 @@
                 }
                 return Math.abs(hash);
             },
-            copyUrl() {
-                navigator.clipboard
-                    .writeText(this.inviteLink)
-                    .then(() => {
-                        this.setSnackbarMessage({
-                            type: '',
-                            text: `Link copied to clipboard`,
-                        });
-                    })
-                    .catch(e => {
-                        console.error(e);
-                    });
-            },
             showControl() {
                 this.showControls = true;
                 clearTimeout(this.timeout);
@@ -192,13 +189,6 @@
                 'account',
                 'userControl',
             ]),
-            inviteLink() {
-                let baseUrl = window.location.href;
-                if (baseUrl.charAt(baseUrl.length - 1) !== '/') {
-                    baseUrl += '/';
-                }
-                return `${baseUrl}`;
-            },
             users() {
                 if (!(this.allUsers.length && this.allScreenUsers.length)) {
                     return [];
@@ -236,5 +226,12 @@
             right: 0;
             z-index: 2;
         }
+    }
+    .invite {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgb(0, 0, 0, 0.5);
+      z-index: 2;
     }
 </style>
