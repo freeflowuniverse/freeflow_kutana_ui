@@ -79,7 +79,9 @@ export default {
         console.log("I am a publisher, cant join again ...")
         return;
       }
-      janusHelpers.screenShare.onJanusCreateSuccess(() => janusHelpers.screenShare.joinScreen(id));
+      setTimeout(() => {
+        janusHelpers.screenShare.onJanusCreateSuccess(() => janusHelpers.screenShare.joinScreen(id));
+      }, 200);
     },
     stopScreenShare(state) {
       state.screenShareRole = null;
