@@ -114,7 +114,7 @@ export const janusHelpers = {
           }
           switch (event) {
             case "joined":
-                console.log(`joined`)
+              console.log(`joined`);
               store.commit("setMyPrivateId", msg["private_id"]);
               janusHelpers.publishOwnFeed();
 
@@ -399,16 +399,13 @@ export const janusHelpers = {
     joinScreen(id) {
       store.commit("setScreenShareRoom", parseInt(id));
       store.commit("setScreenShareRole", "listener");
-
       let me = JSON.parse(window.localStorage.getItem("account"));
-
       const register = {
         request: "join",
         room: store.getters.screenShareRoom,
         ptype: "publisher",
         display: me.name,
       };
-
       console.log(
         "Screen share joined: ",
         store.getters.users[0].screenSharePluginHandle,
