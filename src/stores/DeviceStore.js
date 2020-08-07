@@ -1,25 +1,13 @@
 import Vue from 'vue';
+import { getBoolFromStorage } from '@/utils';
 
 export default {
   state: {
     inputSelection: null, //for which room did you do input selection
     stream: undefined,
-    activeAudioDevice: window.localStorage.getItem("activeAudioDevice")
-      ? JSON.parse(window.localStorage.getItem("activeAudioDevice"))
-      : null,
-    activeAudioOutputDevice: undefined,
-    activeVideoDevice: window.localStorage.getItem("activeVideoDevice")
-      ? JSON.parse(window.localStorage.getItem("activeVideoDevice"))
-      : null,
-    videoPublished: window.localStorage.getItem("videoPublished")
-      ? JSON.parse(window.localStorage.getItem("videoPublished"))
-      : false,
-    micEnabled: window.localStorage.getItem("micEnabled")
-      ? JSON.parse(window.localStorage.getItem("micEnabled"))
-      : false,
-    wallpaperEnabled: window.localStorage.getItem("wallpaperEnabled")
-      ? JSON.parse(window.localStorage.getItem("wallpaperEnabled"))
-      : false,
+    videoPublished: false,
+    micEnabled: false,
+    wallpaperEnabled: false,
     audioDeviceId: null,
     videoDeviceId: null,
     inputDevices: [],
@@ -41,15 +29,15 @@ export default {
       });
     },
     setVideoPublished(state, enabled) {
-      window.localStorage.setItem("videoPublished", enabled);
+      localStorage.setItem("videoPublished", enabled);
       state.videoPublished = enabled;
     },
     setMicEnabled(state, enabled) {
-      window.localStorage.setItem("micEnabled", enabled);
+      localStorage.setItem("micEnabled", enabled);
       state.micEnabled = enabled;
     },
     setWallPaperEnabled(state, enabled) {
-      window.localStorage.setItem("wallpaperEnabled", enabled);
+      localStorage.setItem("wallpaperEnabled", enabled);
       state.wallpaperEnabled = enabled;
     },
     setAudioDeviceId(state, audioDeviceId) {
@@ -66,6 +54,14 @@ export default {
     }
   },
   actions: {
+    async refreshLocalStorageItems({ commit }) {
+      const videoPublished = getBoolFromStorage('videoPublished');
+      const micEnabled = getBoolFromStorage('micEnabled');
+      const wallpaperEnabled = getBoolFromStorage( 'wallpaperEnabled');
+      commit('setVideoPublished', videoPublished);
+      commit('setMicEnabled', micEnabled);
+      commit('setWallPaperEnabled', wallpaperEnabled);
+    },
     async refreshInputDevices({ commit }) {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();

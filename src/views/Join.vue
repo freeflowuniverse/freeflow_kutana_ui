@@ -98,6 +98,10 @@ export default {
     this.refreshInputDevices().then(() => {
       this.updateLocalStream();
     });
+    this.refreshLocalStorageItems().then(() => {
+      this.audio = this.micEnabled;
+      this.video = this.videoPublished;
+    })
   },
   computed: {
     ...mapGetters([
@@ -140,6 +144,7 @@ export default {
       "setVideoPublished",
       "setMicEnabled",
       "setInputSelection",
+      "refreshLocalStorageItems"
     ]),
     disableAudioStream() {
       this.localStream?.getAudioTracks().forEach(audioTrack => {
@@ -157,8 +162,8 @@ export default {
       tracks.push(await this.updateAudioStream());
       tracks.push(await this.updateVideoStream());
 
-      this.audio = !this.hasAudioError
-      this.video = !this.hasVideoError
+      this.audio = !this.hasAudioError && this.audio;
+      this.video = !this.hasVideoError && this.video;
 
       const activeTracks = tracks.filter(
           track => track !== undefined
@@ -166,10 +171,14 @@ export default {
 
       if (activeTracks.length <= 0) {
         this.localStream = null;
+        this.updateDevices();
         return;
       }
 
       this.localStream = new MediaStream(activeTracks);
+      this.updateDevices();
+    },
+    updateDevices() {
       this.videoDevice = this.inputDevices.find(
           d =>
               d.label === this.localStream?.getVideoTracks()[0]?.label
@@ -238,7 +247,8 @@ export default {
       }
 
       this.setStream(this.localStream);
-      this.setVideoPublished(this.videoDevice !== undefined);
+      this.setVideoPublished(this.videoDevice !== undefined && this.video);
+      this.setMicEnabled(this.audioDevice !== undefined && this.audio);
 
       this.setInputSelection(this.$route.params.token);
       this.$router.push({
