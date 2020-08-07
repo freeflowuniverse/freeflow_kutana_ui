@@ -90,10 +90,12 @@ class StreamFilterService {
         await imageWaiter(this.bg)
     }
     async getFrameFromVideo() { //private
+        // grab frame gives issues sometimes
         let image = new Image(); // pre init
-        var capture = await this.imageCapture.grabFrame()
-        image = await createImageBitmap(capture)
-
+        try {
+            var capture = await this.imageCapture.grabFrame()
+            image = await createImageBitmap(capture)
+        } catch {}
         return image
     }
     async init() {

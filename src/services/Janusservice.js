@@ -374,6 +374,7 @@ export const janusHelpers = {
           }
 
           store.commit("setScreenShareRoom", result["room"]);
+          console.log('screenshare room', result["room"])
           let me = JSON.parse(window.localStorage.getItem("account"));
 
           console.log("shareAndPublishScreen Join screen share");
@@ -434,7 +435,7 @@ export const janusHelpers = {
         content: store.getters.screenShareRoom,
       });
 
-      store.getters.users[0].screenSharePluginHandle.detach();
+      store.getters.users[0].screenSharePluginHandle?.detach();
     },
   },
   async changeWallpaper(wallpaperDataUrl) {
@@ -448,18 +449,18 @@ export const janusHelpers = {
     localForage.setItem("wallpaper", wallpaperDataUrl);
   },
   async changeDevice(
-    isCameraActive,
-    isAudioActive,
-    newAudioDeviceId,
-    newVideoDeviceId,
-    wallpaperEnabled,
+      isCameraActive,
+      isAudioActive,
+      newAudioDeviceId,
+      newVideoDeviceId,
+      wallpaperEnabled,
   ) {
     if (!isCameraActive) {
       if (backgroundRemovalActive) {
         this.streamFilterService.changeSettings(
-          isCameraActive,
-          isAudioActive,
-          wallpaperEnabled,
+            isCameraActive,
+            isAudioActive,
+            wallpaperEnabled,
         );
       }
       setTimeout(() => {
@@ -468,12 +469,11 @@ export const janusHelpers = {
       }, 200);
       return;
     }
+
     //Get the video stream again and put it in the filter
     let tempStream;
     try {
-      tempStream = await navigator.mediaDevices.getUserMedia({
-        video: { deviceId: { exact: newVideoDeviceId } },
-      });
+      tempStream = await store.dispatch('getVideoStream', newVideoDeviceId);
     } catch (error) {
       throw error;
     }
@@ -483,9 +483,9 @@ export const janusHelpers = {
       setTimeout(() => {
         this.streamFilterService.startVideo(tempStream);
         this.streamFilterService.changeSettings(
-          isCameraActive,
-          isAudioActive,
-          wallpaperEnabled,
+            isCameraActive,
+            isAudioActive,
+            wallpaperEnabled,
         );
       }, 500);
     }
