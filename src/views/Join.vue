@@ -199,7 +199,9 @@ export default {
     async updateAudioStream() {
       this.disableAudioStream();
       if (!this.audio) {
-        return undefined;
+        return (await this.getAudioStream(
+            this.inputDevices.filter(d => d.label === "audioinput")[0]
+        ))?.getAudioTracks()[0];
       }
       const audioStream = await this.getAudioStream(
           this.audioDevice
