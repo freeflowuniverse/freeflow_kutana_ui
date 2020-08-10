@@ -65,7 +65,7 @@
           </v-row>
           <v-row>
             <v-spacer />
-            <v-btn text @click="joinRoom">Join Room</v-btn>
+            <v-btn :disabled="canJoinRoom" text @click="joinRoom">Join Room</v-btn>
           </v-row>
         </v-card-text>
       </v-card>
@@ -92,6 +92,7 @@ export default {
       audio: true,
       video: true,
       localStream: undefined,
+      updatingLocalStream: false,
     };
   },
   mounted: function() {
@@ -126,6 +127,9 @@ export default {
           d => d.kind === 'audiooutput' && d.label
       );
     },
+    canJoinRoom() {
+      return this.updatingLocalStream;
+    },
     hasAudioError() {
       return this.inputDeviceErrors.hasOwnProperty('audio');
     },
@@ -157,6 +161,7 @@ export default {
       });
     },
     async updateLocalStream() {
+      this.updatingLocalStream = true;
       const tracks = [];
 
       tracks.push(await this.updateAudioStream());
@@ -177,6 +182,7 @@ export default {
 
       this.localStream = new MediaStream(activeTracks);
       this.updateDevices();
+      this.updatingLocalStream = false;
     },
     updateDevices() {
       this.videoDevice = this.inputDevices.find(
@@ -218,14 +224,6 @@ export default {
       );
       return videoStream?.getVideoTracks()[0];
     },
-    async changeDevice() {
-      await this.initialiseDevices({
-        audio: this.audio,
-        video: this.video,
-        audioDevice: this.audioDevice,
-        videoDevice: this.videoDevice,
-      });
-    },
     createDummyMediaStream() {
       const mediaStream = new MediaStream();
       const ctx = new AudioContext();
@@ -244,6 +242,10 @@ export default {
       return mediaStream;
     },
     joinRoom() {
+      if (this.updatingLocalStream) {
+        return;
+      }
+
       if (!this.localStream) {
         this.localStream = this.createDummyMediaStream();
       }
