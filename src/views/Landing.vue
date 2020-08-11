@@ -14,8 +14,8 @@
         <v-row class="io mb-2" justify="center" align="center">
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn fab @click="toggleCam" class="primary mx-2" v-on="on" v-bind="attrs" dark icon>
-                <v-icon>{{ video ? 'videocam' : 'videocam_off' }}</v-icon>
+              <v-btn :disabled="hasVideoError" fab @click="toggleCam" class="primary mx-2" v-on="on" v-bind="attrs" dark icon>
+                <v-icon>{{ video && !hasVideoError ? 'videocam' : 'videocam_off' }}</v-icon>
               </v-btn>
             </template>
             <span>Turn {{ video ? 'Off' : 'On' }} Camera</span>
@@ -23,8 +23,8 @@
 
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
-              <v-btn fab @click="toggleMic" class="primary mx-2" v-on="on" v-bind="attrs" dark icon>
-                <v-icon>{{ audio ? 'mic' : 'mic_off' }}</v-icon>
+              <v-btn :disabled="hasAudioError" fab @click="toggleMic" class="primary mx-2" v-on="on" v-bind="attrs" dark icon>
+                <v-icon>{{ audio && !hasAudioError ? 'mic' : 'mic_off' }}</v-icon>
               </v-btn>
             </template>
             <span>{{ audio ? 'Mute' : 'Unmute' }} Microphone</span>
@@ -108,7 +108,6 @@
                 devices: [],
                 videoDevice: null,
                 audioDevice: null,
-                localStream: null,
                 myBackground: '',
                 showSettings: false,
             };
@@ -125,7 +124,9 @@
               'account',
               'teamName',
               'userControl',
-              'mediaDevices'
+              'mediaDevices',
+              'mediaDeviceErrors',
+              'localStream'
             ]),
             avatar() {
                 const generator = new AvatarGenerator();
@@ -148,9 +149,15 @@
                     d => d.kind === 'audiooutput' && d.label
                 );
             },
+            hasAudioError() {
+              return this.mediaDeviceErrors.hasOwnProperty('audio');
+            },
+            hasVideoError() {
+              return this.mediaDeviceErrors.hasOwnProperty('video');
+            }
         },
         methods: {
-            ...mapMutations(['setLocalStream']),
+            ...mapMutations(['setLocalStream', 'clearMediaDeviceError']),
             ...mapActions([
                 'createTeam',
                 'join',
@@ -179,11 +186,12 @@
                 );
 
                 if (activeTracks.length <= 0) {
-                    this.localStream = null;
+                    this.setLocalStream(null);
                     return;
                 }
 
-                this.localStream = new MediaStream(activeTracks);
+                const localStream = new MediaStream(activeTracks);
+                this.setLocalStream(localStream);
 
                 this.videoDevice = this.mediaDevices.find(
                     d =>
@@ -204,11 +212,11 @@
             },
             async updateVideoStream() {
               this.disableVideoStream();
-                if (!this.video) {
-                  return undefined;
-                }
-                const videoStream = await this.getVideoStream();
-                return videoStream?.getVideoTracks()[0];
+              if (!this.video) {
+                return undefined;
+              }
+              const videoStream = await this.getVideoStream();
+              return videoStream?.getVideoTracks()[0];
             },
             toggleCam() {
                 this.video = !this.video;

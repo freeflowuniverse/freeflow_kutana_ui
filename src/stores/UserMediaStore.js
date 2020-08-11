@@ -19,6 +19,9 @@ export default {
         },
         setMediaDeviceError(state, error) {
             Vue.set(state.mediaDeviceErrors, error.type, error.message)
+        },
+        clearMediaDeviceError(state) {
+          state.mediaDeviceErrors = {};
         }
     },
     actions: {
@@ -42,6 +45,7 @@ export default {
         },
         async getVideoStream({ commit, getters, dispatch }, deviceId = null) {
             if ((deviceId || getters.videoDeviceId) || (!deviceId && getters.videoDeviceId)) {
+                console.log('testtstse')
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         deviceId: deviceId ? deviceId : getters.videoDeviceId,
