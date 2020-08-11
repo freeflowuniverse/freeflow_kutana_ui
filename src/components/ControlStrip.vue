@@ -38,7 +38,7 @@
             <v-icon :small="isMobile">chat_bubble</v-icon>
           </v-btn>
         </template>
-        <span>Open Chat</span>
+        <span>Toggle Chat</span>
       </v-tooltip>
       <v-tooltip top>
         <template v-slot:activator="{ on, attrs }">
@@ -54,7 +54,7 @@
             <v-icon :small="isMobile">settings</v-icon>
           </v-btn>
         </template>
-        <span>Open Settings</span>
+        <span>Toggle Settings</span>
       </v-tooltip>
     </v-row>
 </template>

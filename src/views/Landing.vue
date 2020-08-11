@@ -5,8 +5,8 @@
             <v-col align="center">
                 <h1 class="ttl">FreeFlowConnect</h1>
             </v-col>
-            <v-col cols="1" align="end">
-                <v-btn icon class="pr-6" @click="showSettings = true">
+            <v-col cols="1" align="end" class="pr-6">
+                <v-btn icon @click="showSettings = true">
                     <v-icon>settings</v-icon>
                 </v-btn>
             </v-col>
