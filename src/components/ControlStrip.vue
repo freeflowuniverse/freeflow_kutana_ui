@@ -76,9 +76,6 @@ export default {
             'isMobile',
             'videoDeviceId',
         ]),
-        micEnabled() {
-            return true;
-        },
     },
     methods: {
         ...mapActions(['getAudioStream', 'getVideoStream']),

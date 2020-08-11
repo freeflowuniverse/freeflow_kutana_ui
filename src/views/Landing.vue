@@ -12,12 +12,23 @@
             </v-col>
         </v-row>
         <v-row class="io mb-2" justify="center" align="center">
-            <v-btn fab @click="toggleCam" class="primary mx-2" dark icon>
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn fab @click="toggleCam" class="primary mx-2" v-on="on" v-bind="attrs" dark icon>
                 <v-icon>{{ video ? 'videocam' : 'videocam_off' }}</v-icon>
-            </v-btn>
-            <v-btn fab @click="toggleMic" class="primary mx-2" dark icon>
+              </v-btn>
+            </template>
+            <span>Turn {{ video ? 'Off' : 'On' }} Camera</span>
+          </v-tooltip>
+
+          <v-tooltip top>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn fab @click="toggleMic" class="primary mx-2" v-on="on" v-bind="attrs" dark icon>
                 <v-icon>{{ audio ? 'mic' : 'mic_off' }}</v-icon>
-            </v-btn>
+              </v-btn>
+            </template>
+            <span>{{ audio ? 'Mute' : 'Unmute' }} Microphone</span>
+          </v-tooltip>
         </v-row>
         <v-row class="actions pa-2" justify="center" align="center">
             <v-col cols="4">
