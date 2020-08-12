@@ -205,9 +205,10 @@ export default {
     async updateAudioStream() {
       this.disableAudioStream();
       if (!this.audio) {
-        return (await this.getAudioStream(
+        const defaultAudioStream = await this.getAudioStream(
             this.inputDevices.filter(d => d.label === "audioinput")[0]
-        ))?.getAudioTracks()[0];
+        )?.getAudioTracks()[0];
+        return defaultAudioStream;
       }
       const audioStream = await this.getAudioStream(
           this.audioDevice
@@ -243,6 +244,7 @@ export default {
     },
     joinRoom() {
       if (this.updatingLocalStream) {
+        console.log('Still updating local stream...');
         return;
       }
 
