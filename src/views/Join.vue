@@ -174,9 +174,12 @@ export default {
           track => track !== undefined
       );
 
+      console.log(activeTracks.length)
+
       if (activeTracks.length <= 0) {
         this.localStream = null;
         this.updateDevices();
+        this.updatingLocalStream = false;
         return;
       }
 
@@ -205,9 +208,9 @@ export default {
     async updateAudioStream() {
       this.disableAudioStream();
       if (!this.audio) {
-        const defaultAudioStream = await this.getAudioStream(
+        const defaultAudioStream = (await this.getAudioStream(
             this.inputDevices.filter(d => d.label === "audioinput")[0]
-        )?.getAudioTracks()[0];
+        ))?.getAudioTracks()[0];
         return defaultAudioStream;
       }
       const audioStream = await this.getAudioStream(
