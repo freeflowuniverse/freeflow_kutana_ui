@@ -35,7 +35,7 @@
   </v-row>
 </template>
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters, mapMutations } from "vuex";
 export default {
   data() {
     return {
@@ -53,7 +53,17 @@ export default {
   computed: {
     ...mapGetters(["account", "teamName"])
   },
+  beforeMount() {
+    const userName = this.$route.query.username || this.account?.name;
+
+    if (!userName) {
+      return;
+    }
+
+    this.setAccount({ name: userName });
+  },
   methods: {
+    ...mapMutations(["setAccount"]),
     ...mapActions(["createTeam", "join"]),
     create() {
       this.createTeam();
