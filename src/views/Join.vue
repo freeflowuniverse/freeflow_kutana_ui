@@ -174,8 +174,6 @@ export default {
           track => track !== undefined
       );
 
-      console.log(activeTracks.length)
-
       if (activeTracks.length <= 0) {
         this.localStream = null;
         this.updateDevices();
