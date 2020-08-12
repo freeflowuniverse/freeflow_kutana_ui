@@ -2,16 +2,16 @@
     <v-row justify="center" ref="controlstrip" class="mb-5" style="z-index: 99999999999999999">
       <v-tooltip top>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn @click="toggleCam" class="primary mx-2" dark icon v-bind="attrs" v-on="on" :fab="!isMobile" :loading="isCamLoading">
-            <v-icon :small="isMobile">{{ localUser.cam ? 'videocam' : 'videocam_off' }}</v-icon>
+          <v-btn @click="toggleCam" class="primary mx-2" dark icon v-bind="attrs" v-on="on" :disabled="hasVideoError" :fab="!isMobile" :loading="isCamLoading">
+            <v-icon :small="isMobile">{{ localUser.cam && !hasVideoError ? 'videocam' : 'videocam_off' }}</v-icon>
           </v-btn>
         </template>
         <span>Turn {{ localUser.cam ? 'Off' : 'On' }} Camera</span>
       </v-tooltip>
       <v-tooltip top>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn @click="toggleMic" class="primary mx-2" v-bind="attrs" v-on="on" dark icon :fab="!isMobile" :loading="isMicLoading">
-            <v-icon :small="isMobile">{{ localUser.mic ? 'mic' : 'mic_off' }}</v-icon>
+          <v-btn @click="toggleMic" class="primary mx-2" v-bind="attrs" v-on="on" dark icon :fab="!isMobile" :disabled="hasAudioError" :loading="isMicLoading">
+            <v-icon :small="isMobile">{{ localUser.mic && !hasAudioError ? 'mic' : 'mic_off' }}</v-icon>
           </v-btn>
         </template>
         <span>{{ localUser.mic ? 'Mute' : 'Unmute' }} Microphone</span>
@@ -75,10 +75,20 @@ export default {
             'localScreenUser',
             'isMobile',
             'videoDeviceId',
+            'mediaDeviceErrors'
         ]),
+        hasAudioError() {
+          return this.mediaDeviceErrors.hasOwnProperty('audio');
+        },
+        hasVideoError() {
+          return this.mediaDeviceErrors.hasOwnProperty('video');
+        }
     },
     methods: {
-        ...mapActions(['getAudioStream', 'getVideoStream']),
+        ...mapActions([
+            'getAudioStream',
+            'getVideoStream'
+        ]),
         setLoading(isLoading) {
             //@TODO Make loading animation more good
             this.isMicLoading = isLoading;
@@ -120,6 +130,8 @@ export default {
                 );
                 this.localUser.mic = true;
             }
+
+            this.localUser.cam = true;
             
             setTimeout(() => {
                 this.setLoading(false);

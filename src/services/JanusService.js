@@ -39,7 +39,7 @@ export const initializeJanus = async (
                 videoTrack.canvas.dataset.dummy
             )
         ) {
-            user.cam = true;
+            user.cam = store.getters.videoActive;
             videoTrack.onended = async event => {
                 const localUser = store.getters.localUser;
                 localUser.cam = false;
@@ -53,7 +53,7 @@ export const initializeJanus = async (
             audioTrack &&
             audioTrack.label !== 'MediaStreamAudioDestinationNode'
         ) {
-            user.mic = true;
+            user.mic = store.getters.audioActive;
             audioTrack.onended = async event => {
                 const localUser = store.getters.localUser;
                 localUser.mic = false;

@@ -15,19 +15,19 @@
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
               <v-btn :disabled="hasVideoError" fab @click="toggleCam" class="primary mx-2" v-on="on" v-bind="attrs" dark icon>
-                <v-icon>{{ video && !hasVideoError ? 'videocam' : 'videocam_off' }}</v-icon>
+                <v-icon>{{ videoActive && !hasVideoError ? 'videocam' : 'videocam_off' }}</v-icon>
               </v-btn>
             </template>
-            <span>Turn {{ video ? 'Off' : 'On' }} Camera</span>
+            <span>Turn {{ videoActive ? 'Off' : 'On' }} Camera</span>
           </v-tooltip>
 
           <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
               <v-btn :disabled="hasAudioError" fab @click="toggleMic" class="primary mx-2" v-on="on" v-bind="attrs" dark icon>
-                <v-icon>{{ audio && !hasAudioError ? 'mic' : 'mic_off' }}</v-icon>
+                <v-icon>{{ audioActive && !hasAudioError ? 'mic' : 'mic_off' }}</v-icon>
               </v-btn>
             </template>
-            <span>{{ audio ? 'Mute' : 'Unmute' }} Microphone</span>
+            <span>{{ audioActive ? 'Mute' : 'Unmute' }} Microphone</span>
           </v-tooltip>
         </v-row>
         <v-row class="actions pa-2" justify="center" align="center">
@@ -70,7 +70,7 @@
                 muted
                 ref="localStream"
                 v-if="
-                    video &&
+                    videoActive &&
                         localStream &&
                         localStream.getVideoTracks().length > 0
                 "
@@ -103,8 +103,6 @@
                         this.reg.test(url) || 'Invite url or room ID  invalid',
                 ],
                 inviteUrl: null,
-                video: true,
-                audio: true,
                 devices: [],
                 videoDevice: null,
                 audioDevice: null,
@@ -121,6 +119,8 @@
         },
         computed: {
             ...mapGetters([
+              'audioActive',
+              'videoActive',
               'account',
               'teamName',
               'userControl',
@@ -157,7 +157,12 @@
             }
         },
         methods: {
-            ...mapMutations(['setLocalStream', 'clearMediaDeviceError']),
+            ...mapMutations([
+                'setLocalStream',
+                'clearMediaDeviceError',
+                'toggleAudio',
+                'toggleVideo'
+            ]),
             ...mapActions([
                 'createTeam',
                 'join',
@@ -204,7 +209,7 @@
             },
             async updateAudioStream() {
               this.disableAudioStream();
-              if (!this.audio) {
+              if (!this.audioActive) {
                 return undefined;
               }
               const audioStream = await this.getAudioStream();
@@ -212,18 +217,18 @@
             },
             async updateVideoStream() {
               this.disableVideoStream();
-              if (!this.video) {
+              if (!this.videoActive) {
                 return undefined;
               }
               const videoStream = await this.getVideoStream();
               return videoStream?.getVideoTracks()[0];
             },
             toggleCam() {
-                this.video = !this.video;
+                this.toggleVideo();
                 this.updateLocalStream();
             },
             toggleMic() {
-                this.audio = !this.audio;
+                this.toggleAudio();
                 this.updateLocalStream();
             },
             create() {
@@ -256,7 +261,6 @@
             },
             teamName(val) {
                 if (val) {
-                    this.updateLocalStream();
                     this.$router.push({ name: 'room', params: { token: val } });
                 }
             },

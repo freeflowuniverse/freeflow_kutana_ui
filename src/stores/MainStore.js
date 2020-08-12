@@ -4,8 +4,6 @@ export default {
         snackbarMessage: '',
         localStream: null,
         wallpaperDataUrl: null,
-        camId: null,
-        micId: null,
     },
     mutations: {
         setSnackbarMessage(state, message) {
@@ -17,12 +15,6 @@ export default {
         },
         setLocalStream(state, stream) {
             state.localStream = stream;
-        },
-        setCamId(state, id){
-            state.camId = id
-        },
-        setMicId(state, id) {
-            state.micId = id
         },
         setWallpaperDataUrl(state, wallpaperDataUrl) {
             state.wallpaperDataUrl = wallpaperDataUrl;
@@ -61,8 +53,6 @@ export default {
         },
         snackbarMessage: state => state.snackbarMessage,
         localStream: state => state.localStream,
-        wallpaperDataUrl: state => state.wallpaperDataUrl,
-        camId: state => state.camId,
-        micId: state => state.micId,
+        wallpaperDataUrl: state => state.wallpaperDataUrl
     },
 };

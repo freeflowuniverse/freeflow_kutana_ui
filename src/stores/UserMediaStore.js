@@ -4,6 +4,8 @@ export default {
     state: {
         videoDeviceId: null,
         audioDeviceId: null,
+        audioActive: true,
+        videoActive: true,
         mediaDevices: [],
         mediaDeviceErrors: {}
     },
@@ -22,6 +24,12 @@ export default {
         },
         clearMediaDeviceError(state) {
           state.mediaDeviceErrors = {};
+        },
+        toggleAudio(state) {
+            state.audioActive = !state.audioActive;
+        },
+        toggleVideo(state) {
+            state.videoActive = !state.videoActive;
         }
     },
     actions: {
@@ -45,7 +53,6 @@ export default {
         },
         async getVideoStream({ commit, getters, dispatch }, deviceId = null) {
             if ((deviceId || getters.videoDeviceId) || (!deviceId && getters.videoDeviceId)) {
-                console.log('testtstse')
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         deviceId: deviceId ? deviceId : getters.videoDeviceId,
@@ -108,5 +115,7 @@ export default {
         audioDeviceId: state => state.audioDeviceId,
         mediaDevices: state => state.mediaDevices,
         mediaDeviceErrors: state => state.mediaDeviceErrors,
+        audioActive: state => state.audioActive,
+        videoActive: state => state.videoActive
     },
 };

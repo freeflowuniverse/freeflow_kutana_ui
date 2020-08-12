@@ -66,14 +66,12 @@
                     <v-row justify="center">
                         <v-switch
                             :disabled="hasVideoError"
-                            @change="updateLocalStream"
                             class="pa-2"
                             label="Webcam"
                             v-model="video"
                         />
                         <v-switch
                             :disabled="hasAudioError"
-                            @change="updateLocalStream"
                             class="pa-2"
                             label="Microphone"
                             v-model="audio"
@@ -97,13 +95,20 @@
     export default {
         name: 'JoinRoom',
         methods: {
-            ...mapMutations(['setLocalStream']),
-            ...mapActions(['getVideoStream', 'getAudioStream', 'refreshMediaDevices']),
+            ...mapMutations([
+                'setLocalStream',
+                'toggleAudio',
+                'toggleVideo'
+            ]),
+            ...mapActions([
+                'getVideoStream',
+                'getAudioStream',
+                'refreshMediaDevices'
+            ]),
             joinRoom() {
                 if (!this.localStream) {
                     return;
                 }
-                this.setLocalStream(this.localStream);
 
                 router.push({
                     name: 'room',
@@ -131,11 +136,12 @@
                 );
 
                 if (activeTracks.length <= 0) {
-                    this.localStream = null;
+                    this.setLocalStream(null);
                     return;
                 }
 
-                this.localStream = new MediaStream(activeTracks);
+                const localStream = new MediaStream(activeTracks);
+                this.setLocalStream(localStream);
 
                 this.videoDevice = this.mediaDevices.find(
                     d =>
@@ -147,11 +153,11 @@
                 )?.deviceId;
             },
             changeVideoDevice() {
-                this.video = true;
+                this.toggleVideo();
                 this.updateLocalStream();
             },
             changeAudioDevice() {
-                this.audio = true;
+                this.toggleAudio();
                 this.updateLocalStream();
             },
             async updateAudioStream() {
@@ -186,16 +192,36 @@
         },
         data: function() {
             return {
-                video: true,
-                audio: true,
                 videoDevice: null,
-                audioDevice: null,
-                localStream: null,
+                audioDevice: null
             };
         },
-
         computed: {
-            ...mapGetters(['userControl', 'account', 'mediaDevices', 'mediaDeviceErrors']),
+            ...mapGetters([
+                'userControl',
+                'account',
+                'mediaDevices',
+                'mediaDeviceErrors',
+                'localStream',
+                'audioActive',
+                'videoActive',
+            ]),
+            audio: {
+              get () {
+                return this.audioActive;
+              },
+              set () {
+                return this.toggleAudio();
+              }
+            },
+            video: {
+              get () {
+                return this.videoActive;
+              },
+              set () {
+                return this.toggleVideo();
+              }
+            },
             avatar() {
                 const generator = new AvatarGenerator();
                 return generator.generateRandomAvatar(this.account.name);
