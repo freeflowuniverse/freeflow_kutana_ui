@@ -461,6 +461,9 @@ export const janusHelpers = {
         );
       }
       setTimeout(() => {
+        if (!this.currentVideo) {
+          return;
+        }
         this.currentVideo.stop();
         this.mediaStream.removeTrack(this.currentVideo); // This will stop the camera led, do it 200ms later or get race condition
       }, 200);

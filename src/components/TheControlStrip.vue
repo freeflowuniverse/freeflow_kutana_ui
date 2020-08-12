@@ -68,7 +68,7 @@
     </v-dialog>
     <!-- <v-card class="secondary pa-1" dark v-else> -->
     <v-row class="mx-2" style="height:60px">
-      <v-col cols="5">
+      <v-col cols="3">
         <v-row>
           <v-btn
             @click="toggleCamera"
@@ -92,7 +92,7 @@
         </v-row>
       </v-col>
 
-      <v-col>
+      <v-col cols="6">
         <v-row justify="center" align="center">
           <v-btn v-if="!isMobile" icon class="mx-1" @click="$root.$emit('toggleGridPresentation')">
             <v-icon>{{grid ? 'grid_off' : 'grid_on'}}</v-icon>
@@ -130,7 +130,7 @@
         </v-row>
       </v-col>
 
-      <v-col cols="5">
+      <v-col cols="3">
         <v-row justify="end" align="center">
           <v-btn v-if="minimal" icon class="ml-1" @click="showAddUserDialog">
             <v-icon>person_add</v-icon>
