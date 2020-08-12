@@ -110,7 +110,9 @@ export default {
       "micEnabled",
       "videoPublished",
       "inputDevices",
-      "inputDeviceErrors"
+      "inputDeviceErrors",
+      "audioDeviceId",
+      "videoDeviceId"
     ]),
     videoInputDevices() {
       return this.inputDevices.filter(
@@ -186,14 +188,8 @@ export default {
       this.updatingLocalStream = false;
     },
     updateDevices() {
-      this.videoDevice = this.inputDevices.find(
-          d =>
-              d.label === this.localStream?.getVideoTracks()[0]?.label
-      )?.deviceId;
-      this.audioDevice = this.inputDevices.find(
-          d =>
-              d.label === this.localStream?.getAudioTracks()[0]?.label
-      )?.deviceId;
+      this.videoDevice = this.videoDeviceId;
+      this.audioDevice = this.audioDeviceId;
     },
     changeVideoDevice() {
       this.video = true;
