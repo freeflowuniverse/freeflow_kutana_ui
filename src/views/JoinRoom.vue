@@ -89,6 +89,7 @@
 
 <script>
     import router from '../plugins/router';
+    import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
     import { mapActions, mapGetters, mapMutations } from 'vuex';
     import { AvatarGenerator } from 'random-avatar-generator';
 
@@ -103,7 +104,9 @@
             ...mapActions([
                 'getVideoStream',
                 'getAudioStream',
-                'refreshMediaDevices'
+                'refreshMediaDevices',
+                'updateAudioDevice',
+                'updateVideoDevice'
             ]),
             joinRoom() {
                 if (!this.localStream) {
@@ -115,71 +118,22 @@
                     params: { token: this.$route.params.token },
                 });
             },
-            disableAudioStream() {
-                this.localStream?.getAudioTracks().forEach(audioTrack => {
-                    audioTrack.stop();
+            async changeVideoDevice() {
+                this.updateVideoDevice(this.videoDevice);
+                updateCurrentStream().then(() => {
+                  this.updateMediaDevices();
                 });
             },
-            disableVideoStream() {
-                this.localStream?.getVideoTracks().forEach(videoTrack => {
-                    videoTrack.stop();
+            async changeAudioDevice() {
+                this.updateAudioDevice(this.audioDevice);
+                updateCurrentStream().then(() => {
+                  this.updateMediaDevices();
                 });
             },
-            async updateLocalStream() {
-                const tracks = [];
-
-                tracks.push(await this.updateAudioStream());
-                tracks.push(await this.updateVideoStream());
-
-                const activeTracks = tracks.filter(
-                    track => track !== undefined
-                );
-
-                if (activeTracks.length <= 0) {
-                    this.setLocalStream(null);
-                    return;
-                }
-
-                const localStream = new MediaStream(activeTracks);
-                this.setLocalStream(localStream);
-
-                this.videoDevice = this.mediaDevices.find(
-                    d =>
-                        d.label === this.localStream?.getVideoTracks()[0]?.label
-                )?.deviceId;
-                this.audioDevice = this.mediaDevices.find(
-                    d =>
-                        d.label === this.localStream?.getAudioTracks()[0]?.label
-                )?.deviceId;
-            },
-            changeVideoDevice() {
-                this.toggleVideo();
-                this.updateLocalStream();
-            },
-            changeAudioDevice() {
-                this.toggleAudio();
-                this.updateLocalStream();
-            },
-            async updateAudioStream() {
-              this.disableAudioStream();
-              if (!this.audio) {
-                return undefined;
-              }
-              const audioStream = await this.getAudioStream(
-                  this.audioDevice
-              );
-              return audioStream?.getAudioTracks()[0];
-            },
-            async updateVideoStream() {
-              this.disableVideoStream();
-              if (!this.video) {
-                return undefined;
-              }
-              const videoStream = await this.getVideoStream(
-                  this.videoDevice
-              );
-              return videoStream?.getVideoTracks()[0];
-            },
+            updateMediaDevices() {
+                this.audioDevice = this.audioDeviceId;
+                this.videoDevice = this.videoDeviceId;
+            }
         },
         mounted() {
             if (this.userControl) {
@@ -187,7 +141,9 @@
                 location.reload();
             }
             this.refreshMediaDevices().then(() => {
-                this.updateLocalStream();
+              updateCurrentStream().then(() => {
+                this.updateMediaDevices();
+              });
             });
         },
         data: function() {
@@ -205,13 +161,16 @@
                 'localStream',
                 'audioActive',
                 'videoActive',
+                'videoDeviceId',
+                'audioDeviceId'
             ]),
             audio: {
               get () {
                 return this.audioActive;
               },
               set () {
-                return this.toggleAudio();
+                this.toggleAudio();
+                updateCurrentStream();
               }
             },
             video: {
@@ -219,7 +178,8 @@
                 return this.videoActive;
               },
               set () {
-                return this.toggleVideo();
+                this.toggleVideo();
+                updateCurrentStream();
               }
             },
             avatar() {

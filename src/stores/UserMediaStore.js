@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { disableVideoStream, disableAudioStream } from '@/utils/mediaDevicesUtils';
 
 export default {
     state: {
@@ -30,7 +31,13 @@ export default {
         },
         toggleVideo(state) {
             state.videoActive = !state.videoActive;
-        }
+        },
+        setAudioState(state, isActive) {
+            state.audioActive = isActive;
+        },
+        setVideoState(state, isActive) {
+            state.videoActive = isActive;
+        },
     },
     actions: {
         async refreshMediaDevices({ commit }) {
@@ -41,15 +48,13 @@ export default {
                 commit('setMediaDeviceError', e);
             }
         },
-        updateVideoDevice({ commit, getters }, deviceId) {
-            if (deviceId || (!deviceId && getters.videoDeviceId)) {
-                commit('setVideoDeviceId', deviceId);
-            }
+        updateVideoDevice({ commit }, deviceId) {
+            disableVideoStream();
+            commit('setVideoDeviceId', deviceId);
         },
-        updateAudioDevice({ commit, getters }, deviceId) {
-            if (deviceId || (!deviceId && getters.audioDeviceId)) {
-                commit('setAudioDeviceId', deviceId);
-            }
+        updateAudioDevice({ commit }, deviceId) {
+            disableAudioStream();
+            commit('setAudioDeviceId', deviceId);
         },
         async getVideoStream({ commit, getters, dispatch }, deviceId = null) {
             if ((deviceId || getters.videoDeviceId) || (!deviceId && getters.videoDeviceId)) {
@@ -78,7 +83,7 @@ export default {
             }
         },
         async getAudioStream({ commit, getters, dispatch }, deviceId = null) {
-            if ((deviceId || getters.audioDeviceId) || (!deviceId && getters.audioDeviceId)) {
+            if (getters.audioDeviceId) {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: {
                         deviceId: deviceId ? deviceId : getters.audioDeviceId,

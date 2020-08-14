@@ -96,6 +96,7 @@
     import { removeBackground } from '@/services/backGroundRemovalService';
     import version from '../../public/version';
     import { mapActions, mapGetters } from 'vuex';
+    import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
 
     export default {
         name: 'Settings',
@@ -155,21 +156,15 @@
             ]),
             async changeVideoDevice(videoDeviceId) {
               this.updateVideoDevice(videoDeviceId);
-              if (this.local) {
-                this.$root.$emit('updateLocalStream');
-                return;
-              }
-              const stream = await this.getVideoStream();
-              await this.userControl.publishTrack(stream.getVideoTracks()[0]);
+              updateCurrentStream().then(() => {
+                this.calculateDevices();
+              });
             },
             async changeAudioDevice(audiDeviceId) {
               this.updateAudioDevice(audiDeviceId);
-              if (this.local) {
-                this.$root.$emit('updateLocalStream');
-                return;
-              }
-              const stream = await this.getAudioStream();
-              await this.userControl.publishTrack(stream.getAudioTracks()[0]);
+              updateCurrentStream().then(() => {
+                this.calculateDevices();
+              });
             },
             changeWallpaper() {
               this.changeCameraBackground(this.wallpaperFile);

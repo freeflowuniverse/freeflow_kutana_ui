@@ -1,30 +1,37 @@
 import store from '@/plugins/vuex';
+import { stopIndicesWithElidedDims } from '@tensorflow/tfjs-core/dist/ops/slice_util';
 
 navigator.mediaDevices.ondevicechange = async function() {
     refreshMediaDevices();
+    await updateCurrentStream();
+}
 
-    const videoStream = await store.dispatch('getVideoStream');
-    const audioStream = await store.dispatch('getAudioStream');
+async function updateCurrentStream() {
     const userControl = store.getters.userControl;
 
     if (userControl) {
-        await republishVideo(userControl, videoStream);
-        await republishAudio(userControl, audioStream);
+        console.log("updating publish stream")
+        await republishVideo();
+        await republishAudio();
         return;
     }
 
-    const localStream = getLocalStream(videoStream, audioStream);
+    console.log("updating local stream")
+    const localStream = await getLocalStream();
     store.commit('setLocalStream', localStream);
 }
 
-function getLocalStream(videoStream, audioStream) {
+async function getLocalStream() {
     const tracks = [];
 
-    tracks.push(videoStream?.getVideoTracks()[0]);
-    tracks.push(audioStream?.getAudioTracks()[0]);
+    const updatedAudioStream = await updateAudioStream();
+    const updatedVideoStream = await updateVideoStream();
+
+    tracks.push(updatedAudioStream);
+    tracks.push(updatedVideoStream);
 
     const activeTracks = tracks.filter(
-        track => track
+        track => track && track.readyState === 'live'
     );
 
     if (activeTracks.length <= 0) {
@@ -34,33 +41,114 @@ function getLocalStream(videoStream, audioStream) {
     return new MediaStream(activeTracks);
 }
 
-async function republishVideo(userControl, videoStream) {
-    const user = store.getters.localUser;
+async function republishVideo() {
+    const userControl = store.getters.userControl;
 
-    if (videoStream && user.cam) {
-        await userControl.publishTrack(videoStream.getVideoTracks()[0]);
+    console.log("republishing video")
+    if (!store.getters.videoActive && store.getters.localUser.stream.getVideoTracks().length > 0) {
+        userControl.stopVideoTrack();
         return;
     }
 
-    user.cam = false;
-    store.commit('setLocalUser', user);
+    if (!store.getters.videoActive) {
+        await republishAudio();
+        return;
+    }
+
+    const videoStream = await store.dispatch('getVideoStream');
+    if (!videoStream) {
+        store.commit('setVideoDeviceId', null);
+        store.commit('setVideoState', false);
+        return;
+    }
+    await userControl.publishTrack(
+        videoStream?.getVideoTracks()[0],
+        store.getters.videoActive,
+        store.getters.audioActive
+    );
 }
 
-async function republishAudio(userControl, audioStream) {
-    const user = store.getters.localUser;
+async function republishAudio() {
+    const userControl = store.getters.userControl;
 
-    if (audioStream && user.mic) {
-        await userControl.publishTrack(audioStream?.getAudioTracks()[0]);
+    console.log("republishing audio")
+    if (!store.getters.audioActive && store.getters.localUser.stream.getAudioTracks().length > 0) {
+        userControl.stopAudioTrack();
         return;
     }
 
-    user.mic = false;
-    store.commit('setLocalUser', user);
+    if (!store.getters.audioActive) {
+        return;
+    }
+
+    const audioStream = await store.dispatch('getAudioStream')
+
+    if (!audioStream) {
+        store.commit('setAudioDeviceId', null);
+        store.commit('setAudioState', false);
+        return;
+    }
+
+    await userControl.publishTrack(
+        audioStream?.getAudioTracks()[0],
+        store.getters.videoActive,
+        store.getters.audioActive
+    );
+}
+
+function disableAudioStream() {
+    store.getters.localStream?.getAudioTracks().forEach(audioTrack => {
+        audioTrack.stop();
+    });
+}
+
+function disableVideoStream() {
+    store.getters.localStream?.getVideoTracks().forEach(videoTrack => {
+        videoTrack.stop();
+    });
+}
+
+//@TODO when stream is initialised it will always return the same stream over and over again
+async function updateAudioStream() {
+    if (!store.getters.audioActive) {
+        disableAudioStream();
+        return undefined;
+    }
+    if (!store.getters.localStream || store.getters.localStream?.getAudioTracks().length <= 0) {
+        const audioStream = await store.dispatch(
+            'getAudioStream'
+        );
+        return audioStream?.getAudioTracks()[0];
+    }
+    return store.getters.localStream.getAudioTracks()[0];
+}
+
+async function updateVideoStream() {
+    if (!store.getters.videoActive) {
+        disableVideoStream();
+        return undefined;
+    }
+    if (!store.getters.localStream || store.getters.localStream?.getVideoTracks().length <= 0
+        || store.getters.localStream.getVideoTracks()[0].readyState === 'ended') {
+        const videoStream = await store.dispatch(
+            'getVideoStream'
+        );
+        return videoStream?.getVideoTracks()[0];
+    }
+    return store.getters.localStream.getVideoTracks()[0];
 }
 
 function refreshMediaDevices() {
     store.dispatch('refreshMediaDevices');
     store.commit('clearMediaDeviceError');
-    store.commit('setVideoDeviceId', null);
     store.commit('setAudioDeviceId', null);
+    store.commit('setVideoDeviceId', null);
+}
+
+export {
+    updateCurrentStream,
+    republishAudio,
+    republishVideo,
+    disableAudioStream,
+    disableVideoStream
 }

@@ -3,18 +3,18 @@
       <v-tooltip top>
         <template v-slot:activator="{ on, attrs }">
           <v-btn @click="toggleCam" class="primary mx-2" dark icon v-bind="attrs" v-on="on" :disabled="hasVideoError" :fab="!isMobile" :loading="isCamLoading">
-            <v-icon :small="isMobile">{{ localUser.cam && !hasVideoError ? 'videocam' : 'videocam_off' }}</v-icon>
+            <v-icon :small="isMobile">{{ videoActive && !hasVideoError ? 'videocam' : 'videocam_off' }}</v-icon>
           </v-btn>
         </template>
-        <span>Turn {{ localUser.cam ? 'Off' : 'On' }} Camera</span>
+        <span>Turn {{ videoActive ? 'Off' : 'On' }} Camera</span>
       </v-tooltip>
       <v-tooltip top>
         <template v-slot:activator="{ on, attrs }">
           <v-btn @click="toggleMic" class="primary mx-2" v-bind="attrs" v-on="on" dark icon :fab="!isMobile" :disabled="hasAudioError" :loading="isMicLoading">
-            <v-icon :small="isMobile">{{ localUser.mic && !hasAudioError ? 'mic' : 'mic_off' }}</v-icon>
+            <v-icon :small="isMobile">{{ audioActive && !hasAudioError ? 'mic' : 'mic_off' }}</v-icon>
           </v-btn>
         </template>
-        <span>{{ localUser.mic ? 'Mute' : 'Unmute' }} Microphone</span>
+        <span>{{ audioActive ? 'Mute' : 'Unmute' }} Microphone</span>
       </v-tooltip>
       <v-tooltip top>
         <template v-slot:activator="{ on, attrs }">
@@ -59,7 +59,8 @@
     </v-row>
 </template>
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapMutations, mapGetters } from 'vuex';
+import { republishAudio, republishVideo, updateCurrentStream } from '@/utils/mediaDevicesUtils';
 
 export default {
     data: () => {
@@ -75,7 +76,9 @@ export default {
             'localScreenUser',
             'isMobile',
             'videoDeviceId',
-            'mediaDeviceErrors'
+            'mediaDeviceErrors',
+            'audioActive',
+            'videoActive'
         ]),
         hasAudioError() {
           return this.mediaDeviceErrors.hasOwnProperty('audio');
@@ -87,7 +90,12 @@ export default {
     methods: {
         ...mapActions([
             'getAudioStream',
-            'getVideoStream'
+            'getVideoStream',
+        ]),
+        ...mapMutations([
+            'setLocalUser',
+            'toggleAudio',
+            'toggleVideo'
         ]),
         setLoading(isLoading) {
             //@TODO Make loading animation more good
@@ -95,61 +103,23 @@ export default {
             this.isCamLoading = isLoading; 
         },
         async toggleCam() {
-            const micOn = this.localUser.mic;
-            this.setLoading(true);
-            if (this.localUser.cam) {
-                this.userControl.stopVideoTrack();
-                this.localUser.cam = false;
-                if (micOn) {
-                    const stream = await this.getAudioStream();
-                    await this.userControl.publishTrack(
-                        stream.getAudioTracks()[0],
-                        false,
-                        true
-                    );
-                    this.localUser.mic = true;
-                }
-                setTimeout(() => {
-                    this.setLoading(false);
-                }, 100);
-                return;
-            }
-            const stream = await this.getVideoStream();
-            await this.userControl.publishTrack(
-                stream.getVideoTracks()[0], 
-                true,
-                this.localUser.mic
-            );
-
-            if (micOn) {
-                const stream = await this.getAudioStream();
-                await this.userControl.publishTrack(
-                    stream.getAudioTracks()[0],
-                    true,
-                    true
-                );
-                this.localUser.mic = true;
-            }
-
-            this.localUser.cam = true;
-            
-            setTimeout(() => {
-                this.setLoading(false);
-            }, 100);
+          this.setLoading(true);
+            this.toggleVideo();
+            await republishVideo();
+            /*if (this.audioActive) {
+              await republishAudio();
+            }*/
+          setTimeout(() => {
+            this.setLoading(false);
+          }, 500);
         },
         async toggleMic() {
-            if (this.localUser.mic) {
-                this.userControl.stopAudioTrack();
-                this.localUser.mic = false;
-                return;
-            }
-            const stream = await this.getAudioStream();
-            await this.userControl.publishTrack(
-                stream.getAudioTracks()[0],
-                this.localUser.cam,
-                true
-            );
-            this.localUser.mic = true;
+          this.setLoading(true);
+            this.toggleAudio();
+            await updateCurrentStream();
+          setTimeout(() => {
+            this.setLoading(false);
+          }, 500);
         },
         screen() {
             this.userControl.startScreenShare();

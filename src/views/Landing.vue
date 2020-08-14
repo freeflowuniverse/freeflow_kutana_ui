@@ -85,6 +85,7 @@
 </template>
 <script>
     import { mapActions, mapMutations, mapGetters } from 'vuex';
+    import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
     import { AvatarGenerator } from 'random-avatar-generator';
     import Settings from '../components/Settings';
     export default {
@@ -103,19 +104,16 @@
                         this.reg.test(url) || 'Invite url or room ID  invalid',
                 ],
                 inviteUrl: null,
-                devices: [],
-                videoDevice: null,
-                audioDevice: null,
                 myBackground: '',
                 showSettings: false,
             };
         },
         async mounted() {
           this.refreshMediaDevices().then(() => {
-            this.updateLocalStream();
+            updateCurrentStream();
           });
           this.getBackgroundOfMine();
-          this.$root.$on("updateLocalStream", this.updateLocalStream);
+          this.$root.$on("updateLocalStream", updateCurrentStream);
         },
         computed: {
             ...mapGetters([
@@ -132,21 +130,6 @@
                 const generator = new AvatarGenerator();
                 return generator.generateRandomAvatar(
                     this.account && this.account.name ? this.account.name : ''
-                );
-            },
-            videoInputDevices() {
-                return this.devices.filter(
-                    d => d.kind === 'videoinput' && d.label
-                );
-            },
-            audioInputDevices() {
-                return this.devices.filter(
-                    d => d.kind === 'audioinput' && d.label
-                );
-            },
-            audioOutputDevices() {
-                return this.devices.filter(
-                    d => d.kind === 'audiooutput' && d.label
                 );
             },
             hasAudioError() {
@@ -170,73 +153,20 @@
                 'getAudioStream',
                 'refreshMediaDevices',
             ]),
-            disableAudioStream() {
-                this.localStream?.getAudioTracks().forEach(audioTrack => {
-                    audioTrack.stop();
-                });
-            },
-            disableVideoStream() {
-                this.localStream?.getVideoTracks().forEach(videoTrack => {
-                    videoTrack.stop();
-                });
-            },
-            async updateLocalStream() {
-                const tracks = [];
-
-                tracks.push(await this.updateAudioStream());
-                tracks.push(await this.updateVideoStream());
-
-                const activeTracks = tracks.filter(
-                    track => track !== undefined
-                );
-
-                if (activeTracks.length <= 0) {
-                    this.setLocalStream(null);
-                    return;
-                }
-
-                const localStream = new MediaStream(activeTracks);
-                this.setLocalStream(localStream);
-
-                this.videoDevice = this.mediaDevices.find(
-                    d =>
-                        d.label === this.localStream?.getVideoTracks()[0]?.label
-                )?.deviceId;
-                this.audioDevice = this.mediaDevices.find(
-                    d =>
-                        d.label === this.localStream?.getAudioTracks()[0]?.label
-                )?.deviceId;
-            },
-            async updateAudioStream() {
-              this.disableAudioStream();
-              if (!this.audioActive) {
-                return undefined;
-              }
-              const audioStream = await this.getAudioStream();
-              return audioStream?.getAudioTracks()[0];
-            },
-            async updateVideoStream() {
-              this.disableVideoStream();
-              if (!this.videoActive) {
-                return undefined;
-              }
-              const videoStream = await this.getVideoStream();
-              return videoStream?.getVideoTracks()[0];
-            },
             toggleCam() {
                 this.toggleVideo();
-                this.updateLocalStream();
+                updateCurrentStream();
             },
             toggleMic() {
                 this.toggleAudio();
-                this.updateLocalStream();
+                updateCurrentStream();
             },
             create() {
                 this.createTeam();
             },
             joinRoom() {
                 if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
-                    this.updateLocalStream();
+                    updateCurrentStream();
                     this.$router.push({
                         name: 'room',
                         params: {

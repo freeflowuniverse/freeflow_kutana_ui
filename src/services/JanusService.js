@@ -39,7 +39,7 @@ export const initializeJanus = async (
                 videoTrack.canvas.dataset.dummy
             )
         ) {
-            user.cam = store.getters.videoActive;
+            user.cam = true;
             videoTrack.onended = async event => {
                 const localUser = store.getters.localUser;
                 localUser.cam = false;
@@ -53,7 +53,7 @@ export const initializeJanus = async (
             audioTrack &&
             audioTrack.label !== 'MediaStreamAudioDestinationNode'
         ) {
-            user.mic = store.getters.audioActive;
+            user.mic = true;
             audioTrack.onended = async event => {
                 const localUser = store.getters.localUser;
                 localUser.mic = false;
@@ -194,33 +194,11 @@ export const initializeJanus = async (
         publishTrack: async (track, video, audio) => {
             await videoRoomPlugin.publishTrack(track, video, audio);
         },
-        stopVideoTrack: (audioTrack = false) => {
-            //@todo: move this
+        stopVideoTrack: () => {
             videoRoomPlugin.myStream.getVideoTracks()[0].stop();
             videoRoomPlugin.myStream
                 .getVideoTracks()[0]
                 .dispatchEvent(new Event('ended'));
-            window.janusshizzle.videoRoomPlugin.pluginHandle.hangup();
-            if (audioTrack) {
-                window.janusshizzle.videoRoomPlugin.pluginHandle.createOffer({
-                    stream: new MediaStream([audioTrack]),
-                    success: jsep => {
-                        const publish = {
-                            request: 'configure',
-                            audio: true,
-                            video: false,
-                        };
-
-                        window.janusshizzle.videoRoomPlugin.pluginHandle.send({
-                            message: publish,
-                            jsep: jsep,
-                            success: e => {},
-                            error: () => {},
-                        });
-                    },
-                    error: error => {},
-                });
-            }
         },
         stopAudioTrack: () => {
             videoRoomPlugin.myStream.getAudioTracks()[0].stop();
