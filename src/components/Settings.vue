@@ -93,10 +93,10 @@
 </template>
 
 <script>
-    import { removeBackground } from '@/services/backGroundRemovalService';
+    import { removeBackground } from '../services/backGroundRemovalService';
     import version from '../../public/version';
     import { mapActions, mapGetters } from 'vuex';
-    import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
+    import { updateCurrentStream } from '../utils/mediaDevicesUtils';
 
     export default {
         name: 'Settings',

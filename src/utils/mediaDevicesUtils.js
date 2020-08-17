@@ -1,17 +1,19 @@
 import store from '@/plugins/vuex';
 
-navigator.mediaDevices.ondevicechange = async function() {
-    refreshMediaDevices();
-    await updateCurrentStream();
+export const initMediaDeviceDetection = async () => {
+    navigator.mediaDevices.ondevicechange = async function() {
+        refreshMediaDevices();
+        await updateCurrentStream();
+    }
 }
 
 export const updateCurrentStream = async () => {
     const userControl = store.getters.userControl;
 
     if (userControl) {
-        console.log("updating publish stream")
-        await republishVideo();
-        await republishAudio();
+        console.log("updating published stream")
+        await updateVideoStream();
+        await updateAudioStream();
         return;
     }
 
@@ -23,8 +25,8 @@ export const updateCurrentStream = async () => {
 const getLocalStream = async () => {
     const tracks = [];
 
-    const updatedAudioStream = await updateAudioStream();
-    const updatedVideoStream = await updateVideoStream();
+    const updatedAudioStream = await updateLocalAudioStream();
+    const updatedVideoStream = await updateLocalVideoStream();
 
     tracks.push(updatedAudioStream);
     tracks.push(updatedVideoStream);
@@ -40,17 +42,17 @@ const getLocalStream = async () => {
     return new MediaStream(activeTracks);
 }
 
-const republishVideo = async () => {
+const updateVideoStream = async () => {
     const userControl = store.getters.userControl;
 
-    console.log("republishing video")
+    console.log("updating video stream")
     if (!store.getters.videoActive && store.getters.localUser.stream.getVideoTracks().length > 0) {
         userControl.stopVideoTrack();
         return;
     }
 
     if (!store.getters.videoActive) {
-        await republishAudio();
+        await updateAudioStream();
         return;
     }
 
@@ -67,10 +69,10 @@ const republishVideo = async () => {
     );
 }
 
-const republishAudio = async () => {
+const updateAudioStream = async () => {
     const userControl = store.getters.userControl;
 
-    console.log("republishing audio")
+    console.log("updating audio stream")
     if (!store.getters.audioActive && store.getters.localUser.stream.getAudioTracks().length > 0) {
         userControl.stopAudioTrack();
         return;
@@ -109,7 +111,7 @@ export const disableVideoStream = () => {
     });
 }
 
-const updateAudioStream = async () => {
+const updateLocalAudioStream = async () => {
     if (!store.getters.audioActive) {
         disableAudioStream();
         return;
@@ -125,7 +127,7 @@ const updateAudioStream = async () => {
     return store.getters.localStream.getAudioTracks()[0];
 }
 
-const updateVideoStream = async () => {
+const updateLocalVideoStream = async () => {
     if (!store.getters.videoActive) {
         disableVideoStream();
         return;

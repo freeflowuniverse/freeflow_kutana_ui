@@ -89,7 +89,7 @@
 
 <script>
     import router from '../plugins/router';
-    import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
+    import { updateCurrentStream } from '../utils/mediaDevicesUtils';
     import { mapActions, mapGetters, mapMutations } from 'vuex';
     import { AvatarGenerator } from 'random-avatar-generator';
 
@@ -98,8 +98,8 @@
         methods: {
             ...mapMutations([
                 'setLocalStream',
-                'toggleAudio',
-                'toggleVideo'
+                'toggleAudioActive',
+                'toggleVideoActive'
             ]),
             ...mapActions([
                 'getVideoStream',
@@ -168,7 +168,7 @@
                 return this.audioActive;
               },
               set () {
-                this.toggleAudio();
+                this.toggleAudioActive();
                 updateCurrentStream();
               }
             },
@@ -177,7 +177,7 @@
                 return this.videoActive;
               },
               set () {
-                this.toggleVideo();
+                this.toggleVideoActive();
                 updateCurrentStream();
               }
             },

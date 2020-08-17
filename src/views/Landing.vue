@@ -143,8 +143,8 @@
             ...mapMutations([
                 'setLocalStream',
                 'clearMediaDeviceError',
-                'toggleAudio',
-                'toggleVideo'
+                'toggleAudioActive',
+                'toggleVideoActive'
             ]),
             ...mapActions([
                 'createTeam',
@@ -154,11 +154,11 @@
                 'refreshMediaDevices',
             ]),
             toggleCam() {
-                this.toggleVideo();
+                this.toggleVideoActive();
                 updateCurrentStream();
             },
             toggleMic() {
-                this.toggleAudio();
+                this.toggleAudioActive();
                 updateCurrentStream();
             },
             create() {

@@ -60,7 +60,7 @@
 </template>
 <script>
 import { mapActions, mapMutations, mapGetters } from 'vuex';
-import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
+import { updateCurrentStream } from '../utils/mediaDevicesUtils';
 
 export default {
     data: () => {
@@ -94,8 +94,8 @@ export default {
         ]),
         ...mapMutations([
             'setLocalUser',
-            'toggleAudio',
-            'toggleVideo'
+            'toggleAudioActive',
+            'toggleVideoActive'
         ]),
         setLoading(isLoading) {
             //@TODO Make loading animation more good
@@ -104,7 +104,7 @@ export default {
         },
         async toggleCam() {
             this.setLoading(true);
-            this.toggleVideo();
+            this.toggleVideoActive();
             await updateCurrentStream();
             //Arbitrary time
             setTimeout(() => {
@@ -113,7 +113,7 @@ export default {
         },
         async toggleMic() {
             this.setLoading(true);
-            this.toggleAudio();
+            this.toggleAudioActive();
             await updateCurrentStream();
             //Arbitrary time
             setTimeout(() => {

@@ -26,10 +26,10 @@ export default {
         clearMediaDeviceError(state) {
           state.mediaDeviceErrors = {};
         },
-        toggleAudio(state) {
+        toggleAudioActive(state) {
             state.audioActive = !state.audioActive;
         },
-        toggleVideo(state) {
+        toggleVideoActive(state) {
             state.videoActive = !state.videoActive;
         },
         setAudioState(state, isActive) {
@@ -56,14 +56,14 @@ export default {
             disableAudioStream();
             commit('setAudioDeviceId', deviceId);
         },
-        async getVideoStream({ commit, getters, dispatch }, deviceId = null) {
-            if ((deviceId || getters.videoDeviceId) || (!deviceId && getters.videoDeviceId)) {
+        async getVideoStream({ commit, getters, dispatch }) {
+            if (getters.videoDeviceId) {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        deviceId: deviceId ? deviceId : getters.videoDeviceId,
+                        deviceId: getters.videoDeviceId,
                     },
                 });
-                commit('setVideoDeviceId', deviceId ? deviceId : getters.videoDeviceId);
+                commit('setVideoDeviceId', getters.videoDeviceId);
                 return stream;
             }
             try {
@@ -82,14 +82,14 @@ export default {
                 commit('setMediaDeviceError', { type: 'video', message: e.message});
             }
         },
-        async getAudioStream({ commit, getters, dispatch }, deviceId = null) {
+        async getAudioStream({ commit, getters, dispatch }) {
             if (getters.audioDeviceId) {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: {
-                        deviceId: deviceId ? deviceId : getters.audioDeviceId,
+                        deviceId: getters.audioDeviceId,
                     },
                 });
-                commit('setAudioDeviceId', deviceId ? deviceId : getters.audioDeviceId);
+                commit('setAudioDeviceId', getters.audioDeviceId);
                 return stream;
             }
             try {
