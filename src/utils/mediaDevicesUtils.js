@@ -1,12 +1,11 @@
 import store from '@/plugins/vuex';
-import { stopIndicesWithElidedDims } from '@tensorflow/tfjs-core/dist/ops/slice_util';
 
 navigator.mediaDevices.ondevicechange = async function() {
     refreshMediaDevices();
     await updateCurrentStream();
 }
 
-async function updateCurrentStream() {
+export const updateCurrentStream = async () => {
     const userControl = store.getters.userControl;
 
     if (userControl) {
@@ -21,7 +20,7 @@ async function updateCurrentStream() {
     store.commit('setLocalStream', localStream);
 }
 
-async function getLocalStream() {
+const getLocalStream = async () => {
     const tracks = [];
 
     const updatedAudioStream = await updateAudioStream();
@@ -41,7 +40,7 @@ async function getLocalStream() {
     return new MediaStream(activeTracks);
 }
 
-async function republishVideo() {
+const republishVideo = async () => {
     const userControl = store.getters.userControl;
 
     console.log("republishing video")
@@ -68,7 +67,7 @@ async function republishVideo() {
     );
 }
 
-async function republishAudio() {
+const republishAudio = async () => {
     const userControl = store.getters.userControl;
 
     console.log("republishing audio")
@@ -81,7 +80,9 @@ async function republishAudio() {
         return;
     }
 
-    const audioStream = await store.dispatch('getAudioStream')
+    const audioStream = await store.dispatch(
+        'getAudioStream'
+    );
 
     if (!audioStream) {
         store.commit('setAudioDeviceId', null);
@@ -96,25 +97,26 @@ async function republishAudio() {
     );
 }
 
-function disableAudioStream() {
+export const disableAudioStream = () => {
     store.getters.localStream?.getAudioTracks().forEach(audioTrack => {
         audioTrack.stop();
     });
 }
 
-function disableVideoStream() {
+export const disableVideoStream = () => {
     store.getters.localStream?.getVideoTracks().forEach(videoTrack => {
         videoTrack.stop();
     });
 }
 
-//@TODO when stream is initialised it will always return the same stream over and over again
-async function updateAudioStream() {
+const updateAudioStream = async () => {
     if (!store.getters.audioActive) {
         disableAudioStream();
-        return undefined;
+        return;
     }
-    if (!store.getters.localStream || store.getters.localStream?.getAudioTracks().length <= 0) {
+    if (!store.getters.localStream
+        || store.getters.localStream?.getAudioTracks().length <= 0
+        || store.getters.localStream?.getAudioTracks()[0].readyState === 'ended') {
         const audioStream = await store.dispatch(
             'getAudioStream'
         );
@@ -123,13 +125,14 @@ async function updateAudioStream() {
     return store.getters.localStream.getAudioTracks()[0];
 }
 
-async function updateVideoStream() {
+const updateVideoStream = async () => {
     if (!store.getters.videoActive) {
         disableVideoStream();
-        return undefined;
+        return;
     }
-    if (!store.getters.localStream || store.getters.localStream?.getVideoTracks().length <= 0
-        || store.getters.localStream.getVideoTracks()[0].readyState === 'ended') {
+    if (!store.getters.localStream
+        || store.getters.localStream?.getVideoTracks().length <= 0
+        || store.getters.localStream?.getVideoTracks()[0].readyState === 'ended') {
         const videoStream = await store.dispatch(
             'getVideoStream'
         );
@@ -138,17 +141,9 @@ async function updateVideoStream() {
     return store.getters.localStream.getVideoTracks()[0];
 }
 
-function refreshMediaDevices() {
+const refreshMediaDevices = () => {
     store.dispatch('refreshMediaDevices');
     store.commit('clearMediaDeviceError');
     store.commit('setAudioDeviceId', null);
     store.commit('setVideoDeviceId', null);
-}
-
-export {
-    updateCurrentStream,
-    republishAudio,
-    republishVideo,
-    disableAudioStream,
-    disableVideoStream
 }

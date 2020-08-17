@@ -140,10 +140,9 @@
                 this.userControl.hangUp();
                 location.reload();
             }
-            this.refreshMediaDevices().then(() => {
-              updateCurrentStream().then(() => {
-                this.updateMediaDevices();
-              });
+
+            updateCurrentStream().then(() => {
+              this.updateMediaDevices();
             });
         },
         data: function() {

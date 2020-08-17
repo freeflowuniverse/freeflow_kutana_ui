@@ -1,4 +1,5 @@
 import store from '../plugins/vuex';
+import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
 
 export class VideoRoomPlugin {
     constructor(opaqueId, bitrateCap = false, debugString = 'video') {

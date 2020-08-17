@@ -60,7 +60,7 @@
 </template>
 <script>
 import { mapActions, mapMutations, mapGetters } from 'vuex';
-import { republishAudio, republishVideo, updateCurrentStream } from '@/utils/mediaDevicesUtils';
+import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
 
 export default {
     data: () => {
@@ -103,23 +103,22 @@ export default {
             this.isCamLoading = isLoading; 
         },
         async toggleCam() {
-          this.setLoading(true);
+            this.setLoading(true);
             this.toggleVideo();
-            await republishVideo();
-            /*if (this.audioActive) {
-              await republishAudio();
-            }*/
-          setTimeout(() => {
-            this.setLoading(false);
-          }, 500);
+            await updateCurrentStream();
+            //Arbitrary time
+            setTimeout(() => {
+              this.setLoading(false);
+            }, 100);
         },
         async toggleMic() {
-          this.setLoading(true);
+            this.setLoading(true);
             this.toggleAudio();
             await updateCurrentStream();
-          setTimeout(() => {
-            this.setLoading(false);
-          }, 500);
+            //Arbitrary time
+            setTimeout(() => {
+              this.setLoading(false);
+            }, 100);
         },
         screen() {
             this.userControl.startScreenShare();

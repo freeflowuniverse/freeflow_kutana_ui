@@ -1,6 +1,7 @@
 import { JanusBuilder } from '../januswrapper/JanusBuilder';
 import { VideoRoomPlugin } from '../januswrapper/VideoRoomPlugin';
 import store from '../plugins/vuex';
+import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
 
 export const initializeJanus = async (
     serverUrl,
@@ -152,8 +153,8 @@ export const initializeJanus = async (
     screenShareRoomPlugin.addEventListener('userLeft', screenUser => {
         store.commit('deleteRemoteScreenUser', screenUser);
     });
-    screenShareRoomPlugin.addEventListener('cleanupUser', screenUser => {
-        if (store.dispatch('findScreenUserById', screenUser.id)) {
+    screenShareRoomPlugin.addEventListener('cleanupUser', async screenUser => {
+        if (await store.dispatch('findScreenUserById', screenUser.id)) {
             store.commit('addRemoteScreenUser', screenUser);
             return;
         }

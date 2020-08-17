@@ -162,9 +162,8 @@
             },
             async changeAudioDevice(audiDeviceId) {
               this.updateAudioDevice(audiDeviceId);
-              updateCurrentStream().then(() => {
-                this.calculateDevices();
-              });
+              await updateCurrentStream();
+              await this.calculateDevices();
             },
             changeWallpaper() {
               this.changeCameraBackground(this.wallpaperFile);
