@@ -156,9 +156,8 @@
             ]),
             async changeVideoDevice(videoDeviceId) {
               this.updateVideoDevice(videoDeviceId);
-              updateCurrentStream().then(() => {
-                this.calculateDevices();
-              });
+              await updateCurrentStream();
+              await this.calculateDevices();
             },
             async changeAudioDevice(audiDeviceId) {
               this.updateAudioDevice(audiDeviceId);
