@@ -95,7 +95,7 @@
 <script>
     import { removeBackground } from '@/services/backGroundRemovalService';
     import version from '../../public/version';
-    import { mapActions, mapGetters } from 'vuex';
+    import { mapActions, mapMutations, mapGetters } from 'vuex';
 
     export default {
         name: 'Settings',
@@ -151,7 +151,10 @@
               'getAudioStream',
               'updateVideoDevice',
               'updateAudioDevice',
-              'changeCameraBackground'
+              'changeCameraBackground',
+              'clearActiveBackground',
+              'setActiveBackground',
+              'setBackgroundTrack',
             ]),
             async changeVideoDevice(videoDeviceId) {
               this.updateVideoDevice(videoDeviceId);
@@ -177,7 +180,7 @@
             },
             async toggleBackgroundRemoval(newBackgroundRemove) {
               const stream = await this.getVideoStream();
-              this.clearExistingBackground();
+              this.clearActiveBackground();
               if (!newBackgroundRemove) {
                 await this.userControl.publishTrack(
                     stream.getVideoTracks()[0]
@@ -188,15 +191,9 @@
                   stream.getVideoTracks()[0],
                   this.getWallpaperImage
               );
-              this.renderLoop = renderLoop;
-              window.track = track;
+              this.setActiveBackground(renderLoop);
+              this.setBackgroundTrack(track);
               await this.userControl.publishTrack(track);
-            },
-            clearExistingBackground() {
-              if (this.renderLoop) {
-                window.track.stop();
-                clearInterval(this.renderLoop);
-              }
             },
             async calculateDevices() {
                 this.videoDevices = this.mediaDevices.filter(

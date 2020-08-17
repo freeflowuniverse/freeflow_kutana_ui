@@ -17,7 +17,6 @@ export const removeBackground = async (
             outputStride: 16,
             multiplier: 0.75,
             quantBytes: 2
-
         });
     }
     if (!document.querySelector('#bgremovalcanvas')) {
@@ -41,10 +40,8 @@ export const removeBackground = async (
     }
 
     const resultCanvas = document.querySelector('#bgremovalresultcanvas');
-
     resultCanvas.width = videoTrack.getSettings().width;
     resultCanvas.height = videoTrack.getSettings().height;
-
 
     const imageCapture = new ImageCapture(videoTrack);
 
@@ -52,7 +49,18 @@ export const removeBackground = async (
     backgroundImage.src = image;
 
     const captureStream = resultCanvas.captureStream(60);
-    return { renderLoop: startRenderLoop(canvas, canvas.getContext('2d'), resultCanvas, resultCanvas.getContext('2d'), backgroundImage, imageCapture), track: captureStream.getVideoTracks()[0] };
+    const renderLoop = startRenderLoop(
+        canvas,
+        canvas.getContext('2d'),
+        resultCanvas,
+        resultCanvas.getContext('2d'),
+        backgroundImage,
+        imageCapture
+    );
+    return {
+        renderLoop,
+        track: captureStream.getVideoTracks()[0]
+    };
 };
 
 async function grabFrame(imageCapture) {
@@ -62,10 +70,13 @@ async function grabFrame(imageCapture) {
 function startRenderLoop(canvas, context, resultCanvas, resultContext, backgroundImage, imageCapture) {
     return setInterval(async () => {
         let image = new Image(); // pre init
-        let imageElement = new Image(640, 480);
+        const width = canvas.width;
+        const height = canvas.height;
+        let imageElement = new Image(width, height);
         const canvas2 = document.createElement('canvas');
-        canvas2.width = 480;
-        canvas2.height = 640;
+
+        canvas2.width = width;
+        canvas2.height = height;
 
         const foregroundColor = { r: 0, g: 0, b: 0, a: 255 };
         const backgroundColor = { r: 0, g: 0, b: 0, a: 0 };
@@ -73,15 +84,12 @@ function startRenderLoop(canvas, context, resultCanvas, resultContext, backgroun
         let segmentation;
         let capture;
 
-        const width = canvas.width;
-        const height = canvas.height;
-
         capture = await grabFrame(imageCapture);
 
         image = await createImageBitmap(capture);
         context.drawImage(image, 0, 0, width, height);
 
-        const personSegmentation = await bodyPixNet.segmentPerson(context.getImageData(0,0,640,480), true);
+        const personSegmentation = await bodyPixNet.segmentPerson(context.getImageData(0, 0, width, height), true);
 
         segmentation = bodyPix.toMask(
             personSegmentation,
@@ -89,12 +97,15 @@ function startRenderLoop(canvas, context, resultCanvas, resultContext, backgroun
             backgroundColor
         );
 
+        const maskOpacity = 1;
+        const maskBlurAmount = 3;
+
         await bodyPix.drawMask(
             resultCanvas,
             imageElement,
             segmentation,
-            1,
-            3
+            maskOpacity,
+            maskBlurAmount
         );
         resultContext.globalCompositeOperation = 'source-in';
 
