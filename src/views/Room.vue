@@ -8,8 +8,8 @@
         class="room"
         v-if="allUsers.length && allScreenUsers.length"
     >
-        <div :class="showInvitation ? 'invite': ''">
-          <InviteUsers v-if="users.length <= 1 && showInvitation"/>
+        <div v-if="users.length <= 1 && showInvitation" :class="showInvitation ? 'invite': ''">
+          <InviteUsers @closeInvitations="closeInvitations" />
         </div>
         <UserGrid :users="users" :showChat="view === 'chat'">
             <template v-slot:chat>
@@ -65,7 +65,7 @@
     import Settings from '../components/Settings';
     import ChatMessageNotification from '../components/ChatMessageNotification';
     import { uniqBy } from 'lodash/array';
-    import InviteUsers from '@/components/InviteUsers';
+    import InviteUsers from '../components/InviteUsers';
 
     export default {
         name: 'Room',
@@ -114,10 +114,6 @@
 
                 return;
             }
-
-            this.$root.$on("closeInvitations", () => {
-              this.showInvitation = false
-            });
 
             if (this.localUser) {
                 return;
@@ -176,6 +172,9 @@
                     this.showControls = false;
                 }, 4000);
             },
+          closeInvitations() {
+            this.showInvitation = false;
+          }
         },
         computed: {
             ...mapGetters([

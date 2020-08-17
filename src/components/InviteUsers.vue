@@ -6,7 +6,7 @@
           <h3>No users yet</h3>
         </v-col>
         <v-col align="end" class="py-0">
-          <v-btn icon @click="$root.$emit('closeInvitations')">
+          <v-btn icon @click="$emit('closeInvitations')">
             <v-icon color="black">close</v-icon>
           </v-btn>
         </v-col>
@@ -32,21 +32,25 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 export default {
   name: "InviteUsers",
   methods: {
-    copyUrl() {
-      navigator.clipboard
-          .writeText(this.inviteLink)
-          .then(() => {
-            this.setSnackbarMessage({
-              type: '',
-              text: `Link copied to clipboard`,
-            });
-          })
-          .catch(e => {
-            console.error(e);
-          });
+    ...mapActions(['setSnackbarMessage']),
+    async copyUrl() {
+      try {
+        await navigator.clipboard.writeText(this.inviteLink);
+        this.setSnackbarMessage({
+          type: 'info',
+          text: `Link copied to clipboard`,
+        });
+      } catch (e) {
+        this.setSnackbarMessage({
+          type: 'warning',
+          text: `Failed to copy link to clipboard`,
+        });
+        console.error(e);
+      }
     },
   },
   computed: {
