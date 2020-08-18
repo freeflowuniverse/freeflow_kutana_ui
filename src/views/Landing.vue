@@ -10,12 +10,12 @@
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on: tooltip }">
                         <v-btn class="primary" @click="toggleCam" v-on="{ ...tooltip}">
-                            <v-icon>{{ video ? 'videocam' : 'videocam_off' }}</v-icon>
+                            <v-icon>{{ videoActive && !hasVideoError ? 'videocam' : 'videocam_off' }}</v-icon>
                         </v-btn>
                     </template>
-                    <span>{{ video ? 'Deactivate camera' : 'Activate camera' }}</span>
+                    <span>Turn camera {{ videoActive ? 'off' : 'on' }}</span>
                 </v-tooltip>
-                <v-menu top left offset-y v-if="video">
+                <v-menu top left offset-y v-if="videoActive">
                     <template v-slot:activator="{ on: menu }">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on: tooltip }">
@@ -47,12 +47,12 @@
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on: tooltip }">
                         <v-btn class="primary" @click="toggleMic" v-on="{ ...tooltip}">
-                            <v-icon>{{ audio ? 'mic' : 'mic_off' }}</v-icon>
+                            <v-icon>{{ audioActive && !hasAudioError ? 'mic' : 'mic_off' }}</v-icon>
                         </v-btn>
                     </template>
-                    <span>{{ audio ? 'Unmute' : 'Mute' }}</span>
+                    <span>{{ audioActive ? 'Unmute' : 'Mute' }}</span>
                 </v-tooltip>
-                <v-menu top left offset-y v-if="audio">
+                <v-menu top left offset-y v-if="audioActive">
                     <template v-slot:activator="{ on: menu }">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on: tooltip }">
@@ -123,18 +123,24 @@
                 muted
                 ref="localStream"
                 v-if="
-                    video &&
+                    videoActive &&
                         localStream &&
                         localStream.getVideoTracks().length > 0
                 "
             ></video>
         </div>
+        <Settings v-model="showSettings" :local="true" style="position: absolute; padding: 16px;" />
     </section>
 </template>
 <script>
 import { mapActions, mapMutations, mapGetters } from 'vuex';
+import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
 import { AvatarGenerator } from 'random-avatar-generator';
+import Settings from '../components/Settings';
 export default {
+    components: {
+        Settings
+    },
     data() {
         return {
             /* eslint-disable */
@@ -146,24 +152,31 @@ export default {
                 url => this.reg.test(url) || 'Invite url or room ID  invalid',
             ],
             inviteUrl: null,
-            video: true,
-            audio: true,
-            devices: [],
-            videoDevice: null,
-            audioDevice: null,
-            localStream: null,
             myBackground: '',
+            showSettings: false,
+            devices:[],
+            videoDevice: null,
+            audioDevice: null
         };
     },
     mounted() {
         navigator.mediaDevices.enumerateDevices().then(devices => {
             this.devices = devices;
-            this.updateLocalStream();
+            updateCurrentStream();
         });
         this.getBackgroundOfMine();
     },
     computed: {
-        ...mapGetters(['account', 'teamName', 'userControl']),
+        ...mapGetters([
+            'audioActive',
+            'videoActive',
+            'account',
+            'teamName',
+            'userControl',
+            'mediaDevices',
+            'mediaDeviceErrors',
+            'localStream',
+        ]),
         avatar() {
             const generator = new AvatarGenerator();
             return generator.generateRandomAvatar(
@@ -181,69 +194,49 @@ export default {
                 d => d.kind === 'audiooutput' && d.label
             );
         },
+        hasAudioError() {
+            return this.mediaDeviceErrors.hasOwnProperty('audio');
+        },
+        hasVideoError() {
+            return this.mediaDeviceErrors.hasOwnProperty('video');
+        },
     },
     methods: {
-        ...mapMutations(['setLocalStream']),
+        changeAudioInputTo(audioInputDeviceId) {
+            this.audioDevice = audioInputDeviceId;
+            updateCurrentStream();
+        },
+        changeVideoTo(videoDeviceId) {
+            this.videoDevice = videoDeviceId;
+            updateCurrentStream();
+        },
+        ...mapMutations([
+            'setLocalStream',
+            'clearMediaDeviceError',
+            'toggleAudioActive',
+            'toggleVideoActive',
+        ]),
         ...mapActions([
             'createTeam',
             'join',
             'getVideoStream',
             'getAudioStream',
+            'refreshMediaDevices',
         ]),
-        changeAudioInputTo(audioInputDeviceId) {
-            this.audioDevice = audioInputDeviceId;
-            this.updateLocalStream();
-        },
-        changeVideoTo(videoDeviceId) {
-            this.videoDevice = videoDeviceId;
-            this.updateLocalStream();
-        },
-        async updateLocalStream() {
-            const tracks = [];
-
-            if (this.video) {
-                const videoStream = await this.getVideoStream(this.videoDevice);
-                tracks.push(videoStream.getVideoTracks()[0]);
-            }
-
-            if (this.audio) {
-                const audioStream = await this.getAudioStream(this.audioDevice);
-                tracks.push(audioStream.getAudioTracks()[0]);
-            }
-
-            if (!tracks) {
-                this.localStream = null;
-
-                return;
-            }
-            this.localStream = new MediaStream(tracks);
-
-            this.videoDevice = this.devices.find(
-                d => d.label === this.localStream?.getVideoTracks()[0]?.label
-            )?.deviceId;
-            this.audioDevice = this.devices.find(
-                d => d.label === this.localStream?.getAudioTracks()[0]?.label
-            )?.deviceId;
-
-            if (!this.localStream) {
-                return;
-            }
-            this.setLocalStream(this.localStream);
-        },
         toggleCam() {
-            this.video = !this.video;
-            this.updateLocalStream();
+            this.toggleVideoActive();
+            updateCurrentStream();
         },
         toggleMic() {
-            this.audio = !this.audio;
-            this.updateLocalStream();
+            this.toggleAudioActive();
+            updateCurrentStream();
         },
         create() {
             this.createTeam();
         },
         joinRoom() {
             if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
-                this.updateLocalStream();
+                updateCurrentStream();
                 this.$router.push({
                     name: 'room',
                     params: {
@@ -268,7 +261,7 @@ export default {
         },
         teamName(val) {
             if (val) {
-                this.updateLocalStream();
+                updateCurrentStream();
                 this.$router.push({ name: 'room', params: { token: val } });
             }
         },

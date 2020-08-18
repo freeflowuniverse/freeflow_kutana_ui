@@ -10,6 +10,8 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
+import { initMediaDeviceDetection } from './utils/mediaDevicesUtils';
+
 export default {
     data() {
         return {
@@ -27,6 +29,7 @@ export default {
         },
     },
     mounted() {
+        initMediaDeviceDetection();
         let vh = window.innerHeight * 0.01;
 
         // Then we set the value in the --vh custom property to the root of the document
@@ -83,11 +86,12 @@ video.mine {
 }
 .shrink-x-enter-active,
 .shrink-x-leave-active {
-    transition: max-width 30s;
+    transition: max-width 300ms;
     max-width: 100% !important;
     overflow: hidden !important;
 }
-.shrink-x-enter, .shrink-x-leave-to {
+.shrink-x-enter,
+.shrink-x-leave-to {
     max-width: 0 !important;
     overflow: hidden !important;
 }

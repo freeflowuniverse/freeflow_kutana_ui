@@ -26,11 +26,11 @@
                         </div>
                     </v-row>
                     <v-select
-                        :loading="videoInputDevices.length <= 0"
-                        :disabled="videoInputDevices.length <= 0"
+                        :loading="videoInputDevices.length <= 0 && !hasVideoError"
+                        :disabled="hasVideoError || !video"
                         :items="videoInputDevices"
                         :label="
-                            videoInputDevices.length <= 0
+                            videoInputDevices.length <= 0 || hasVideoError
                                 ? 'No video input device'
                                 : 'Video input device'
                         "
@@ -45,11 +45,11 @@
                         v-model="videoDevice"
                     />
                     <v-select
-                        :disabled="audioInputDevices.length <= 0"
-                        :loading="audioInputDevices.length <= 0"
+                        :disabled="hasAudioError || !audio"
+                        :loading="audioInputDevices.length <= 0 && !hasAudioError"
                         :items="audioInputDevices"
                         :label="
-                            audioInputDevices.length <= 0
+                            audioInputDevices.length <= 0 || hasAudioError
                                 ? 'No Audio input device'
                                 : 'Audio input device'
                         "
@@ -65,13 +65,13 @@
                     />
                     <v-row justify="center">
                         <v-switch
-                            @change="updateLocalStream"
+                            :disabled="hasVideoError"
                             class="pa-2"
                             label="Webcam"
                             v-model="video"
                         />
                         <v-switch
-                            @change="updateLocalStream"
+                            :disabled="hasAudioError"
                             class="pa-2"
                             label="Microphone"
                             v-model="audio"
@@ -89,88 +89,98 @@
 
 <script>
     import router from '../plugins/router';
+    import { updateCurrentStream } from '../utils/mediaDevicesUtils';
     import { mapActions, mapGetters, mapMutations } from 'vuex';
     import { AvatarGenerator } from 'random-avatar-generator';
 
     export default {
         name: 'JoinRoom',
         methods: {
-            ...mapMutations(['setLocalStream']),
-            ...mapActions(['getVideoStream', 'getAudioStream', 'refreshMediaDevices']),
+            ...mapMutations([
+                'setLocalStream',
+                'toggleAudioActive',
+                'toggleVideoActive'
+            ]),
+            ...mapActions([
+                'getVideoStream',
+                'getAudioStream',
+                'refreshMediaDevices',
+                'updateAudioDevice',
+                'updateVideoDevice'
+            ]),
             joinRoom() {
                 if (!this.localStream) {
                     return;
                 }
-                this.setLocalStream(this.localStream);
 
                 router.push({
                     name: 'room',
                     params: { token: this.$route.params.token },
                 });
             },
-            async updateLocalStream() {
-                const tracks = [];
-
-                if (this.video) {
-                    const videoStream = await this.getVideoStream(
-                        this.videoDevice
-                    );
-                    tracks.push(videoStream.getVideoTracks()[0]);
-                }
-
-                if (this.audio) {
-                    const audioStream = await this.getAudioStream(
-                        this.audioDevice
-                    );
-                    tracks.push(audioStream.getAudioTracks()[0]);
-                }
-
-                if (!tracks) {
-                    this.localStream = null;
-
-                    return;
-                }
-                this.localStream = new MediaStream(tracks);
-
-                this.videoDevice = this.mediaDevices.find(
-                    d =>
-                        d.label === this.localStream?.getVideoTracks()[0]?.label
-                )?.deviceId;
-                this.audioDevice = this.mediaDevices.find(
-                    d =>
-                        d.label === this.localStream?.getAudioTracks()[0]?.label
-                )?.deviceId;
+            async changeVideoDevice() {
+                this.updateVideoDevice(this.videoDevice);
+                updateCurrentStream().then(() => {
+                  this.updateMediaDevices();
+                });
             },
-            changeVideoDevice() {
-                this.video = true;
-                this.updateLocalStream();
+            async changeAudioDevice() {
+                this.updateAudioDevice(this.audioDevice);
+                updateCurrentStream().then(() => {
+                  this.updateMediaDevices();
+                });
             },
-            changeAudioDevice() {
-                this.audio = true;
-                this.updateLocalStream();
-            },
+            updateMediaDevices() {
+                this.audioDevice = this.audioDeviceId;
+                this.videoDevice = this.videoDeviceId;
+            }
         },
         mounted() {
             if (this.userControl) {
                 this.userControl.hangUp();
                 location.reload();
             }
-            this.refreshMediaDevices().then(() => {
-                this.updateLocalStream();
+
+            updateCurrentStream().then(() => {
+              this.updateMediaDevices();
             });
         },
         data: function() {
             return {
-                video: true,
-                audio: true,
                 videoDevice: null,
-                audioDevice: null,
-                localStream: null,
+                audioDevice: null
             };
         },
-
         computed: {
-            ...mapGetters(['userControl', 'account', 'mediaDevices']),
+            ...mapGetters([
+                'userControl',
+                'account',
+                'mediaDevices',
+                'mediaDeviceErrors',
+                'localStream',
+                'audioActive',
+                'videoActive',
+                'videoDeviceId',
+                'audioDeviceId'
+            ]),
+            audio: {
+              get () {
+                return this.audioActive;
+              },
+              set () {
+                this.toggleAudioActive();
+                updateCurrentStream();
+              }
+            },
+            video: {
+              get () {
+                return this.videoActive;
+              },
+              set () {
+                this.toggleVideoActive();
+                updateCurrentStream();
+              }
+            },
             avatar() {
                 const generator = new AvatarGenerator();
                 return generator.generateRandomAvatar(this.account.name);
@@ -190,6 +200,12 @@
                     d => d.kind === 'audiooutput' && d.label
                 );
             },
+            hasAudioError() {
+                return this.mediaDeviceErrors.hasOwnProperty('audio');
+            },
+            hasVideoError() {
+                return this.mediaDeviceErrors.hasOwnProperty('video');
+            }
         },
     };
 </script>

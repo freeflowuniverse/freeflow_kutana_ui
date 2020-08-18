@@ -1,8 +1,14 @@
+import Vue from 'vue';
+import { disableVideoStream, disableAudioStream } from '@/utils/mediaDevicesUtils';
+
 export default {
     state: {
         videoDeviceId: null,
         audioDeviceId: null,
-        mediaDevices: []
+        audioActive: true,
+        videoActive: true,
+        mediaDevices: [],
+        mediaDeviceErrors: {}
     },
     mutations: {
         setVideoDeviceId(state, deviceId) {
@@ -13,58 +19,95 @@ export default {
         },
         refreshMediaDevices(state, devices) {
             state.mediaDevices = devices;
-        }
+        },
+        setMediaDeviceError(state, error) {
+            Vue.set(state.mediaDeviceErrors, error.type, error.message)
+        },
+        clearMediaDeviceError(state) {
+          state.mediaDeviceErrors = {};
+        },
+        toggleAudioActive(state) {
+            state.audioActive = !state.audioActive;
+        },
+        toggleVideoActive(state) {
+            state.videoActive = !state.videoActive;
+        },
+        setAudioState(state, isActive) {
+            state.audioActive = isActive;
+        },
+        setVideoState(state, isActive) {
+            state.videoActive = isActive;
+        },
     },
     actions: {
         async refreshMediaDevices({ commit }) {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            commit('refreshMediaDevices', devices);
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                commit('refreshMediaDevices', devices);
+            } catch (e) {
+                commit('setMediaDeviceError', e);
+            }
         },
-        async getVideoStream({ commit, getters, dispatch }, deviceId = null) {
-            if (deviceId || (!deviceId && getters.videoDeviceId)) {
+        updateVideoDevice({ commit }, deviceId) {
+            disableVideoStream();
+            commit('setVideoDeviceId', deviceId);
+        },
+        updateAudioDevice({ commit }, deviceId) {
+            disableAudioStream();
+            commit('setAudioDeviceId', deviceId);
+        },
+        async getVideoStream({ commit, getters, dispatch }) {
+            if (getters.videoDeviceId) {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        deviceId: deviceId ? deviceId : getters.videoDeviceId,
+                        deviceId: getters.videoDeviceId,
                     },
                 });
-                commit('setVideoDeviceId', deviceId);
+                commit('setVideoDeviceId', getters.videoDeviceId);
                 return stream;
             }
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-            });
-            const newDeviceId = dispatch('findDeviceId', {
-                kind: 'videoinput',
-                label: stream.getVideoTracks()[0].label,
-            });
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                });
+                const newDeviceId = await dispatch('findDeviceId', {
+                    kind: 'videoinput',
+                    label: stream.getVideoTracks()[0].label,
+                });
 
-            commit('setVideoDeviceId', newDeviceId);
-            dispatch('refreshMediaDevices');
-
-            return stream;
+                commit('setVideoDeviceId', newDeviceId);
+                dispatch('refreshMediaDevices');
+                return stream;
+            } catch (e) {
+                commit('setMediaDeviceError', { type: 'video', message: e.message});
+            }
         },
-        async getAudioStream({ commit, getters, dispatch }, deviceId = null) {
-            if (deviceId || (!deviceId && getters.audioDeviceId)) {
+        async getAudioStream({ commit, getters, dispatch }) {
+            if (getters.audioDeviceId) {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: {
-                        deviceId: deviceId ? deviceId : getters.audioDeviceId,
+                        deviceId: getters.audioDeviceId,
                     },
                 });
-                commit('setAudioDeviceId', deviceId);
+                commit('setAudioDeviceId', getters.audioDeviceId);
                 return stream;
             }
-            const stream = await navigator.mediaDevices.getUserMedia({
-                audio: true,
-            });
-            const newDeviceId = dispatch('findDeviceId', {
-                kind: 'audioinput',
-                label: stream.getAudioTracks()[0].label,
-            });
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                });
+                const newDeviceId = await dispatch('findDeviceId', {
+                    kind: 'audioinput',
+                    label: stream.getAudioTracks()[0].label,
+                });
 
-            commit('setAudioDeviceId', newDeviceId);
-            dispatch('refreshMediaDevices');
+                commit('setAudioDeviceId', newDeviceId);
+                dispatch('refreshMediaDevices');
 
-            return stream;
+                return stream;
+            } catch (e) {
+                commit('setMediaDeviceError', { type: 'audio', message: e.message});
+            }
         },
         async findDeviceId(_, { kind, label }) {
             const devices = await navigator.mediaDevices.enumerateDevices();
@@ -76,5 +119,8 @@ export default {
         videoDeviceId: state => state.videoDeviceId,
         audioDeviceId: state => state.audioDeviceId,
         mediaDevices: state => state.mediaDevices,
+        mediaDeviceErrors: state => state.mediaDeviceErrors,
+        audioActive: state => state.audioActive,
+        videoActive: state => state.videoActive
     },
 };
