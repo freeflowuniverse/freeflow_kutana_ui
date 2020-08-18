@@ -1,7 +1,6 @@
 import { JanusBuilder } from '../januswrapper/JanusBuilder';
 import { VideoRoomPlugin } from '../januswrapper/VideoRoomPlugin';
 import store from '../plugins/vuex';
-import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
 
 export const initializeJanus = async (
     serverUrl,
