@@ -1,6 +1,6 @@
 import store from '@/plugins/vuex';
 
-export const initMediaDeviceDetection = async () => {
+export const initMediaDeviceDetection = () => {
     navigator.mediaDevices.ondevicechange = async function() {
         refreshMediaDevices();
         await updateCurrentStream();
