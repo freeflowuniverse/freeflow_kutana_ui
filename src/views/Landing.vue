@@ -84,6 +84,7 @@
             <v-col cols="4">
                 <v-form @submit.prevent="joinRoom" v-model="valid">
                     <v-text-field
+                        :readonly="!!$route.query && !!$route.query.roomName"
                         :rules="inviteUrlRules"
                         filled
                         hint="Paste the room ID or link you've received"
@@ -160,6 +161,9 @@ export default {
         };
     },
     mounted() {
+        if (this.$route.query && this.$route.query.roomName) {
+            this.inviteUrl = this.$route.query.roomName
+        }
         navigator.mediaDevices.enumerateDevices().then(devices => {
             this.devices = devices;
             updateCurrentStream();
@@ -202,12 +206,23 @@ export default {
         },
     },
     methods: {
+        ...mapActions([
+            'createTeam',
+            'join',
+            'getVideoStream',
+            'getAudioStream',
+            'refreshMediaDevices',
+            'updateVideoDevice',
+            'updateAudioDevice',
+        ]),
         changeAudioInputTo(audioInputDeviceId) {
             this.audioDevice = audioInputDeviceId;
+            this.updateAudioDevice(audioInputDeviceId);
             updateCurrentStream();
         },
         changeVideoTo(videoDeviceId) {
             this.videoDevice = videoDeviceId;
+            this.updateVideoDevice(videoDeviceId);
             updateCurrentStream();
         },
         ...mapMutations([
@@ -215,13 +230,6 @@ export default {
             'clearMediaDeviceError',
             'toggleAudioActive',
             'toggleVideoActive',
-        ]),
-        ...mapActions([
-            'createTeam',
-            'join',
-            'getVideoStream',
-            'getAudioStream',
-            'refreshMediaDevices',
         ]),
         toggleCam() {
             this.toggleVideoActive();
@@ -254,6 +262,14 @@ export default {
         },
     },
     watch: {
+        devices (val) {
+            if (!val) {
+                return
+            }
+            console.log(`updateing selected devices`)
+            this.videoDevice = this.videoInputDevices[0].deviceId
+            this.audioDevice = this.audioInputDevices[0].deviceId
+        },
         inviteUrl(val) {
             if (val && this.reg.test(val) && val.length > 15) {
                 this.inviteUrl = val.match(this.reg)[1];
