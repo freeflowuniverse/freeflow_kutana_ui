@@ -10,6 +10,7 @@ import SocketStore from '../stores/SocketStore';
 import UserStore from '../stores/UserStore';
 import ScreenShareStore from '../stores/ScreenShareStore';
 import UserMediaStore from '../stores/UserMediaStore';
+import BackgroundRemovalStore from '../stores/BackgroundRemovalStore';
 
 Vue.use(Vuex);
 
@@ -24,5 +25,6 @@ export default new Vuex.Store({
         UserStore,
         ScreenShareStore,
         UserMediaStore,
+        BackgroundRemovalStore,
     },
 });
