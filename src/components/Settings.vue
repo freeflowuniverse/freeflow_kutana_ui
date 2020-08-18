@@ -95,7 +95,7 @@
 <script>
     import { removeBackground } from '@/services/backGroundRemovalService';
     import version from '../../public/version';
-    import { mapActions, mapGetters } from 'vuex';
+    import { mapActions, mapMutations, mapGetters } from 'vuex';
 
     export default {
         name: 'Settings',
@@ -137,7 +137,7 @@
                 selectedVideo: null,
                 selectedAudio: null,
                 backgroundRemove: false,
-                stopBackgroundRemove: () => {},
+                renderLoop: null,
                 wallpaperFile: null,
                 version: version,
             };
@@ -151,7 +151,10 @@
               'getAudioStream',
               'updateVideoDevice',
               'updateAudioDevice',
-              'changeCameraBackground'
+              'changeCameraBackground',
+              'clearActiveBackground',
+              'setActiveBackground',
+              'setBackgroundTrack',
             ]),
             async changeVideoDevice(videoDeviceId) {
               this.updateVideoDevice(videoDeviceId);
@@ -176,25 +179,20 @@
               this.toggleBackgroundRemoval(this.backgroundRemove);
             },
             async toggleBackgroundRemoval(newBackgroundRemove) {
+              const stream = await this.getVideoStream();
+              this.clearActiveBackground();
               if (!newBackgroundRemove) {
-                this.stopBackgroundRemove();
-                this.stopBackgroundRemove = () => {};
-                const stream = await this.getVideoStream();
                 await this.userControl.publishTrack(
                     stream.getVideoTracks()[0]
                 );
                 return;
               }
-              const stream = await this.getVideoStream();
-              const { stop, track } = await removeBackground(
+              const { renderLoop, track } = await removeBackground(
                   stream.getVideoTracks()[0],
-                  this.getWallpaperImage,
-                  () => {
-                    this.backgroundRemove = false;
-                  }
+                  this.getWallpaperImage
               );
-              this.stopBackgroundRemove = stop;
-              window.track = track;
+              this.setActiveBackground(renderLoop);
+              this.setBackgroundTrack(track);
               await this.userControl.publishTrack(track);
             },
             async calculateDevices() {
