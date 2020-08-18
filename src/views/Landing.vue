@@ -6,42 +6,78 @@
             </v-col>
         </v-row>
         <v-row class="io mb-2" justify="center" align="center">
-            <v-btn-toggle multiple rounded class="primary mr-1" dark>
-                <v-btn class="primary" @click="toggleCam">
-                    <v-icon>{{ video ? 'videocam' : 'videocam_off' }}</v-icon>
-                </v-btn>
-                <v-menu>
-                    <template v-slot:activator="{ on: menu, attrs }">
+            <v-btn-toggle rounded class="primary mr-1" dark>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on: tooltip }">
+                        <v-btn class="primary" @click="toggleCam" v-on="{ ...tooltip}">
+                            <v-icon>{{ video ? 'videocam' : 'videocam_off' }}</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>{{ video ? 'Deactivate camera' : 'Activate camera' }}</span>
+                </v-tooltip>
+                <v-menu top left offset-y v-if="video">
+                    <template v-slot:activator="{ on: menu }">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on: tooltip }">
-                                <v-btn
-                                    color="primary"
-                                    dark
-                                    v-bind="attrs"
-                                    v-on="{ ...tooltip, ...menu }"
-                                >Dropdown w/ Tooltip</v-btn>
+                                <v-btn class="small" v-on="{ ...tooltip, ...menu }">
+                                    <v-icon small>expand_less</v-icon>
+                                </v-btn>
                             </template>
-                            <span>Im A ToolTip</span>
+                            <span>Change video input</span>
                         </v-tooltip>
                     </template>
                     <v-list>
-                        <v-list-item v-for="(item, index) in items" :key="index" @click>
-                            <v-list-item-title>{{ item.title }}</v-list-item-title>
-                        </v-list-item>
+                        <v-list-item-group
+                            :value="videoInputDevices.map(d=>d.deviceId).indexOf(videoDevice)"
+                            color="primary"
+                        >
+                            <v-list-item
+                                v-for="(item) in videoInputDevices"
+                                :key="item.deviceId"
+                                @click="changeVideoTo(item.deviceId)"
+                            >
+                                <v-list-item-title>{{ item.label }}</v-list-item-title>
+                            </v-list-item>
+                        </v-list-item-group>
                     </v-list>
                 </v-menu>
-                <v-btn class="small">
-                    <v-icon small>expand_less</v-icon>
-                </v-btn>
             </v-btn-toggle>
 
-            <v-btn-toggle multiple rounded class="primary ml-1" dark>
-                <v-btn @click="toggleMic" class="primary">
-                    <v-icon>{{ audio ? 'mic' : 'mic_off' }}</v-icon>
-                </v-btn>
-                <v-btn class="small">
-                    <v-icon small>expand_less</v-icon>
-                </v-btn>
+            <v-btn-toggle multiple rounded class="primary mr-1" dark>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on: tooltip }">
+                        <v-btn class="primary" @click="toggleMic" v-on="{ ...tooltip}">
+                            <v-icon>{{ audio ? 'mic' : 'mic_off' }}</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>{{ audio ? 'Unmute' : 'Mute' }}</span>
+                </v-tooltip>
+                <v-menu top left offset-y v-if="audio">
+                    <template v-slot:activator="{ on: menu }">
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on: tooltip }">
+                                <v-btn class="small" v-on="{ ...tooltip, ...menu }">
+                                    <v-icon small>expand_less</v-icon>
+                                </v-btn>
+                            </template>
+                            <span>Change audio input</span>
+                        </v-tooltip>
+                    </template>
+                    <v-list>
+                        <v-list-item-group
+                            :value="audioInputDevices.map(d=>d.deviceId).indexOf(audioDevice)"
+                            color="primary"
+                        >
+                            <v-list-item
+                                v-for="(item) in audioInputDevices"
+                                :key="item.deviceId"
+                                @click="changeAudioInputTo(item.deviceId)"
+                            >
+                                <v-list-item-title>{{ item.label }}</v-list-item-title>
+                            </v-list-item>
+                        </v-list-item-group>
+                    </v-list>
+                </v-menu>
             </v-btn-toggle>
         </v-row>
         <v-row class="actions pa-2" justify="center" align="center">
@@ -71,10 +107,14 @@
                     </v-text-field>
                 </v-form>
             </v-col>
-            <v-divider vertical></v-divider>
-            <v-col cols="4" align="center" v-if="!inviteUrl">
-                <v-btn @click="create" text color="primary">Create room</v-btn>
-            </v-col>
+            <transition name="fade">
+                <v-divider vertical v-if="!inviteUrl"></v-divider>
+            </transition>
+            <transition name="shrink-x">
+                <v-col cols="4" align="center" v-if="!inviteUrl">
+                    <v-btn @click="create" text color="primary">Create room</v-btn>
+                </v-col>
+            </transition>
         </v-row>
         <div class="mine" :style="myBackground">
             <video
@@ -150,6 +190,14 @@ export default {
             'getVideoStream',
             'getAudioStream',
         ]),
+        changeAudioInputTo(audioInputDeviceId) {
+            this.audioDevice = audioInputDeviceId;
+            this.updateLocalStream();
+        },
+        changeVideoTo(videoDeviceId) {
+            this.videoDevice = videoDeviceId;
+            this.updateLocalStream();
+        },
         async updateLocalStream() {
             const tracks = [];
 
