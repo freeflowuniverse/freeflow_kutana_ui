@@ -93,10 +93,10 @@
 </template>
 
 <script>
-    import { removeBackground } from '@/services/backGroundRemovalService';
+    import { removeBackground } from '../services/backGroundRemovalService';
     import version from '../../public/version';
-    import { mapActions, mapMutations, mapGetters } from 'vuex';
-
+    import { mapActions, mapGetters } from 'vuex';
+    import { updateCurrentStream } from '../utils/mediaDevicesUtils';
     export default {
         name: 'Settings',
         props: {
@@ -158,21 +158,13 @@
             ]),
             async changeVideoDevice(videoDeviceId) {
               this.updateVideoDevice(videoDeviceId);
-              if (this.local) {
-                this.$root.$emit('updateLocalStream');
-                return;
-              }
-              const stream = await this.getVideoStream();
-              await this.userControl.publishTrack(stream.getVideoTracks()[0]);
+              await updateCurrentStream();
+              await this.calculateDevices();
             },
             async changeAudioDevice(audiDeviceId) {
               this.updateAudioDevice(audiDeviceId);
-              if (this.local) {
-                this.$root.$emit('updateLocalStream');
-                return;
-              }
-              const stream = await this.getAudioStream();
-              await this.userControl.publishTrack(stream.getAudioTracks()[0]);
+              await updateCurrentStream();
+              await this.calculateDevices();
             },
             changeWallpaper() {
               this.changeCameraBackground(this.wallpaperFile);

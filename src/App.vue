@@ -6,6 +6,8 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import { initMediaDeviceDetection } from './utils/mediaDevicesUtils';
+
 export default {
   data() {
     return {
@@ -23,6 +25,7 @@ export default {
     }
   },
   mounted() {
+    initMediaDeviceDetection();
     let vh = window.innerHeight * 0.01;
 
     // Then we set the value in the --vh custom property to the root of the document

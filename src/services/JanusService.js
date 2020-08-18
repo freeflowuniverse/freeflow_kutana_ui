@@ -152,8 +152,8 @@ export const initializeJanus = async (
     screenShareRoomPlugin.addEventListener('userLeft', screenUser => {
         store.commit('deleteRemoteScreenUser', screenUser);
     });
-    screenShareRoomPlugin.addEventListener('cleanupUser', screenUser => {
-        if (store.dispatch('findScreenUserById', screenUser.id)) {
+    screenShareRoomPlugin.addEventListener('cleanupUser', async screenUser => {
+        if (await store.dispatch('findScreenUserById', screenUser.id)) {
             store.commit('addRemoteScreenUser', screenUser);
             return;
         }
@@ -194,33 +194,11 @@ export const initializeJanus = async (
         publishTrack: async (track, video, audio) => {
             await videoRoomPlugin.publishTrack(track, video, audio);
         },
-        stopVideoTrack: (audioTrack = false) => {
-            //@todo: move this
+        stopVideoTrack: () => {
             videoRoomPlugin.myStream.getVideoTracks()[0].stop();
             videoRoomPlugin.myStream
                 .getVideoTracks()[0]
                 .dispatchEvent(new Event('ended'));
-            window.janusshizzle.videoRoomPlugin.pluginHandle.hangup();
-            if (audioTrack) {
-                window.janusshizzle.videoRoomPlugin.pluginHandle.createOffer({
-                    stream: new MediaStream([audioTrack]),
-                    success: jsep => {
-                        const publish = {
-                            request: 'configure',
-                            audio: true,
-                            video: false,
-                        };
-
-                        window.janusshizzle.videoRoomPlugin.pluginHandle.send({
-                            message: publish,
-                            jsep: jsep,
-                            success: e => {},
-                            error: () => {},
-                        });
-                    },
-                    error: error => {},
-                });
-            }
         },
         stopAudioTrack: () => {
             videoRoomPlugin.myStream.getAudioTracks()[0].stop();

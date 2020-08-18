@@ -79,8 +79,7 @@
 </template>
 
 <script>
-import { Janus } from "janus-gateway";
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   props: ["grid", "minimal"],

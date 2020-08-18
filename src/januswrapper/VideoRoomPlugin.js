@@ -317,7 +317,6 @@ export class VideoRoomPlugin {
      */
     async publishOwnFeed(video, audio) {
         this.myStream = this.generateDummyMediaStream(video, audio);
-
         this.pluginHandle.createOffer({
             stream: this.myStream,
             success: jsep => {

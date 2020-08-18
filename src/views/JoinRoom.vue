@@ -66,14 +66,12 @@
                     <v-row justify="center">
                         <v-switch
                             :disabled="hasVideoError"
-                            @change="updateLocalStream"
                             class="pa-2"
                             label="Webcam"
                             v-model="video"
                         />
                         <v-switch
                             :disabled="hasAudioError"
-                            @change="updateLocalStream"
                             class="pa-2"
                             label="Microphone"
                             v-model="audio"
@@ -91,111 +89,98 @@
 
 <script>
     import router from '../plugins/router';
+    import { updateCurrentStream } from '../utils/mediaDevicesUtils';
     import { mapActions, mapGetters, mapMutations } from 'vuex';
     import { AvatarGenerator } from 'random-avatar-generator';
 
     export default {
         name: 'JoinRoom',
         methods: {
-            ...mapMutations(['setLocalStream']),
-            ...mapActions(['getVideoStream', 'getAudioStream', 'refreshMediaDevices']),
+            ...mapMutations([
+                'setLocalStream',
+                'toggleAudioActive',
+                'toggleVideoActive'
+            ]),
+            ...mapActions([
+                'getVideoStream',
+                'getAudioStream',
+                'refreshMediaDevices',
+                'updateAudioDevice',
+                'updateVideoDevice'
+            ]),
             joinRoom() {
                 if (!this.localStream) {
                     return;
                 }
-                this.setLocalStream(this.localStream);
 
                 router.push({
                     name: 'room',
                     params: { token: this.$route.params.token },
                 });
             },
-            disableAudioStream() {
-                this.localStream?.getAudioTracks().forEach(audioTrack => {
-                    audioTrack.stop();
+            async changeVideoDevice() {
+                this.updateVideoDevice(this.videoDevice);
+                updateCurrentStream().then(() => {
+                  this.updateMediaDevices();
                 });
             },
-            disableVideoStream() {
-                this.localStream?.getVideoTracks().forEach(videoTrack => {
-                    videoTrack.stop();
+            async changeAudioDevice() {
+                this.updateAudioDevice(this.audioDevice);
+                updateCurrentStream().then(() => {
+                  this.updateMediaDevices();
                 });
             },
-            async updateLocalStream() {
-                const tracks = [];
-
-                tracks.push(await this.updateAudioStream());
-                tracks.push(await this.updateVideoStream());
-
-                const activeTracks = tracks.filter(
-                    track => track !== undefined
-                );
-
-                if (activeTracks.length <= 0) {
-                    this.localStream = null;
-                    return;
-                }
-
-                this.localStream = new MediaStream(activeTracks);
-
-                this.videoDevice = this.mediaDevices.find(
-                    d =>
-                        d.label === this.localStream?.getVideoTracks()[0]?.label
-                )?.deviceId;
-                this.audioDevice = this.mediaDevices.find(
-                    d =>
-                        d.label === this.localStream?.getAudioTracks()[0]?.label
-                )?.deviceId;
-            },
-            changeVideoDevice() {
-                this.video = true;
-                this.updateLocalStream();
-            },
-            changeAudioDevice() {
-                this.audio = true;
-                this.updateLocalStream();
-            },
-            async updateAudioStream() {
-              this.disableAudioStream();
-              if (!this.audio) {
-                return undefined;
-              }
-              const audioStream = await this.getAudioStream(
-                  this.audioDevice
-              );
-              return audioStream?.getAudioTracks()[0];
-            },
-            async updateVideoStream() {
-              this.disableVideoStream();
-              if (!this.video) {
-                return undefined;
-              }
-              const videoStream = await this.getVideoStream(
-                  this.videoDevice
-              );
-              return videoStream?.getVideoTracks()[0];
-            },
+            updateMediaDevices() {
+                this.audioDevice = this.audioDeviceId;
+                this.videoDevice = this.videoDeviceId;
+            }
         },
         mounted() {
             if (this.userControl) {
                 this.userControl.hangUp();
                 location.reload();
             }
-            this.refreshMediaDevices().then(() => {
-                this.updateLocalStream();
+
+            updateCurrentStream().then(() => {
+              this.updateMediaDevices();
             });
         },
         data: function() {
             return {
-                video: true,
-                audio: true,
                 videoDevice: null,
-                audioDevice: null,
-                localStream: null,
+                audioDevice: null
             };
         },
-
         computed: {
-            ...mapGetters(['userControl', 'account', 'mediaDevices', 'mediaDeviceErrors']),
+            ...mapGetters([
+                'userControl',
+                'account',
+                'mediaDevices',
+                'mediaDeviceErrors',
+                'localStream',
+                'audioActive',
+                'videoActive',
+                'videoDeviceId',
+                'audioDeviceId'
+            ]),
+            audio: {
+              get () {
+                return this.audioActive;
+              },
+              set () {
+                this.toggleAudioActive();
+                updateCurrentStream();
+              }
+            },
+            video: {
+              get () {
+                return this.videoActive;
+              },
+              set () {
+                this.toggleVideoActive();
+                updateCurrentStream();
+              }
+            },
             avatar() {
                 const generator = new AvatarGenerator();
                 return generator.generateRandomAvatar(this.account.name);
