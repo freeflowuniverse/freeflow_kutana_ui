@@ -8,17 +8,20 @@
             :label="account.name !== user.username ? user.username : null"
             :stream="user.screenShareStream"
             class="screen"
+            :class="screenShareDisabled ? 'cameraDisabled' : 'cameraActive'"
             v-if="user.screen"
+            @stopVideo="screenShareDisabled = true"
+            @resumeVideo="screenShareDisabled = false"
         ></JanusVideo>
         <JanusVideo
             :cover="true"
             :label="account.name !== user.username ? user.username : null"
             :stream="user.stream"
             class="main"
-            :class="{
-                mine: account.name == user.username,
-            }"
+            :class="userCameraDisabled ? 'cameraDisabled' : 'cameraActive'"
             v-if="user.cam"
+            @stopVideo="userCameraDisabled = true"
+            @resumeVideo="userCameraDisabled = false"
         ></JanusVideo>
     </div>
 </template>
@@ -34,6 +37,12 @@
             user: {
                 required: true,
             },
+        },
+        data: () => {
+          return {
+            userCameraDisabled: false,
+            screenShareDisabled: false,
+          }
         },
         mounted() {
             //@todo: check if this is not a memmory leak
@@ -95,6 +104,16 @@
                 width: 10vw;
                 height: 10vh;
             }
+        }
+
+        .cameraActive {
+            display: block;
+        }
+
+        .cameraDisabled {
+            transition: filter 0.5s ease-in-out;
+            transition-delay: 2s;
+            filter: grayscale(1) blur(44px);
         }
 
         .avatar {
