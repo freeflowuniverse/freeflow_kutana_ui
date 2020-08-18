@@ -22,7 +22,7 @@
         </v-btn>
         <video
                 :class="{
-                    isFullScreen: 'fullScreen'
+                    fullscreen: isFullScreen
                 }"
                 :src-object.prop.camel="stream"
                 autoplay
