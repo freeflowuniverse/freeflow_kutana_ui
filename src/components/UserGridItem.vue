@@ -8,7 +8,10 @@
             :label="account.name !== user.username ? user.username : null"
             :stream="user.screenShareStream"
             class="screen"
+            :class="screenShareDisabled ? 'cameraDisabled' : 'cameraActive'"
             v-if="user.screen"
+            @stopVideo="screenShareDisabled = true"
+            @resumeVideo="screenShareDisabled = false"
         ></JanusVideo>
         <JanusVideo
             :cover="true"
@@ -37,7 +40,8 @@
         },
         data: () => {
           return {
-            userCameraDisabled: false
+            userCameraDisabled: false,
+            screenShareDisabled: false,
           }
         },
         mounted() {
@@ -107,7 +111,9 @@
         }
 
         .cameraDisabled {
-            display: none;
+            transition: filter 0.5s ease-in-out;
+            transition-delay: 2s;
+            filter: grayscale(1) blur(44px);
         }
 
         .avatar {

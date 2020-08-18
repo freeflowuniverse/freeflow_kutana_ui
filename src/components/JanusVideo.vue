@@ -123,9 +123,11 @@
               this.userCameraDisabled = currentVideoStatus;
 
               if (currentVideoStatus) {
+                console.log('stop video')
                 this.$emit('stopVideo');
                 return;
               }
+              console.log('resume video')
               this.$emit('resumeVideo');
             }
         },
