@@ -15,10 +15,10 @@
             :label="account.name !== user.username ? user.username : null"
             :stream="user.stream"
             class="main"
-            :class="{
-                mine: account.name == user.username,
-            }"
+            :class="userCameraDisabled ? 'cameraDisabled' : 'cameraActive'"
             v-if="user.cam"
+            @stopVideo="userCameraDisabled = true"
+            @resumeVideo="userCameraDisabled = false"
         ></JanusVideo>
     </div>
 </template>
@@ -34,6 +34,11 @@
             user: {
                 required: true,
             },
+        },
+        data: () => {
+          return {
+            userCameraDisabled: false
+          }
         },
         mounted() {
             //@todo: check if this is not a memmory leak
@@ -95,6 +100,14 @@
                 width: 10vw;
                 height: 10vh;
             }
+        }
+
+        .cameraActive {
+            display: block;
+        }
+
+        .cameraDisabled {
+            display: none;
         }
 
         .avatar {

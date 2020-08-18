@@ -21,20 +21,16 @@
             <v-icon color="white" v-else>fullscreen_exit</v-icon>
         </v-btn>
         <video
-                :class="isFullScreen ? 'fullScreen' : ''"
+                :class="{
+                    isFullScreen: 'fullScreen'
+                }"
                 :src-object.prop.camel="stream"
                 autoplay
                 muted
                 playsinline
                 ref="video"
-                v-if="true"
         ></video>
-                <span class="video-label" v-if="label">{{label}}</span>
-
-        <!-- @todo fixme -->
-        <v-row align="center" class="video-cam-off" justify="center">
-            <v-icon color="white">videocam_off</v-icon>
-        </v-row>
+        <span class="video-label" v-if="label">{{label}}</span>
     </div>
 </template>
 
@@ -62,20 +58,22 @@
                 isFullScreen: false,
                 show: false,
                 timeout: null,
+                userCameraDisabled: false,
             };
         },
         computed: {
             ...mapGetters(['isMobile']),
             classes() {
-                const videopresent = this.stream.getVideoTracks().length;
-
                 return {
                     'cover': this.cover,
-                    'video-present': videopresent,
-                    'video-not-present': !videopresent,
+                    'video-present': !this.userCameraDisabled,
+                    'video-not-present': this.userCameraDisabled,
                 };
 
             },
+        },
+        mounted() {
+          this.$refs.video.addEventListener('progress', this.checkVideoStatus);
         },
         methods: {
             fullScreenChanged() {
@@ -115,6 +113,21 @@
                         this.show = false;
                     }, 4000);
             },
+            checkVideoStatus() {
+              const currentVideoStatus = this.stream.getVideoTracks()[0].getSettings().frameRate === 0;
+
+              if(currentVideoStatus === this.userCameraDisabled) {
+                return;
+              }
+
+              this.userCameraDisabled = currentVideoStatus;
+
+              if (currentVideoStatus) {
+                this.$emit('stopVideo');
+                return;
+              }
+              this.$emit('resumeVideo');
+            }
         },
     };
 </script>
@@ -129,6 +142,10 @@
 
     video.fullScreen {
         object-fit: contain;
+    }
+
+    video.disabled {
+        display: none;
     }
 
     video {
@@ -177,6 +194,20 @@
                 opacity: 1;
             }
         }
+    }
 
+    .avatar {
+      pointer-events: none;
+      user-select: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
     }
 </style>
