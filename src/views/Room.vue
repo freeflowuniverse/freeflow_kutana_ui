@@ -93,7 +93,7 @@
         beforeMount() {
             if (!store.getters.localStream) {
                 router.push({
-                    name: 'landing',
+                    name: 'home',
                     params: { token: this.$route.params.token },
                 });
                 return;
