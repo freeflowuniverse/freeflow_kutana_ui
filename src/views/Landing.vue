@@ -141,7 +141,7 @@
                     </v-card-actions>
                 </span>
             </v-card>
-            <GuestLogin v-else />
+            <GuestLogin v-else @continuelogin="continueLogin"/>
         </v-dialog>
     </section>
 </template>
@@ -174,15 +174,16 @@ export default {
         };
     },
     mounted() {
-        if (this.$route.query && this.$route.query.redirect) {
+        if (!this.account) {
             this.showLogin = true
+        }
+        if (this.$route.query && this.$route.query.redirect) {
+            this.inviteUrl = `https://${this.$route.query.redirect}`;
         }
         if (this.$route.query && this.$route.query.roomName) {
             this.inviteUrl = this.$route.query.roomName;
         }
-        navigator.mediaDevices.enumerateDevices().then(devices => {
-            console.log(`dddddd`, devices);
-            this.devices = devices;
+        this.refreshMediaDevices().then(() => {
             updateCurrentStream();
         });
         this.getBackgroundOfMine();
@@ -222,13 +223,13 @@ export default {
             );
         },
         videoInputDevices() {
-            return this.devices.filter(d => d.kind === 'videoinput' && d.label);
+            return this.mediaDevices.filter(d => d.kind === 'videoinput' && d.label);
         },
         audioInputDevices() {
-            return this.devices.filter(d => d.kind === 'audioinput' && d.label);
+            return this.mediaDevices.filter(d => d.kind === 'audioinput' && d.label);
         },
         audioOutputDevices() {
-            return this.devices.filter(
+            return this.mediaDevices.filter(
                 d => d.kind === 'audiooutput' && d.label
             );
         },
@@ -249,6 +250,9 @@ export default {
             'updateVideoDevice',
             'updateAudioDevice',
         ]),
+        continueLogin() {
+            this.showLogin = false
+        },
         changeAudioInputTo(audioInputDeviceId) {
             this.audioDevice = audioInputDeviceId;
             this.updateAudioDevice(audioInputDeviceId);
@@ -310,7 +314,7 @@ export default {
         },
     },
     watch: {
-        devices(val) {
+        mediaDevices(val) {
             if (!val || !val.length) {
                 return;
             }
@@ -338,17 +342,7 @@ export default {
                 return;
             }
             window.location.replace(val);
-        },
-        account(val) {
-            if (!val) {
-                return;
-            }
-            if (!this.$route.query.redirect) {
-                this.$router.push({ name: 'room' });
-                return;
-            }
-            this.$router.push(this.$route.query.redirect);
-        },
+        }
     },
 };
 </script>

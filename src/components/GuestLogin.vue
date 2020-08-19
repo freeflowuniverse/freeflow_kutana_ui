@@ -36,10 +36,7 @@ export default {
     continueLogin() {
       if (this.valid) {
         this.loginAsGuest(this.guestName);
-        if (!this.$route.query.redirect) {
-          return;
-        }
-        this.$router.push(this.$route.query.redirect);
+        this.$emit('continuelogin')
       }
     }
   }
