@@ -10,7 +10,7 @@
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on: tooltip }">
                         <v-btn class="primary" @click="toggleCam" v-on="{ ...tooltip}">
-                            <v-icon>{{ videoActive && !hasVideoError ? 'videocam' : 'videocam_off' }}</v-icon>
+                            <v-icon>{{ videoActive && !hasVideoError ? 'videocam_off' : 'videocam' }}</v-icon>
                         </v-btn>
                     </template>
                     <span>Turn camera {{ videoActive ? 'off' : 'on' }}</span>
@@ -27,10 +27,7 @@
                         </v-tooltip>
                     </template>
                     <v-list>
-                        <v-list-item-group
-                            :value="videoInputDevices.map(d=>d.deviceId).indexOf(videoDevice)"
-                            color="primary"
-                        >
+                        <v-list-item-group :value="indexOfSelectedVideo" color="primary">
                             <v-list-item
                                 v-for="(item) in videoInputDevices"
                                 :key="item.deviceId"
@@ -47,10 +44,10 @@
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on: tooltip }">
                         <v-btn class="primary" @click="toggleMic" v-on="{ ...tooltip}">
-                            <v-icon>{{ audioActive && !hasAudioError ? 'mic' : 'mic_off' }}</v-icon>
+                            <v-icon>{{ audioActive && !hasAudioError ? 'mic_off' : 'mic' }}</v-icon>
                         </v-btn>
                     </template>
-                    <span>{{ audioActive ? 'Unmute' : 'Mute' }}</span>
+                    <span>{{ audioActive ? 'Mute' : 'Unmute' }}</span>
                 </v-tooltip>
                 <v-menu top left offset-y v-if="audioActive">
                     <template v-slot:activator="{ on: menu }">
@@ -64,10 +61,7 @@
                         </v-tooltip>
                     </template>
                     <v-list>
-                        <v-list-item-group
-                            :value="audioInputDevices.map(d=>d.deviceId).indexOf(audioDevice)"
-                            color="primary"
-                        >
+                        <v-list-item-group :value="indexOfSelectedAudio" color="primary">
                             <v-list-item
                                 v-for="(item) in audioInputDevices"
                                 :key="item.deviceId"
@@ -130,17 +124,35 @@
                 "
             ></video>
         </div>
-        <Settings v-model="showSettings" :local="true" style="position: absolute; padding: 16px;" />
+        <v-dialog  :value="showLogin" width="600" persistent>
+            <v-card v-if="!isLoginInAsGuest" :loading="$route.query.callback">
+                <v-card-title>Freeflow Connect</v-card-title>
+                <v-card-text v-if="$route.query.callback">Validating auth...</v-card-text>
+                <span v-else>
+                    <v-card-text>Please login using 3Bot Connect or continue as guest.</v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn id="guestLoginBtn" @click="guestLogin" text>Continue as Guest</v-btn>
+                        <v-btn
+                            id="threebotConnectLoginBtn"
+                            @click="threebotConnectLogin"
+                            text
+                        >Use 3Bot Connect</v-btn>
+                    </v-card-actions>
+                </span>
+            </v-card>
+            <GuestLogin v-else />
+        </v-dialog>
     </section>
 </template>
 <script>
 import { mapActions, mapMutations, mapGetters } from 'vuex';
 import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
 import { AvatarGenerator } from 'random-avatar-generator';
-import Settings from '../components/Settings';
+import GuestLogin from '../components/GuestLogin'
 export default {
     components: {
-        Settings
+        GuestLogin
     },
     data() {
         return {
@@ -154,17 +166,22 @@ export default {
             ],
             inviteUrl: null,
             myBackground: '',
-            showSettings: false,
-            devices:[],
+            devices: [],
             videoDevice: null,
-            audioDevice: null
+            audioDevice: null,
+            isLoginInAsGuest: false,
+            showLogin: false
         };
     },
     mounted() {
+        if (this.$route.query && this.$route.query.redirect) {
+            this.showLogin = true
+        }
         if (this.$route.query && this.$route.query.roomName) {
-            this.inviteUrl = this.$route.query.roomName
+            this.inviteUrl = this.$route.query.roomName;
         }
         navigator.mediaDevices.enumerateDevices().then(devices => {
+            console.log(`dddddd`, devices);
             this.devices = devices;
             updateCurrentStream();
         });
@@ -172,6 +189,7 @@ export default {
     },
     computed: {
         ...mapGetters([
+            'loginUrl',
             'audioActive',
             'videoActive',
             'account',
@@ -181,6 +199,22 @@ export default {
             'mediaDeviceErrors',
             'localStream',
         ]),
+        indexOfSelectedAudio() {
+            if (!this.audioInputDevices || !this.audioInputDevices.length) {
+                return;
+            }
+            return this.audioInputDevices
+                .map(d => d.deviceId)
+                .indexOf(this.audioDevice);
+        },
+        indexOfSelectedVideo() {
+            if (!this.videoInputDevices || !this.videoInputDevices.length) {
+                return;
+            }
+            return this.videoInputDevices
+                .map(d => d.deviceId)
+                .indexOf(this.videoDevice);
+        },
         avatar() {
             const generator = new AvatarGenerator();
             return generator.generateRandomAvatar(
@@ -240,9 +274,17 @@ export default {
             updateCurrentStream();
         },
         create() {
+            if(!this.account) {
+                this.showLogin = true
+                return
+            }
             this.createTeam();
         },
         joinRoom() {
+            if(!this.account) {
+                this.showLogin = true
+                return
+            }
             if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
                 updateCurrentStream();
                 this.$router.push({
@@ -260,15 +302,25 @@ export default {
                 this.myBackground = `background: url(${this.avatar}); background-position: center; background-repeat: no-repeat; background-color: rgba(0,0,0,0.4);`;
             });
         },
+        threebotConnectLogin() {
+            this.generateLoginUrl(this.$route.query);
+        },
+        guestLogin() {
+            this.isLoginInAsGuest = true
+        },
     },
     watch: {
-        devices (val) {
-            if (!val) {
-                return
+        devices(val) {
+            if (!val || !val.length) {
+                return;
             }
-            console.log(`updateing selected devices`)
-            this.videoDevice = this.videoInputDevices[0].deviceId
-            this.audioDevice = this.audioInputDevices[0].deviceId
+            console.log(`updateing selected devices`);
+            if (this.videoInputDevices[0]) {
+                this.videoDevice = this.videoInputDevices[0].deviceId;
+            }
+            if (this.audioInputDevices[0]) {
+                this.audioDevice = this.audioInputDevices[0].deviceId;
+            }
         },
         inviteUrl(val) {
             if (val && this.reg.test(val) && val.length > 15) {
@@ -280,6 +332,22 @@ export default {
                 updateCurrentStream();
                 this.$router.push({ name: 'room', params: { token: val } });
             }
+        },
+        loginUrl(val) {
+            if (!val) {
+                return;
+            }
+            window.location.replace(val);
+        },
+        account(val) {
+            if (!val) {
+                return;
+            }
+            if (!this.$route.query.redirect) {
+                this.$router.push({ name: 'room' });
+                return;
+            }
+            this.$router.push(this.$route.query.redirect);
         },
     },
 };
