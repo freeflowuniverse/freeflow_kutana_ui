@@ -73,9 +73,7 @@
             ...mapGetters(['account']),
             avatar() {
                 const generator = new AvatarGenerator();
-                return generator.generateRandomAvatar(
-                    this.$props.user.username
-                );
+                return `https://avatars.dicebear.com/api/avataaars/${this.hashString(this.$props.user.username)}.svg`;
             },
             camlive() {
                 return (
@@ -88,6 +86,14 @@
                     this.$props.user.screenShareStream.getVideoTracks()[0]
                         .readyState === 'live'
                 );
+            },
+            hashString(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
+                    hash = hash & hash;
+                }
+                return Math.abs(hash);
             },
         },
     };
