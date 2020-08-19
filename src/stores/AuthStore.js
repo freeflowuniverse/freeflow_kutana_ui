@@ -179,7 +179,9 @@ export default {
                     text: error,
                 });
             }
+
             decryptedData['name'] = user;
+            decryptedData['uuid'] = uuidv4();
 
             context.commit('setAccount', decryptedData);
         },
@@ -202,6 +204,7 @@ export default {
             state.loginUrl = url;
         },
         setAccount(state, account) {
+            console.log(account)
             window.localStorage.setItem('account', JSON.stringify(account));
             state.account = account;
         },
