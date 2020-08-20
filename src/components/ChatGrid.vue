@@ -31,7 +31,7 @@
                 </div>
                 <div :key="index">
                     <TheChatMessage
-                        :dense="!showDivider(message, index) && message && messages[index - 1] && message.sender == messages[index - 1].sender"
+                        :dense="!showDivider(message, index) && message && messages[index - 1] && message.senderId === messages[index - 1].senderId"
                         :message="message"
                     />
                 </div>

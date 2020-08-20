@@ -39,7 +39,7 @@
         mounted() {
         },
         computed: {
-            ...mapGetters(["account"]),
+            ...mapGetters(["account", "localUser"]),
         },
         methods: {
             ...mapActions(["sendMessage", "setSnackbarMessage"]),
@@ -53,6 +53,7 @@
                 if (content !== "") {
                     this.sendMessage({
                         sender: this.account.name,
+                        senderId: this.account.uuid,
                         createdAt: moment(),
                         content,
                         type
