@@ -6,73 +6,26 @@
             </v-col>
         </v-row>
         <v-row class="io mb-2" justify="center" align="center">
-            <v-btn-toggle rounded class="primary mr-1" dark>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on: tooltip }">
-                        <v-btn class="primary" @click="toggleCam" v-on="{ ...tooltip}">
-                            <v-icon>{{ videoActive && !hasVideoError ? 'videocam_off' : 'videocam' }}</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Turn camera {{ videoActive ? 'off' : 'on' }}</span>
-                </v-tooltip>
-                <v-menu top left offset-y v-if="videoActive">
-                    <template v-slot:activator="{ on: menu }">
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on: tooltip }">
-                                <v-btn class="small" v-on="{ ...tooltip, ...menu }">
-                                    <v-icon small>expand_less</v-icon>
-                                </v-btn>
-                            </template>
-                            <span>Change video input</span>
-                        </v-tooltip>
-                    </template>
-                    <v-list>
-                        <v-list-item-group :value="indexOfSelectedVideo" color="primary">
-                            <v-list-item
-                                v-for="(item) in videoInputDevices"
-                                :key="item.deviceId"
-                                @click="changeVideoTo(item.deviceId)"
-                            >
-                                <v-list-item-title>{{ item.label }}</v-list-item-title>
-                            </v-list-item>
-                        </v-list-item-group>
-                    </v-list>
-                </v-menu>
-            </v-btn-toggle>
-
-            <v-btn-toggle multiple rounded class="primary mr-1" dark>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on: tooltip }">
-                        <v-btn class="primary" @click="toggleMic" v-on="{ ...tooltip}">
-                            <v-icon>{{ audioActive && !hasAudioError ? 'mic_off' : 'mic' }}</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>{{ audioActive ? 'Mute' : 'Unmute' }}</span>
-                </v-tooltip>
-                <v-menu top left offset-y v-if="audioActive">
-                    <template v-slot:activator="{ on: menu }">
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on: tooltip }">
-                                <v-btn class="small" v-on="{ ...tooltip, ...menu }">
-                                    <v-icon small>expand_less</v-icon>
-                                </v-btn>
-                            </template>
-                            <span>Change audio input</span>
-                        </v-tooltip>
-                    </template>
-                    <v-list>
-                        <v-list-item-group :value="indexOfSelectedAudio" color="primary">
-                            <v-list-item
-                                v-for="(item) in audioInputDevices"
-                                :key="item.deviceId"
-                                @click="changeAudioInputTo(item.deviceId)"
-                            >
-                                <v-list-item-title>{{ item.label }}</v-list-item-title>
-                            </v-list-item>
-                        </v-list-item-group>
-                    </v-list>
-                </v-menu>
-            </v-btn-toggle>
+            <DeviceSelector
+                device="cam"
+                activeIcon="videocam"
+                inactiveIcon="videocam_off"
+                :devices="videoInputDevices"
+                :isActive="videoActive && !hasVideoError"
+                :selectedDeviceId="videoDevice"
+                @toggle="toggleCam"
+                @change="changeVideoTo"
+            />
+            <DeviceSelector
+                device="mic"
+                activeIcon="mic"
+                inactiveIcon="mic_off"
+                :devices="audioInputDevices"
+                :isActive="audioActive && !hasAudioError"
+                :selectedDeviceId="audioDevice"
+                @toggle="toggleMic"
+                @change="changeAudioInputTo"
+            />
         </v-row>
         <v-row class="actions pa-2" justify="center" align="center">
             <v-col cols="4">
@@ -124,7 +77,7 @@
                 "
             ></video>
         </div>
-        <v-dialog  :value="showLogin" width="600" persistent>
+        <v-dialog :value="showLogin" width="600" persistent>
             <v-card v-if="!isLoginInAsGuest" :loading="$route.query.callback">
                 <v-card-title>Freeflow Connect</v-card-title>
                 <v-card-text v-if="$route.query.callback">Validating auth...</v-card-text>
@@ -141,7 +94,7 @@
                     </v-card-actions>
                 </span>
             </v-card>
-            <GuestLogin v-else @continuelogin="continueLogin"/>
+            <GuestLogin v-else @continuelogin="continueLogin" />
         </v-dialog>
     </section>
 </template>
@@ -149,10 +102,12 @@
 import { mapActions, mapMutations, mapGetters } from 'vuex';
 import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
 import { AvatarGenerator } from 'random-avatar-generator';
-import GuestLogin from '../components/GuestLogin'
+import GuestLogin from '../components/GuestLogin';
+import DeviceSelector from '../components/DeviceSelector';
 export default {
     components: {
-        GuestLogin
+        GuestLogin,
+        DeviceSelector,
     },
     data() {
         return {
@@ -166,16 +121,15 @@ export default {
             ],
             inviteUrl: null,
             myBackground: '',
-            devices: [],
             videoDevice: null,
             audioDevice: null,
             isLoginInAsGuest: false,
-            showLogin: false
+            showLogin: false,
         };
     },
     mounted() {
         if (!this.account) {
-            this.showLogin = true
+            this.showLogin = true;
         }
         if (this.$route.query && this.$route.query.redirect) {
             this.inviteUrl = `https://${this.$route.query.redirect}`;
@@ -200,22 +154,6 @@ export default {
             'mediaDeviceErrors',
             'localStream',
         ]),
-        indexOfSelectedAudio() {
-            if (!this.audioInputDevices || !this.audioInputDevices.length) {
-                return;
-            }
-            return this.audioInputDevices
-                .map(d => d.deviceId)
-                .indexOf(this.audioDevice);
-        },
-        indexOfSelectedVideo() {
-            if (!this.videoInputDevices || !this.videoInputDevices.length) {
-                return;
-            }
-            return this.videoInputDevices
-                .map(d => d.deviceId)
-                .indexOf(this.videoDevice);
-        },
         avatar() {
             const generator = new AvatarGenerator();
             return generator.generateRandomAvatar(
@@ -223,10 +161,14 @@ export default {
             );
         },
         videoInputDevices() {
-            return this.mediaDevices.filter(d => d.kind === 'videoinput' && d.label);
+            return this.mediaDevices.filter(
+                d => d.kind === 'videoinput' && d.label
+            );
         },
         audioInputDevices() {
-            return this.mediaDevices.filter(d => d.kind === 'audioinput' && d.label);
+            return this.mediaDevices.filter(
+                d => d.kind === 'audioinput' && d.label
+            );
         },
         audioOutputDevices() {
             return this.mediaDevices.filter(
@@ -251,7 +193,7 @@ export default {
             'updateAudioDevice',
         ]),
         continueLogin() {
-            this.showLogin = false
+            this.showLogin = false;
         },
         changeAudioInputTo(audioInputDeviceId) {
             this.audioDevice = audioInputDeviceId;
@@ -278,16 +220,16 @@ export default {
             updateCurrentStream();
         },
         create() {
-            if(!this.account) {
-                this.showLogin = true
-                return
+            if (!this.account) {
+                this.showLogin = true;
+                return;
             }
             this.createTeam();
         },
         joinRoom() {
-            if(!this.account) {
-                this.showLogin = true
-                return
+            if (!this.account) {
+                this.showLogin = true;
+                return;
             }
             if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
                 updateCurrentStream();
@@ -310,7 +252,7 @@ export default {
             this.generateLoginUrl(this.$route.query);
         },
         guestLogin() {
-            this.isLoginInAsGuest = true
+            this.isLoginInAsGuest = true;
         },
     },
     watch: {
@@ -318,13 +260,19 @@ export default {
             if (!val || !val.length) {
                 return;
             }
-            console.log(`updateing selected devices`);
-            if (this.videoInputDevices[0]) {
-                this.videoDevice = this.videoInputDevices[0].deviceId;
-            }
-            if (this.audioInputDevices[0]) {
-                this.audioDevice = this.audioInputDevices[0].deviceId;
-            }
+
+            this.videoDevice =
+                (this.mediaDevices.find(
+                    d =>
+                        d.label ===
+                        this.localUser?.stream?.getVideoTracks()[0]?.label
+                )?.deviceId || this.videoInputDevices[0]).deviceId;
+            this.audioDevice =
+                (this.mediaDevices.find(
+                    d =>
+                        d.label ===
+                        this.localUser?.stream?.getAudioTracks()[0]?.label
+                )?.deviceId || this.audioInputDevices[0]).deviceId;
         },
         inviteUrl(val) {
             if (val && this.reg.test(val) && val.length > 15) {
@@ -342,7 +290,7 @@ export default {
                 return;
             }
             window.location.replace(val);
-        }
+        },
     },
 };
 </script>
@@ -373,12 +321,6 @@ export default {
         grid-row-end: ioend;
         grid-column-end: 1;
         z-index: 2;
-        .v-btn {
-            min-width: 68px !important;
-        }
-        .v-btn.small {
-            min-width: 0 !important;
-        }
     }
     .actions {
         grid-row-start: actionsstart;
