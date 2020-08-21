@@ -76,22 +76,13 @@
                 "
             ></video>
         </div>
-        <Settings
-            v-model="showSettings"
-            :local="true"
-            style="position: absolute; padding: 16px;"
-        />
     </section>
 </template>
 <script>
     import { mapActions, mapMutations, mapGetters } from 'vuex';
     import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
     import { AvatarGenerator } from 'random-avatar-generator';
-    import Settings from '../components/Settings';
     export default {
-        components: {
-            Settings,
-        },
         data() {
             return {
                 /* eslint-disable */
