@@ -1,5 +1,5 @@
 <template>
-    <v-row justify="center" ref="controlstrip" class="mb-5" style="z-index: 99999999999999999">
+    <v-row justify="center" ref="controlstrip" class="mb-5">
       <v-tooltip top>
         <template v-slot:activator="{ on, attrs }">
           <v-btn @click="toggleCam" class="primary mx-2" dark icon v-bind="attrs" v-on="on" :disabled="hasVideoError" :fab="!isMobile" :loading="isCamLoading">
