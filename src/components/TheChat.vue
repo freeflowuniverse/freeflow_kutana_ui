@@ -9,7 +9,7 @@
           <v-divider class="mb-2"></v-divider>
         </div>
         <div :key="index">
-          <TheChatMessage :message="message" :dense="message && messages[index - 1] && message.sender == messages[index - 1].sender && !showDivider(message, index)"/>
+          <TheChatMessage :message="message" :dense="message && messages[index - 1] && message.senderId === messages[index - 1].senderId && !showDivider(message, index)"/>
         </div>
       </template>
     </div>

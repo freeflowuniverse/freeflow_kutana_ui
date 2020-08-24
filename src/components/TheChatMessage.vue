@@ -72,9 +72,6 @@ export default {
   },
   computed: {
     ...mapGetters(["account"]),
-    isMine() {
-      return this.message.sender === this.account.name
-    },
     mimeType() {
       if (this.message.type === "file") {
         return this.message.content.file.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0];

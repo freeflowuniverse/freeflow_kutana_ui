@@ -27,6 +27,7 @@ export const initializeJanus = async (
             console.log('initialJoin');
             initialJoin = false;
             initialStream.getTracks().forEach(async track => {
+                console.log('track', track)
                 await videoRoomPlugin.publishTrack(track);
             });
         }
@@ -88,8 +89,8 @@ export const initializeJanus = async (
     videoRoomPlugin.addEventListener('userLeft', user => {
         store.commit('deleteRemoteUser', user);
     });
-    videoRoomPlugin.addEventListener('cleanupUser', user => {
-        if (store.dispatch('findUserById', user.id)) {
+    videoRoomPlugin.addEventListener('cleanupUser', async user => {
+        if (await store.dispatch('findUserById', user.id)) {
             store.commit('addRemoteUser', user);
             return;
         }

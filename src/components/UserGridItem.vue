@@ -5,7 +5,7 @@
         </div>
         <JanusVideo
             :cover="false"
-            :label="account.name !== user.username ? user.username : null"
+            :label="localUser.id !== user.id ? user.username : null"
             :stream="user.screenShareStream"
             class="screen"
             :class="screenShareDisabled ? 'cameraDisabled' : 'cameraActive'"
@@ -15,7 +15,7 @@
         ></JanusVideo>
         <JanusVideo
             :cover="true"
-            :label="account.name !== user.username ? user.username : null"
+            :label="localUser.id !== user.id ? user.username : null"
             :stream="user.stream"
             class="main"
             :class="userCameraDisabled ? 'cameraDisabled' : 'cameraActive'"
@@ -70,7 +70,7 @@
             }
         },
         computed: {
-            ...mapGetters(['account']),
+            ...mapGetters(['account', 'localUser']),
             avatar() {
                 const generator = new AvatarGenerator();
                 return `https://avatars.dicebear.com/api/avataaars/${this.hashString(this.$props.user.username)}.svg`;
