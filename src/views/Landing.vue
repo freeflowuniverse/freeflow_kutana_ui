@@ -104,6 +104,9 @@ import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
 import { AvatarGenerator } from 'random-avatar-generator';
 import GuestLogin from '../components/GuestLogin';
 import DeviceSelector from '../components/DeviceSelector';
+import { mapActions, mapMutations, mapGetters } from 'vuex';
+import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
+import { AvatarGenerator } from 'random-avatar-generator';
 export default {
     components: {
         GuestLogin,
