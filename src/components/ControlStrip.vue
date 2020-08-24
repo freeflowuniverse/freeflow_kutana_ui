@@ -1,5 +1,5 @@
 <template>
-    <v-row justify="center" ref="controlstrip" class="mb-5" style="z-index: 99999999999999999">
+    <v-row justify="center" ref="controlstrip" class="mb-5">
         <DeviceSelector
             :loading="isCamLoading"
             device="cam"
