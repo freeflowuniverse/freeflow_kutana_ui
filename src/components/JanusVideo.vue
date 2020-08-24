@@ -58,7 +58,6 @@
                 isFullScreen: false,
                 show: false,
                 timeout: null,
-                userCameraDisabled: false,
             };
         },
         computed: {
@@ -69,11 +68,7 @@
                     'video-present': !this.userCameraDisabled,
                     'video-not-present': this.userCameraDisabled,
                 };
-
             },
-        },
-        mounted() {
-          this.$refs.video.addEventListener('progress', this.checkVideoStatus);
         },
         methods: {
             fullScreenChanged() {
@@ -113,23 +108,6 @@
                         this.show = false;
                     }, 4000);
             },
-            checkVideoStatus() {
-              const currentVideoStatus = this.stream.getVideoTracks()[0].getSettings().frameRate === 0;
-
-              if(currentVideoStatus === this.userCameraDisabled) {
-                return;
-              }
-
-              this.userCameraDisabled = currentVideoStatus;
-
-              if (currentVideoStatus) {
-                console.log('stop video')
-                this.$emit('stopVideo');
-                return;
-              }
-              console.log('resume video')
-              this.$emit('resumeVideo');
-            }
         },
     };
 </script>

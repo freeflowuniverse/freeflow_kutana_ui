@@ -8,20 +8,14 @@
             :label="localUser.id !== user.id ? user.username : null"
             :stream="user.screenShareStream"
             class="screen"
-            :class="screenShareDisabled ? 'cameraDisabled' : 'cameraActive'"
             v-if="user.screen"
-            @stopVideo="screenShareDisabled = true"
-            @resumeVideo="screenShareDisabled = false"
         ></JanusVideo>
         <JanusVideo
             :cover="true"
             :label="localUser.id !== user.id ? user.username : null"
             :stream="user.stream"
             class="main"
-            :class="userCameraDisabled ? 'cameraDisabled' : 'cameraActive'"
             v-if="user.cam"
-            @stopVideo="userCameraDisabled = true"
-            @resumeVideo="userCameraDisabled = false"
         ></JanusVideo>
     </div>
 </template>
@@ -41,7 +35,6 @@
         data: () => {
           return {
             userCameraDisabled: false,
-            screenShareDisabled: false,
           }
         },
         mounted() {
@@ -70,7 +63,7 @@
             }
         },
         computed: {
-            ...mapGetters(['account', 'localUser']),
+            ...mapGetters(['account', 'allUsers', 'localUser']),
             avatar() {
                 const generator = new AvatarGenerator();
                 return `https://avatars.dicebear.com/api/avataaars/${this.hashString(this.$props.user.username)}.svg`;
@@ -112,16 +105,6 @@
                 width: 10vw;
                 height: 10vh;
             }
-        }
-
-        .cameraActive {
-            display: block;
-        }
-
-        .cameraDisabled {
-            transition: filter 0.5s ease-in-out;
-            transition-delay: 2s;
-            filter: grayscale(1) blur(44px);
         }
 
         .avatar {

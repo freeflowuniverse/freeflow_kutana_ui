@@ -18,7 +18,7 @@
 </template>
 <script>
 import UserGridItem from './UserGridItem';
-import { mapGetters } from 'vuex';
+import { mapMutations, mapGetters } from 'vuex';
 
 export default {
     components: {
@@ -37,7 +37,11 @@ export default {
         return {
             windowOrientation: 'landscape',
             controlStripStyle: '',
+            pollingVideoStreams: null,
         };
+    },
+    created() {
+      this.pollingVideoStreamsLoop = this.checkActiveVideoStreams();
     },
     mounted() {
         this.$nextTick(function() {
@@ -51,11 +55,13 @@ export default {
     },
     beforeDestroy() {
         delete this.observer;
+        clearInterval(this.pollingVideoStreamsLoop);
     },
     computed: {
-        ...mapGetters(['isMobile']),
+        ...mapGetters(['isMobile', 'remoteUsers']),
     },
     methods: {
+        ...mapMutations(['updateRemoteUser']),
         calculateOrientation() {
             this.windowOrientation =
                 this.$refs.usergrid?.clientWidth * 3 >
@@ -73,6 +79,26 @@ export default {
                     'position:relative; transition: all 300ms ease-in-out 0s;';
             });
         },
+        checkActiveVideoStreams() {
+            this.pollingVideoStreams = setInterval(() => {
+                for (const user of this.remoteUsers) {
+                    const remoteUser = user;
+                    const currentVideoStatus = remoteUser.stream.getVideoTracks()[0].getSettings().frameRate > 0;
+
+                    if(currentVideoStatus === remoteUser.cam) {
+                      return;
+                    }
+
+                    if (currentVideoStatus) {
+                      remoteUser.cam = true;
+                      this.updateRemoteUser(remoteUser);
+                      return;
+                    }
+                    remoteUser.cam = false;
+                    this.updateRemoteUser(remoteUser);
+                }
+            }, 100)
+        }
     },
     watch: {
         showChat() {

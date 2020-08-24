@@ -1,3 +1,5 @@
+import { toNestedArray } from '@tensorflow/tfjs-core/dist/util';
+
 export default {
     state: {
         localUser: null,
@@ -25,6 +27,12 @@ export default {
                 return;
             }
 
+            state.remoteUsers.splice(userIndex, 1, user);
+        },
+        updateRemoteUser(state, user) {
+            const userIndex = state.remoteUsers.findIndex(
+                u => u.id === user.id
+            );
             state.remoteUsers.splice(userIndex, 1, user);
         },
         deleteRemoteUser(state, user) {
