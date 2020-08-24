@@ -204,7 +204,6 @@ export default {
             state.loginUrl = url;
         },
         setAccount(state, account) {
-            console.log(account)
             window.localStorage.setItem('account', JSON.stringify(account));
             state.account = account;
         },
