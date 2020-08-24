@@ -93,8 +93,6 @@ export default {
                 return this.wallpaperDataUrl;
             } else if (this.selectedBackground) {
                 return this.selectedBackground;
-            } else {
-                return this.defaultBackgrounds[0];
             }
         },
     },
@@ -137,7 +135,9 @@ export default {
         },
         changeWallpaper(e) {
             var files = e.target.files;
-            if (files[0] !== undefined) {
+            if (files[0] == undefined) {
+                return
+            } else {
                 this.selectedBackground = null
                 this.wallpaperFile = files[0];
                 this.changeCameraBackground(this.wallpaperFile);
