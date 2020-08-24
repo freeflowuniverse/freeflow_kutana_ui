@@ -1,7 +1,5 @@
 <template>
-  <v-row class="guestlogin" align="center" justify="center">
-    <v-col cols="12" md="6">
-      <v-form @submit.prevent="continueLogin" class="mx-5" v-model="valid">
+      <v-form @submit.prevent="continueLogin" v-model="valid">
         <v-card :loading="$route.query.callback">
           <v-card-title>Freeflow Connect</v-card-title>
           <v-card-text>
@@ -14,8 +12,6 @@
           </v-card-actions>
         </v-card>
       </v-form>
-    </v-col>
-  </v-row>
 </template>
 <script>
 import { mapActions } from "vuex";
@@ -40,18 +36,9 @@ export default {
     continueLogin() {
       if (this.valid) {
         this.loginAsGuest(this.guestName);
-        if (!this.$route.query.redirect) {
-          return;
-        }
-        this.$router.push(this.$route.query.redirect);
+        this.$emit('continuelogin')
       }
     }
   }
 };
 </script>
-<style lang="scss">
-  .guestlogin{
-    background: #f5f5f5;
-    height: calc(var(--vh) * 100);
-  }
-</style>

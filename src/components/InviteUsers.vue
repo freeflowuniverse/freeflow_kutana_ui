@@ -41,7 +41,6 @@ export default {
       try {
         await navigator.clipboard.writeText(this.inviteLink);
         this.setSnackbarMessage({
-          type: 'info',
           text: `Link copied to clipboard`,
         });
       } catch (e) {

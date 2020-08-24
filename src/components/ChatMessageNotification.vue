@@ -56,6 +56,7 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    z-index: 3;
     .notification {
         opacity: 0.8;
         border-radius: 5px;

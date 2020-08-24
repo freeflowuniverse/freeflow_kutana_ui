@@ -51,7 +51,7 @@ export default {
       return this.$vuetify.breakpoint.mdAndDown;
     },
     isMine() {
-      return this.user == this.localUser;
+      return this.localUser.id !== this.user.id;
     },
     userVideoStream() {
       if (!this.user || !this.user.stream) {

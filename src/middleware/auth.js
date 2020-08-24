@@ -12,7 +12,7 @@ router.beforeEach((to, from, next) => {
         !(store.getters.account && store.getters.account.name)
     ) {
         next({
-            name: 'login',
+            name: 'home',
             query: {
                 redirect: to.fullPath,
             },

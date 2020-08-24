@@ -5,14 +5,14 @@
         </div>
         <JanusVideo
             :cover="false"
-            :label="account.name !== user.username ? user.username : null"
+            :label="localUser.id !== user.id ? user.username : null"
             :stream="user.screenShareStream"
             class="screen"
             v-if="user.screen"
         ></JanusVideo>
         <JanusVideo
             :cover="true"
-            :label="account.name !== user.username ? user.username : null"
+            :label="localUser.id !== user.id ? user.username : null"
             :stream="user.stream"
             class="main"
             v-if="user.cam"
@@ -63,12 +63,10 @@
             }
         },
         computed: {
-            ...mapGetters(['account', 'allUsers']),
+            ...mapGetters(['account', 'allUsers', 'localUser']),
             avatar() {
                 const generator = new AvatarGenerator();
-                return generator.generateRandomAvatar(
-                    this.$props.user.username
-                );
+                return `https://avatars.dicebear.com/api/avataaars/${this.hashString(this.$props.user.username)}.svg`;
             },
             camlive() {
                 return (
@@ -83,6 +81,16 @@
                 );
             },
         },
+      methods: {
+          hashString(str) {
+              let hash = 0;
+              for (let i = 0; i < str.length; i++) {
+                  hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
+                  hash = hash & hash;
+              }
+              return Math.abs(hash);
+          },
+      }
     };
 </script>
 <style lang="scss" scoped>
