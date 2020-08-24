@@ -157,7 +157,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions(['getAudioStream', 'getVideoStream']),
+        ...mapActions(['getAudioStream', 'getVideoStream', 'updateAudioDevice', 'updateVideoDevice']),
         ...mapMutations([
             'setLocalUser',
             'toggleAudioActive',
