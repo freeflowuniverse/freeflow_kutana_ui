@@ -8,7 +8,7 @@
         class="room"
         v-if="allUsers.length && allScreenUsers.length"
     >
-        <div v-if="users.length <= 1 && showInvitation" :class="showInvitation ? 'invite': ''">
+        <div v-if="(remoteUsers.length <= 0 && showInvitation) || forceOpenInvitation" :class="showInvitation || forceOpenInvitation ? 'invite': ''">
           <InviteUsers @closeInvitations="closeInvitations" />
         </div>
         <UserGrid :users="users" :showChat="view === 'chat'">
@@ -27,6 +27,7 @@
                             view === 'chat' ? (view = 'grid') : (view = 'chat')
                         "
                         @openSettings="showSettings = true"
+                        @openInvitations="forceOpenInvitation = true"
                     ></ControlStrip>
                 </v-row>
             </template>
@@ -44,7 +45,7 @@
         <Settings v-if="userControl" v-model="showSettings"></Settings>
         <ChatMessageNotification
             class="notifications"
-            v-if="view != 'chat'"
+            v-if="view !== 'chat'"
             @click="view = view === 'chat' ? 'grid' : 'chat'"
         />
     </div>
@@ -87,7 +88,8 @@
                 showControls: false,
                 timeout: null,
                 showSettings: false,
-                showInvitation: true
+                showInvitation: true,
+                forceOpenInvitation: false
             };
         },
         beforeMount() {
@@ -172,9 +174,11 @@
                     this.showControls = false;
                 }, 4000);
             },
-          closeInvitations() {
-            this.showInvitation = false;
-          }
+            closeInvitations() {
+              console.log('close')
+              this.showInvitation = false;
+              this.forceOpenInvitation = false;
+            }
         },
         computed: {
             ...mapGetters([

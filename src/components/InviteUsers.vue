@@ -3,7 +3,7 @@
     <v-card-title>
       <v-row>
         <v-col class="py-0">
-          <h3>No users yet</h3>
+          <h3>{{ inviteMessage }}</h3>
         </v-col>
         <v-col align="end" class="py-0">
           <v-btn icon @click="$emit('closeInvitations')">
@@ -32,11 +32,13 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 export default {
   name: "InviteUsers",
   methods: {
-    ...mapActions(['setSnackbarMessage']),
+    ...mapActions([
+        'setSnackbarMessage'
+    ]),
     async copyUrl() {
       try {
         await navigator.clipboard.writeText(this.inviteLink);
@@ -53,6 +55,12 @@ export default {
     },
   },
   computed: {
+    ...mapGetters([
+       'remoteUsers'
+    ]),
+    inviteMessage() {
+      return this.remoteUsers.length <= 0 ? 'No users yet' : 'Invite more users'
+    },
     inviteLink() {
       let baseUrl = window.location.href;
       if (baseUrl.charAt(baseUrl.length - 1) !== '/') {

@@ -66,11 +66,11 @@
         </v-tooltip>
         <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
-                <v-btn disabled class="primary mx-2" v-bind="attrs" v-on="on" dark icon>
-                    <v-icon small>broken_image</v-icon>
+                <v-btn @click="$emit('openInvitations')" class="primary mx-2" v-bind="attrs" v-on="on" dark icon>
+                    <v-icon small>group_add</v-icon>
                 </v-btn>
             </template>
-            <span>Toggle Background</span>
+            <span>Invite Users</span>
         </v-tooltip>
         <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
@@ -157,7 +157,12 @@ export default {
         },
     },
     methods: {
-        ...mapActions(['getAudioStream', 'getVideoStream', 'updateAudioDevice', 'updateVideoDevice']),
+        ...mapActions([
+          'getAudioStream',
+          'getVideoStream',
+          'updateAudioDevice',
+          'updateVideoDevice'
+        ]),
         ...mapMutations([
             'setLocalUser',
             'toggleAudioActive',
