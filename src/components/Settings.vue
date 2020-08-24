@@ -91,7 +91,7 @@ export default {
         getWallpaperImage() {
             if (this.wallpaperDataUrl) {
                 return this.wallpaperDataUrl;
-            } else if (this.selectedBackground) {
+            } else {
                 return this.selectedBackground;
             }
         },
