@@ -179,7 +179,9 @@ export default {
                     text: error,
                 });
             }
+
             decryptedData['name'] = user;
+            decryptedData['uuid'] = uuidv4();
 
             context.commit('setAccount', decryptedData);
         },
