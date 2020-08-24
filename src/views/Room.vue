@@ -93,7 +93,7 @@
         beforeMount() {
             if (!store.getters.localStream) {
                 router.push({
-                    name: 'joinRoom',
+                    name: 'home',
                     params: { token: this.$route.params.token },
                 });
                 return;
@@ -107,8 +107,8 @@
             if (!store.getters.localStream) {
                 try {
                     await router.push({
-                        name: 'joinRoom',
-                        params: { token: this.$route.params.token },
+                        name: 'home',
+                        query: { roomName: this.$route.params.token },
                     });
                 } catch (e) {}
 
