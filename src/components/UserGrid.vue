@@ -58,7 +58,7 @@ export default {
         clearInterval(this.pollingVideoStreamsLoop);
     },
     computed: {
-        ...mapGetters(['isMobile', 'localUser', 'remoteUsers']),
+        ...mapGetters(['isMobile', 'remoteUsers']),
     },
     methods: {
         ...mapMutations(['updateRemoteUser']),
