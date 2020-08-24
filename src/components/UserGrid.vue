@@ -83,7 +83,7 @@ export default {
             this.pollingVideoStreams = setInterval(() => {
                 for (const user of this.remoteUsers) {
                     const remoteUser = user;
-                    const currentVideoStatus = remoteUser.stream.getVideoTracks()[0].getSettings().frameRate > 0;
+                    const currentVideoStatus = remoteUser.stream?.getVideoTracks()[0]?.getSettings().frameRate > 0;
 
                     if(currentVideoStatus === remoteUser.cam) {
                       return;

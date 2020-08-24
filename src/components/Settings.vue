@@ -13,6 +13,7 @@
                     <h2 class="subtitle-1 pt-5 red--text">Experimental feature</h2>
                     <v-switch
                         inset
+                        :disabled="!videoActive"
                         v-model="backgroundRemove"
                         @change="toggleBackgroundRemoval"
                         label="Replace background"
@@ -21,8 +22,8 @@
                     <v-row>
                         <v-col cols="3" v-for="(bg, index) in defaultBackgrounds" :key="index">
                             <v-card
-                                @click="selectedBackground = bg"
-                                :class="{ selected: selectedBackground == bg}"
+                                @click="changeWallpaper(bg)"
+                                :class="{ selected: selectedBackground === bg}"
                             >
                                 <v-img :aspect-ratio="16/9" :src="bg" ></v-img>
                             </v-card>
@@ -34,7 +35,7 @@
                                 :class="{ selected: !!wallpaperFile}"
                             >
                                 <input
-                                    @change="changeWallpaper"
+                                    @change="useUploadedBackground"
                                     style="display:none"
                                     ref="imageUpload"
                                     type="file"
@@ -78,6 +79,7 @@ export default {
             'mediaDevices',
             'mediaDeviceErrors',
             'wallpaperDataUrl',
+            'videoActive',
             'account',
         ]),
         show: {
@@ -91,9 +93,8 @@ export default {
         getWallpaperImage() {
             if (this.wallpaperDataUrl) {
                 return this.wallpaperDataUrl;
-            } else {
-                return this.selectedBackground;
             }
+            return this.selectedBackground;
         },
     },
     data: function () {
@@ -133,17 +134,20 @@ export default {
             });
             this.logout();
         },
-        changeWallpaper(e) {
-            var files = e.target.files;
-            if (files[0] == undefined) {
-                return
-            } else {
-                this.selectedBackground = null
-                this.wallpaperFile = files[0];
-                this.changeCameraBackground(this.wallpaperFile);
-                this.toggleBackgroundRemoval(this.backgroundRemove);
-            }
-            
+        useUploadedBackground(e) {
+          const files = e.target.files;
+          const wallpaper = files[0];
+          if (!wallpaper) {
+            return;
+          }
+          this.selectedBackground = null;
+          this.wallpaperFile = wallpaper;
+          this.changeCameraBackground(this.wallpaperFile);
+        },
+        changeWallpaper(file) {
+            this.selectedBackground = file;
+            this.wallpaperFile = null;
+            this.changeCameraBackground(null);
         },
         async toggleBackgroundRemoval(newBackgroundRemove) {
             const stream = await this.getVideoStream();
@@ -166,13 +170,13 @@ export default {
             await this.toggleBackgroundRemoval(newBackgroundRemove);
         },
         selectedBackground(val, oldval) {
-            if (oldval != null && val != null) {
+            if (oldval === null && val === null) {
                 this.toggleBackgroundRemoval(false);
+                return;
             }
-            if (val != null) {
-                this.wallpaperFile = '';
-                this.toggleBackgroundRemoval(this.backgroundRemove);
-            }
+            this.wallpaperFile = null;
+            this.changeCameraBackground(null);
+            this.toggleBackgroundRemoval(this.backgroundRemove);
         },
     },
 };
