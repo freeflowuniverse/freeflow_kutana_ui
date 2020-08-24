@@ -172,19 +172,19 @@ export const initializeJanus = async (
         startScreenShare: async () => {
             const stream = await navigator.mediaDevices.getDisplayMedia();
             const videoTrack = stream.getVideoTracks()[0];
-            stream.oninactive = () => {
-                //@todo: use screenShareRoomPlugin
-                window.janusshizzle.screenShareRoomPlugin.pluginHandle.hangup();
-                videoTrack.dispatchEvent(new Event('ended'));
-                stream.dispatchEvent(new Event('ended'));
-                const localScreenUser = store.getters.localScreenUser;
-                localScreenUser.screen = false;
-                store.commit('setLocalScreenUser', localScreenUser);
-            };
             await screenShareRoomPlugin.publishTrack(videoTrack);
             const localScreenUser = store.getters.localScreenUser;
             localScreenUser.screen = true;
             store.commit('setLocalScreenUser', localScreenUser);
+        },
+        stopScreenShare: async () => {
+            screenShareRoomPlugin?.myStream?.getTracks().forEach(t => {
+                t.stop();
+            });
+            const localScreenUser = store.getters.localScreenUser;
+            localScreenUser.screen = false;
+            store.commit('setLocalScreenUser', localScreenUser);
+            screenShareRoomPlugin.pluginHandle.hangup();
         },
         startCamera: async () => {
             const stream = await store.dispatch('getVideoStream');

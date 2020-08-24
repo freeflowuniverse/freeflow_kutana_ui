@@ -196,11 +196,14 @@ export default {
             }, 100);
         },
         screen() {
+            if (this.localScreenUser.screen) {
+              this.userControl.stopScreenShare();
+              return;
+            }
             this.userControl.startScreenShare();
             setTimeout(() => {
                 this.$forceUpdate();
             }, 100);
-            return;
         },
         async hangUp() {
             this.userControl.hangUp();
