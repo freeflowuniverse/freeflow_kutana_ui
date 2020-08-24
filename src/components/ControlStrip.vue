@@ -121,7 +121,6 @@ export default {
             }, 100);
         },
         screen() {
-          console.log(this.localScreenUser)
             if (this.localScreenUser.screen) {
               this.userControl.stopScreenShare();
               return;
