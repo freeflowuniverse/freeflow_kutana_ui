@@ -7,7 +7,7 @@
         :data-ismobile="isMobile ? 'true' : 'false'"
         class="grid"
     >
-        <UserGridItem :user="user" class="user" :class="{mine: user == users[0]}" v-bind:key="user.uuid" v-for="user of users" />
+        <UserGridItem :user="user" class="user" v-bind:key="user.uuid" v-for="user of users" />
         <div class="controlstrip">
             <slot name="controlStrip"></slot>
         </div>
