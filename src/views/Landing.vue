@@ -112,7 +112,7 @@ export default {
     data() {
         return {
             /* eslint-disable */
-            reg: new RegExp('(?:https://.*/room/)?(.*)'),
+            reg: new RegExp('(?:https://.*/room/)?([a-z0-9]*)(.*)'),
             /* eslint-enable */
             valid: false,
             inviteUrlRules: [
@@ -128,6 +128,9 @@ export default {
         };
     },
     mounted() {
+        if (this.$route.query.callback) {
+            this.checkResponse(window.location.href);
+        }
         if (!this.account) {
             this.showLogin = true;
         }
@@ -191,6 +194,8 @@ export default {
             'refreshMediaDevices',
             'updateVideoDevice',
             'updateAudioDevice',
+            'generateLoginUrl',
+            'checkResponse'
         ]),
         continueLogin() {
             this.showLogin = false;
@@ -286,11 +291,19 @@ export default {
             }
         },
         loginUrl(val) {
-            if (!val) {
-                return;
+            if (val) {
+                window.location.replace(val);
             }
-            window.location.replace(val);
         },
+        account(val) {
+            if(val && this.$route.query.callback){
+                let query = Object.assign({}, this.$route.query);
+                delete query.callback;
+                delete query.signedAttempt;
+                this.$router.replace({ query });
+                this.showLogin = false;
+            }
+        }
     },
 };
 </script>

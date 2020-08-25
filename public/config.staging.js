@@ -2,7 +2,7 @@ export default {
     ffcBackend: 'https://ffc-api.staging.jimber.org/',
     appId: window.location.host,
     scope: JSON.stringify({ doubleName: true }),
-    redirect_url: `/login?callback=true`,
+    redirect_url: `?callback=true`,
     botFrontEnd: "https://login.staging.jimber.org/",
     botBackend: "https://login.staging.jimber.org/",
     debugJanus: false,

@@ -55,6 +55,7 @@ export default {
             }); // * indicates guest login
         },
         async checkResponse(context, responseUrl) {
+            console.log(`Checking response`)
             responseUrl = new URL(responseUrl);
             let url = new URL(window.location.href);
             let error = url.searchParams.get('error');
