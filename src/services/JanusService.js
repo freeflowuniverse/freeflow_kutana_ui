@@ -167,6 +167,12 @@ export const initializeJanus = async (
             const videoTrack = stream.getVideoTracks()[0];
             await screenShareRoomPlugin.publishTrack(videoTrack);
             const localScreenUser = store.getters.localScreenUser;
+            stream.oninactive = () => {
+                const localScreenUser = store.getters.localScreenUser;
+                localScreenUser.screen = false;
+                store.commit('setLocalScreenUser', localScreenUser);
+                screenShareRoomPlugin.pluginHandle.hangup();
+            };
             localScreenUser.screen = true;
             store.commit('setLocalScreenUser', localScreenUser);
         },
