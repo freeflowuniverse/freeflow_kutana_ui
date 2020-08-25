@@ -175,7 +175,6 @@
                 }, 4000);
             },
             closeInvitations() {
-              console.log('close')
               this.showInvitation = false;
               this.forceOpenInvitation = false;
             }
