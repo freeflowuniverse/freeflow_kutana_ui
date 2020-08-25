@@ -3,6 +3,7 @@ import * as bodyPix from '@tensorflow-models/body-pix';
 import * as tf from '@tensorflow/tfjs-core';
 
 let bodyPixNet;
+let renderLoop;
 
 // @todo move to webworker with offscreen rendering
 export const removeBackground = async (
@@ -49,7 +50,11 @@ export const removeBackground = async (
     backgroundImage.src = image;
 
     const captureStream = resultCanvas.captureStream(60);
-    const renderLoop = startRenderLoop(
+
+    if (renderLoop) {
+        clearInterval(renderLoop);
+    }
+    renderLoop = startRenderLoop(
         canvas,
         canvas.getContext('2d'),
         resultCanvas,
@@ -57,10 +62,7 @@ export const removeBackground = async (
         backgroundImage,
         imageCapture
     );
-    return {
-        renderLoop,
-        track: captureStream.getVideoTracks()[0]
-    };
+    return captureStream.getVideoTracks()[0];
 };
 
 async function grabFrame(imageCapture) {

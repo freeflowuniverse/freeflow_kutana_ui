@@ -122,8 +122,7 @@ export default {
             'updateVideoDevice',
             'updateAudioDevice',
             'changeCameraBackground',
-            'clearActiveBackground',
-            'setActiveBackground',
+            'stopActiveBackgroundTrack',
             'setBackgroundTrack',
             'logout',
         ]),
@@ -151,18 +150,17 @@ export default {
         },
         async toggleBackgroundRemoval(newBackgroundRemove) {
             const stream = await this.getVideoStream();
-            this.clearActiveBackground();
+            this.stopActiveBackgroundTrack();
             if (!newBackgroundRemove) {
                 await this.userControl.publishTrack(stream.getVideoTracks()[0]);
                 return;
             }
-            const { renderLoop, track } = await removeBackground(
+            const backgroundTrack = await removeBackground(
                 stream.getVideoTracks()[0],
                 this.getWallpaperImage
             );
-            this.setActiveBackground(renderLoop);
-            this.setBackgroundTrack(track);
-            await this.userControl.publishTrack(track);
+            this.setBackgroundTrack(backgroundTrack);
+            await this.userControl.publishTrack(backgroundTrack);
         },
     },
     watch: {
