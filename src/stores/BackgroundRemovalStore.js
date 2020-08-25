@@ -26,7 +26,6 @@ export default {
                 return;
             }
             const fileReader = new FileReader();
-            console.log(`wallpaperFile`, wallpaperFile)
             fileReader.readAsDataURL(wallpaperFile);
             fileReader.onload = function() {
                 commit('setWallpaperDataUrl', fileReader.result);
