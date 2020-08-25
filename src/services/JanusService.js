@@ -71,14 +71,6 @@ export const initializeJanus = async (
         if (user === store.getters.localUser) {
             return;
         }
-        user.stream.getVideoTracks().forEach(track => {
-            track.onended = async event => {
-                console.log('ended');
-                const newUser = store.dispatch('findUserById', user.id);
-                newUser.cam = false;
-                store.commit('addRemoteUser', newUser);
-            };
-        });
         const videoTrack = user?.stream?.getVideoTracks()[0];
         if (videoTrack && videoTrack.readyState === 'live') {
             user.cam = true;
