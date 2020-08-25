@@ -22,7 +22,7 @@
         </v-row>
       <!-- </v-card-subtitle> -->
       <v-card-text v-if="message.type === 'text'" class="font-weight-bold content pa-1 pl-2">
-        <vueMarkdown :anchorAttributes="anchorAttributes" :html="false">{{message.content}}</vueMarkdown>
+        <div v-dompurify-html="parseMarkdown"></div>
       </v-card-text>
       <v-card-text v-else-if="message.type === 'file' && mimeType === 'image/png'">
         <v-img :src="message.content.file"></v-img>
@@ -54,14 +54,12 @@
 
 <script type="javascript">
 import { mapGetters } from "vuex";
-import vueMarkdown from "vue-markdown";
+import marked from 'marked';
 import moment from "moment";
 
 export default {
   props: ["message", "dense"],
-  components: {
-    vueMarkdown
-  },
+  components: {},
   data() {
     return {
       showTime: false,
@@ -92,6 +90,9 @@ export default {
         return `${Math.round((sizeInBytes / 1000) * 100) / 100} KB`;
       }
       return false;
+    },
+    parseMarkdown() {
+      return marked(this.message.content);
     },
     parsedMessage() {
       var urlRegex = /(https?:\/\/[^\s]+)/g;
