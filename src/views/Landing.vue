@@ -104,7 +104,6 @@ import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
 import { AvatarGenerator } from 'random-avatar-generator';
 import GuestLogin from '../components/GuestLogin';
 import DeviceSelector from '../components/DeviceSelector';
-import { parseUrl } from '@tensorflow/tfjs-core/dist/io/http';
 export default {
     components: {
         GuestLogin,
@@ -130,7 +129,6 @@ export default {
     },
     mounted() {
         if (this.$route.query.callback) {
-            console.log(this.$route.query);
             this.checkResponse(window.location.href);
         }
         if (!this.account) {
@@ -306,7 +304,7 @@ export default {
                 delete query.redirect;
                 this.$router.replace({ query });
                 if (redirect) {
-                    this.$router.push(redirect)
+                    this.$router.push(redirect);
                 }
                 this.showLogin = false;
             }
