@@ -5,7 +5,7 @@ import vuetify from './plugins/vuetify';
 import router from './plugins/router';
 import store from './plugins/vuex';
 import './plugins/socketio';
-import './plugins/dompurify';
+import './plugins/markdown';
 import './middleware/auth';
 import './filters';
 import './registerServiceWorker';
