@@ -1,16 +1,16 @@
 <template>
     <v-btn-toggle small rounded class="primary mr-1" dark>
-        <v-tooltip bottom>
+        <v-tooltip top>
             <template v-slot:activator="{ on: tooltip }">
-                <v-btn small class="primary" @click="$emit('toggle')" v-on="{ ...tooltip}">
-                    <v-icon small>{{ isActive ? inactiveIcon : activeIcon }}</v-icon>
+                <v-btn :disabled="disabled" small class="primary" @click="$emit('toggle')" v-on="{ ...tooltip}">
+                    <v-icon small>{{ isActive ? activeIcon : inactiveIcon }}</v-icon>
                 </v-btn>
             </template>
             <span>Turn {{device}} {{ isActive ? 'off' : 'on' }}</span>
         </v-tooltip>
         <v-menu top left offset-y v-if="isActive">
             <template v-slot:activator="{ on: menu }">
-                <v-tooltip bottom>
+                <v-tooltip top>
                     <template v-slot:activator="{ on: tooltip }">
                         <v-btn small class="small" v-on="{ ...tooltip, ...menu }">
                             <v-icon small>expand_less</v-icon>
@@ -55,6 +55,10 @@ export default {
         selectedDeviceId: {
             type: String,
         },
+        disabled: {
+          type: Boolean,
+          default: false
+        }
     },
     computed: {
         indexOfSelectedDevice() {
