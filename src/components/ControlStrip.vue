@@ -7,6 +7,7 @@
             inactiveIcon="videocam_off"
             :devices="videoInputDevices"
             :isActive="videoActive && !hasVideoError"
+            :disabled="videoInputDevices.length <= 0 || hasVideoError"
             :selectedDeviceId="videoDevice"
             @toggle="toggleCam"
             @change="changeVideoTo"
@@ -18,6 +19,7 @@
             inactiveIcon="mic_off"
             :devices="audioInputDevices"
             :isActive="audioActive && !hasAudioError"
+            :disabled="audioInputDevices.length <= 0 || hasAudioError"
             :selectedDeviceId="audioDevice"
             @toggle="toggleMic"
             @change="changeAudioInputTo"
@@ -107,20 +109,8 @@ export default {
         };
     },
     mounted() {
-        this.videoDevice = (
-            this.mediaDevices.find(
-                d =>
-                    d.label ===
-                    this.localUser?.stream?.getVideoTracks()[0]?.label
-            )?.deviceId || this.videoInputDevices[0]
-        ).deviceId;
-        this.audioDevice = (
-            this.mediaDevices.find(
-                d =>
-                    d.label ===
-                    this.localUser?.stream?.getAudioTracks()[0]?.label
-            )?.deviceId || this.audioInputDevices[0]
-        ).deviceId;
+        this.videoDevice = this.videoDeviceId;
+        this.audioDevice = this.audioDeviceId;
     },
     computed: {
         ...mapGetters([
@@ -133,6 +123,8 @@ export default {
             'audioActive',
             'videoActive',
             'mediaDevices',
+            'audioDeviceId',
+            'videoDeviceId'
         ]),
         hasAudioError() {
             return this.mediaDeviceErrors.hasOwnProperty('audio');
