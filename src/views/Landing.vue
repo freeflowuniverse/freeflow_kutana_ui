@@ -12,7 +12,8 @@
                 inactiveIcon="videocam_off"
                 :devices="videoInputDevices"
                 :isActive="videoActive && !hasVideoError"
-                :selectedDeviceId="videoDevice"
+                :disabled="videoInputDevices.length <= 0 || hasVideoError"
+                :selectedDeviceId="videoDeviceId"
                 @toggle="toggleCam"
                 @change="changeVideoTo"
             />
@@ -22,7 +23,8 @@
                 inactiveIcon="mic_off"
                 :devices="audioInputDevices"
                 :isActive="audioActive && !hasAudioError"
-                :selectedDeviceId="audioDevice"
+                :disabled="audioInputDevices.length <= 0 || hasAudioError"
+                :selectedDeviceId="audioDeviceId"
                 @toggle="toggleMic"
                 @change="changeAudioInputTo"
             />
@@ -121,8 +123,6 @@ export default {
             ],
             inviteUrl: null,
             myBackground: '',
-            videoDevice: null,
-            audioDevice: null,
             isLoginInAsGuest: false,
             showLogin: false,
         };
@@ -156,6 +156,8 @@ export default {
             'mediaDevices',
             'mediaDeviceErrors',
             'localStream',
+            'videoDeviceId',
+            'audioDeviceId'
         ]),
         avatar() {
             const generator = new AvatarGenerator();
@@ -261,24 +263,6 @@ export default {
         },
     },
     watch: {
-        mediaDevices(val) {
-            if (!val || !val.length) {
-                return;
-            }
-
-            this.videoDevice =
-                (this.mediaDevices.find(
-                    d =>
-                        d.label ===
-                        this.localUser?.stream?.getVideoTracks()[0]?.label
-                )?.deviceId || this.videoInputDevices[0]).deviceId;
-            this.audioDevice =
-                (this.mediaDevices.find(
-                    d =>
-                        d.label ===
-                        this.localUser?.stream?.getAudioTracks()[0]?.label
-                )?.deviceId || this.audioInputDevices[0]).deviceId;
-        },
         inviteUrl(val) {
             if (val && this.reg.test(val) && val.length > 15) {
                 this.inviteUrl = val.match(this.reg)[1];

@@ -40,9 +40,6 @@ export default {
             pollingVideoStreams: null,
         };
     },
-    created() {
-      this.pollingVideoStreamsLoop = this.checkActiveVideoStreams();
-    },
     mounted() {
         this.$nextTick(function() {
             if (this.$refs.usergrid) {
@@ -52,6 +49,7 @@ export default {
             }
             this.calculateOrientation();
         });
+        this.pollingVideoStreamsLoop = this.checkActiveVideoStreams();
     },
     beforeDestroy() {
         delete this.observer;
@@ -86,18 +84,19 @@ export default {
                     const currentVideoStatus = remoteUser.stream?.getVideoTracks()[0]?.getSettings().frameRate > 0;
 
                     if(currentVideoStatus === remoteUser.cam) {
-                      return;
+                      continue;
                     }
 
                     if (currentVideoStatus) {
                       remoteUser.cam = true;
                       this.updateRemoteUser(remoteUser);
-                      return;
+                      continue;
                     }
+
                     remoteUser.cam = false;
                     this.updateRemoteUser(remoteUser);
                 }
-            }, 100)
+            }, 200)
         }
     },
     watch: {
