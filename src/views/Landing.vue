@@ -197,7 +197,7 @@ export default {
             'updateVideoDevice',
             'updateAudioDevice',
             'generateLoginUrl',
-            'checkResponse'
+            'checkResponse',
         ]),
         continueLogin() {
             this.showLogin = false;
@@ -243,9 +243,7 @@ export default {
                 this.$router.push({
                     name: 'room',
                     params: {
-                        token: this.inviteUrl
-                            .match(this.reg)[1]
-                            .substring(0, 15),
+                        token: this.inviteUrl,
                     },
                 });
             }
@@ -280,14 +278,19 @@ export default {
             }
         },
         account(val) {
-            if(val && this.$route.query.callback){
+            if (val && this.$route.query.callback) {
                 let query = Object.assign({}, this.$route.query);
+                let redirect = decodeURI(query.redirect);
                 delete query.callback;
                 delete query.signedAttempt;
+                delete query.redirect;
                 this.$router.replace({ query });
+                if (redirect) {
+                    this.$router.push(redirect);
+                }
                 this.showLogin = false;
             }
-        }
+        },
     },
 };
 </script>
