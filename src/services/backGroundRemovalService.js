@@ -3,6 +3,7 @@ import * as bodyPix from '@tensorflow-models/body-pix';
 import * as tf from '@tensorflow/tfjs-core';
 
 let bodyPixNet;
+let renderLoop;
 
 // @todo move to webworker with offscreen rendering
 export const removeBackground = async (
@@ -49,7 +50,11 @@ export const removeBackground = async (
     backgroundImage.src = image;
 
     const captureStream = resultCanvas.captureStream(60);
-    const renderLoop = startRenderLoop(
+
+    if (renderLoop) {
+        clearInterval(renderLoop);
+    }
+    renderLoop = startRenderLoop(
         canvas,
         canvas.getContext('2d'),
         resultCanvas,
@@ -57,19 +62,21 @@ export const removeBackground = async (
         backgroundImage,
         imageCapture
     );
-    return {
-        renderLoop,
-        track: captureStream.getVideoTracks()[0]
-    };
+    return captureStream.getVideoTracks()[0];
 };
 
-async function grabFrame(imageCapture) {
-    return await imageCapture.grabFrame();
+async function getFrameFromVideo(imageCapture) {
+    let image = new Image(); // pre init
+    try {
+        const capture = await imageCapture.grabFrame()
+        image = await createImageBitmap(capture)
+    } catch {}
+    return image
 }
 
 function startRenderLoop(canvas, context, resultCanvas, resultContext, backgroundImage, imageCapture) {
     return setInterval(async () => {
-        let image = new Image(); // pre init
+        let image;
         const width = canvas.width;
         const height = canvas.height;
         let imageElement = new Image(width, height);
@@ -82,11 +89,8 @@ function startRenderLoop(canvas, context, resultCanvas, resultContext, backgroun
         const backgroundColor = { r: 0, g: 0, b: 0, a: 0 };
 
         let segmentation;
-        let capture;
 
-        capture = await grabFrame(imageCapture);
-
-        image = await createImageBitmap(capture);
+        image = await getFrameFromVideo(imageCapture);
         context.drawImage(image, 0, 0, width, height);
 
         const personSegmentation = await bodyPixNet.segmentPerson(context.getImageData(0, 0, width, height), true);

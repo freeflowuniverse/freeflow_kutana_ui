@@ -1,21 +1,16 @@
 export default {
     state: {
         wallpaperDataUrl: null,
-        activeBackground: null,
         backgroundTrack: null,
     },
     mutations: {
         setWallpaperDataUrl(state, wallpaperDataUrl) {
             state.wallpaperDataUrl = wallpaperDataUrl;
         },
-        setActiveBackground(state, activeBackground) {
-            state.activeBackground = activeBackground;
-        },
         setBackgroundTrack(state, backgroundTrack) {
             state.backgroundTrack = backgroundTrack;
         },
-        clearActiveBackground(state) {
-            clearInterval(state.activeBackground);
+        stopActiveBackgroundTrack(state) {
             state.backgroundTrack.stop();
         }
     },
@@ -31,21 +26,17 @@ export default {
                 commit('setWallpaperDataUrl', fileReader.result);
             }
         },
-        setActiveBackground({ commit }, activeBackground) {
-            commit('setActiveBackground', activeBackground);
-        },
         setBackgroundTrack({ commit }, backgroundTrack) {
             commit('setBackgroundTrack', backgroundTrack);
         },
-        clearActiveBackground({ commit, getters }) {
-            if (!getters.activeBackground) {
+        stopActiveBackgroundTrack({ commit, getters }) {
+            if (!getters.backgroundTrack) {
                 return;
             }
-            commit('clearActiveBackground');
+            commit('stopActiveBackgroundTrack');
         }
     },
     getters: {
         wallpaperDataUrl: state => state.wallpaperDataUrl,
-        activeBackground: state => state.activeBackground,
     },
 };
