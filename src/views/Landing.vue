@@ -280,12 +280,12 @@ export default {
         account(val) {
             if (val && this.$route.query.callback) {
                 let query = Object.assign({}, this.$route.query);
-                let redirect = decodeURI(query.redirect);
+                let redirect = query.redirect;
                 delete query.callback;
                 delete query.signedAttempt;
                 delete query.redirect;
                 this.$router.replace({ query });
-                if (redirect) {
+                if (redirect != undefined) {
                     this.$router.push(redirect);
                 }
                 this.showLogin = false;
