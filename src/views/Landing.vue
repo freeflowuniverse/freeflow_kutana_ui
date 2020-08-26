@@ -104,6 +104,7 @@ import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
 import { AvatarGenerator } from 'random-avatar-generator';
 import GuestLogin from '../components/GuestLogin';
 import DeviceSelector from '../components/DeviceSelector';
+import { parseUrl } from '@tensorflow/tfjs-core/dist/io/http';
 export default {
     components: {
         GuestLogin,
@@ -129,6 +130,7 @@ export default {
     },
     mounted() {
         if (this.$route.query.callback) {
+            console.log(this.$route.query);
             this.checkResponse(window.location.href);
         }
         if (!this.account) {
@@ -195,7 +197,7 @@ export default {
             'updateVideoDevice',
             'updateAudioDevice',
             'generateLoginUrl',
-            'checkResponse'
+            'checkResponse',
         ]),
         continueLogin() {
             this.showLogin = false;
@@ -241,9 +243,7 @@ export default {
                 this.$router.push({
                     name: 'room',
                     params: {
-                        token: this.inviteUrl
-                            .match(this.reg)[1]
-                            .substring(0, 15),
+                        token: this.inviteUrl,
                     },
                 });
             }
@@ -266,18 +266,20 @@ export default {
                 return;
             }
 
-            this.videoDevice =
-                (this.mediaDevices.find(
+            this.videoDevice = (
+                this.mediaDevices.find(
                     d =>
                         d.label ===
                         this.localUser?.stream?.getVideoTracks()[0]?.label
-                )?.deviceId || this.videoInputDevices[0]).deviceId;
-            this.audioDevice =
-                (this.mediaDevices.find(
+                )?.deviceId || this.videoInputDevices[0]
+            ).deviceId;
+            this.audioDevice = (
+                this.mediaDevices.find(
                     d =>
                         d.label ===
                         this.localUser?.stream?.getAudioTracks()[0]?.label
-                )?.deviceId || this.audioInputDevices[0]).deviceId;
+                )?.deviceId || this.audioInputDevices[0]
+            ).deviceId;
         },
         inviteUrl(val) {
             if (val && this.reg.test(val) && val.length > 15) {
@@ -296,14 +298,19 @@ export default {
             }
         },
         account(val) {
-            if(val && this.$route.query.callback){
+            if (val && this.$route.query.callback) {
                 let query = Object.assign({}, this.$route.query);
+                let redirect = decodeURI(query.redirect);
                 delete query.callback;
                 delete query.signedAttempt;
+                delete query.redirect;
                 this.$router.replace({ query });
+                if (redirect) {
+                    this.$router.push(redirect)
+                }
                 this.showLogin = false;
             }
-        }
+        },
     },
 };
 </script>
