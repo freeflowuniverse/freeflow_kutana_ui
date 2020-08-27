@@ -1,6 +1,6 @@
 export default {
     state: {
-        viewStyle: localStorage.getItem('view-style') || 'Default',
+        viewStyle: localStorage.getItem('view-style') || 'grid',
         snackbarMessage: '',
         localStream: null,
     },
@@ -26,7 +26,7 @@ export default {
         },
     },
     getters: {
-        isGridView: state => state.viewStyle.toString() === 'Grid',
+        viewStyle: state => state.viewStyle,
         isMobile: () => {
             //https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
             let check = false;

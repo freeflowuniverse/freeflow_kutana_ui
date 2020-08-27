@@ -11,6 +11,7 @@
             :selectedDeviceId="videoDevice"
             @toggle="toggleCam"
             @change="changeVideoTo"
+            class="mr-3"
         />
         <DeviceSelector
             :loading="isMicLoading"

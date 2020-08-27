@@ -49,10 +49,6 @@ export class VideoRoomPlugin {
         };
     }
 
-    /*
-      not used yest
-      @todo: use or remove this
-     */
     determineSpeaker(stream, remoteFeed, id) {
         if (!window.audioContext) {
             var _AudioContext =
@@ -98,14 +94,7 @@ export class VideoRoomPlugin {
                 ) {
                     if (!this.inThrottle) {
                         this.inThrottle = true;
-                        store.dispatch('selectUser', {
-                            id: id,
-                            username: remoteFeed.rfdisplay,
-                            stream: stream,
-                            pluginHandle: remoteFeed,
-                            screenShareStream: null,
-                            pinned: false,
-                        });
+                        store.dispatch('selectUser', id);
                         setTimeout(() => (this.inThrottle = false), 1000);
                     }
                 }

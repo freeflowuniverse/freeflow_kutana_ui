@@ -1,6 +1,6 @@
 <template>
     <div class="settings">
-        <v-dialog max-width="650" v-model="show">
+        <v-dialog max-width="650" v-model="show" scrollable>
             <v-card>
                 <v-toolbar color="primary" dark>
                     <v-toolbar-title>Settings</v-toolbar-title>
@@ -10,6 +10,25 @@
                     </v-btn>
                 </v-toolbar>
                 <v-card-text>
+                    <h2 class="subtitle-1 pt-5">View</h2>
+                    <v-row>
+                        <v-col>
+                            <v-card @click="$emit('change-view', 'grid')" :class="{selected: viewStyle == 'grid'}">
+                                <v-col align="center" justify="center" class="py-5">
+                                    <v-icon x-large>view_module</v-icon>
+                                    <p>Grid view</p>
+                                </v-col>
+                            </v-card>
+                        </v-col>
+                        <v-col>
+                            <v-card @click="$emit('change-view', 'presentation')" :class="{selected: viewStyle == 'presentation'}">
+                                <v-col align="center" justify="center" class="py-5">
+                                    <v-icon x-large style="transform: rotateY(180deg);">view_quilt</v-icon>
+                                    <p>Presentation view</p>
+                                </v-col>
+                            </v-card>
+                        </v-col>
+                    </v-row>
                     <h2 class="subtitle-1 pt-5 red--text">Experimental feature</h2>
                     <v-switch
                         inset
@@ -25,7 +44,7 @@
                                 @click="changeWallpaper(bg)"
                                 :class="{ selected: selectedBackground === bg}"
                             >
-                                <v-img :aspect-ratio="16/9" :src="bg" ></v-img>
+                                <v-img :aspect-ratio="16/9" :src="bg"></v-img>
                             </v-card>
                         </v-col>
                         <v-col cols="3">
@@ -81,6 +100,7 @@ export default {
             'wallpaperDataUrl',
             'videoActive',
             'account',
+            'viewStyle'
         ]),
         show: {
             get() {
@@ -134,14 +154,14 @@ export default {
             this.logout();
         },
         useUploadedBackground(e) {
-          const files = e.target.files;
-          const wallpaper = files[0];
-          if (!wallpaper) {
-            return;
-          }
-          this.selectedBackground = null;
-          this.wallpaperFile = wallpaper;
-          this.changeCameraBackground(this.wallpaperFile);
+            const files = e.target.files;
+            const wallpaper = files[0];
+            if (!wallpaper) {
+                return;
+            }
+            this.selectedBackground = null;
+            this.wallpaperFile = wallpaper;
+            this.changeCameraBackground(this.wallpaperFile);
         },
         changeWallpaper(file) {
             this.selectedBackground = file;
@@ -189,8 +209,8 @@ export default {
     right: 1rem;
     bottom: 0;
 }
-.selected::after{
-    content:'';
+.selected::after {
+    content: '';
     position: absolute;
     width: 100%;
     height: 100%;

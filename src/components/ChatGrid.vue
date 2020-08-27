@@ -8,7 +8,7 @@
                     </v-btn>
                 </v-col>
                 <v-col align="center" class="py-0 ttl">
-                    <h3>Messages</h3>
+                    <h3>Messages {{isMobile}}</h3>
                 </v-col>
                 <v-col cols="2" class="py-0" align="end">
                     <v-btn v-if="!isMobile" icon @click="$emit('back')">
