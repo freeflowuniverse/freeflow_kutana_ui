@@ -1,6 +1,7 @@
 import random from "../plugins/random";
 import moment from "moment";
 import ffcService from "../services/ffcService";
+import { removeBackground } from '@/services/backGroundRemovalService';
 export default {
   state: {
     isAccepted: false,
@@ -17,42 +18,70 @@ export default {
     },
   },
   actions: {
-    createTeam(context) {
-      context.commit("setTeamName", random.stringGenerator(15));
+    createTeam({ commit }) {
+      commit("setTeamName", random.stringGenerator(15));
     },
-    getTeamInfo(context) {
-      ffcService.getTeamInfo(context.getters.teamName).then((result) => {
+    getTeamInfo({ commit, getters }) {
+      ffcService.getTeamInfo(getters.teamName).then((result) => {
         let data = result.data;
-        context.commit("setMessages", data.messages);
+        commit("setMessages", data.messages);
       });
     },
-    requestAccess(context, token) {
-      context.commit("setTeamName", token);
-      context.dispatch("sendSignal", {
-        sender: context.getters.account.name,
+    requestAccess({ commit, dispatch, getters }, token) {
+      commit("setTeamName", token);
+      dispatch("sendSignal", {
+        sender: getters.account.name,
         createdAt: moment(),
         content: token,
         type: "access_requested",
       });
     },
-    accessGranted(context) {
-      context.commit("setAccepted", true);
-      context.dispatch("join");
+    accessGranted({ commit, dispatch }) {
+      commit("setAccepted", true);
+      dispatch("join");
     },
-    joinScreenShare(context, message) {
-      context.commit("setSnackbarMessage", {
+    joinScreenShare({ commit }, message) {
+      commit("setSnackbarMessage", {
         text: `Screenshare started`,
       });
       
-      context.commit("joinScreen", message.content)
+      commit("joinScreen", message.content)
     },
-    stopScreenShare(context) {
-      context.commit("setSnackbarMessage", {
+    stopScreenShare({ commit }) {
+      commit("setSnackbarMessage", {
         text: `Screenshare stopped`,
       });
 
-      context.commit("stopScreenShare")
+      commit("stopScreenShare")
     },
+    async startPresenterMode({ commit, dispatch, getters }, message) {
+      commit("setSnackbarMessage", {
+        text: `Presentation started`,
+      });
+      message = message || getters.presentationMessage;
+      console.log('message', message)
+      console.log('localUser', getters.localUser)
+      if (getters.localUser.id === message.id) {
+        let localUser = getters.localUser;
+        dispatch('setPresenter', { user: localUser, backgroundImage: message.backgroundImage });
+        return;
+      }
+      let presenter = await dispatch('findUserById', message.id);
+      dispatch('setPresenter', { user: presenter, backgroundImage: message.backgroundImage });
+      console.log('presenter', presenter);
+    },
+    async stopPresenterMode({ commit, dispatch, getters }, message) {
+      commit("setSnackbarMessage", {
+        text: `Presentation stopped`,
+      });
+      if (getters.localUser.id === message.id) {
+        let presenter = getters.presenter;
+        await dispatch('removePresenter', presenter);
+        return;
+      }
+      let presenter = getters.presenter;
+      await dispatch('removePresenter', presenter);
+    }
   },
   getters: {
     teamName: (state) => {

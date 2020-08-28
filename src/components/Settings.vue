@@ -32,6 +32,13 @@
                     <h2 class="subtitle-1 pt-5 red--text">Experimental feature</h2>
                     <v-switch
                         inset
+                        :disabled="presenter && presenter.id !== localUser.id"
+                        v-model="presentationMode"
+                        @change="togglePresenterMode"
+                        label="Enable Presentation mode"
+                    ></v-switch>
+                    <v-switch
+                        inset
                         :disabled="!videoActive"
                         v-model="backgroundRemove"
                         @change="toggleBackgroundRemoval"
@@ -84,8 +91,9 @@
 
 <script>
 import { removeBackground } from '../services/backGroundRemovalService';
+import PresenterModeService from '../services/PresenterModeService';
 import version from '../../public/version';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 export default {
     name: 'Settings',
     props: {
@@ -94,13 +102,15 @@ export default {
     computed: {
         ...mapGetters([
             'userControl',
+            'localScreenUser',
             'localUser',
             'mediaDevices',
             'mediaDeviceErrors',
             'wallpaperDataUrl',
             'videoActive',
             'account',
-            'viewStyle'
+            'viewStyle',
+            'presenter',
         ]),
         show: {
             get() {
@@ -124,6 +134,7 @@ export default {
             selectedVideo: null,
             selectedAudio: null,
             backgroundRemove: false,
+            presentationMode: false,
             renderLoop: null,
             wallpaperFile: null,
             version: version,
@@ -145,6 +156,10 @@ export default {
             'stopActiveBackgroundTrack',
             'setBackgroundTrack',
             'logout',
+            'sendSignal'
+        ]),
+        ...mapMutations([
+            'setPresenterMode'
         ]),
         logoutAndGoToLanding() {
             this.$router.push({
@@ -181,6 +196,29 @@ export default {
             );
             this.setBackgroundTrack(backgroundTrack);
             await this.userControl.publishTrack(backgroundTrack);
+        },
+        async togglePresenterMode(isOn) {
+          //this.setPresenterMode(isOn); @todo
+          const stream = await this.getVideoStream();
+          if (!stream) {
+            this.sendSignal({ type: 'presenter_started', backgroundImage: this.getWallpaperImage, id: this.localUser.id });
+            return;
+          }
+          const presenterMode = new PresenterModeService(stream.getVideoTracks()[0]);
+          if (!isOn) {
+            this.sendSignal({ type: 'presenter_ended', id: this.localUser.id });
+            if (this.localScreenUser) {
+              this.userControl.stopScreenShare();
+            }
+            await this.userControl.publishTrack(stream.getVideoTracks()[0]);
+            return;
+          }
+          this.sendSignal({ type: 'presenter_started', backgroundImage: this.getWallpaperImage, id: this.localUser.id });
+          if (!this.backgroundRemove) {
+            return;
+          }
+          const backgroundStream = await presenterMode.startPresenterMode();
+          await this.userControl.publishTrack(backgroundStream.getVideoTracks()[0]);
         },
     },
     watch: {

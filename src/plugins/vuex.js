@@ -11,6 +11,7 @@ import UserStore from '../stores/UserStore';
 import ScreenShareStore from '../stores/ScreenShareStore';
 import UserMediaStore from '../stores/UserMediaStore';
 import BackgroundRemovalStore from '../stores/BackgroundRemovalStore';
+import PresenterStore from '../stores/PresenterStore';
 
 Vue.use(Vuex);
 
@@ -24,6 +25,7 @@ export default new Vuex.Store({
         SocketStore,
         UserStore,
         ScreenShareStore,
+        PresenterStore,
         UserMediaStore,
         BackgroundRemovalStore,
     },

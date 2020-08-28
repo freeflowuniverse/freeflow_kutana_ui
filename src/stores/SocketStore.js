@@ -1,44 +1,67 @@
 import socketService from "../services/socketService";
 
 export default {
+  state: {
+    screenShareMessage: null,
+    presentationMessage: null
+  },
+  mutations: {
+    setScreenShareMessage(state, screenShareMessage) {
+      state.screenShareMessage = screenShareMessage;
+    },
+    setPresentationMessage(state, presentationMessage) {
+      state.presentationMessage = presentationMessage;
+    }
+  },
   actions: {
-    join(context, teamName) {
+    join({ commit, getters }, teamName) {
       if (teamName) {
-        context.commit('setTeamName', teamName)
+        commit('setTeamName', teamName)
       }
       socketService.emit("join", {
-        username: context.getters.account.name,
-        channel: context.getters.teamName,
+        username: getters.account.name,
+        channel: getters.teamName,
       });
     },
-    sendMessage(context, message) {
+    sendMessage({ getters }, message) {
       socketService.emit("message", {
         ...message,
-        channel: context.getters.teamName
+        channel: getters.teamName
       });
     },
-    sendSignal(context, message) {
+    sendSignal({ getters }, message) {
       socketService.emit("signal", {
         ...message,
-        channel: context.getters.teamName
+        channel: getters.teamName
       });
     },
-    SOCKET_message(context, message) {
-      context.commit("addMessage", message);
+    SOCKET_message({ commit }, message) {
+      commit("addMessage", message);
     },
-    SOCKET_signal(context, message) {
+    SOCKET_signal({ dispatch, commit, getters }, message) {
       console.log(`GOT SIGNAL`, message);
       switch (message.type) {
         case "access_granted":
-          context.dispatch("accessGranted");
+          dispatch("accessGranted");
           break;
         case "screenshare_started":
           console.log("[Signal] Joining screen share ... ");
-          context.dispatch("joinScreenShare", message);
+          dispatch("joinScreenShare", message);
           break;
         case "screenshare_stopped":
           console.log("[Signal] Stopped screen share ... ");
-          context.dispatch("stopScreenShare");
+          dispatch("stopScreenShare");
+          break;
+        case "presenter_started":
+          if (getters.localUser) {
+            dispatch('startPresenterMode', message);
+            return;
+          }
+          commit('setPresentationMessage', message);
+          break;
+        case "presenter_ended":
+          console.log("[Signal] Presenter Mode ... ");
+          dispatch('stopPresenterMode', message)
           break;
         default:
           console.log(`NOT DISPATCHING`);
@@ -46,4 +69,8 @@ export default {
       }
     },
   },
+  getters: {
+    screenShareMessage: state => state.screenShareMessage,
+    presentationMessage: state => state.presentationMessage
+  }
 };
