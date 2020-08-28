@@ -1,5 +1,3 @@
-import { toNestedArray } from '@tensorflow/tfjs-core/dist/util';
-
 export default {
     state: {
         localUser: null,

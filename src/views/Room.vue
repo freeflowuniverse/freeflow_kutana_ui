@@ -202,6 +202,7 @@
                             ...u,
                             screenShareStream: screenUser.stream,
                             screen: screenUser.screen,
+                            presenter: this.presenter
                         };
                     }),
                     isNull

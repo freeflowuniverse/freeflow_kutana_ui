@@ -33,6 +33,13 @@
                     <v-switch
                         inset
                         :disabled="!videoActive"
+                        v-model="presentationMode"
+                        @change="togglePresenterMode"
+                        label="Enable Presentation mode"
+                    ></v-switch>
+                    <v-switch
+                        inset
+                        :disabled="!videoActive"
                         v-model="backgroundRemove"
                         @change="toggleBackgroundRemoval"
                         label="Replace background"
@@ -84,8 +91,9 @@
 
 <script>
 import { removeBackground } from '../services/backGroundRemovalService';
+import PresenterModeService from '../services/PresenterModeService';
 import version from '../../public/version';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 export default {
     name: 'Settings',
     props: {
@@ -100,7 +108,7 @@ export default {
             'wallpaperDataUrl',
             'videoActive',
             'account',
-            'viewStyle'
+            'viewStyle',
         ]),
         show: {
             get() {
@@ -124,6 +132,7 @@ export default {
             selectedVideo: null,
             selectedAudio: null,
             backgroundRemove: false,
+            presentationMode: false,
             renderLoop: null,
             wallpaperFile: null,
             version: version,
@@ -145,6 +154,7 @@ export default {
             'stopActiveBackgroundTrack',
             'setBackgroundTrack',
             'logout',
+            'sendSignal'
         ]),
         logoutAndGoToLanding() {
             this.$router.push({
@@ -181,6 +191,25 @@ export default {
             );
             this.setBackgroundTrack(backgroundTrack);
             await this.userControl.publishTrack(backgroundTrack);
+        },
+        async togglePresenterMode(isOn) {
+          const stream = await this.getVideoStream();
+          if (!stream) {
+            this.sendSignal({ type: 'presenter_started', backgroundImage: this.wallpaperDataUrl, id: this.localUser.id });
+            return;
+          }
+          const presenterMode = new PresenterModeService(stream.getVideoTracks()[0]);
+          if (!isOn) {
+            this.sendSignal({ type: 'presenter_ended', id: this.localUser.id });
+            await this.userControl.publishTrack(stream.getVideoTracks()[0]);
+            return;
+          }
+          this.sendSignal({ type: 'presenter_started', backgroundImage: this.wallpaperDataUrl, id: this.localUser.id });
+          if (!this.backgroundRemove) {
+            return;
+          }
+          const backgroundStream = await presenterMode.startPresenterMode();
+          await this.userControl.publishTrack(backgroundStream.getVideoTracks()[0]);
         },
     },
     watch: {

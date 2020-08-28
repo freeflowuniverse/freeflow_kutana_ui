@@ -1,7 +1,19 @@
 <template>
     <div :data-cam="user.cam" :data-screen="user.screen" class="user-grid-item">
+      <template v-if="isPresenter">
         <div class="avatar">
-            <img :alt="user.username" :src="avatar" />
+          <img alt="presenter background" :src="presenter.backgroundImage || '/img/office.jpeg'" />
+        </div>
+        <UserPresenter
+            :label="localUser.id !== user.id ? user.username : null"
+            :videoStream="user.stream"
+            :screenStream="user.screenShareStream"
+        >
+        </UserPresenter>
+      </template>
+      <template v-else>
+        <div class="avatar">
+          <img :alt="user.username" :src="avatar" />
         </div>
         <JanusVideo
             :cover="false"
@@ -15,19 +27,21 @@
             :label="localUser.id !== user.id ? user.username : null"
             :stream="user.stream"
             class="main"
-            :class="{mine: localUser.id == user.id}"
+            :class="{mine: localUser.id === user.id}"
             v-if="user.cam"
         ></JanusVideo>
+      </template>
     </div>
 </template>
 <script>
     import { AvatarGenerator } from 'random-avatar-generator';
     import JanusVideo from './JanusVideo';
     import { mapGetters } from 'vuex';
+    import UserPresenter from '@/components/UserPresenter';
 
     export default {
         name: 'UserGridItem',
-        components: { JanusVideo },
+        components: { UserPresenter, JanusVideo },
         props: {
             user: {
                 required: true,
@@ -62,9 +76,18 @@
                     }, 100);
                 };
             }
+            console.log('user', this.user)
         },
         computed: {
-            ...mapGetters(['account', 'allUsers', 'localUser']),
+            ...mapGetters([
+                'account',
+                'allUsers',
+                'localUser',
+                'presenter'
+            ]),
+            isPresenter() {
+                return this.presenter && this.presenter.id === this.user.id;
+            },
             avatar() {
                 const generator = new AvatarGenerator();
                 return `https://avatars.dicebear.com/api/avataaars/${this.hashString(this.$props.user.username)}.svg`;

@@ -18,6 +18,7 @@ export default {
       });
     },
     sendSignal(context, message) {
+      console.log('test')
       socketService.emit("signal", {
         ...message,
         channel: context.getters.teamName
@@ -39,6 +40,14 @@ export default {
         case "screenshare_stopped":
           console.log("[Signal] Stopped screen share ... ");
           context.dispatch("stopScreenShare");
+          break;
+        case "presenter_started":
+          console.log("[Signal] Presenter Mode ... ", message);
+          context.dispatch('startPresenterMode', message)
+          break;
+        case "presenter_ended":
+          console.log("[Signal] Presenter Mode ... ");
+          context.dispatch('stopPresenterMode', message)
           break;
         default:
           console.log(`NOT DISPATCHING`);
