@@ -160,18 +160,6 @@
         color: #ffffff;
     }
 
-    .desktop {
-        .fullscreen {
-            opacity: 0;
-        }
-
-        .janus-video:hover {
-            .fullscreen {
-                opacity: 1;
-            }
-        }
-    }
-
     .avatar {
       pointer-events: none;
       user-select: none;

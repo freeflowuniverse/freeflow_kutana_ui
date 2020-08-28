@@ -1,12 +1,10 @@
 <template>
     <div :data-cam="user.cam" :data-screen="user.screen" class="user-grid-item">
       <template v-if="isPresenter">
-        <div class="avatar">
-          <img alt="presenter background" :src="presenter.backgroundImage" />
-        </div>
         <UserPresenter
             :label="localUser.id !== user.id ? user.username : null"
             :user="user"
+            :background-image="presenter.backgroundImage"
         >
         </UserPresenter>
       </template>
@@ -40,7 +38,10 @@
 
     export default {
         name: 'UserGridItem',
-        components: { UserPresenter, JanusVideo },
+        components: {
+          UserPresenter,
+          JanusVideo
+        },
         props: {
             user: {
                 required: true,
