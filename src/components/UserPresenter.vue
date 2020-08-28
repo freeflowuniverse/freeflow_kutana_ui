@@ -1,52 +1,34 @@
 <template>
   <div>
     <video
-        :src-object.prop.camel="screenStream"
+        :src-object.prop.camel="user.screenShareStream"
         autoplay
         muted
         playsinline
         ref="screenShare"
         class="screenShareStream"
+        v-if="user.screen"
     >
     </video>
     <video
-        :src-object.prop.camel="videoStream"
+        :src-object.prop.camel="user.stream"
         autoplay
         muted
         playsinline
         ref="video"
         class="videoStream"
+        v-if="user.cam"
     ></video>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "Presenter",
   props: {
-    videoStream: {
-      type: MediaStream,
+    user: {
       required: true,
     },
-    screenStream: {
-      type: MediaStream,
-      required: true,
-    }
-  },
-  mounted() {
-    console.log('videoTracks', this.videoStream.getVideoTracks());
-    console.log('screenshare', this.screenStream?.getTracks());
-  },
-  methods: {
-    ...mapActions([
-        ''
-    ]),
-  },
-  computed: {
-    ...mapGetters([
-        'localUser',
-    ]),
   },
 }
 </script>

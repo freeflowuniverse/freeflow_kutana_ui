@@ -58,9 +58,12 @@ export default {
       commit("setSnackbarMessage", {
         text: `Presentation started`,
       });
+      message = message || getters.presentationMessage;
+      console.log('message', message)
+      console.log('localUser', getters.localUser)
       if (getters.localUser.id === message.id) {
         let localUser = getters.localUser;
-        commit('setPresenter', { user: localUser, backgroundImage: message.backgroundImage });
+        dispatch('setPresenter', { user: localUser, backgroundImage: message.backgroundImage });
         return;
       }
       let presenter = await dispatch('findUserById', message.id);

@@ -32,7 +32,7 @@
                     <h2 class="subtitle-1 pt-5 red--text">Experimental feature</h2>
                     <v-switch
                         inset
-                        :disabled="!videoActive"
+                        :disabled="presenter && presenter.id !== localUser.id"
                         v-model="presentationMode"
                         @change="togglePresenterMode"
                         label="Enable Presentation mode"
@@ -102,6 +102,7 @@ export default {
     computed: {
         ...mapGetters([
             'userControl',
+            'localScreenUser',
             'localUser',
             'mediaDevices',
             'mediaDeviceErrors',
@@ -109,6 +110,7 @@ export default {
             'videoActive',
             'account',
             'viewStyle',
+            'presenter',
         ]),
         show: {
             get() {
@@ -156,6 +158,9 @@ export default {
             'logout',
             'sendSignal'
         ]),
+        ...mapMutations([
+            'setPresenterMode'
+        ]),
         logoutAndGoToLanding() {
             this.$router.push({
                 name: 'home',
@@ -193,18 +198,22 @@ export default {
             await this.userControl.publishTrack(backgroundTrack);
         },
         async togglePresenterMode(isOn) {
+          //this.setPresenterMode(isOn); @todo
           const stream = await this.getVideoStream();
           if (!stream) {
-            this.sendSignal({ type: 'presenter_started', backgroundImage: this.wallpaperDataUrl, id: this.localUser.id });
+            this.sendSignal({ type: 'presenter_started', backgroundImage: this.getWallpaperImage, id: this.localUser.id });
             return;
           }
           const presenterMode = new PresenterModeService(stream.getVideoTracks()[0]);
           if (!isOn) {
             this.sendSignal({ type: 'presenter_ended', id: this.localUser.id });
+            if (this.localScreenUser) {
+              this.userControl.stopScreenShare();
+            }
             await this.userControl.publishTrack(stream.getVideoTracks()[0]);
             return;
           }
-          this.sendSignal({ type: 'presenter_started', backgroundImage: this.wallpaperDataUrl, id: this.localUser.id });
+          this.sendSignal({ type: 'presenter_started', backgroundImage: this.getWallpaperImage, id: this.localUser.id });
           if (!this.backgroundRemove) {
             return;
           }

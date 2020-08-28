@@ -150,8 +150,12 @@
                 'getTeamInfo',
                 'join',
                 'changeViewStyle',
+                'startPresenterMode'
             ]),
-            ...mapMutations(['setUserControl']),
+            ...mapMutations([
+                'setUserControl',
+                'setPresentationMessage'
+            ]),
             hashString(str) {
                 let hash = 0;
                 for (let i = 0; i < str.length; i++) {
@@ -183,6 +187,7 @@
                 'isMobile',
                 'account',
                 'userControl',
+                'presentationMessage'
             ]),
             users() {
                 if (!(this.allUsers.length && this.allScreenUsers.length)) {
@@ -210,6 +215,17 @@
                 return uniqBy(users, 'uuid').reverse();
             },
         },
+        watch: {
+          localUser(val) {
+            if (!val) {
+              return;
+            }
+            if (this.presentationMessage) {
+              this.startPresenterMode();
+              this.setPresentationMessage(null);
+            }
+          }
+        }
     };
 </script>
 
