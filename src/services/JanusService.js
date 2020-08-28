@@ -206,6 +206,14 @@ export const initializeJanus = async (
                 .dispatchEvent(new Event('ended'));
         },
         hangUp: () => {
+            const presenter = store.getters.presenter;
+            const localUser = store.getters.localUser;
+            if (presenter && presenter.id === localUser.id) {
+                store.dispatch('sendSignal', {
+                    type: 'presenter_ended',
+                    id: localUser.id
+                });
+            }
             videoRoomPlugin?.myStream?.getTracks().forEach(t => {
                 t.stop();
             });
