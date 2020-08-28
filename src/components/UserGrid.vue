@@ -14,7 +14,9 @@
             class="user"
             v-bind:key="user.uuid"
             v-for="user of users"
-            :class="{presenter: user.uuid == users[0].uuid}" 
+            :ref="`user-${user.id}`"
+            :class="{presenter: user.id == (selectedUser ? selectedUser.id : users[0].id)}" 
+            @click.native="changeSelection(user)"
         />
         <div class="controlstrip">
             <slot name="controlStrip"></slot>
@@ -26,7 +28,7 @@
 </template>
 <script>
 import UserGridItem from './UserGridItem';
-import { mapMutations, mapGetters } from 'vuex';
+import { mapMutations, mapGetters, mapActions } from 'vuex';
 
 export default {
     components: {
@@ -68,10 +70,14 @@ export default {
         clearInterval(this.pollingVideoStreamsLoop);
     },
     computed: {
-        ...mapGetters(['isMobile', 'remoteUsers']),
+        ...mapGetters(['isMobile', 'remoteUsers', 'selectedUser']),
     },
     methods: {
         ...mapMutations(['updateRemoteUser']),
+        ...mapActions(['selectUser']),
+        changeSelection(user) {
+            this.selectUser({id: user.id, pinned: true})
+        },
         calculateOrientation() {
             this.windowOrientation =
                 this.$refs.usergrid?.clientWidth * 3 >
@@ -115,6 +121,12 @@ export default {
         },
     },
     watch: {
+        selectedUser(newSelectedUser, oldSelectedUser) {
+            const oldSelectedUserId = oldSelectedUser ? oldSelectedUser.id : this.users[0].id
+            let oldSelectedUserEl = this.$refs[`user-${oldSelectedUserId}`][0].$el
+            let newSelectedUserEl = this.$refs[`user-${newSelectedUser.id}`][0].$el
+            oldSelectedUserEl.style['grid-area'] = window.getComputedStyle(newSelectedUserEl,null).getPropertyValue("grid-area")
+        },
         showChat() {
             this.calculateOrientation();
         },

@@ -1,14 +1,16 @@
-import { toNestedArray } from '@tensorflow/tfjs-core/dist/util';
-
 export default {
     state: {
         localUser: null,
         remoteUsers: [],
         userControl: null,
+        selectedUser: null,
     },
     mutations: {
         setLocalUser(state, user) {
             state.localUser = user;
+        },
+        selectUser(state, userId) {
+            state.selectedUser = userId;
         },
         setUserControl(state, userControl) {
             state.userControl = userControl;
@@ -46,6 +48,31 @@ export default {
         findUserByName({ getters }, name) {
             return getters.allUsers.find(user => user.name === name);
         },
+        selectUser(context, { id, pinned }) {
+            // If same user toggle pin
+            if (
+                context.getters.selectedUser &&
+                context.getters.selectedUser.id == id
+                ) {
+                    pinned = !pinned;
+                }
+
+            console.log(`will update`, (
+                !context.getters.selectedUser ||
+                (context.getters.selectedUser && !context.getters.selectedUser.pinned) ||
+                (context.getters.selectedUser && context.getters.selectedUser.pinned && !pinned)
+            ))
+            if (
+                !context.getters.selectedUser ||
+                (context.getters.selectedUser && !context.getters.selectedUser.pinned) ||
+                (context.getters.selectedUser && context.getters.selectedUser.pinned && !pinned)
+            )
+                console.log(`updating selected user to `, {id, pinned})
+                context.commit('selectUser', {
+                    id,
+                    pinned,
+                });
+        },
     },
     getters: {
         localUser: state => state.localUser,
@@ -57,5 +84,8 @@ export default {
             return [state.localUser, ...state.remoteUsers];
         },
         userControl: state => state.userControl,
+        selectedUser: state => {
+            return state.selectedUser;
+        },
     },
 };
