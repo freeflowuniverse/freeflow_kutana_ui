@@ -168,7 +168,7 @@ export default {
             });
             this.logout();
         },
-        useUploadedBackground(e) {
+        async useUploadedBackground(e) {
             const files = e.target.files;
             const wallpaper = files[0];
             if (!wallpaper) {
@@ -176,12 +176,18 @@ export default {
             }
             this.selectedBackground = null;
             this.wallpaperFile = wallpaper;
-            this.changeCameraBackground(this.wallpaperFile);
+            await this.changeCameraBackground(this.wallpaperFile);
         },
-        changeWallpaper(file) {
+        async changeWallpaper(file) {
             this.selectedBackground = file;
             this.wallpaperFile = null;
-            this.changeCameraBackground(null);
+            await this.changeCameraBackground(null);
+        },
+        updatePresenterBackground() {
+          if (!this.presentationMode) {
+            return;
+          }
+          this.sendSignal({ type: 'presenter_change_settings', backgroundImage: this.getWallpaperImage, id: this.localUser.id });
         },
         async toggleBackgroundRemoval(newBackgroundRemove) {
             const stream = await this.getVideoStream();
@@ -222,6 +228,12 @@ export default {
         },
     },
     watch: {
+        wallpaperDataUrl(val) {
+          if (!val) {
+            return;
+          }
+          this.updatePresenterBackground();
+        },
         backgroundRemove: async function (newBackgroundRemove) {
             await this.toggleBackgroundRemoval(newBackgroundRemove);
         },
@@ -230,6 +242,7 @@ export default {
                 this.toggleBackgroundRemoval(false);
                 return;
             }
+            this.updatePresenterBackground();
             this.wallpaperFile = null;
             this.changeCameraBackground(null);
             this.toggleBackgroundRemoval(this.backgroundRemove);

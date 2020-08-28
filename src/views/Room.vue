@@ -150,7 +150,7 @@
                 'getTeamInfo',
                 'join',
                 'changeViewStyle',
-                'startPresenterMode'
+                'setPresenterMode'
             ]),
             ...mapMutations([
                 'setUserControl',
@@ -221,7 +221,7 @@
               return;
             }
             if (this.presentationMessage) {
-              this.startPresenterMode();
+              this.setPresenterMode();
               this.setPresentationMessage(null);
             }
           }

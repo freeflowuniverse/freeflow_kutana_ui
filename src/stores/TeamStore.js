@@ -1,7 +1,7 @@
 import random from "../plugins/random";
 import moment from "moment";
 import ffcService from "../services/ffcService";
-import { removeBackground } from '@/services/backGroundRemovalService';
+
 export default {
   state: {
     isAccepted: false,
@@ -54,13 +54,9 @@ export default {
 
       commit("stopScreenShare")
     },
-    async startPresenterMode({ commit, dispatch, getters }, message) {
-      commit("setSnackbarMessage", {
-        text: `Presentation started`,
-      });
+    async setPresenterMode({ dispatch, getters }, message) {
       message = message || getters.presentationMessage;
       console.log('message', message)
-      console.log('localUser', getters.localUser)
       if (getters.localUser.id === message.id) {
         let localUser = getters.localUser;
         dispatch('setPresenter', { user: localUser, backgroundImage: message.backgroundImage });
@@ -68,7 +64,6 @@ export default {
       }
       let presenter = await dispatch('findUserById', message.id);
       dispatch('setPresenter', { user: presenter, backgroundImage: message.backgroundImage });
-      console.log('presenter', presenter);
     },
     async stopPresenterMode({ commit, dispatch, getters }, message) {
       commit("setSnackbarMessage", {

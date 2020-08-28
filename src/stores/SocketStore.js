@@ -53,11 +53,17 @@ export default {
           dispatch("stopScreenShare");
           break;
         case "presenter_started":
+          commit("setSnackbarMessage", {
+            text: `Presentation started`,
+          });
           if (getters.localUser) {
-            dispatch('startPresenterMode', message);
+            dispatch('setPresenterMode', message);
             return;
           }
           commit('setPresentationMessage', message);
+          break;
+        case "presenter_change_settings":
+          dispatch('setPresenterMode', message);
           break;
         case "presenter_ended":
           console.log("[Signal] Presenter Mode ... ");

@@ -5,7 +5,10 @@ export default {
     },
     mutations: {
         setPresenter(state, presenter) {
-            state.presenter = presenter;
+            state.presenter = { ...presenter };
+        },
+        removePresenter(state) {
+            state.presenter = null;
         },
         setPresenterMode(state, isActive) {
             state.presentingModeActive = isActive;
@@ -21,7 +24,7 @@ export default {
             if (getters.presenter.id !== user.id) {
                 return;
             }
-            commit('setPresenter', null)
+            commit('removePresenter');
         }
     },
     getters: {
