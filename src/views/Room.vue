@@ -88,10 +88,12 @@
         },
         async mounted() {
             if (!this.localStream) {
-              router.push({
-                name: 'home',
-                params: { token: this.$route.params.token },
-              }).catch();
+              try {
+                await router.push({
+                  name: 'home',
+                  query: { roomName: this.$route.params.token },
+                });
+              } catch (e) {}
               return;
             }
 
