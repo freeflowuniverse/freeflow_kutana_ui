@@ -87,35 +87,16 @@
             };
         },
         beforeMount() {
-            if (!store.getters.localStream) {
-                router.push({
-                    name: 'home',
-                    params: { token: this.$route.params.token },
-                });
-                return;
-            }
-
             this.join(this.$route.params.token);
             this.getTeamInfo();
         },
         async mounted() {
-            if (!store.getters.localStream) {
-                try {
-                    await router.push({
-                        name: 'home',
-                        query: { roomName: this.$route.params.token },
-                    });
-                } catch (e) {}
-
-                return;
-            }
-
-            if (this.localUser) {
+            if (this.localStream) {
                 return;
             }
             //@todo get from prejoin room
             // const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
-            const stream = store.getters.localStream;
+            const stream = this.localStream;
             store.commit('setLocalStream', null);
 
             //@todo fixme
@@ -187,7 +168,8 @@
                 'isMobile',
                 'account',
                 'userControl',
-                'presentationMessage'
+                'presentationMessage',
+                'localStream'
             ]),
             users() {
                 if (!(this.allUsers.length && this.allScreenUsers.length)) {
