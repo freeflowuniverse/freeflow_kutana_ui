@@ -90,7 +90,7 @@
             },
             avatar() {
                 const generator = new AvatarGenerator();
-                return `https://avatars.dicebear.com/api/avataaars/${this.hashString(this.$props.user.username)}.svg`;
+                return `https://avatars.dicebear.com/api/human/${this.hashString(this.$props.user.username)}.svg`;
             },
             camlive() {
                 return (
