@@ -65,6 +65,7 @@
     import ChatMessageNotification from '../components/ChatMessageNotification';
     import { uniqBy } from 'lodash/array';
     import InviteUsers from '../components/InviteUsers';
+    import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
 
     export default {
         name: 'Room',
@@ -91,9 +92,7 @@
             this.getTeamInfo();
         },
         async mounted() {
-            if (!this.localStream) {
-                return;
-            }
+            await updateCurrentStream();
             //@todo get from prejoin room
             // const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
             const stream = this.localStream;
