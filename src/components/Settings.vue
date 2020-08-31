@@ -90,10 +90,10 @@
 </template>
 
 <script>
-import { removeBackground } from '../services/backGroundRemovalService';
-import PresenterModeService from '../services/PresenterModeService';
+import BackGroundRemovalService from '../services/BackGroundRemovalService';
 import version from '../../public/version';
 import { mapActions, mapGetters, mapMutations } from 'vuex';
+
 export default {
     name: 'Settings',
     props: {
@@ -135,7 +135,7 @@ export default {
             selectedAudio: null,
             backgroundRemove: false,
             presentationMode: false,
-            renderLoop: null,
+            backgroundRemovalService: null,
             wallpaperFile: null,
             version: version,
             selectedBackground: '/img/test-pattern.png',
@@ -153,8 +153,6 @@ export default {
             'updateVideoDevice',
             'updateAudioDevice',
             'changeCameraBackground',
-            'stopActiveBackgroundTrack',
-            'setBackgroundTrack',
             'logout',
             'sendSignal'
         ]),
@@ -189,42 +187,32 @@ export default {
           }
           this.sendSignal({ type: 'presenter_change_settings', backgroundImage: this.getWallpaperImage, id: this.localUser.id });
         },
-        async toggleBackgroundRemoval(newBackgroundRemove) {
+        async toggleBackgroundRemoval(isBackgroundRemovalActive) {
             const stream = await this.getVideoStream();
-            this.stopActiveBackgroundTrack();
-            if (!newBackgroundRemove) {
-                await this.userControl.publishTrack(stream.getVideoTracks()[0]);
-                return;
+            if (this.backgroundRemovalService) {
+              this.backgroundRemovalService.stopBackgroundRemoval();
             }
-            const backgroundTrack = await removeBackground(
-                stream.getVideoTracks()[0],
-                this.getWallpaperImage
+            if (!isBackgroundRemovalActive) {
+              await this.userControl.publishTrack(stream.getVideoTracks()[0]);
+              return;
+            }
+            this.backgroundRemovalService = new BackGroundRemovalService(
+              stream.getVideoTracks()[0],
+              this.getWallpaperImage
             );
-            this.setBackgroundTrack(backgroundTrack);
-            await this.userControl.publishTrack(backgroundTrack);
+            const backgroundStream = await this.backgroundRemovalService.startBackgroundRemoval();
+            await this.userControl.publishTrack(backgroundStream.getVideoTracks()[0]);
         },
-        async togglePresenterMode(isOn) {
-          //this.setPresenterMode(isOn); @todo
-          const stream = await this.getVideoStream();
-          if (!stream) {
-            this.sendSignal({ type: 'presenter_started', backgroundImage: this.getWallpaperImage, id: this.localUser.id });
-            return;
-          }
-          const presenterMode = new PresenterModeService(stream.getVideoTracks()[0]);
-          if (!isOn) {
-            this.sendSignal({ type: 'presenter_ended', id: this.localUser.id });
-            if (this.localScreenUser) {
-              this.userControl.stopScreenShare();
-            }
-            await this.userControl.publishTrack(stream.getVideoTracks()[0]);
-            return;
+        async togglePresenterMode(isPresenterActive) {
+          this.setPresenterMode(isPresenterActive);
+          if (!isPresenterActive) {
+             this.sendSignal({ type: 'presenter_ended', id: this.localUser.id });
+             if (this.localScreenUser) {
+               this.userControl.stopScreenShare();
+             }
+             return;
           }
           this.sendSignal({ type: 'presenter_started', backgroundImage: this.getWallpaperImage, id: this.localUser.id });
-          if (!this.backgroundRemove) {
-            return;
-          }
-          const backgroundStream = await presenterMode.startPresenterMode();
-          await this.userControl.publishTrack(backgroundStream.getVideoTracks()[0]);
         },
     },
     watch: {

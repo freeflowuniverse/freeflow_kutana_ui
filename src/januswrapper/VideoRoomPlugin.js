@@ -1,4 +1,5 @@
 import store from '../plugins/vuex';
+import { generateDummyMediaStream } from '@/utils/mediaDevicesUtils';
 
 export class VideoRoomPlugin {
     constructor(opaqueId, bitrateCap = false, debugString = 'video') {
@@ -170,7 +171,7 @@ export class VideoRoomPlugin {
             this.emitEvent(
                 'ownUserJoined',
                 this.buildUser(
-                    this.generateDummyMediaStream(),
+                    generateDummyMediaStream(),
                     this.myId,
                     this.myUsername,
                     {
@@ -195,7 +196,7 @@ export class VideoRoomPlugin {
                     this.emitEvent(
                         'userJoined',
                         this.buildUser(
-                            this.generateDummyMediaStream(),
+                            generateDummyMediaStream(),
                             element['id'],
                             element['display']
                         )
@@ -207,7 +208,7 @@ export class VideoRoomPlugin {
                     this.emitEvent(
                         'userJoined',
                         this.buildUser(
-                            this.generateDummyMediaStream(),
+                            generateDummyMediaStream(),
                             element['id'],
                             element['display']
                         )
@@ -235,7 +236,7 @@ export class VideoRoomPlugin {
                 this.emitEvent(
                     'userLeft',
                     this.buildUser(
-                        this.generateDummyMediaStream(),
+                        generateDummyMediaStream(),
                         msg.leaving,
                         'left'
                     )
@@ -247,7 +248,7 @@ export class VideoRoomPlugin {
             this.emitEvent(
                 'userJoined',
                 this.buildUser(
-                    this.generateDummyMediaStream(),
+                    generateDummyMediaStream(),
                     msg.joining.id,
                     msg.joining.display
                 )
@@ -256,56 +257,10 @@ export class VideoRoomPlugin {
     }
 
     /*
-      @todo: move this
-     */
-    generateDummyMediaStream(
-        video = true,
-        audio = true,
-        width = 640,
-        height = 480
-    ) {
-        const mediaStream = new MediaStream();
-
-        if (video) {
-            const target = document.createElement('canvas');
-            target.dataset.dummy = true;
-            let canvas = Object.assign(target, {
-                width,
-                height,
-            });
-            canvas.getContext('2d').fillRect(0, 0, width, height);
-
-            let stream = canvas.captureStream();
-            let emptyVideo = Object.assign(stream.getVideoTracks()[0], {
-                enabled: false,
-            });
-            emptyVideo.stop();
-            emptyVideo.dispatchEvent(new Event('ended'));
-            mediaStream.addTrack(emptyVideo);
-        }
-
-        if (audio) {
-            let ctx = new AudioContext(),
-                oscillator = ctx.createOscillator();
-            let dst = oscillator.connect(ctx.createMediaStreamDestination());
-
-            oscillator.start();
-            let emptyAudio = Object.assign(dst.stream.getAudioTracks()[0], {
-                enabled: false,
-            });
-            emptyAudio.stop();
-            emptyAudio.dispatchEvent(new Event('ended'));
-            mediaStream.addTrack(emptyAudio);
-        }
-
-        return mediaStream;
-    }
-
-    /*
       dummy feed
      */
     async publishOwnFeed(video, audio) {
-        this.myStream = this.generateDummyMediaStream(video, audio);
+        this.myStream = generateDummyMediaStream(video, audio);
         this.pluginHandle.createOffer({
             stream: this.myStream,
             success: jsep => {
@@ -539,7 +494,7 @@ export class VideoRoomPlugin {
                 this.emitEvent(
                     'cleanupUser',
                     this.buildUser(
-                        this.generateDummyMediaStream(),
+                        generateDummyMediaStream(),
                         pluginHandle.rfid,
                         pluginHandle.rfdisplay
                     )
