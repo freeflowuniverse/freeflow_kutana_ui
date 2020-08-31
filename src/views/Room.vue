@@ -91,7 +91,7 @@
             this.getTeamInfo();
         },
         async mounted() {
-            if (this.localStream) {
+            if (!this.localStream) {
                 return;
             }
             //@todo get from prejoin room
