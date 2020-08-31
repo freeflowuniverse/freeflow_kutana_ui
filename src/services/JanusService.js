@@ -26,6 +26,13 @@ export const initializeJanus = async (
         if (initialJoin) {
             console.log('initialJoin');
             initialJoin = false;
+            if (!initialStream) {
+                // publish dummy tracks if there is no localStream
+                user.stream.getTracks().forEach(async track => {
+                    await videoRoomPlugin.publishTrack(track);
+                });
+                return;
+            }
             initialStream.getTracks().forEach(async track => {
                 console.log('track', track)
                 await videoRoomPlugin.publishTrack(track);
