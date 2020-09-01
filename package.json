@@ -20,7 +20,7 @@
     "janus-gateway": "git://github.com/threefoldtech/freeflowconnect_janus.git",
     "libsodium": "^0.7.6",
     "libsodium-wrappers": "^0.7.6",
-    "localforage": "^1.7.3",
+    "localforage": "^1.9.0",
     "marked": "^1.1.1",
     "moment": "^2.24.0",
     "patch-package": "^6.2.2",
