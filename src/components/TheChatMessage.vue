@@ -96,7 +96,7 @@ export default {
       );
     },
     parseMarkdown() {
-        return marked(this.message.content);
+      return marked(this.message.content);
     },
     timeSent() {
       return moment(this.message.createdAt).format('HH:mm:ss');
