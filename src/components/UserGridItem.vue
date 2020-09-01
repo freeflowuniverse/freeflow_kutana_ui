@@ -92,18 +92,6 @@
                 const generator = new AvatarGenerator();
                 return `https://avatars.dicebear.com/api/human/${this.hashString(this.$props.user.username)}.svg`;
             },
-            camlive() {
-                return (
-                    this.$props.user.stream.getVideoTracks()[0].readyState ===
-                    'live'
-                );
-            },
-            screenLive() {
-                return (
-                    this.$props.user.screenShareStream.getVideoTracks()[0]
-                        .readyState === 'live'
-                );
-            },
         },
       methods: {
           hashString(str) {

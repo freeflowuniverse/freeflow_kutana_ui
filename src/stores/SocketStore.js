@@ -50,11 +50,11 @@ export default {
           break;
         case "screenshare_stopped":
           console.log("[Signal] Stopped screen share ... ");
-          dispatch("stopScreenShare");
+          dispatch("stopScreenShare", message);
           break;
         case "presenter_started":
           commit("setSnackbarMessage", {
-            text: `Presentation started`,
+            text: `${message.sender} started presenting`,
           });
           if (getters.localUser) {
             dispatch('setPresenterMode', message);

@@ -11,7 +11,7 @@
         <div v-if="(remoteUsers.length <= 0 && showInvitation) || forceOpenInvitation" :class="showInvitation || forceOpenInvitation ? 'invite': ''">
           <InviteUsers @closeInvitations="closeInvitations" />
         </div>
-        <UserGrid :users="users" :showChat="view === 'chat'" :view="viewStyle">
+        <UserGrid :users="users" :showChat="view === 'chat'" :view="currentViewStyle">
             <template v-slot:chat>
                 <ChatGrid
                     v-if="view === 'chat'"
@@ -175,8 +175,14 @@
                 'account',
                 'userControl',
                 'presentationMessage',
-                'localStream'
+                'localStream',
+                'presenter'
             ]),
+            currentViewStyle: {
+              get() {
+                return this.presenter ? 'presentation' : this.viewStyle;
+              }
+            },
             users() {
                 if (!(this.allUsers.length && this.allScreenUsers.length)) {
                     return [];
