@@ -134,9 +134,7 @@ export default {
         if (!this.account) {
             this.showLogin = true;
         }
-        if (this.$route.query && this.$route.query.redirect) {
-            this.inviteUrl = `https://${this.$route.query.redirect}`;
-        }
+        
         if (this.$route.query && this.$route.query.roomName) {
             this.inviteUrl = this.$route.query.roomName;
         }

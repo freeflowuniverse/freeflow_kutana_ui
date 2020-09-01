@@ -14,7 +14,7 @@ router.beforeEach((to, from, next) => {
         next({
             name: 'home',
             query: {
-                redirect: to.fullPath,
+                roomName: to.params.token || to.fullPath,
             },
         });
         return;
