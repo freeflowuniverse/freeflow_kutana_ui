@@ -42,17 +42,17 @@ export default {
     },
     joinScreenShare({ commit }, message) {
       commit("setSnackbarMessage", {
-        text: `Screenshare started`,
+        text: `${message.sender} started screen sharing`,
       });
       
-      commit("joinScreen", message.content)
+      //commit("joinScreen", message.content)
     },
-    stopScreenShare({ commit }) {
+    stopScreenShare({ commit }, message) {
       commit("setSnackbarMessage", {
-        text: `Screenshare stopped`,
+        text: `${message.sender} stopped screen sharing`,
       });
 
-      commit("stopScreenShare")
+      //commit("stopScreenShare")
     },
     async setPresenterMode({ dispatch, getters }, message) {
       message = message || getters.presentationMessage;
@@ -67,7 +67,7 @@ export default {
     },
     async stopPresenterMode({ commit, dispatch, getters }, message) {
       commit("setSnackbarMessage", {
-        text: `Presentation stopped`,
+        text: `${message.sender} stopped presenting`,
       });
       if (getters.localUser.id === message.id) {
         let presenter = getters.presenter;

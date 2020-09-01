@@ -13,7 +13,7 @@
                     <h2 class="subtitle-1 pt-5">View</h2>
                     <v-row>
                         <v-col>
-                            <v-card @click="$emit('change-view', 'grid')" :class="{selected: viewStyle == 'grid'}">
+                            <v-card @click="$emit('change-view', 'grid')" :class="{selected: currentViewStyle === 'grid'}">
                                 <v-col align="center" justify="center" class="py-5">
                                     <v-icon x-large>view_module</v-icon>
                                     <p>Grid view</p>
@@ -21,7 +21,7 @@
                             </v-card>
                         </v-col>
                         <v-col>
-                            <v-card @click="$emit('change-view', 'presentation')" :class="{selected: viewStyle == 'presentation'}">
+                            <v-card @click="$emit('change-view', 'presentation')" :class="{selected: currentViewStyle === 'presentation'}">
                                 <v-col align="center" justify="center" class="py-5">
                                     <v-icon x-large style="transform: rotateY(180deg);">view_quilt</v-icon>
                                     <p>Presentation view</p>
@@ -120,6 +120,11 @@ export default {
                 this.$emit('input', value);
             },
         },
+        currentViewStyle: {
+          get() {
+            return this.presenter ? 'presentation' : this.viewStyle;
+          }
+        },
         getWallpaperImage() {
             if (this.wallpaperDataUrl) {
                 return this.wallpaperDataUrl;
@@ -206,13 +211,22 @@ export default {
         async togglePresenterMode(isPresenterActive) {
           this.setPresenterMode(isPresenterActive);
           if (!isPresenterActive) {
-             this.sendSignal({ type: 'presenter_ended', id: this.localUser.id });
+             this.sendSignal({
+               sender: this.localUser.username,
+               type: 'presenter_ended',
+               id: this.localUser.id
+             });
              if (this.localScreenUser) {
                this.userControl.stopScreenShare();
              }
              return;
           }
-          this.sendSignal({ type: 'presenter_started', backgroundImage: this.getWallpaperImage, id: this.localUser.id });
+          this.sendSignal({
+            sender: this.localUser.username,
+            type: 'presenter_started',
+            backgroundImage: this.getWallpaperImage,
+            id: this.localUser.id
+          });
         },
     },
     watch: {

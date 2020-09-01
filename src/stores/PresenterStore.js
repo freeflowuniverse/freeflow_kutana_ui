@@ -1,5 +1,3 @@
-import store from '@/plugins/vuex';
-
 export default {
     state: {
         presentingModeActive: false,
@@ -17,7 +15,7 @@ export default {
         },
     },
     actions: {
-        setPresenter({ commit, dispatch, getters }, { user, backgroundImage }) {
+        setPresenter({ commit, dispatch }, { user, backgroundImage }) {
             user.presenting = true;
             user.backgroundImage = backgroundImage;
             commit('setPresenter', user);

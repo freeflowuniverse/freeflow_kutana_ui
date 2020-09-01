@@ -178,8 +178,12 @@ export const initializeJanus = async (
                 const localScreenUser = store.getters.localScreenUser;
                 localScreenUser.screen = false;
                 store.commit('setLocalScreenUser', localScreenUser);
-                screenShareRoomPlugin.pluginHandle.hangup();
+                store.getters.userControl.stopScreenShare();
             };
+            store.dispatch('sendSignal', {
+                sender: localScreenUser.username,
+                type: "screenshare_started"
+            });
             localScreenUser.screen = true;
             store.commit('setLocalScreenUser', localScreenUser);
         },
@@ -190,6 +194,10 @@ export const initializeJanus = async (
             const localScreenUser = store.getters.localScreenUser;
             localScreenUser.screen = false;
             store.commit('setLocalScreenUser', localScreenUser);
+            store.dispatch('sendSignal', {
+                sender: localScreenUser.username,
+                type: "screenshare_stopped"
+            });
             screenShareRoomPlugin.pluginHandle.hangup();
         },
         startCamera: async () => {
@@ -217,6 +225,7 @@ export const initializeJanus = async (
             const localUser = store.getters.localUser;
             if (presenter && presenter.id === localUser.id) {
                 store.dispatch('sendSignal', {
+                    sender: presenter.username,
                     type: 'presenter_ended',
                     id: localUser.id
                 });

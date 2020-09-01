@@ -158,10 +158,7 @@ export default {
             'audioDeviceId'
         ]),
         avatar() {
-            const generator = new AvatarGenerator();
-            return generator.generateRandomAvatar(
-                this.account && this.account.name ? this.account.name : ''
-            );
+          return `https://avatars.dicebear.com/api/human/${this.hashString(this.$props.user.username)}.svg`;
         },
         videoInputDevices() {
             return this.mediaDevices.filter(
