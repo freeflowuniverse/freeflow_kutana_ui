@@ -70,77 +70,125 @@
     <v-row class="mx-2" style="height:60px">
       <v-col cols="3">
         <v-row>
-          <v-btn
-            @click="toggleCamera"
-            icon
-            class="mr-1"
-            :loading="isChangingCameraOrMicEnableState"
-            :disabled="!isChrome || videoInputDevices.length <= 0"
-          >
-            <v-icon>{{videoPublished ? 'videocam' : 'videocam_off'}}</v-icon>
-          </v-btn>
-
-          <v-btn
-            @click="toggleMute"
-            icon
-            class="mr-0"
-            :loading="isChangingCameraOrMicEnableState"
-            :disabled="!isChrome || audioInputDevices.length <= 0"
-          >
-            <v-icon>{{micEnabled ? 'mic' : 'mic_off'}}</v-icon>
-          </v-btn>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                v-on="on"
+                @click="toggleCamera"
+                icon
+                class="mr-1"
+                :loading="isChangingCameraOrMicEnableState"
+                :disabled="!isChrome || videoInputDevices.length <= 0"
+              >
+                <v-icon>{{videoPublished ? 'videocam' : 'videocam_off'}}</v-icon>
+              </v-btn>
+            </template>
+            <span>Trun camera {{videoPublished ? 'off' : 'on'}}</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                v-on="on"
+                @click="toggleMute"
+                icon
+                class="mr-0"
+                :loading="isChangingCameraOrMicEnableState"
+                :disabled="!isChrome || audioInputDevices.length <= 0"
+              >
+                <v-icon>{{micEnabled ? 'mic' : 'mic_off'}}</v-icon>
+              </v-btn>
+            </template>
+            <span>Trun mic {{micEnabled ? 'off' : 'on'}}</span>
+          </v-tooltip>
         </v-row>
       </v-col>
 
       <v-col cols="6">
         <v-row justify="center" align="center">
-          <v-btn v-if="!isMobile" icon class="mx-1" @click="$root.$emit('toggleGridPresentation')">
-            <v-icon>{{grid ? 'grid_off' : 'grid_on'}}</v-icon>
-          </v-btn>
-          <v-btn @click="hangUp" dark icon class="red mx-2 endCall">
-            <v-icon>call_end</v-icon>
-          </v-btn>
-          <v-btn
-            @click="enableScreenShare"
-            v-if="canScreenShare && screenShare === null && !isMobile"
-            icon
-            class="ml-1"
-          >
-            <v-icon>screen_share</v-icon>
-          </v-btn>
-          <v-btn
-            @click="disableScreenShare"
-            v-else-if="canScreenShare && !isMobile"
-            icon
-            class="ml-1"
-          >
-            <v-icon>stop_screen_share</v-icon>
-          </v-btn>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                v-on="on"
+                v-if="!isMobile"
+                icon
+                class="mx-1"
+                @click="$root.$emit('toggleGridPresentation')"
+              >
+                <v-icon>{{grid ? 'grid_off' : 'grid_on'}}</v-icon>
+              </v-btn>
+            </template>
+            <span>Change to {{grid ? 'presentation' : 'grid'}}view</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{on}">
+              <v-btn v-on="on" @click="hangUp" dark icon class="red mx-2 endCall">
+                <v-icon>call_end</v-icon>
+              </v-btn>
+            </template>
+            <span>End call</span>
+          </v-tooltip>
+
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                v-on="on"
+                @click="screenShare === null? enableScreenShare() : disableScreenShare()"
+                v-if="canScreenShare && !isMobile"
+                icon
+                class="ml-1"
+              >
+                <v-icon>{{screenShare === null? 'screen_share' : 'stop_screen_share'}}</v-icon>
+              </v-btn>
+            </template>
+            <span>{{screenShare === null? 'Start' : 'Stop'}} screenshare</span>
+          </v-tooltip>
           <!-- Virtual background button -->
 
-          <v-btn
-            @click="toggleWallpaper"
-            icon
-            class="ml-1"
-            v-if="isBackgroundRemovalPossible && !isMobile"
-          >
-            <span class="material-icons">{{wallpaperEnabled ? 'broken_image' : 'image'}}</span>
-          </v-btn>
+          <v-tooltip top>
+            <template v-slot:activator="{on}">
+              <v-btn
+                @click="toggleWallpaper"
+                icon
+                class="ml-1"
+                v-on="on"
+                v-if="isBackgroundRemovalPossible && !isMobile"
+              >
+                <span class="material-icons">{{wallpaperEnabled ? 'broken_image' : 'image'}}</span>
+              </v-btn>
+            </template>
+            <span>{{wallpaperEnabled ? 'Stop background removal' : 'Remove background'}}</span>
+          </v-tooltip>
+
           <!-- End virtual background button -->
         </v-row>
       </v-col>
 
       <v-col cols="3">
         <v-row justify="end" align="center">
-          <v-btn v-if="minimal" icon class="ml-1" @click="showAddUserDialog">
-            <v-icon>person_add</v-icon>
-          </v-btn>
-          <v-btn icon class="mx-1" @click="$root.$emit('toggleSidebar')">
-            <v-icon>chat_bubble</v-icon>
-          </v-btn>
-          <v-btn icon class="mx-1" @click="toggleSettings">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn v-on="on" v-if="minimal" icon class="ml-1" @click="showAddUserDialog">
+                <v-icon>person_add</v-icon>
+              </v-btn>
+            </template>
+            <span>Invite user</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn v-on="on" icon class="mx-1" @click="$root.$emit('toggleSidebar')">
+                <v-icon>chat_bubble</v-icon>
+              </v-btn>
+            </template>
+            <span>Show chat</span>
+          </v-tooltip>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-btn v-on="on" icon class="mx-1" @click="toggleSettings">
             <v-icon>settings</v-icon>
           </v-btn>
+            </template>
+            <span>Show settings</span>
+          </v-tooltip>
         </v-row>
       </v-col>
     </v-row>
@@ -184,7 +232,7 @@ import { janusHelpers } from "@/services/Janusservice";
 
 export default {
   props: ["grid", "minimal"],
-  data: function() {
+  data: function () {
     return {
       published: true,
       addUserDialog: false,
@@ -195,7 +243,7 @@ export default {
       audioInputDevice: undefined,
       audioOutputDevice: undefined,
       wallpaperFile: undefined,
-      isChangingCameraOrMicEnableState: false
+      isChangingCameraOrMicEnableState: false,
     };
   },
   mounted() {
@@ -218,19 +266,19 @@ export default {
       "isChrome",
       "audioDeviceId",
       "videoDeviceId",
-      "inputDevices"
+      "inputDevices",
     ]),
     inviteLink() {
       return window.location.href;
     },
     videoInputDevices() {
       return this.inputDevices.filter(
-          d => d.kind === 'videoinput' && d.label
+        (d) => d.kind === "videoinput" && d.label
       );
     },
     audioInputDevices() {
       return this.inputDevices.filter(
-          d => d.kind === 'audioinput' && d.label
+        (d) => d.kind === "audioinput" && d.label
       );
     },
   },
@@ -243,21 +291,21 @@ export default {
       "refreshInputDevices",
       "setVideoPublished",
       "setMicEnabled",
-      "setWallPaperEnabled"
+      "setWallPaperEnabled",
     ]),
-    canScreenShare: function() {
+    canScreenShare: function () {
       return !!navigator.mediaDevices.getDisplayMedia;
     },
-    logout: function() {
+    logout: function () {
       this.hangUp();
       this.clearStorage();
       this.$router.push({ name: "home" });
     },
-    toggleSettings: function() {
+    toggleSettings: function () {
       this.refreshInputDevices();
       this.showExtraSettings = !this.showExtraSettings;
     },
-    changeDevice: function() {
+    changeDevice: function () {
       janusHelpers.changeDevice(
         this.videoPublished,
         this.micEnabled,
@@ -266,7 +314,7 @@ export default {
         this.wallpaperEnabled
       );
     },
-    toggleMute: function() {
+    toggleMute: function () {
       if (!this.isChangingCameraOrMicEnableState) {
         this.isChangingCameraOrMicEnableState = true;
         Janus.log(
@@ -275,7 +323,7 @@ export default {
 
         this.setMicEnabled(!this.micEnabled);
         this.setSnackbarMessage({
-          text: `You are ${!this.micEnabled ? "" : "un"}muted`
+          text: `You are ${!this.micEnabled ? "" : "un"}muted`,
         });
         this.changeDevice();
         setTimeout(() => {
@@ -284,16 +332,16 @@ export default {
       }
     },
 
-    saveQualityOption: function() {
+    saveQualityOption: function () {
       this.setSnackbarMessage({
-        text: `Quality set to ${this.qualityOptions[this.quality]}`
+        text: `Quality set to ${this.qualityOptions[this.quality]}`,
       });
       this.users[0].pluginHandle.send({
-        message: { request: "configure", bitrate: 128000 * this.quality }
+        message: { request: "configure", bitrate: 128000 * this.quality },
       });
     },
 
-    toggleCamera: function() {
+    toggleCamera: function () {
       //todo check if camera can be activated.
       if (!this.isChangingCameraOrMicEnableState) {
         this.isChangingCameraOrMicEnableState = true;
@@ -302,7 +350,7 @@ export default {
           (this.videoPublished ? "Enabling" : "Disabling") + " local camera..."
         );
         this.setSnackbarMessage({
-          text: `Camera ${this.videoPublished ? "enabled" : "disabled"}`
+          text: `Camera ${this.videoPublished ? "enabled" : "disabled"}`,
         });
         this.changeDevice();
         setTimeout(() => {
@@ -312,7 +360,7 @@ export default {
     },
 
     // This function could be improved. @TODO @SingleCore
-    hangUp: function() {
+    hangUp: function () {
       this.users[0].pluginHandle.hangup();
 
       this.users[0].pluginHandle.detach();
@@ -327,11 +375,11 @@ export default {
       location.reload();
     },
 
-    enableScreenShare: function() {
+    enableScreenShare: function () {
       if (this.screenShare) {
         this.setSnackbarMessage({
           type: "",
-          text: `Screenshare already in progress, only one screenshare per room!`
+          text: `Screenshare already in progress, only one screenshare per room!`,
         });
         return;
       }
@@ -339,12 +387,12 @@ export default {
       this.shareScreen();
     },
 
-    disableScreenShare: function() {
+    disableScreenShare: function () {
       if (this.screenShareRole !== "publisher") {
         if (this.screenShare) {
           this.setSnackbarMessage({
             type: "",
-            text: `Screenshare already in progress, only one screenshare per room!`
+            text: `Screenshare already in progress, only one screenshare per room!`,
           });
           return;
         }
@@ -354,11 +402,11 @@ export default {
       console.log("A publisher woooo ... ", this.screenShareRole);
       this.stopScreenShare();
     },
-    toggleWallpaper: function() {
+    toggleWallpaper: function () {
       this.setWallPaperEnabled(!this.wallpaperEnabled);
       this.changeDevice();
     },
-    setWallPaper: function() {
+    setWallPaper: function () {
       if (this.wallpaperFile === undefined) {
         janusHelpers.changeWallpaper(undefined); // go to default wallpaper
         return;
@@ -370,14 +418,14 @@ export default {
       ) {
         this.setSnackbarMessage({
           type: "warning",
-          text: "Please use PNG, GIF or JPG image"
+          text: "Please use PNG, GIF or JPG image",
         });
         this.wallpaperFile = null;
         return;
       }
       var reader = new FileReader();
       reader.readAsDataURL(this.wallpaperFile);
-      reader.onload = function() {
+      reader.onload = function () {
         janusHelpers.changeWallpaper(reader.result);
       };
     },
@@ -385,7 +433,7 @@ export default {
       try {
         navigator.share({
           title: "Join our freeflowconnect meeting",
-          text: `Navigate to ${this.inviteLink} to join our freeflowconnect meeting`
+          text: `Navigate to ${this.inviteLink} to join our freeflowconnect meeting`,
         });
       } catch (e) {
         this.addUserDialog = true;
@@ -397,14 +445,14 @@ export default {
         .then(() => {
           this.setSnackbarMessage({
             type: "",
-            text: "Link copied to clipboard"
+            text: "Link copied to clipboard",
           });
         })
-        .catch(e => {
+        .catch((e) => {
           console.error(e);
         });
-    }
-  }
+    },
+  },
 };
 </script>
 
