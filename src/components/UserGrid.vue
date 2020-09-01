@@ -15,7 +15,9 @@
             v-bind:key="user.uuid"
             v-for="(user) of users"
             :ref="`user-${user.id}`"
-            :class="{presenter: user.id == (selectedUser ? selectedUser.id : users[0].id)}" 
+            :class="{
+              presenter: user.id === (selectedUser ? selectedUser.id : users[0].id)
+            }"
             @click.native="changeSelection(user)"
         />
         <div class="controlstrip">
@@ -70,14 +72,19 @@ export default {
         clearInterval(this.pollingVideoStreamsLoop);
     },
     computed: {
-        ...mapGetters(['isMobile', 'remoteUsers', 'selectedUser']),
+        ...mapGetters([
+          'isMobile',
+          'remoteUsers',
+          'selectedUser',
+          'presenter'
+        ]),
     },
     methods: {
         ...mapMutations(['updateRemoteUser']),
         ...mapActions(['selectUser']),
         changeSelection(user) {
-            if(this.view === 'presentation') {
-                this.selectUser({id: user.id, pinned: true})
+            if(this.view === 'presentation' && !this.presenter) {
+                this.selectUser({ id: user.id, pinned: true })
             }
         },
         calculateOrientation() {

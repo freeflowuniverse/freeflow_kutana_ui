@@ -1,3 +1,5 @@
+import store from '@/plugins/vuex';
+
 export default {
     state: {
         presentingModeActive: false,
@@ -15,16 +17,18 @@ export default {
         },
     },
     actions: {
-        setPresenter({ commit }, { user, backgroundImage }) {
+        setPresenter({ commit, dispatch, getters }, { user, backgroundImage }) {
             user.presenting = true;
             user.backgroundImage = backgroundImage;
             commit('setPresenter', user);
+            dispatch('selectUser', { id: user.id, pinned: true });
         },
         removePresenter({ commit, getters }, user) {
             if (getters.presenter.id !== user.id) {
                 return;
             }
             commit('removePresenter');
+            commit('selectUser', { id: user.id, pinned: false });
         }
     },
     getters: {
