@@ -71,7 +71,7 @@
       <v-col cols="3">
         <v-row>
           <v-tooltip top>
-            <template v-slot:activator="{ on}">
+            <template v-slot:activator="{ on }">
               <v-btn
                 v-on="on"
                 @click="toggleCamera"
@@ -86,7 +86,7 @@
             <span>Trun camera {{videoPublished ? 'off' : 'on'}}</span>
           </v-tooltip>
           <v-tooltip top>
-            <template v-slot:activator="{ on}">
+            <template v-slot:activator="{ on }">
               <v-btn
                 v-on="on"
                 @click="toggleMute"
@@ -106,7 +106,7 @@
       <v-col cols="6">
         <v-row justify="center" align="center">
           <v-tooltip top>
-            <template v-slot:activator="{on}">
+            <template v-slot:activator="{ on }">
               <v-btn
                 v-on="on"
                 v-if="!isMobile"
@@ -129,7 +129,7 @@
           </v-tooltip>
 
           <v-tooltip top>
-            <template v-slot:activator="{on}">
+            <template v-slot:activator="{ on }">
               <v-btn
                 v-on="on"
                 @click="screenShare === null? enableScreenShare() : disableScreenShare()"
@@ -166,7 +166,7 @@
       <v-col cols="3">
         <v-row justify="end" align="center">
           <v-tooltip top>
-            <template v-slot:activator="{on}">
+            <template v-slot:activator="{ on }">
               <v-btn v-on="on" v-if="minimal" icon class="ml-1" @click="showAddUserDialog">
                 <v-icon>person_add</v-icon>
               </v-btn>
@@ -174,7 +174,7 @@
             <span>Invite user</span>
           </v-tooltip>
           <v-tooltip top>
-            <template v-slot:activator="{on}">
+            <template v-slot:activator="{ on }">
               <v-btn v-on="on" icon class="mx-1" @click="$root.$emit('toggleSidebar')">
                 <v-icon>chat_bubble</v-icon>
               </v-btn>
@@ -182,7 +182,7 @@
             <span>Show chat</span>
           </v-tooltip>
           <v-tooltip top>
-            <template v-slot:activator="{on}">
+            <template v-slot:activator="{ on }">
               <v-btn v-on="on" icon class="mx-1" @click="toggleSettings">
             <v-icon>settings</v-icon>
           </v-btn>
