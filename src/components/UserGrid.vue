@@ -16,7 +16,7 @@
             v-for="(user) of users"
             :ref="`user-${user.id}`"
             :class="{
-              presenter: user.id === (selectedUser ? selectedUser.id : users[0].id)
+              presenter: view === 'presentation' && user.id === (selectedUser ? selectedUser.id : users[0].id)
             }"
             @click.native="changeSelection(user)"
         />
@@ -46,8 +46,8 @@ export default {
         },
         view: {
             type: String,
-            default: "presentation"
-        }
+            default: 'presentation',
+        },
     },
     data() {
         return {
@@ -72,19 +72,14 @@ export default {
         clearInterval(this.pollingVideoStreamsLoop);
     },
     computed: {
-        ...mapGetters([
-          'isMobile',
-          'remoteUsers',
-          'selectedUser',
-          'presenter'
-        ]),
+        ...mapGetters(['isMobile', 'remoteUsers', 'selectedUser', 'presenter']),
     },
     methods: {
         ...mapMutations(['updateRemoteUser']),
         ...mapActions(['selectUser']),
         changeSelection(user) {
-            if(this.view === 'presentation' && !this.presenter) {
-                this.selectUser({ id: user.id, pinned: true })
+            if (this.view === 'presentation' && !this.presenter) {
+                this.selectUser({ id: user.id, pinned: true });
             }
         },
         calculateOrientation() {
@@ -131,22 +126,37 @@ export default {
     },
     watch: {
         selectedUser(newSelectedUser, oldSelectedUser) {
-            const oldSelectedUserId = oldSelectedUser ? oldSelectedUser.id : this.users[0].id
-            const oldSelectedUserEl = this.$refs[`user-${oldSelectedUserId}`][0].$el
-            const newSelectedUserEl = this.$refs[`user-${newSelectedUser.id}`][0].$el
-            const oldLocation = window.getComputedStyle(oldSelectedUserEl).getPropertyValue("grid-area")
-            const newLocation = window.getComputedStyle(newSelectedUserEl).getPropertyValue("grid-area")
-            console.log(`oldLocation`,oldLocation)
-            console.log(`newLocation`,newLocation)
-            oldSelectedUserEl.style['grid-area'] = newLocation
-            newSelectedUserEl.style['grid-area'] = oldLocation
+            if (this.view == 'presentation') {
+                const oldSelectedUserId = oldSelectedUser
+                    ? oldSelectedUser.id
+                    : this.users[0].id;
+                const oldSelectedUserEl = this.$refs[
+                    `user-${oldSelectedUserId}`
+                ][0].$el;
+                const newSelectedUserEl = this.$refs[
+                    `user-${newSelectedUser.id}`
+                ][0].$el;
+                const oldLocation = window
+                    .getComputedStyle(oldSelectedUserEl)
+                    .getPropertyValue('grid-area');
+                const newLocation = window
+                    .getComputedStyle(newSelectedUserEl)
+                    .getPropertyValue('grid-area');
+                console.log(`oldLocation`, oldLocation);
+                console.log(`newLocation`, newLocation);
+                oldSelectedUserEl.style['grid-area'] = newLocation;
+                newSelectedUserEl.style['grid-area'] = oldLocation;
+            }
         },
         view() {
-            for (const user of this.users) {
-                this.$refs[`user-${user.id}`][0].$el.style['grid-area']  = null
+            if (this.view !== 'presentation') {
+                this.selectUser({ id: this.users[0].id, pinned: true });
             }
-            if(this.view === 'presentation') {
-                this.selectUser({id: this.users[0].id, pinned: true})
+            for (const user of this.users) {
+                this.$refs[`user-${user.id}`][0].$el.style['grid-area'] = null;
+            }
+            if (this.view != 'presentation') {
+                this.selectUser({ id: this.users[0].id, pinned: true });
             }
         },
         showChat() {
