@@ -63,9 +63,6 @@ export default {
   data() {
     return {
       showTime: false,
-      anchorAttributes: {
-        target: "_blank"
-      }
     };
   },
   computed: {
