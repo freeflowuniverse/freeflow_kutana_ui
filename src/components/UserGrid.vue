@@ -13,7 +13,7 @@
             :user="user"
             class="user"
             v-bind:key="user.uuid"
-            v-for="user of users"
+            v-for="(user) of users"
             :ref="`user-${user.id}`"
             :class="{presenter: user.id == (selectedUser ? selectedUser.id : users[0].id)}" 
             @click.native="changeSelection(user)"
@@ -76,7 +76,9 @@ export default {
         ...mapMutations(['updateRemoteUser']),
         ...mapActions(['selectUser']),
         changeSelection(user) {
-            this.selectUser({id: user.id, pinned: true})
+            if(this.view === 'presentation') {
+                this.selectUser({id: user.id, pinned: true})
+            }
         },
         calculateOrientation() {
             this.windowOrientation =
@@ -123,9 +125,22 @@ export default {
     watch: {
         selectedUser(newSelectedUser, oldSelectedUser) {
             const oldSelectedUserId = oldSelectedUser ? oldSelectedUser.id : this.users[0].id
-            let oldSelectedUserEl = this.$refs[`user-${oldSelectedUserId}`][0].$el
-            let newSelectedUserEl = this.$refs[`user-${newSelectedUser.id}`][0].$el
-            oldSelectedUserEl.style['grid-area'] = window.getComputedStyle(newSelectedUserEl,null).getPropertyValue("grid-area")
+            const oldSelectedUserEl = this.$refs[`user-${oldSelectedUserId}`][0].$el
+            const newSelectedUserEl = this.$refs[`user-${newSelectedUser.id}`][0].$el
+            const oldLocation = window.getComputedStyle(oldSelectedUserEl).getPropertyValue("grid-area")
+            const newLocation = window.getComputedStyle(newSelectedUserEl).getPropertyValue("grid-area")
+            console.log(`oldLocation`,oldLocation)
+            console.log(`newLocation`,newLocation)
+            oldSelectedUserEl.style['grid-area'] = newLocation
+            newSelectedUserEl.style['grid-area'] = oldLocation
+        },
+        view() {
+            for (const user of this.users) {
+                this.$refs[`user-${user.id}`][0].$el.style['grid-area']  = null
+            }
+            if(this.view === 'presentation') {
+                this.selectUser({id: this.users[0].id, pinned: true})
+            }
         },
         showChat() {
             this.calculateOrientation();
@@ -159,7 +174,7 @@ export default {
     }
 
     @for $i from 1 through 16 {
-        .user:nth-child(#{$i}) {
+        &[data-view='grid'] .user:nth-child(#{$i}) {
             grid-area: user-#{$i};
         }
     }
@@ -184,13 +199,15 @@ export default {
         align-items: flex-end;
     }
     &[data-view='presentation'] {
-        .user.presenter {
-            grid-area: presenter !important;
-        }
         @for $i from 1 through 16 {
             .user:nth-child(#{$i}) {
                 grid-area: user-#{$i - 1};
+                cursor: pointer;
             }
+        }
+        .user.presenter {
+            grid-area: presenter !important;
+            cursor: default;
         }
         &[data-orientation='landscape'] {
             .controlstrip {
