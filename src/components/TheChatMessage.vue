@@ -88,13 +88,6 @@ export default {
       }
       return false;
     },
-    parsedMessage() {
-      var urlRegex = /(https?:\/\/[^\s]+)/g;
-      return this.message.content.replace(
-        urlRegex,
-        '<a target="_blank" href="$1">$1</a>'
-      );
-    },
     parseMarkdown() {
       return marked(this.message.content);
     },
