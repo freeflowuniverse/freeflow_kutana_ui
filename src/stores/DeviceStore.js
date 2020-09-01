@@ -55,9 +55,10 @@ export default {
   },
   actions: {
     async refreshLocalStorageItems({ commit }) {
+      const wallpaperEnabled = localStorage.getItem('wallpaperEnabled') ? getBoolFromStorage( 'wallpaperEnabled') : false;
+
       const videoPublished = getBoolFromStorage('videoPublished');
       const micEnabled = getBoolFromStorage('micEnabled');
-      const wallpaperEnabled = getBoolFromStorage( 'wallpaperEnabled');
       commit('setVideoPublished', videoPublished);
       commit('setMicEnabled', micEnabled);
       commit('setWallPaperEnabled', wallpaperEnabled);
