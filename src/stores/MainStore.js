@@ -1,6 +1,6 @@
 export default {
     state: {
-        viewStyle: localStorage.getItem('view-style') || 'Default',
+        viewStyle: localStorage.getItem('view-style') || 'Grid',
         snackbarMessage: '',
         alertUser: null
     },
