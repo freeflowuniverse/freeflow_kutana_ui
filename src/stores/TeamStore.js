@@ -45,6 +45,7 @@ export default {
         text: `Screenshare started`,
       });
       
+      commit("changeViewStyle", "presentation")
       commit("joinScreen", message.content)
     },
     stopScreenShare({ commit }) {

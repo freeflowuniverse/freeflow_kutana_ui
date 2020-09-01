@@ -21,7 +21,6 @@ export default {
             context.commit('setSnackbarMessage', message);
         },
         changeViewStyle(context, style) {
-            console.log(style);
             context.commit('changeViewStyle', style);
         },
     },

@@ -15,9 +15,6 @@
             v-bind:key="user.uuid"
             v-for="(user) of users"
             :ref="`user-${user.id}`"
-            :class="{
-              presenter: view === 'presentation' && user.id === (selectedUser ? selectedUser.id : users[0].id)
-            }"
             @click.native="changeSelection(user)"
         />
         <div class="controlstrip">
@@ -78,7 +75,7 @@ export default {
         ...mapMutations(['updateRemoteUser']),
         ...mapActions(['selectUser']),
         changeSelection(user) {
-            if (this.view === 'presentation' && !this.presenter) {
+            if (this.view === 'presentation') {
                 this.selectUser({ id: user.id, pinned: true });
             }
         },
@@ -123,41 +120,52 @@ export default {
                 }
             }, 200);
         },
-    },
-    watch: {
-        selectedUser(newSelectedUser, oldSelectedUser) {
-            if (this.view == 'presentation') {
-                const oldSelectedUserId = oldSelectedUser
+        setLocationOfSelectedUser(newSelectedUser, oldSelectedUser) {
+            this.$nextTick(() => {
+                const newSelectedUserId = newSelectedUser
+                    ? newSelectedUser.id
+                    : this.users[0].id;
+                const newSelectedUserEl = this.$refs[
+                    `user-${newSelectedUserId}`
+                ][0].$el;
+
+                let oldSelectedUserId = oldSelectedUser
                     ? oldSelectedUser.id
                     : this.users[0].id;
                 const oldSelectedUserEl = this.$refs[
                     `user-${oldSelectedUserId}`
                 ][0].$el;
-                const newSelectedUserEl = this.$refs[
-                    `user-${newSelectedUser.id}`
-                ][0].$el;
-                const oldLocation = window
-                    .getComputedStyle(oldSelectedUserEl)
+
+                oldSelectedUserEl.style['grid-area'] = window
+                    .getComputedStyle(newSelectedUserEl, null)
                     .getPropertyValue('grid-area');
-                const newLocation = window
-                    .getComputedStyle(newSelectedUserEl)
-                    .getPropertyValue('grid-area');
-                console.log(`oldLocation`, oldLocation);
-                console.log(`newLocation`, newLocation);
-                oldSelectedUserEl.style['grid-area'] = newLocation;
-                newSelectedUserEl.style['grid-area'] = oldLocation;
-            }
+                newSelectedUserEl.style['grid-area'] = 'presenter';
+            });
         },
-        view() {
-            if (this.view !== 'presentation') {
-                this.selectUser({ id: this.users[0].id, pinned: true });
-            }
+        refreshPresentationView() {
             for (const user of this.users) {
                 this.$refs[`user-${user.id}`][0].$el.style['grid-area'] = null;
             }
-            if (this.view != 'presentation') {
-                this.selectUser({ id: this.users[0].id, pinned: true });
+            if (this.view == 'presentation') {
+                this.setLocationOfSelectedUser(this.selectedUser, null);
             }
+        },
+    },
+    watch: {
+        selectedUser: {
+            immediate: true,
+            handler(newSelectedUser, oldSelectedUser) {
+                this.setLocationOfSelectedUser(
+                    newSelectedUser,
+                    oldSelectedUser
+                );
+            },
+        },
+        users() {
+            this.refreshPresentationView();
+        },
+        view() {
+            this.refreshPresentationView();
         },
         showChat() {
             this.calculateOrientation();
@@ -216,15 +224,13 @@ export default {
         align-items: flex-end;
     }
     &[data-view='presentation'] {
-        @for $i from 1 through 16 {
+        .user {
+            cursor: pointer;
+        }
+        @for $i from 2 through 16 {
             .user:nth-child(#{$i}) {
                 grid-area: user-#{$i - 1};
-                cursor: pointer;
             }
-        }
-        .user.presenter {
-            grid-area: presenter !important;
-            cursor: default;
         }
         &[data-orientation='landscape'] {
             .controlstrip {
