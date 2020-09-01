@@ -63,9 +63,6 @@ export default {
   data() {
     return {
       showTime: false,
-      anchorAttributes: {
-        target: "_blank"
-      }
     };
   },
   computed: {
@@ -93,13 +90,6 @@ export default {
     },
     parseMarkdown() {
       return marked(this.message.content);
-    },
-    parsedMessage() {
-      var urlRegex = /(https?:\/\/[^\s]+)/g;
-      return this.message.content.replace(
-        urlRegex,
-        '<a target="_blank" href="$1">$1</a>'
-      );
     },
     timeSent() {
       return moment(this.message.createdAt).format('HH:mm:ss');
