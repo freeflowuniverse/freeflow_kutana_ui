@@ -10,6 +10,7 @@
     >
         <!-- Todo: determin presenter -->
         <UserGridItem
+            :extended-controls="view == 'presentation'"
             :user="user"
             class="user"
             v-bind:key="user.uuid"
@@ -125,6 +126,7 @@ export default {
                 const newSelectedUserId = newSelectedUser
                     ? newSelectedUser.id
                     : this.users[0].id;
+                    // FIXME
                 const newSelectedUserEl = this.$refs[
                     `user-${newSelectedUserId}`
                 ][0].$el;
@@ -229,6 +231,7 @@ export default {
         grid-column-start: start;
         display: flex;
         align-items: flex-end;
+        z-index: 2;
     }
     &[data-view='presentation'] {
         .user {

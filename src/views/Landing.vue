@@ -103,7 +103,6 @@
 <script>
 import { mapActions, mapMutations, mapGetters } from 'vuex';
 import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
-import { AvatarGenerator } from 'random-avatar-generator';
 import GuestLogin from '../components/GuestLogin';
 import DeviceSelector from '../components/DeviceSelector';
 export default {
@@ -114,7 +113,7 @@ export default {
     data() {
         return {
             /* eslint-disable */
-            reg: new RegExp('(?:https://.*/room/)?([a-z0-9]*)(.*)'),
+            reg: new RegExp('(?:https://.*/room/)?([a-zA-Z0-9]*)(.*)'),
             /* eslint-enable */
             valid: false,
             inviteUrlRules: [

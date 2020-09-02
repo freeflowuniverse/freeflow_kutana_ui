@@ -1,137 +1,172 @@
 <template>
-    <div :data-cam="user.cam" :data-screen="user.screen" class="user-grid-item">
-      <template v-if="isPresenter">
-        <UserPresenter
-            :label="localUser.id !== user.id ? user.username : null"
-            :user="user"
-            :background-image="presenter.backgroundImage"
-        >
-        </UserPresenter>
-      </template>
-      <template v-else>
-        <div class="avatar">
-          <img :alt="user.username" :src="avatar" />
+    <div
+        :data-cam="user.cam"
+        :data-screen="user.screen"
+        class="user-grid-item"
+    >
+        <div class="controls">
+            <v-btn icon dark v-if="extendedControls">
+                <v-icon>{{selectedUser && selectedUser.id == user.id && selectedUser.pinned? 'thumb_down': 'thumb_up'}}</v-icon>
+            </v-btn>
+            <v-btn icon dark @click="toggleFullscreen">
+                <v-icon>fullscreen</v-icon>
+            </v-btn>
         </div>
-        <JanusVideo
-            :cover="false"
-            :label="localUser.id !== user.id ? user.username : null"
-            :stream="user.screenShareStream"
-            class="screen"
-            v-if="user.screen"
-        ></JanusVideo>
-        <JanusVideo
-            :cover="true"
-            :label="localUser.id !== user.id ? user.username : null"
-            :stream="user.stream"
-            class="main"
-            :class="{mine: localUser.id === user.id}"
-            v-if="user.cam"
-        ></JanusVideo>
-      </template>
+        <template v-if="isPresenter">
+            <UserPresenter
+                :label="localUser.id !== user.id ? user.username : null"
+                :user="user"
+                :background-image="presenter.backgroundImage"
+            ></UserPresenter>
+        </template>
+        <template v-else>
+            <div class="avatar">
+                <img :alt="user.username" :src="avatar" />
+            </div>
+            <JanusVideo
+                :cover="false"
+                :label="localUser.id !== user.id ? user.username : null"
+                :stream="user.screenShareStream"
+                class="screen"
+                v-if="user.screen"
+                :fullscreen="fullscreen"
+            ></JanusVideo>
+            <JanusVideo
+                :cover="true"
+                :label="localUser.id !== user.id ? user.username : null"
+                :stream="user.stream"
+                class="main"
+                :class="{mine: localUser.id === user.id}"
+                v-if="user.cam"
+                :fullscreen="fullscreen"
+            ></JanusVideo>
+        </template>
     </div>
 </template>
 <script>
-    import { AvatarGenerator } from 'random-avatar-generator';
-    import JanusVideo from './JanusVideo';
-    import { mapGetters } from 'vuex';
-    import UserPresenter from '@/components/UserPresenter';
+import { AvatarGenerator } from 'random-avatar-generator';
+import JanusVideo from './JanusVideo';
+import { mapGetters } from 'vuex';
+import UserPresenter from '@/components/UserPresenter';
 
-    export default {
-        name: 'UserGridItem',
-        components: {
-          UserPresenter,
-          JanusVideo
+export default {
+    name: 'UserGridItem',
+    components: {
+        UserPresenter,
+        JanusVideo,
+    },
+    props: {
+        extendedControls: {
+            type: Boolean,
         },
-        props: {
-            user: {
-                required: true,
-            },
+        user: {
+            required: true,
         },
-        data: () => {
-          return {
+    },
+    data: () => {
+        return {
             userCameraDisabled: false,
-          }
-        },
-        mounted() {
-            //@todo: check if this is not a memmory leak
-            //preload image
-            const img = new Image();
-            img.src = this.avatar;
+            fullscreen: false
+        };
+    },
+    mounted() {
+        //@todo: check if this is not a memmory leak
+        //preload image
+        const img = new Image();
+        img.src = this.avatar;
 
-            const videoTrack = this.user.stream.getVideoTracks()[0];
-            if (videoTrack) {
-                videoTrack.onended = () => {
-                    setTimeout(() => {
-                        this.$forceUpdate();
-                    }, 100);
-                };
-            }
-
-            const screenShareTrack = this.user.screenShareStream.getVideoTracks()[0];
-            if (screenShareTrack) {
-                screenShareTrack.oninactive = () => {
-                    setTimeout(() => {
-                        alert('update');
-                        this.$forceUpdate();
-                    }, 100);
-                };
-            }
-            console.log('user', this.user)
-        },
-        computed: {
-            ...mapGetters([
-                'account',
-                'allUsers',
-                'localUser',
-                'presenter'
-            ]),
-            isPresenter() {
-                return this.presenter && this.presenter.id === this.user.id;
-            },
-            avatar() {
-                const generator = new AvatarGenerator();
-                return `https://avatars.dicebear.com/api/human/${this.hashString(this.$props.user.username)}.svg`;
-            },
-        },
-      methods: {
-          hashString(str) {
-              let hash = 0;
-              for (let i = 0; i < str.length; i++) {
-                  hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
-                  hash = hash & hash;
-              }
-              return Math.abs(hash);
-          },
-      }
-    };
-</script>
-<style lang="scss" scoped>
-    .user-grid-item {
-        position: relative;
-
-        &[data-cam='true'][data-screen='true'] {
-            .main {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 10vw;
-                height: 10vh;
-            }
+        const videoTrack = this.user.stream.getVideoTracks()[0];
+        if (videoTrack) {
+            videoTrack.onended = () => {
+                setTimeout(() => {
+                    this.$forceUpdate();
+                }, 100);
+            };
         }
 
-        .avatar {
-            pointer-events: none;
-            user-select: none;
+        const screenShareTrack = this.user.screenShareStream.getVideoTracks()[0];
+        if (screenShareTrack) {
+            screenShareTrack.oninactive = () => {
+                setTimeout(() => {
+                    alert('update');
+                    this.$forceUpdate();
+                }, 100);
+            };
+        }
+        console.log('user', this.user);
+    },
+    computed: {
+        ...mapGetters(['account', 'allUsers', 'localUser', 'presenter', 'selectedUser']),
+        isPresenter() {
+            return this.presenter && this.presenter.id === this.user.id;
+        },
+        avatar() {
+            const generator = new AvatarGenerator();
+            return `https://avatars.dicebear.com/api/human/${this.hashString(
+                this.$props.user.username
+            )}.svg`;
+        },
+    },
+    methods: {
+        hashString(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
+                hash = hash & hash;
+            }
+            return Math.abs(hash);
+        },
+        toggleFullscreen() {
+            this.fullscreen = !this.fullscreen 
+        }
+    },
+};
+</script>
+<style lang="scss" scoped>
+.user-grid-item {
+    position: relative;
+
+    &[data-cam='true'][data-screen='true'] {
+        .main {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-
-            img {
-                width: 100%;
-                height: 100%;
-            }
+            width: 10vw;
+            height: 10vh;
         }
     }
+
+    .avatar {
+        pointer-events: none;
+        user-select: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        img {
+            width: 100%;
+            height: 100%;
+        }
+    }
+    &:hover {
+        .controls {
+            opacity: 0.5;
+        }
+    }
+    .controls {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: -1px;
+        top: 0;
+        background: var(--primary-color);
+        opacity: 0;
+        z-index: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: all 300ms ease-in-out;
+    }
+}
 </style>
