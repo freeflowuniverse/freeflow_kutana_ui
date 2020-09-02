@@ -48,27 +48,28 @@ export default {
         findUserByName({ getters }, name) {
             return getters.allUsers.find(user => user.name === name);
         },
-        selectUser(context, { id, pinned }) {
+        selectUser({ getters, commit }, { id, pinned }) {
             // If same user toggle pin
             if (
-                context.getters.selectedUser &&
-                context.getters.selectedUser.id == id
+                getters.selectedUser &&
+                getters.selectedUser.id === id &&
+                getters.selectedUser.pinned
                 ) {
                     pinned = !pinned;
                 }
 
             console.log(`will update`, (
-                !context.getters.selectedUser ||
-                (context.getters.selectedUser && !context.getters.selectedUser.pinned) ||
-                (context.getters.selectedUser && context.getters.selectedUser.pinned && !pinned)
+                !getters.selectedUser ||
+                (getters.selectedUser && !getters.selectedUser.pinned) ||
+                (getters.selectedUser && getters.selectedUser.pinned && !pinned)
             ))
             if (
-                !context.getters.selectedUser ||
-                (context.getters.selectedUser && !context.getters.selectedUser.pinned) ||
-                (context.getters.selectedUser && context.getters.selectedUser.pinned && !pinned)
+                !getters.selectedUser ||
+                (getters.selectedUser && !getters.selectedUser.pinned) ||
+                (getters.selectedUser && getters.selectedUser.pinned && !pinned)
             )
                 console.log(`updating selected user to `, {id, pinned})
-                context.commit('selectUser', {
+                commit('selectUser', {
                     id,
                     pinned,
                 });

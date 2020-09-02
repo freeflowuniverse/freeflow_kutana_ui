@@ -50,7 +50,7 @@ export class VideoRoomPlugin {
         };
     }
 
-    determineSpeaker(stream, remoteFeed, id) {
+    determineSpeaker(stream, publishHandler, id) {
         if (!window.audioContext) {
             var _AudioContext =
                 window.AudioContext || window.webkitAudioContext;
@@ -75,6 +75,9 @@ export class VideoRoomPlugin {
             analyser.connect(javascriptNode);
             javascriptNode.connect(window.audioContext.destination);
             javascriptNode.onaudioprocess = () => {
+                if (store.getters.viewStyle !== 'presentation') {
+                    return;
+                }
                 const array = new Uint8Array(analyser.frequencyBinCount);
                 analyser.getByteFrequencyData(array);
                 let values = 0;
@@ -87,15 +90,12 @@ export class VideoRoomPlugin {
                 const average = values / length;
                 if (
                     !store.getters.selectedUser ||
-                    (store.getters.selectedUser &&
-                        !store.getters.selectedUser.pinned &&
-                        average > 20 &&
-                        remoteFeed.rfdisplay !==
-                            store.getters.selectedUser.username)
+                    (store.getters.selectedUser.id !== publishHandler.getId() &&
+                        !store.getters.selectedUser.pinned && average > 20)
                 ) {
                     if (!this.inThrottle) {
                         this.inThrottle = true;
-                        store.dispatch('selectUser', id);
+                        store.dispatch('selectUser', { id, pinned: false });
                         setTimeout(() => (this.inThrottle = false), 1000);
                     }
                 }
@@ -480,6 +480,7 @@ export class VideoRoomPlugin {
             },
             onremotestream: stream => {
                 console.log({ stream, pluginHandle });
+                this.determineSpeaker(stream, pluginHandle, id);
                 this.emitEvent(
                     'userJoined',
                     this.buildUser(
