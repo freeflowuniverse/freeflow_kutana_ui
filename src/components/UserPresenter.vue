@@ -149,6 +149,7 @@ video.screenshare {
 }
 
 .presenter-background {
+  object-fit: cover;
   pointer-events: none;
   user-select: none;
   position: absolute;
