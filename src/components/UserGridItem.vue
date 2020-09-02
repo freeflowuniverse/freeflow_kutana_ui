@@ -22,10 +22,10 @@
         <template v-else>
             <div class="avatar">
                 <img :alt="user.username" :src="avatar" />
+                <span class="video-label" v-if="userLabel">{{ userLabel }}</span>
             </div>
             <JanusVideo
                 :cover="false"
-                :label="localUser.id !== user.id ? user.username : null"
                 :stream="user.screenShareStream"
                 class="screen"
                 v-if="user.screen"
@@ -33,7 +33,7 @@
             ></JanusVideo>
             <JanusVideo
                 :cover="true"
-                :label="localUser.id !== user.id ? user.username : null"
+                :label="userLabel"
                 :stream="user.stream"
                 class="main"
                 :class="{mine: localUser.id === user.id}"
@@ -106,6 +106,9 @@ export default {
                 this.$props.user.username
             )}.svg`;
         },
+        userLabel() {
+            return this.localUser.id !== this.user.id ? this.user.username : null;
+        }
     },
     methods: {
         hashString(str) {
@@ -167,6 +170,14 @@ export default {
         justify-content: center;
         align-items: center;
         transition: all 300ms ease-in-out;
+    }
+    .video-label {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      padding: 0 4px;
+      background: #000;
+      color: #ffffff;
     }
 }
 </style>
