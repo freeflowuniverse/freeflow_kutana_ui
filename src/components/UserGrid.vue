@@ -155,6 +155,9 @@ export default {
         selectedUser: {
             immediate: true,
             handler(newSelectedUser, oldSelectedUser) {
+                 if (this.view != 'presentation') {
+                    return
+                }
                 this.setLocationOfSelectedUser(
                     newSelectedUser,
                     oldSelectedUser
