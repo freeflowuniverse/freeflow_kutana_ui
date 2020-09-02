@@ -134,7 +134,7 @@ export default {
         if (!this.account) {
             this.showLogin = true;
         }
-        
+
         if (this.$route.query && this.$route.query.roomName) {
             this.inviteUrl = this.$route.query.roomName;
         }
@@ -155,10 +155,12 @@ export default {
             'mediaDeviceErrors',
             'localStream',
             'videoDeviceId',
-            'audioDeviceId'
+            'audioDeviceId',
         ]),
         avatar() {
-          return `https://avatars.dicebear.com/api/human/${this.hashString(this.$props.user.username)}.svg`;
+            return `https://avatars.dicebear.com/api/human/${this.hashString(
+                this.account.name
+            )}.svg`;
         },
         videoInputDevices() {
             return this.mediaDevices.filter(
@@ -253,6 +255,14 @@ export default {
         },
         guestLogin() {
             this.isLoginInAsGuest = true;
+        },
+        hashString(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
+                hash = hash & hash;
+            }
+            return Math.abs(hash);
         },
     },
     watch: {
