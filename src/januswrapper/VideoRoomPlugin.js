@@ -50,7 +50,7 @@ export class VideoRoomPlugin {
         };
     }
 
-    determineSpeaker(stream, publishHandler, id) {
+    determineSpeaker(stream, userId) {
         if (!window.audioContext) {
             var _AudioContext =
                 window.AudioContext || window.webkitAudioContext;
@@ -90,12 +90,12 @@ export class VideoRoomPlugin {
                 const average = values / length;
                 if (
                     !store.getters.selectedUser ||
-                    (store.getters.selectedUser.id !== publishHandler.getId() &&
+                    (store.getters.selectedUser.id !== userId &&
                         !store.getters.selectedUser.pinned && average > 20)
                 ) {
                     if (!this.inThrottle) {
                         this.inThrottle = true;
-                        store.dispatch('selectUser', { id, pinned: false });
+                        store.dispatch('selectUser', { id: userId, pinned: false });
                         setTimeout(() => (this.inThrottle = false), 1000);
                     }
                 }
@@ -480,7 +480,7 @@ export class VideoRoomPlugin {
             },
             onremotestream: stream => {
                 console.log({ stream, pluginHandle });
-                this.determineSpeaker(stream, pluginHandle, id);
+                this.determineSpeaker(stream, id);
                 this.emitEvent(
                     'userJoined',
                     this.buildUser(
