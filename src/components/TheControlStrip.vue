@@ -83,7 +83,7 @@
                 <v-icon>{{videoPublished ? 'videocam' : 'videocam_off'}}</v-icon>
               </v-btn>
             </template>
-            <span>Trun camera {{videoPublished ? 'off' : 'on'}}</span>
+            <span>Turn camera {{videoPublished ? 'off' : 'on'}}</span>
           </v-tooltip>
           <v-tooltip top>
             <template v-slot:activator="{ on }">
