@@ -70,7 +70,13 @@ export default {
         clearInterval(this.pollingVideoStreamsLoop);
     },
     computed: {
-        ...mapGetters(['isMobile', 'remoteUsers', 'selectedUser', 'presenter']),
+        ...mapGetters([
+            'isMobile',
+            'remoteUsers',
+            'selectedUser',
+            'presenter',
+            'localUser',
+        ]),
     },
     methods: {
         ...mapMutations(['updateRemoteUser']),
@@ -126,7 +132,12 @@ export default {
                 const newSelectedUserId = newSelectedUser
                     ? newSelectedUser.id
                     : this.users[0].id;
-                    // FIXME
+                
+                if (!this.$refs[`user-${newSelectedUserId}`] || !this.$refs[
+                    `user-${newSelectedUserId}`
+                ][0]) {
+                    return;
+                }
                 const newSelectedUserEl = this.$refs[
                     `user-${newSelectedUserId}`
                 ][0].$el;
@@ -134,13 +145,18 @@ export default {
                 let oldSelectedUserId = oldSelectedUser
                     ? oldSelectedUser.id
                     : this.users[0].id;
-                const oldSelectedUserEl = this.$refs[
-                    `user-${oldSelectedUserId}`
-                ][0].$el;
 
-                oldSelectedUserEl.style['grid-area'] = window
-                    .getComputedStyle(newSelectedUserEl, null)
-                    .getPropertyValue('grid-area');
+                if (this.$refs[`user-${oldSelectedUserId}`]) {
+                    const oldSelectedUserEl = this.$refs[
+                        `user-${oldSelectedUserId}`
+                    ][0].$el;
+
+                    oldSelectedUserEl.style[
+                        'grid-area'
+                    ] = window
+                        .getComputedStyle(newSelectedUserEl, null)
+                        .getPropertyValue('grid-area');
+                }
                 newSelectedUserEl.style['grid-area'] = 'presenter';
             });
         },
