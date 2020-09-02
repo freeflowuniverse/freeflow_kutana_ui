@@ -143,20 +143,24 @@ export default {
             });
         },
         refreshPresentationView() {
-            for (const user of this.users) {
-                this.$refs[`user-${user.id}`][0].$el.style['grid-area'] = null;
-            }
-            if (this.view == 'presentation') {
-                this.setLocationOfSelectedUser(this.selectedUser, null);
-            }
+            this.$nextTick(() => {
+                for (const user of this.users) {
+                    this.$refs[`user-${user.id}`][0].$el.style[
+                        'grid-area'
+                    ] = null;
+                }
+                if (this.view == 'presentation') {
+                    this.setLocationOfSelectedUser(this.selectedUser, null);
+                }
+            });
         },
     },
     watch: {
         selectedUser: {
             immediate: true,
             handler(newSelectedUser, oldSelectedUser) {
-                 if (this.view != 'presentation') {
-                    return
+                if (this.view != 'presentation') {
+                    return;
                 }
                 this.setLocationOfSelectedUser(
                     newSelectedUser,
