@@ -55,7 +55,7 @@ export default {
                 return;
             }
             dispatch('changeViewStyle', 'presentation');
-            dispatch('selectUser', { id: userSharingScreen.id, pinned: false });
+            dispatch('selectUser', { id: userSharingScreen.id, pinned: true });
         },
         stopScreenShare({ commit }, message) {
             commit('setSnackbarMessage', {
