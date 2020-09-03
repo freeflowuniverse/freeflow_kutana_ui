@@ -4,12 +4,12 @@
         :data-screen="user.screen"
         class="user-grid-item"
     >
-        <div class="controls">
-            <v-btn icon dark v-if="extendedControls">
-                <v-icon>{{selectedUser && selectedUser.id == user.id && selectedUser.pinned? 'thumb_down': 'thumb_up'}}</v-icon>
+        <div class="controls elevation-1">
+            <v-btn small icon dark v-if="extendedControls">
+                <v-icon small>{{selectedUser && selectedUser.id == user.id && selectedUser.pinned? 'thumb_down': 'thumb_up'}}</v-icon>
             </v-btn>
-            <v-btn icon dark @click="toggleFullscreen">
-                <v-icon>fullscreen</v-icon>
+            <v-btn small icon dark @click="toggleFullscreen">
+                <v-icon small>fullscreen</v-icon>
             </v-btn>
         </div>
         <template v-if="isPresenter">
@@ -154,15 +154,13 @@ export default {
     }
     &:hover {
         .controls {
-            opacity: 0.5;
+            opacity: 0.8;
         }
     }
     .controls {
         position: absolute;
-        width: 100%;
-        height: 100%;
-        left: -1px;
-        top: 0;
+        right: 0;
+        bottom: 50%;
         background: var(--primary-color);
         opacity: 0;
         z-index: 1;
@@ -170,6 +168,9 @@ export default {
         justify-content: center;
         align-items: center;
         transition: all 300ms ease-in-out;
+        padding: 5px 20px 5px 5px;
+        border-radius: 5px 0 0 5px;
+        transform: translateY(50%);
     }
     .video-label {
       position: absolute;
