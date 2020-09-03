@@ -159,7 +159,9 @@ export default {
             'updateAudioDevice',
             'changeCameraBackground',
             'logout',
-            'sendSignal'
+            'stopPresenting',
+            'startPresenting',
+            'changePresenterSettings'
         ]),
         ...mapMutations([
             'setPresenterMode'
@@ -190,7 +192,7 @@ export default {
           if (!this.presentationMode) {
             return;
           }
-          this.sendSignal({ type: 'presenter_change_settings', backgroundImage: this.getWallpaperImage, id: this.localUser.id });
+          this.changePresenterSettings(this.getWallpaperImage);
         },
         async toggleBackgroundRemoval(isBackgroundRemovalActive) {
             const stream = await this.getVideoStream();
@@ -211,22 +213,13 @@ export default {
         async togglePresenterMode(isPresenterActive) {
           this.setPresenterMode(isPresenterActive);
           if (!isPresenterActive) {
-             this.sendSignal({
-               sender: this.localUser.username,
-               type: 'presenter_ended',
-               id: this.localUser.id
-             });
+             this.stopPresenting();
              if (this.localScreenUser) {
                this.userControl.stopScreenShare();
              }
              return;
           }
-          this.sendSignal({
-            sender: this.localUser.username,
-            type: 'presenter_started',
-            backgroundImage: this.getWallpaperImage,
-            id: this.localUser.id
-          });
+          this.startPresenting(this.getWallpaperImage);
         },
     },
     watch: {

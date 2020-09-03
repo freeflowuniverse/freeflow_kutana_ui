@@ -15,6 +15,28 @@ export default {
         },
     },
     actions: {
+        startPresenting({ dispatch, getters }, background) {
+            dispatch('sendSignal', {
+                sender: getters.localUser.username,
+                type: 'presenter_started',
+                backgroundImage: background,
+                id: getters.localUser.id
+            });
+        },
+        stopPresenting({ dispatch, getters }) {
+            dispatch('sendSignal', {
+                sender: getters.localUser.username,
+                type: 'presenter_ended',
+                id: getters.localUser.id
+            });
+        },
+        changePresenterSettings({ dispatch, getters }, background) {
+            dispatch('sendSignal', {
+                type: 'presenter_change_settings',
+                backgroundImage: background,
+                id: getters.localUser.id
+            });
+        },
         setPresenter({ commit, dispatch }, { user, backgroundImage }) {
             user.presenting = true;
             user.backgroundImage = backgroundImage;

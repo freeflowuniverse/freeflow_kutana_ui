@@ -66,7 +66,6 @@ export default {
         },
         async setPresenterMode({ dispatch, getters }, message) {
             message = message || getters.presentationMessage;
-            console.log('message', message);
             if (getters.localUser.id === message.id) {
                 let localUser = getters.localUser;
                 dispatch('setPresenter', {
@@ -85,12 +84,7 @@ export default {
             commit('setSnackbarMessage', {
                 text: `${message.sender} stopped presenting`,
             });
-            if (getters.localUser.id === message.id) {
-                let presenter = getters.presenter;
-                await dispatch('removePresenter', presenter);
-                return;
-            }
-            let presenter = getters.presenter;
+            const presenter = getters.presenter;
             await dispatch('removePresenter', presenter);
         },
     },
