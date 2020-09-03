@@ -205,6 +205,12 @@ export default {
         },
     },
     watch: {
+        allUsers: {
+            immediate: true,
+            handler(val) {
+                this.showInvitation = !!(val && val.length <= 1)
+            }
+        },
         localUser(val) {
             if (!val) {
                 return;
@@ -227,13 +233,6 @@ export default {
         right: 0;
         z-index: 2;
     }
-}
-.invite {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: rgb(0, 0, 0, 0.5);
-    z-index: 2;
 }
 .controlStrip {
     z-index: 213;
