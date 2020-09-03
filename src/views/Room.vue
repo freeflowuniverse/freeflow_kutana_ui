@@ -208,7 +208,6 @@ export default {
         allUsers: {
             immediate: true,
             handler(val) {
-                console.log(`val`, !!(val && val.length <= 1))
                 this.showInvitation = !!(val && val.length <= 1)
             }
         },
