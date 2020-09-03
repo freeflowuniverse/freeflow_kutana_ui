@@ -53,6 +53,7 @@ export default {
           dispatch("stopScreenShare", message);
           break;
         case "presenter_started":
+          console.log("[Signal] Presenter Mode Started ... ");
           commit("setSnackbarMessage", {
             text: `${message.sender} started presenting`,
           });
@@ -66,7 +67,7 @@ export default {
           dispatch('setPresenterMode', message);
           break;
         case "presenter_ended":
-          console.log("[Signal] Presenter Mode ... ");
+          console.log("[Signal] Presenter Mode Stopped ... ");
           dispatch('stopPresenterMode', message)
           break;
         default:
