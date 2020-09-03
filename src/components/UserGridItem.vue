@@ -168,7 +168,7 @@ export default {
         right: 0;
         bottom: 50%;
         background: var(--primary-color);
-        opacity: 1;
+        opacity: 0;
         z-index: 1;
         display: flex;
         justify-content: center;
