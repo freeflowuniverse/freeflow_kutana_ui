@@ -82,9 +82,10 @@ export default {
         ...mapMutations(['updateRemoteUser']),
         ...mapActions(['selectUser']),
         changeSelection(user) {
-            if (this.view === 'presentation') {
-                this.selectUser({ id: user.id, pinned: true });
+            if (this.view != 'presentation') {
+                return;
             }
+            this.selectUser({ id: user.id, pinned: true });
         },
         calculateOrientation() {
             this.windowOrientation =
@@ -132,31 +133,34 @@ export default {
                 const newSelectedUserId = newSelectedUser
                     ? newSelectedUser.id
                     : this.users[0].id;
-                
-                if (!this.$refs[`user-${newSelectedUserId}`] || !this.$refs[
-                    `user-${newSelectedUserId}`
-                ][0]) {
+                const oldSelectedUserId = oldSelectedUser
+                    ? oldSelectedUser.id
+                    : this.users[0].id;
+
+                if (
+                    !this.$refs[`user-${newSelectedUserId}`] ||
+                    !this.$refs[`user-${newSelectedUserId}`][0]
+                ) {
                     return;
                 }
+                if (
+                    !this.$refs[`user-${oldSelectedUserId}`] ||
+                    !this.$refs[`user-${oldSelectedUserId}`][0]
+                ) {
+                    return;
+                }
+
                 const newSelectedUserEl = this.$refs[
                     `user-${newSelectedUserId}`
                 ][0].$el;
 
-                let oldSelectedUserId = oldSelectedUser
-                    ? oldSelectedUser.id
-                    : this.users[0].id;
+                const oldSelectedUserEl = this.$refs[
+                    `user-${oldSelectedUserId}`
+                ][0].$el;
 
-                if (this.$refs[`user-${oldSelectedUserId}`]) {
-                    const oldSelectedUserEl = this.$refs[
-                        `user-${oldSelectedUserId}`
-                    ][0].$el;
-
-                    oldSelectedUserEl.style[
-                        'grid-area'
-                    ] = window
-                        .getComputedStyle(newSelectedUserEl, null)
-                        .getPropertyValue('grid-area');
-                }
+                oldSelectedUserEl.style['grid-area'] = window
+                    .getComputedStyle(newSelectedUserEl, null)
+                    .getPropertyValue('grid-area');
                 newSelectedUserEl.style['grid-area'] = 'presenter';
             });
         },
