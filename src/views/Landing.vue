@@ -103,7 +103,6 @@
 <script>
 import { mapActions, mapMutations, mapGetters } from 'vuex';
 import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
-import { AvatarGenerator } from 'random-avatar-generator';
 import GuestLogin from '../components/GuestLogin';
 import DeviceSelector from '../components/DeviceSelector';
 export default {
@@ -114,7 +113,7 @@ export default {
     data() {
         return {
             /* eslint-disable */
-            reg: new RegExp('(?:https://.*/room/)?([a-z0-9]*)(.*)'),
+            reg: new RegExp('(?:https://.*/room/)?([a-zA-Z0-9]*)(.*)'),
             /* eslint-enable */
             valid: false,
             inviteUrlRules: [
@@ -134,9 +133,7 @@ export default {
         if (!this.account) {
             this.showLogin = true;
         }
-        if (this.$route.query && this.$route.query.redirect) {
-            this.inviteUrl = `https://${this.$route.query.redirect}`;
-        }
+
         if (this.$route.query && this.$route.query.roomName) {
             this.inviteUrl = this.$route.query.roomName;
         }
@@ -157,13 +154,12 @@ export default {
             'mediaDeviceErrors',
             'localStream',
             'videoDeviceId',
-            'audioDeviceId'
+            'audioDeviceId',
         ]),
         avatar() {
-            const generator = new AvatarGenerator();
-            return generator.generateRandomAvatar(
-                this.account && this.account.name ? this.account.name : ''
-            );
+            return `https://avatars.dicebear.com/api/human/${this.hashString(
+                this.account.name
+            )}.svg`;
         },
         videoInputDevices() {
             return this.mediaDevices.filter(
@@ -258,6 +254,14 @@ export default {
         },
         guestLogin() {
             this.isLoginInAsGuest = true;
+        },
+        hashString(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
+                hash = hash & hash;
+            }
+            return Math.abs(hash);
         },
     },
     watch: {

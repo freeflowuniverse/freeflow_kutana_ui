@@ -10,6 +10,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.14.0",
     "@kevinfaguiar/vue-twemoji-picker": "^5.7.4",
     "@tensorflow-models/body-pix": "^2.0.5",
     "@tensorflow/tfjs-backend-wasm": "^2.0.1",

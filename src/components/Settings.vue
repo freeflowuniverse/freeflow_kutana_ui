@@ -1,6 +1,6 @@
 <template>
     <div class="settings">
-        <v-dialog max-width="650" v-model="show">
+        <v-dialog max-width="650" v-model="show" scrollable>
             <v-card>
                 <v-toolbar color="primary" dark>
                     <v-toolbar-title>Settings</v-toolbar-title>
@@ -10,7 +10,33 @@
                     </v-btn>
                 </v-toolbar>
                 <v-card-text>
+                    <h2 class="subtitle-1 pt-5">View</h2>
+                    <v-row>
+                        <v-col>
+                            <v-card @click="$emit('change-view', 'grid')" :class="{selected: currentViewStyle === 'grid'}">
+                                <v-col align="center" justify="center" class="py-5">
+                                    <v-icon x-large>view_module</v-icon>
+                                    <p>Grid view</p>
+                                </v-col>
+                            </v-card>
+                        </v-col>
+                        <v-col>
+                            <v-card @click="$emit('change-view', 'presentation')" :class="{selected: currentViewStyle === 'presentation'}">
+                                <v-col align="center" justify="center" class="py-5">
+                                    <v-icon x-large style="transform: rotateY(180deg);">view_quilt</v-icon>
+                                    <p>Presentation view</p>
+                                </v-col>
+                            </v-card>
+                        </v-col>
+                    </v-row>
                     <h2 class="subtitle-1 pt-5 red--text">Experimental feature</h2>
+                    <v-switch
+                        inset
+                        :disabled="presenter && presenter.id !== localUser.id"
+                        v-model="presentationMode"
+                        @change="togglePresenterMode"
+                        label="Enable Presentation mode"
+                    ></v-switch>
                     <v-switch
                         inset
                         :disabled="!videoActive"
@@ -25,7 +51,7 @@
                                 @click="changeWallpaper(bg)"
                                 :class="{ selected: selectedBackground === bg}"
                             >
-                                <v-img :aspect-ratio="16/9" :src="bg" ></v-img>
+                                <v-img :aspect-ratio="16/9" :src="bg"></v-img>
                             </v-card>
                         </v-col>
                         <v-col cols="3">
@@ -64,9 +90,10 @@
 </template>
 
 <script>
-import { removeBackground } from '../services/backGroundRemovalService';
+import BackGroundRemovalService from '../services/BackGroundRemovalService';
 import version from '../../public/version';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
+
 export default {
     name: 'Settings',
     props: {
@@ -75,12 +102,15 @@ export default {
     computed: {
         ...mapGetters([
             'userControl',
+            'localScreenUser',
             'localUser',
             'mediaDevices',
             'mediaDeviceErrors',
             'wallpaperDataUrl',
             'videoActive',
             'account',
+            'viewStyle',
+            'presenter',
         ]),
         show: {
             get() {
@@ -89,6 +119,11 @@ export default {
             set(value) {
                 this.$emit('input', value);
             },
+        },
+        currentViewStyle: {
+          get() {
+            return this.presenter ? 'presentation' : this.viewStyle;
+          }
         },
         getWallpaperImage() {
             if (this.wallpaperDataUrl) {
@@ -104,7 +139,8 @@ export default {
             selectedVideo: null,
             selectedAudio: null,
             backgroundRemove: false,
-            renderLoop: null,
+            presentationMode: false,
+            backgroundRemovalService: null,
             wallpaperFile: null,
             version: version,
             selectedBackground: '/img/test-pattern.png',
@@ -122,9 +158,13 @@ export default {
             'updateVideoDevice',
             'updateAudioDevice',
             'changeCameraBackground',
-            'stopActiveBackgroundTrack',
-            'setBackgroundTrack',
             'logout',
+            'stopPresenting',
+            'startPresenting',
+            'changePresenterSettings'
+        ]),
+        ...mapMutations([
+            'setPresenterMode'
         ]),
         logoutAndGoToLanding() {
             this.$router.push({
@@ -133,37 +173,62 @@ export default {
             });
             this.logout();
         },
-        useUploadedBackground(e) {
-          const files = e.target.files;
-          const wallpaper = files[0];
-          if (!wallpaper) {
-            return;
-          }
-          this.selectedBackground = null;
-          this.wallpaperFile = wallpaper;
-          this.changeCameraBackground(this.wallpaperFile);
-        },
-        changeWallpaper(file) {
-            this.selectedBackground = file;
-            this.wallpaperFile = null;
-            this.changeCameraBackground(null);
-        },
-        async toggleBackgroundRemoval(newBackgroundRemove) {
-            const stream = await this.getVideoStream();
-            this.stopActiveBackgroundTrack();
-            if (!newBackgroundRemove) {
-                await this.userControl.publishTrack(stream.getVideoTracks()[0]);
+        async useUploadedBackground(e) {
+            const files = e.target.files;
+            const wallpaper = files[0];
+            if (!wallpaper) {
                 return;
             }
-            const backgroundTrack = await removeBackground(
-                stream.getVideoTracks()[0],
-                this.getWallpaperImage
+            this.selectedBackground = null;
+            this.wallpaperFile = wallpaper;
+            await this.changeCameraBackground(this.wallpaperFile);
+        },
+        async changeWallpaper(file) {
+            this.selectedBackground = file;
+            this.wallpaperFile = null;
+            await this.changeCameraBackground(null);
+        },
+        updatePresenterBackground() {
+          if (!this.presentationMode) {
+            return;
+          }
+          this.changePresenterSettings(this.getWallpaperImage);
+        },
+        async toggleBackgroundRemoval(isBackgroundRemovalActive) {
+            const stream = await this.getVideoStream();
+            if (this.backgroundRemovalService) {
+              this.backgroundRemovalService.stopBackgroundRemoval();
+            }
+            if (!isBackgroundRemovalActive) {
+              await this.userControl.publishTrack(stream.getVideoTracks()[0]);
+              return;
+            }
+            this.backgroundRemovalService = new BackGroundRemovalService(
+              stream.getVideoTracks()[0],
+              this.getWallpaperImage
             );
-            this.setBackgroundTrack(backgroundTrack);
-            await this.userControl.publishTrack(backgroundTrack);
+            const backgroundStream = await this.backgroundRemovalService.startBackgroundRemoval();
+            await this.userControl.publishTrack(backgroundStream.getVideoTracks()[0]);
+        },
+        async togglePresenterMode(isPresenterActive) {
+          this.setPresenterMode(isPresenterActive);
+          if (!isPresenterActive) {
+             this.stopPresenting();
+             if (this.localScreenUser) {
+               this.userControl.stopScreenShare();
+             }
+             return;
+          }
+          this.startPresenting(this.getWallpaperImage);
         },
     },
     watch: {
+        wallpaperDataUrl(val) {
+          if (!val) {
+            return;
+          }
+          this.updatePresenterBackground();
+        },
         backgroundRemove: async function (newBackgroundRemove) {
             await this.toggleBackgroundRemoval(newBackgroundRemove);
         },
@@ -172,6 +237,7 @@ export default {
                 this.toggleBackgroundRemoval(false);
                 return;
             }
+            this.updatePresenterBackground();
             this.wallpaperFile = null;
             this.changeCameraBackground(null);
             this.toggleBackgroundRemoval(this.backgroundRemove);
@@ -189,8 +255,8 @@ export default {
     right: 1rem;
     bottom: 0;
 }
-.selected::after{
-    content:'';
+.selected::after {
+    content: '';
     position: absolute;
     width: 100%;
     height: 100%;

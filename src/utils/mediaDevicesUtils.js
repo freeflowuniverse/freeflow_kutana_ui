@@ -36,7 +36,7 @@ const getLocalStream = async () => {
     );
 
     if (activeTracks.length <= 0) {
-        return null;
+        return generateDummyMediaStream();
     }
 
     return new MediaStream(activeTracks);
@@ -148,4 +148,47 @@ const refreshMediaDevices = () => {
     store.commit('clearMediaDeviceError');
     store.commit('setAudioDeviceId', null);
     store.commit('setVideoDeviceId', null);
+}
+
+export const generateDummyMediaStream = (
+    video = true,
+    audio = true,
+    width = 640,
+    height = 480
+) => {
+    const mediaStream = new MediaStream();
+
+    if (video) {
+        const target = document.createElement('canvas');
+        target.dataset.dummy = true;
+        let canvas = Object.assign(target, {
+            width,
+            height,
+        });
+        canvas.getContext('2d').fillRect(0, 0, width, height);
+
+        let stream = canvas.captureStream();
+        let emptyVideo = Object.assign(stream.getVideoTracks()[0], {
+            enabled: false,
+        });
+        emptyVideo.stop();
+        emptyVideo.dispatchEvent(new Event('ended'));
+        mediaStream.addTrack(emptyVideo);
+    }
+
+    if (audio) {
+        let ctx = new AudioContext(),
+            oscillator = ctx.createOscillator();
+        let dst = oscillator.connect(ctx.createMediaStreamDestination());
+
+        oscillator.start();
+        let emptyAudio = Object.assign(dst.stream.getAudioTracks()[0], {
+            enabled: false,
+        });
+        emptyAudio.stop();
+        emptyAudio.dispatchEvent(new Event('ended'));
+        mediaStream.addTrack(emptyAudio);
+    }
+
+    return mediaStream;
 }

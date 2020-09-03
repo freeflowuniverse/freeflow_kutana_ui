@@ -11,6 +11,7 @@
             :selectedDeviceId="videoDevice"
             @toggle="toggleCam"
             @change="changeVideoTo"
+            class="mr-3"
         />
         <DeviceSelector
             :loading="isMicLoading"
@@ -205,8 +206,6 @@ export default {
         async hangUp() {
             this.userControl.hangUp();
             await this.$router.push({ name: 'home' });
-
-            console.log('Forcing reload');
             location.reload();
         },
     },

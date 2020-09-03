@@ -1,65 +1,99 @@
-import random from "../plugins/random";
-import moment from "moment";
-import ffcService from "../services/ffcService";
-export default {
-  state: {
-    isAccepted: false,
-    teamName: window.localStorage.getItem("teamName") || null,
-  },
-  mutations: {
-     setAccepted(state, accepted) {
-      state.isAccepted = accepted;
-    },
-    setTeamName(state, teamName) {
-      if (teamName.length < 15) teamName = teamName.toLowerCase()
-      window.localStorage.setItem("teamName", teamName);
-      state.teamName = teamName;
-    },
-  },
-  actions: {
-    createTeam(context) {
-      context.commit("setTeamName", random.stringGenerator(15));
-    },
-    getTeamInfo(context) {
-      ffcService.getTeamInfo(context.getters.teamName).then((result) => {
-        let data = result.data;
-        context.commit("setMessages", data.messages);
-      });
-    },
-    requestAccess(context, token) {
-      context.commit("setTeamName", token);
-      context.dispatch("sendSignal", {
-        sender: context.getters.account.name,
-        createdAt: moment(),
-        content: token,
-        type: "access_requested",
-      });
-    },
-    accessGranted(context) {
-      context.commit("setAccepted", true);
-      context.dispatch("join");
-    },
-    joinScreenShare(context, message) {
-      context.commit("setSnackbarMessage", {
-        text: `Screenshare started`,
-      });
-      
-      context.commit("joinScreen", message.content)
-    },
-    stopScreenShare(context) {
-      context.commit("setSnackbarMessage", {
-        text: `Screenshare stopped`,
-      });
+import random from '../plugins/random';
+import moment from 'moment';
+import ffcService from '../services/ffcService';
 
-      context.commit("stopScreenShare")
+export default {
+    state: {
+        isAccepted: false,
+        teamName: window.localStorage.getItem('teamName') || null,
     },
-  },
-  getters: {
-    teamName: (state) => {
-      return state.teamName;
+    mutations: {
+        setAccepted(state, accepted) {
+            state.isAccepted = accepted;
+        },
+        setTeamName(state, teamName) {
+            if (teamName.length < 15) teamName = teamName.toLowerCase();
+            window.localStorage.setItem('teamName', teamName);
+            state.teamName = teamName;
+        },
     },
-    isAccepted: (state) => {
-      return state.isAccepted;
+    actions: {
+        createTeam({ commit }) {
+            commit('setTeamName', random.stringGenerator(15));
+        },
+        getTeamInfo({ commit, getters }) {
+            ffcService.getTeamInfo(getters.teamName).then(result => {
+                let data = result.data;
+                commit('setMessages', data.messages);
+            });
+        },
+        requestAccess({ commit, dispatch, getters }, token) {
+            commit('setTeamName', token);
+            dispatch('sendSignal', {
+                sender: getters.account.name,
+                createdAt: moment(),
+                content: token,
+                type: 'access_requested',
+            });
+        },
+        accessGranted({ commit, dispatch }) {
+            commit('setAccepted', true);
+            dispatch('join');
+        },
+        joinScreenShare({ commit, dispatch, getters }, message) {
+            commit('setSnackbarMessage', {
+                text: `${message.sender} started screen sharing`,
+            });
+
+            if (!getters.allUsers) {
+                return;
+            }
+            let userSharingScreen = getters.allUsers.find(
+                u => u.username === message.sender
+            );
+            if (!userSharingScreen || !userSharingScreen.id) {
+                return;
+            }
+            dispatch('changeViewStyle', 'presentation');
+            dispatch('selectUser', { id: userSharingScreen.id, pinned: true });
+        },
+        stopScreenShare({ commit }, message) {
+            commit('setSnackbarMessage', {
+                text: `${message.sender} stopped screen sharing`,
+            });
+
+            //commit("stopScreenShare")
+        },
+        async setPresenterMode({ dispatch, getters }, message) {
+            message = message || getters.presentationMessage;
+            if (getters.localUser.id === message.id) {
+                let localUser = getters.localUser;
+                dispatch('setPresenter', {
+                    user: localUser,
+                    backgroundImage: message.backgroundImage,
+                });
+                return;
+            }
+            let presenter = await dispatch('findUserById', message.id);
+            dispatch('setPresenter', {
+                user: presenter,
+                backgroundImage: message.backgroundImage,
+            });
+        },
+        async stopPresenterMode({ commit, dispatch, getters }, message) {
+            commit('setSnackbarMessage', {
+                text: `${message.sender} stopped presenting`,
+            });
+            const presenter = getters.presenter;
+            await dispatch('removePresenter', presenter);
+        },
     },
-  },
+    getters: {
+        teamName: state => {
+            return state.teamName;
+        },
+        isAccepted: state => {
+            return state.isAccepted;
+        },
+    },
 };

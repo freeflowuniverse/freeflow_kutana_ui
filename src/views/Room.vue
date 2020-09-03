@@ -11,21 +11,19 @@
         <div v-if="(remoteUsers.length <= 0 && showInvitation) || forceOpenInvitation" :class="showInvitation || forceOpenInvitation ? 'invite': ''">
           <InviteUsers @closeInvitations="closeInvitations" />
         </div>
-        <UserGrid :users="users" :showChat="view === 'chat'">
+        <UserGrid :users="users" :showChat="view === 'chat'" :view="currentViewStyle">
             <template v-slot:chat>
                 <ChatGrid
                     v-if="view === 'chat'"
                     :selectedUser="localUser"
-                    v-on:back="view = 'grid'"
+                    v-on:back="view = 'no-chat'"
                 ></ChatGrid>
             </template>
             <template v-slot:controlStrip>
                 <v-row justify="center" class="controlStrip mx-0">
                     <ControlStrip
                         class="mx-0"
-                        @toggleChat="
-                            view === 'chat' ? (view = 'grid') : (view = 'chat')
-                        "
+                        @toggleChat="view === 'chat' ? (view = 'no-chat') : (view = 'chat')"
                         @openSettings="showSettings = true"
                         @openInvitations="forceOpenInvitation = true"
                     ></ControlStrip>
@@ -42,11 +40,11 @@
                 v-for="user of remoteUsers"
             ></audio>
         </div>
-        <Settings v-if="userControl" v-model="showSettings"></Settings>
+        <Settings v-if="userControl" v-model="showSettings" @change-view="changeViewStyle"></Settings>
         <ChatMessageNotification
             class="notifications"
             v-if="view !== 'chat'"
-            @click="view = view === 'chat' ? 'grid' : 'chat'"
+            @click="view = view === 'chat' ? 'no-chat' : 'chat'"
         />
     </div>
 </template>
@@ -80,11 +78,7 @@
         },
         data() {
             return {
-                isGrid: true,
-                showUserList: true,
-                startX: null,
-                dragging: false,
-                view: 'grid',
+                view: 'no-chat',
                 showControls: false,
                 timeout: null,
                 showSettings: false,
@@ -92,37 +86,23 @@
                 forceOpenInvitation: false
             };
         },
-        beforeMount() {
-            if (!store.getters.localStream) {
-                router.push({
-                    name: 'home',
-                    params: { token: this.$route.params.token },
+        async mounted() {
+            if (!this.localStream) {
+              try {
+                await router.push({
+                  name: 'home',
+                  query: { roomName: this.$route.params.token },
                 });
-                return;
+              } catch (e) {}
+              return;
             }
 
-            this.isGrid = this.isGridView;
             this.join(this.$route.params.token);
             this.getTeamInfo();
-        },
-        async mounted() {
-            if (!store.getters.localStream) {
-                try {
-                    await router.push({
-                        name: 'home',
-                        query: { roomName: this.$route.params.token },
-                    });
-                } catch (e) {}
 
-                return;
-            }
-
-            if (this.localUser) {
-                return;
-            }
             //@todo get from prejoin room
             // const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
-            const stream = store.getters.localStream;
+            const stream = this.localStream;
             store.commit('setLocalStream', null);
 
             //@todo fixme
@@ -157,8 +137,12 @@
                 'getTeamInfo',
                 'join',
                 'changeViewStyle',
+                'setPresenterMode'
             ]),
-            ...mapMutations(['setUserControl']),
+            ...mapMutations([
+                'setUserControl',
+                'setPresentationMessage'
+            ]),
             hashString(str) {
                 let hash = 0;
                 for (let i = 0; i < str.length; i++) {
@@ -183,14 +167,22 @@
             ...mapGetters([
                 'remoteUsers',
                 'teamName',
-                'isGridView',
+                'viewStyle',
                 'localUser',
                 'allUsers',
                 'allScreenUsers',
                 'isMobile',
                 'account',
                 'userControl',
+                'presentationMessage',
+                'localStream',
+                'presenter'
             ]),
+            currentViewStyle: {
+              get() {
+                return this.presenter ? 'presentation' : this.viewStyle;
+              }
+            },
             users() {
                 if (!(this.allUsers.length && this.allScreenUsers.length)) {
                     return [];
@@ -209,6 +201,7 @@
                             ...u,
                             screenShareStream: screenUser.stream,
                             screen: screenUser.screen,
+                            presenter: this.presenter
                         };
                     }),
                     isNull
@@ -216,6 +209,17 @@
                 return uniqBy(users, 'uuid').reverse();
             },
         },
+        watch: {
+          localUser(val) {
+            if (!val) {
+              return;
+            }
+            if (this.presentationMessage) {
+              this.setPresenterMode();
+              this.setPresentationMessage(null);
+            }
+          }
+        }
     };
 </script>
 

@@ -1,14 +1,16 @@
-import { toNestedArray } from '@tensorflow/tfjs-core/dist/util';
-
 export default {
     state: {
         localUser: null,
         remoteUsers: [],
         userControl: null,
+        selectedUser: null,
     },
     mutations: {
         setLocalUser(state, user) {
             state.localUser = user;
+        },
+        selectUser(state, userId) {
+            state.selectedUser = userId;
         },
         setUserControl(state, userControl) {
             state.userControl = userControl;
@@ -46,6 +48,25 @@ export default {
         findUserByName({ getters }, name) {
             return getters.allUsers.find(user => user.name === name);
         },
+        selectUser({ getters, commit }, { id, pinned }) {
+            // If same user toggle pin
+            if (
+                getters.selectedUser &&
+                getters.selectedUser.id === id &&
+                getters.selectedUser.pinned
+                ) {
+                    pinned = !pinned;
+                }
+            if (
+                !getters.selectedUser ||
+                (getters.selectedUser && !getters.selectedUser.pinned) ||
+                (getters.selectedUser && getters.selectedUser.pinned && !pinned)
+            )
+                commit('selectUser', {
+                    id,
+                    pinned,
+                });
+        },
     },
     getters: {
         localUser: state => state.localUser,
@@ -57,5 +78,8 @@ export default {
             return [state.localUser, ...state.remoteUsers];
         },
         userControl: state => state.userControl,
+        selectedUser: state => {
+            return state.selectedUser;
+        },
     },
 };
