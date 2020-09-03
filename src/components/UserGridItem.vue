@@ -1,15 +1,14 @@
 <template>
-    <div
-        :data-cam="user.cam"
-        :data-screen="user.screen"
-        class="user-grid-item"
-    >
+    <div :data-cam="user.cam" :data-screen="user.screen" class="user-grid-item">
         <div class="controls elevation-1">
             <v-btn small icon dark v-if="extendedControls">
-                <v-icon small>{{selectedUser && selectedUser.id == user.id && selectedUser.pinned? 'thumb_down': 'thumb_up'}}</v-icon>
+                <v-icon
+                    small
+                    :class="{rotated: selectedUser && selectedUser.id == user.id && selectedUser.pinned}"
+                >fas fa-thumbtack</v-icon>
             </v-btn>
             <v-btn small icon dark @click="toggleFullscreen">
-                <v-icon small>fullscreen</v-icon>
+                <v-icon small>fas fa-expand</v-icon>
             </v-btn>
         </div>
         <template v-if="isPresenter">
@@ -66,7 +65,7 @@ export default {
     data: () => {
         return {
             userCameraDisabled: false,
-            fullscreen: false
+            fullscreen: false,
         };
     },
     mounted() {
@@ -96,7 +95,13 @@ export default {
         console.log('user', this.user);
     },
     computed: {
-        ...mapGetters(['account', 'allUsers', 'localUser', 'presenter', 'selectedUser']),
+        ...mapGetters([
+            'account',
+            'allUsers',
+            'localUser',
+            'presenter',
+            'selectedUser',
+        ]),
         isPresenter() {
             return this.presenter && this.presenter.id === this.user.id;
         },
@@ -107,8 +112,10 @@ export default {
             )}.svg`;
         },
         userLabel() {
-            return this.localUser.id !== this.user.id ? this.user.username : null;
-        }
+            return this.localUser.id !== this.user.id
+                ? this.user.username
+                : null;
+        },
     },
     methods: {
         hashString(str) {
@@ -120,8 +127,8 @@ export default {
             return Math.abs(hash);
         },
         toggleFullscreen() {
-            this.fullscreen = !this.fullscreen 
-        }
+            this.fullscreen = !this.fullscreen;
+        },
     },
 };
 </script>
@@ -162,7 +169,7 @@ export default {
         right: 0;
         bottom: 50%;
         background: var(--primary-color);
-        opacity: 0;
+        opacity: 1;
         z-index: 1;
         display: flex;
         justify-content: center;
@@ -173,12 +180,15 @@ export default {
         transform: translateY(50%);
     }
     .video-label {
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      padding: 0 4px;
-      background: #000;
-      color: #ffffff;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        padding: 0 4px;
+        background: #000;
+        color: #ffffff;
+    }
+    .rotated {
+        transform: rotate(45deg);
     }
 }
 </style>
