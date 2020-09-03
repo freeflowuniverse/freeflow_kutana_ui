@@ -11,21 +11,19 @@
         <v-dialog v-model="showInvitation">
             <InviteUsers @closeInvitations="closeInvitations" />
         </v-dialog>
-        <UserGrid :users="users" :showChat="view === 'chat'">
+        <UserGrid :users="users" :showChat="view === 'chat'" :view="currentViewStyle">
             <template v-slot:chat>
                 <ChatGrid
                     v-if="view === 'chat'"
                     :selectedUser="localUser"
-                    v-on:back="view = 'grid'"
+                    v-on:back="view = 'no-chat'"
                 ></ChatGrid>
             </template>
             <template v-slot:controlStrip>
                 <v-row justify="center" class="controlStrip mx-0">
                     <ControlStrip
                         class="mx-0"
-                        @toggleChat="
-                            view === 'chat' ? (view = 'grid') : (view = 'chat')
-                        "
+                        @toggleChat="view === 'chat' ? (view = 'no-chat') : (view = 'chat')"
                         @openSettings="showSettings = true"
                         @openInvitations="showInvitation = true"
                     ></ControlStrip>
@@ -42,11 +40,11 @@
                 v-for="user of remoteUsers"
             ></audio>
         </div>
-        <Settings v-if="userControl" v-model="showSettings"></Settings>
+        <Settings v-if="userControl" v-model="showSettings" @change-view="changeViewStyle"></Settings>
         <ChatMessageNotification
             class="notifications"
             v-if="view !== 'chat'"
-            @click="view = view === 'chat' ? 'grid' : 'chat'"
+            @click="view = view === 'chat' ? 'no-chat' : 'chat'"
         />
     </div>
 </template>
@@ -80,48 +78,30 @@ export default {
     },
     data() {
         return {
-            isGrid: true,
-            showUserList: true,
-            startX: null,
-            dragging: false,
-            view: 'grid',
+            view: 'no-chat',
             showControls: false,
             timeout: null,
             showSettings: false,
             showInvitation: true,
         };
     },
-    beforeMount() {
-        if (!store.getters.localStream) {
-            router.push({
-                name: 'home',
-                params: { token: this.$route.params.token },
-            });
-            return;
-        }
-
-        this.isGrid = this.isGridView;
-        this.join(this.$route.params.token);
-        this.getTeamInfo();
-    },
     async mounted() {
-        if (!store.getters.localStream) {
+        if (!this.localStream) {
             try {
                 await router.push({
                     name: 'home',
                     query: { roomName: this.$route.params.token },
                 });
             } catch (e) {}
-
             return;
         }
 
-        if (this.localUser) {
-            return;
-        }
+        this.join(this.$route.params.token);
+        this.getTeamInfo();
+
         //@todo get from prejoin room
         // const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
-        const stream = store.getters.localStream;
+        const stream = this.localStream;
         store.commit('setLocalStream', null);
 
         //@todo fixme
@@ -156,8 +136,9 @@ export default {
             'getTeamInfo',
             'join',
             'changeViewStyle',
+            'setPresenterMode',
         ]),
-        ...mapMutations(['setUserControl']),
+        ...mapMutations(['setUserControl', 'setPresentationMessage']),
         hashString(str) {
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
@@ -181,14 +162,22 @@ export default {
         ...mapGetters([
             'remoteUsers',
             'teamName',
-            'isGridView',
+            'viewStyle',
             'localUser',
             'allUsers',
             'allScreenUsers',
             'isMobile',
             'account',
             'userControl',
+            'presentationMessage',
+            'localStream',
+            'presenter',
         ]),
+        currentViewStyle: {
+            get() {
+                return this.presenter ? 'presentation' : this.viewStyle;
+            },
+        },
         users() {
             if (!(this.allUsers.length && this.allScreenUsers.length)) {
                 return [];
@@ -207,11 +196,23 @@ export default {
                         ...u,
                         screenShareStream: screenUser.stream,
                         screen: screenUser.screen,
+                        presenter: this.presenter,
                     };
                 }),
                 isNull
             );
             return uniqBy(users, 'uuid').reverse();
+        },
+    },
+    watch: {
+        localUser(val) {
+            if (!val) {
+                return;
+            }
+            if (this.presentationMessage) {
+                this.setPresenterMode();
+                this.setPresentationMessage(null);
+            }
         },
     },
 };
@@ -226,6 +227,13 @@ export default {
         right: 0;
         z-index: 2;
     }
+}
+.invite {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgb(0, 0, 0, 0.5);
+    z-index: 2;
 }
 .controlStrip {
     z-index: 213;
