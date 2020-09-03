@@ -10,8 +10,13 @@
           fullscreen: isFullScreen
         }"
         class="presenter-background"
+        :style="{
+          background:`url(${backgroundImage})`,
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }"
     >
-      <img alt="presenter background" :src="backgroundImage" />
     </div>
     <v-btn
         :absolute="!isFullScreen"
@@ -149,7 +154,6 @@ video.screenshare {
 }
 
 .presenter-background {
-  object-fit: cover;
   pointer-events: none;
   user-select: none;
   position: absolute;
