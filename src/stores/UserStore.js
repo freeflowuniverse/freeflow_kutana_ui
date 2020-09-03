@@ -57,18 +57,11 @@ export default {
                 ) {
                     pinned = !pinned;
                 }
-
-            console.log(`will update`, (
-                !getters.selectedUser ||
-                (getters.selectedUser && !getters.selectedUser.pinned) ||
-                (getters.selectedUser && getters.selectedUser.pinned && !pinned)
-            ))
             if (
                 !getters.selectedUser ||
                 (getters.selectedUser && !getters.selectedUser.pinned) ||
                 (getters.selectedUser && getters.selectedUser.pinned && !pinned)
             )
-                console.log(`updating selected user to `, {id, pinned})
                 commit('selectUser', {
                     id,
                     pinned,

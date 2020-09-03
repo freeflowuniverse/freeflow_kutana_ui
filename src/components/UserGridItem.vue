@@ -92,7 +92,6 @@ export default {
                 }, 100);
             };
         }
-        console.log('user', this.user);
     },
     computed: {
         ...mapGetters([

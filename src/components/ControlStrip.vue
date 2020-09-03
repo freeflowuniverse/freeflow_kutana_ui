@@ -206,8 +206,6 @@ export default {
         async hangUp() {
             this.userControl.hangUp();
             await this.$router.push({ name: 'home' });
-
-            console.log('Forcing reload');
             location.reload();
         },
     },

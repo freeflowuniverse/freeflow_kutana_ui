@@ -132,7 +132,7 @@ export default {
 <style scoped lang="scss">
 .videoStream {
   position: absolute;
-  width: 15%;
+  width: 25%;
   bottom: 0;
   left: 0;
 }
