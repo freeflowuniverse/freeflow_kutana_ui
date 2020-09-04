@@ -24,26 +24,18 @@
             :selectedDeviceId="audioDevice"
             @toggle="toggleMic"
             @change="changeAudioInputTo"
+            class="mr-3"
         />
 
-        <v-tooltip top>
-            <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                    @click="screen"
-                    class="primary mx-2"
-                    v-bind="attrs"
-                    v-on="on"
-                    dark
-                    icon
-                    v-if="!isMobile"
-                >
-                    <v-icon
-                        small
-                    >{{ localScreenUser.screen ? 'stop_screen_share' : 'screen_share' }}</v-icon>
-                </v-btn>
-            </template>
-            <span>{{ localScreenUser.screen ? 'Stop' : 'Start' }} Screenshare</span>
-        </v-tooltip>
+        <DeviceSelector
+            device="screen share"
+            activeIcon="stop_screen_share"
+            inactiveIcon="screen_share"
+            :isActive="localScreenUser.screen"
+            @toggle="toggleScreen"
+            @change="changeScreen"
+        />
+
         <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn @click="hangUp" class="red mx-2" v-bind="attrs" v-on="on" dark icon>
@@ -193,9 +185,15 @@ export default {
                 this.setLoading(false);
             }, 100);
         },
-        screen() {
+       changeScreen() {
+          this.userControl.switchScreenShare();
+        },
+        stopScreen() {
+          this.userControl.stopScreenShare();
+        },
+        toggleScreen() {
             if (this.localScreenUser.screen) {
-              this.userControl.stopScreenShare();
+              this.stopScreen();
               return;
             }
             this.userControl.startScreenShare();

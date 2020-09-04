@@ -3,6 +3,7 @@ export default {
         localScreenUser: null,
         remoteScreenUsers: [],
         screenUserControl: null,
+        isChangingScreenShare: false
     },
     mutations: {
         setLocalScreenUser(state, screenUser) {
@@ -28,6 +29,9 @@ export default {
         },
         deleteRemoteScreenUser(state, screenUser) {
             state.remoteScreenUsers = state.remoteScreenUsers.filter(u => u.id !== screenUser.id);
+        },
+        setChangingScreenShare(state, isActive) {
+            state.isChangingScreenShare = isActive;
         }
     },
     actions: {
@@ -48,5 +52,6 @@ export default {
             return [state.localScreenUser, ...state.remoteScreenUsers];
         },
         screenUserControl: state => state.screenUserControl,
+        isChangingScreenShare: state => state.isChangingScreenShare
     }
 };

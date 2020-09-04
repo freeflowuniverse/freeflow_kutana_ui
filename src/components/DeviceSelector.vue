@@ -19,7 +19,7 @@
                     <span>Change {{device}} input</span>
                 </v-tooltip>
             </template>
-            <v-list>
+            <v-list v-if="devices">
                 <v-list-item-group :value="indexOfSelectedDevice" color="primary">
                     <v-list-item
                         v-for="(item) in devices"
@@ -29,6 +29,18 @@
                         <v-list-item-title>{{ item.label }}</v-list-item-title>
                     </v-list-item>
                 </v-list-item-group>
+            </v-list>
+            <v-list v-else>
+              <v-list-item
+                  @click="$emit('change')"
+              >
+                <v-list-item-title>Change Screen Share</v-list-item-title>
+              </v-list-item>
+              <v-list-item
+                  @click="$emit('toggle')"
+              >
+                <v-list-item-title>Stop Screen Share</v-list-item-title>
+              </v-list-item>
             </v-list>
         </v-menu>
     </v-btn-toggle>

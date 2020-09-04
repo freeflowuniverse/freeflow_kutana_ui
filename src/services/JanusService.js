@@ -175,6 +175,10 @@ export const initializeJanus = async (
             await screenShareRoomPlugin.publishTrack(videoTrack);
             const localScreenUser = store.getters.localScreenUser;
             stream.oninactive = () => {
+                if (store.getters.isChangingScreenShare) {
+                    store.commit('setUpdatingScreenShare', false);
+                    return;
+                }
                 const localScreenUser = store.getters.localScreenUser;
                 localScreenUser.screen = false;
                 store.commit('setLocalScreenUser', localScreenUser);
@@ -186,6 +190,20 @@ export const initializeJanus = async (
             });
             localScreenUser.screen = true;
             store.commit('setLocalScreenUser', localScreenUser);
+        },
+        switchScreenShare: async () => {
+            store.commit('setChangingScreenShare', true);
+            try {
+                const stream = await navigator.mediaDevices.getDisplayMedia();
+                const videoTrack = stream.getVideoTracks()[0];
+                await screenShareRoomPlugin.publishTrack(videoTrack);
+                const localScreenUser = store.getters.localScreenUser;
+                localScreenUser.screen = true;
+                store.commit('setLocalScreenUser', localScreenUser);
+            } catch (e) {
+                store.commit('setChangingScreenShare', false);
+            }
+
         },
         stopScreenShare: async () => {
             screenShareRoomPlugin?.myStream?.getTracks().forEach(t => {
