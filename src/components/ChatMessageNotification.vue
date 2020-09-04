@@ -23,15 +23,13 @@ export default {
     },
     watch: {
         messages(val) {
-            // TODO check if overlapping with controls
-
             const lastMessage = val[val.length - 1];
-            if (lastMessage.sender != this.account.name) {
-            if ('Notification' in window) {
-                new Notification(`New message from ${lastMessage.sender}`, {
-                    body: lastMessage.content,
-                });
-            }
+            if (lastMessage && lastMessage.sender != this.account.name) {
+                if ('Notification' in window) {
+                    new Notification(`New message from ${lastMessage.sender}`, {
+                        body: lastMessage.content,
+                    });
+                }
                 lastMessage.timeout = setTimeout(() => {
                     this.messagesToShow = this.messagesToShow.filter(
                         m => m != lastMessage
