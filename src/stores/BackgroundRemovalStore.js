@@ -1,6 +1,6 @@
 export default {
     state: {
-        wallpaperDataUrl: null,
+        wallpaperDataUrl: '/img/test-pattern.png',
         backgroundTrack: null,
     },
     mutations: {

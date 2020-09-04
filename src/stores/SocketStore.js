@@ -46,11 +46,16 @@ export default {
           break;
         case "screenshare_started":
           console.log("[Signal] Joining screen share ... ");
+          commit('setSnackbarMessage', {
+            text: `${message.sender} started screen sharing`,
+          });
           dispatch("joinScreenShare", message);
           break;
         case "screenshare_stopped":
           console.log("[Signal] Stopped screen share ... ");
-          dispatch("stopScreenShare", message);
+          commit('setSnackbarMessage', {
+            text: `${message.sender} stopped screen sharing`,
+          });
           break;
         case "presenter_started":
           console.log("[Signal] Presenter Mode Started ... ");
@@ -68,6 +73,9 @@ export default {
           break;
         case "presenter_ended":
           console.log("[Signal] Presenter Mode Stopped ... ");
+          commit('setSnackbarMessage', {
+            text: `${message.sender} stopped presenting`,
+          });
           dispatch('stopPresenterMode', message)
           break;
         default:

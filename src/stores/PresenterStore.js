@@ -15,11 +15,11 @@ export default {
         },
     },
     actions: {
-        startPresenting({ dispatch, getters }, background) {
+        startPresenting({ dispatch, getters }) {
             dispatch('sendSignal', {
                 sender: getters.localUser.username,
                 type: 'presenter_started',
-                backgroundImage: background,
+                backgroundImage: getters.wallpaperDataUrl,
                 id: getters.localUser.id
             });
         },
@@ -37,18 +37,15 @@ export default {
                 id: getters.localUser.id
             });
         },
-        setPresenter({ commit, dispatch }, { user, backgroundImage }) {
-            user.presenting = true;
-            user.backgroundImage = backgroundImage;
-            commit('setPresenter', user);
-            dispatch('selectUser', { id: user.id, pinned: true });
+        setPresenter({ commit, dispatch }, { user: presenter, backgroundImage }) {
+            presenter.presenting = true;
+            presenter.backgroundImage = backgroundImage;
+            commit('setPresenter', presenter);
+            dispatch('selectUser', { id: presenter.id, pinned: true });
         },
-        removePresenter({ commit, getters }, user) {
-            if (getters.presenter.id !== user.id) {
-                return;
-            }
+        removePresenter({ commit }, presenter) {
+            commit('selectUser', { id: presenter.id, pinned: false });
             commit('removePresenter');
-            commit('selectUser', { id: user.id, pinned: false });
         }
     },
     getters: {
