@@ -188,12 +188,9 @@ export default {
        changeScreen() {
           this.userControl.switchScreenShare();
         },
-        stopScreen() {
-          this.userControl.stopScreenShare();
-        },
         toggleScreen() {
             if (this.localScreenUser.screen) {
-              this.stopScreen();
+              this.userControl.stopScreenShare();
               return;
             }
             this.userControl.startScreenShare();
