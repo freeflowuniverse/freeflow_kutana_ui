@@ -18,7 +18,7 @@
             :ref="`user-${user.id}`"
             @click.native="changeSelection(user)"
         />
-        <div class="controlstrip">
+        <div class="controlstripWrapper">
             <slot name="controlStrip"></slot>
         </div>
         <div class="chat" ref="chatSlot">
@@ -233,12 +233,12 @@ export default {
         }
     }
 
-    // &:hover .controlStrip {
+    // &:hover .controlstripWrapper {
     //     opacity: 0.9;
     //     bottom: 0;
     //     transition: all 300ms ease-in-out 0s;
     // }
-    // .controlStrip {
+    // .controlstripWrapper {
     //     bottom: -100%;
     //     opacity: 0;
     //     position: fixed;
@@ -247,11 +247,11 @@ export default {
     //     align-content: center;
     // }
 
-    .controlstrip {
+    .controlstripWrapper {
         grid-column-start: start;
         display: flex;
         align-items: flex-end;
-        z-index: 2;
+        z-index: 213;
     }
     &[data-view='presentation'] {
         .user {
@@ -263,7 +263,7 @@ export default {
             }
         }
         &[data-orientation='landscape'] {
-            .controlstrip {
+            .controlstripWrapper {
                 grid-row-end: end;
                 grid-column-end: end;
             }
@@ -325,7 +325,7 @@ export default {
                 // https://grid.layoutit.com/?id=85AKD3S
                 grid-template-columns: [start] 138.5fr [end-content] 9fr 2fr 3fr 4fr 3.5fr 5fr 5.5fr 4fr 5fr 2fr 2fr 9fr [end];
                 grid-template-rows: [start] 2fr 1fr 1fr 2fr 18fr [end];
-                .controlstrip {
+                .controlstripWrapper {
                     grid-column-end: end-content;
                 }
                 &[data-useramount='1'] {
@@ -379,7 +379,7 @@ export default {
             }
         }
         &[data-orientation='portrait'] {
-            .controlstrip {
+            .controlstripWrapper {
                 grid-column-start: start;
                 grid-column-end: end;
             }
@@ -387,7 +387,7 @@ export default {
                 // https://grid.layoutit.com/?id=SqpUF0W
                 grid-template-columns: [start] 3fr 1fr 2fr 2fr 1fr 3fr [end];
                 grid-template-rows: [start] 28fr 7fr 2fr 5fr 4fr 2fr 7fr [end];
-                .controlstrip {
+                .controlstripWrapper {
                     grid-row-end: end;
                 }
                 &[data-useramount='1'] {
@@ -445,7 +445,7 @@ export default {
                 grid-template-rows: [start] 3fr [end-content] 8fr [end];
                 grid-template-areas: 'presenter' 'chat';
             }
-            .controlstrip {
+            .controlstripWrapper {
                 grid-row-end: end-content;
             }
         }
@@ -454,11 +454,11 @@ export default {
         &[data-orientation='landscape'] {
             grid-template-columns: [start] 9fr [one-quarter-chat] 3fr [one-quarter one-third-chat] 4fr [one-third] 2fr [middle-chat] 2fr 4fr [middle two-thirds-chat] 3fr [three-quarters-chat] 1fr 4fr [two-thirds] 4fr [three-quarters begin-chat] 12fr [end];
             grid-template-rows: [start] 3fr [one-quarter] 1fr [one-third] 1fr 1fr [middle] 1fr 1fr [two-thirds] 1fr [three-quarters] 3fr [end];
-            .controlstrip {
+            .controlstripWrapper {
                 grid-row-end: end;
             }
             &[data-showchat='false'] {
-                .controlstrip {
+                .controlstripWrapper {
                     grid-column-end: end;
                 }
                 .chat {
@@ -514,7 +514,7 @@ export default {
                 }
             }
             &[data-showchat='true'] {
-                .controlstrip {
+                .controlstripWrapper {
                     grid-column-end: begin-chat;
                 }
                 .chat {
@@ -625,11 +625,11 @@ export default {
         &[data-orientation='portrait'] {
             grid-template-columns: [start] 3fr 1fr 1fr 1fr 1fr 1fr 1fr 3fr [end];
             grid-template-rows: [start] 3fr 1fr 1fr 1fr 1fr 1fr 1fr 3fr [begin-chat] 3fr 3fr 3fr 3fr 3fr 9fr [end];
-            .controlstrip {
+            .controlstripWrapper {
                 grid-column-end: end;
             }
             &[data-showchat='true'] {
-                .controlstrip {
+                .controlstripWrapper {
                     grid-row-end: begin-chat;
                 }
                 &[data-useramount='1'] {
@@ -682,7 +682,7 @@ export default {
                 }
             }
             &[data-showchat='false'] {
-                .controlstrip {
+                .controlstripWrapper {
                     grid-row-end: end;
                 }
                 &[data-useramount='1'] {
