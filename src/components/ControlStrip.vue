@@ -27,10 +27,7 @@
             class="mr-3"
         />
 
-        <DeviceSelector
-            device="screen share"
-            activeIcon="stop_screen_share"
-            inactiveIcon="screen_share"
+        <ScreenShareSelector
             :isActive="localScreenUser.screen"
             @toggle="toggleScreen"
             @change="changeScreen"
@@ -88,9 +85,11 @@
 import { mapActions, mapMutations, mapGetters } from 'vuex';
 import { updateCurrentStream } from '../utils/mediaDevicesUtils';
 import DeviceSelector from './DeviceSelector';
+import ScreenShareSelector from '@/components/ScreenShareSelector';
 
 export default {
     components: {
+        ScreenShareSelector,
         DeviceSelector,
     },
     data: () => {
