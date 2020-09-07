@@ -77,6 +77,12 @@ export default {
             'presenter',
             'localUser',
         ]),
+        selectedUserStillExists() {
+            if(!this.users || !this.users.length || !this.selectedUser) {
+                return false
+            }
+            return this.users.some(u => u.id == this.selectedUser.id)
+        }
     },
     methods: {
         ...mapMutations(['updateRemoteUser']),
@@ -171,8 +177,13 @@ export default {
                         'grid-area'
                     ] = null;
                 }
-                if (this.view == 'presentation') {
+                if (this.view != 'presentation') {
+                    return
+                }
+                if(this.selectedUserStillExists) {
                     this.setLocationOfSelectedUser(this.selectedUser, null);
+                } else {
+                    this.setLocationOfSelectedUser(this.users[0], null);
                 }
             });
         },
