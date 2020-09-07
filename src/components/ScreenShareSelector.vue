@@ -2,7 +2,7 @@
   <v-btn-toggle small rounded class="primary mr-1" dark>
     <v-tooltip top>
       <template v-slot:activator="{ on: tooltip }">
-        <v-btn :disabled="disabled" small class="primary" @click="$emit('toggle')" v-on="{ ...tooltip}">
+        <v-btn small class="primary" @click="$emit('toggle')" v-on="{ ...tooltip}">
           <v-icon small>{{ isActive ? 'stop_screen_share' : 'screen_share' }}</v-icon>
         </v-btn>
       </template>

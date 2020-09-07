@@ -174,22 +174,20 @@ export const initializeJanus = async (
             const videoTrack = stream.getVideoTracks()[0];
             await screenShareRoomPlugin.publishTrack(videoTrack);
             const localScreenUser = store.getters.localScreenUser;
-            stream.oninactive = () => {
+            stream.oninactive = async () => {
                 if (store.getters.isChangingScreenShare) {
-                    store.commit('setUpdatingScreenShare', false);
+                    store.commit('setChangingScreenShare', false);
                     return;
                 }
-                const localScreenUser = store.getters.localScreenUser;
-                localScreenUser.screen = false;
-                store.commit('setLocalScreenUser', localScreenUser);
-                store.getters.userControl.stopScreenShare();
+                await store.getters.userControl.stopScreenShare();
             };
-            store.dispatch('sendSignal', {
-                sender: localScreenUser.username,
-                type: "screenshare_started"
-            });
             localScreenUser.screen = true;
             store.commit('setLocalScreenUser', localScreenUser);
+            if (store.getters.presentingModeActive && !store.getters.presenter) {
+                store.dispatch('startPresenting');
+                return;
+            }
+            store.dispatch('startScreenSharing');
         },
         switchScreenShare: async () => {
             store.commit('setChangingScreenShare', true);
@@ -209,13 +207,16 @@ export const initializeJanus = async (
             screenShareRoomPlugin?.myStream?.getTracks().forEach(t => {
                 t.stop();
             });
+
             const localScreenUser = store.getters.localScreenUser;
             localScreenUser.screen = false;
             store.commit('setLocalScreenUser', localScreenUser);
-            store.dispatch('sendSignal', {
-                sender: localScreenUser.username,
-                type: "screenshare_stopped"
-            });
+
+            if (store.getters.presentingModeActive) {
+                await store.dispatch('stopPresenting');
+            }
+
+            await store.dispatch('stopScreenSharing');
             screenShareRoomPlugin.pluginHandle.hangup();
         },
         startCamera: async () => {

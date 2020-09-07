@@ -40,11 +40,7 @@ export default {
             commit('setAccepted', true);
             dispatch('join');
         },
-        joinScreenShare({ commit, dispatch, getters }, message) {
-            commit('setSnackbarMessage', {
-                text: `${message.sender} started screen sharing`,
-            });
-
+        joinScreenShare({ dispatch, getters }, message) {
             if (!getters.allUsers) {
                 return;
             }
@@ -56,13 +52,6 @@ export default {
             }
             dispatch('changeViewStyle', 'presentation');
             dispatch('selectUser', { id: userSharingScreen.id, pinned: true });
-        },
-        stopScreenShare({ commit }, message) {
-            commit('setSnackbarMessage', {
-                text: `${message.sender} stopped screen sharing`,
-            });
-
-            //commit("stopScreenShare")
         },
         async setPresenterMode({ dispatch, getters }, message) {
             message = message || getters.presentationMessage;
@@ -80,10 +69,7 @@ export default {
                 backgroundImage: message.backgroundImage,
             });
         },
-        async stopPresenterMode({ commit, dispatch, getters }, message) {
-            commit('setSnackbarMessage', {
-                text: `${message.sender} stopped presenting`,
-            });
+        async stopPresenterMode({ dispatch, getters }) {
             const presenter = getters.presenter;
             await dispatch('removePresenter', presenter);
         },

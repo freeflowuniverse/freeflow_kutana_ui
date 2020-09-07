@@ -40,6 +40,18 @@ export default {
         },
         findScreenUserByName({getters}, name) {
             return getters.allScreenUsers.find(screenUser => screenUser.name === name);
+        },
+        startScreenSharing({ dispatch, getters }) {
+            dispatch('sendSignal', {
+                sender: getters.localScreenUser.username,
+                type: "screenshare_started"
+            });
+        },
+        stopScreenSharing({ dispatch, getters }) {
+            dispatch('sendSignal', {
+                sender: getters.localScreenUser.username,
+                type: "screenshare_stopped"
+            });
         }
     },
     getters: {
