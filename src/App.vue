@@ -1,5 +1,5 @@
 <template>
-    <v-app :style="cssProps">
+    <v-app id="app" :style="cssProps">
         <router-view></router-view>
         <v-snackbar
             top

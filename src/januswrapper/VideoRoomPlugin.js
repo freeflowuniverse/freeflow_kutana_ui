@@ -7,7 +7,8 @@ export class VideoRoomPlugin {
         this.debugString = debugString;
         this.pluginHandle = null;
         this.opaqueId = opaqueId;
-        this.inThrottle = null;
+        this.inThrottleForSelectedUser = null;
+        this.inThrottleForSpeakerVolume = null;
         this.feeds = [];
         this.listeners = {
             error: [],
@@ -75,9 +76,6 @@ export class VideoRoomPlugin {
             analyser.connect(javascriptNode);
             javascriptNode.connect(window.audioContext.destination);
             javascriptNode.onaudioprocess = () => {
-                if (store.getters.viewStyle !== 'presentation') {
-                    return;
-                }
                 const array = new Uint8Array(analyser.frequencyBinCount);
                 analyser.getByteFrequencyData(array);
                 let values = 0;
@@ -88,15 +86,28 @@ export class VideoRoomPlugin {
                 }
 
                 const average = values / length;
+                if (!this.inThrottleForSpeakerVolume) {
+                    this.inThrottleForSpeakerVolume = true;
+                    store.dispatch('setSpeakerVolume', {
+                        id: userId,
+                        volume: average,
+                    });
+                    setTimeout(() => (this.inThrottleForSpeakerVolume = false), 500);
+                }
                 if (
-                    !store.getters.selectedUser ||
-                    (store.getters.selectedUser.id !== userId &&
-                        !store.getters.selectedUser.pinned && average > 20)
+                    store.getters.viewStyle === 'presentation' &&
+                    (!store.getters.selectedUser ||
+                        (store.getters.selectedUser.id !== userId &&
+                            !store.getters.selectedUser.pinned &&
+                            average > 20))
                 ) {
-                    if (!this.inThrottle) {
-                        this.inThrottle = true;
-                        store.dispatch('selectUser', { id: userId, pinned: false });
-                        setTimeout(() => (this.inThrottle = false), 1000);
+                    if (!this.inThrottleForSelectedUser) {
+                        this.inThrottleForSelectedUser = true;
+                        store.dispatch('selectUser', {
+                            id: userId,
+                            pinned: false,
+                        });
+                        setTimeout(() => (this.inThrottleForSelectedUser = false), 1000);
                     }
                 }
             };

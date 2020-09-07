@@ -1,5 +1,6 @@
 <template>
     <div :data-cam="user.cam" :data-screen="user.screen" class="user-grid-item">
+        <div class="border" :style="borderStyle"></div>
         <div class="controls elevation-1">
             <v-btn small icon dark v-if="extendedControls">
                 <v-icon
@@ -101,6 +102,26 @@ export default {
             'presenter',
             'selectedUser',
         ]),
+        borderStyle() {
+            const primaryColor = getComputedStyle(document.querySelector('#app')).getPropertyValue('--primary-color');
+            const colorRegex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(primaryColor);
+            const color = colorRegex ? {
+                r: parseInt(colorRegex[1], 16),
+                g: parseInt(colorRegex[2], 16),
+                b: parseInt(colorRegex[3], 16)
+            } : null;
+
+            let volume = 0;
+            if (!this.user || !this.user.speakingVolume) {
+                return;
+            }
+            if (this.user.speakingVolume > 100) {
+                volume = 1;
+            } else {
+                volume = this.user.speakingVolume / 100;
+            }
+            return `border: 5px solid rgba(${color.r},${color.g},${color.b}, ${volume})`;
+        },
         isPresenter() {
             return this.presenter && this.presenter.id === this.user.id;
         },
@@ -188,6 +209,12 @@ export default {
     }
     .rotated {
         transform: rotate(45deg);
+    }
+    .border {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 3;
     }
 }
 </style>
