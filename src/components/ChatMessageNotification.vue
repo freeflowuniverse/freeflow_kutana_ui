@@ -28,7 +28,9 @@ export default {
                 if ('Notification' in window) {
                     new Notification(`New message from ${lastMessage.sender}`, {
                         body: lastMessage.content,
-                    });
+                    }).onclick = () => {
+                        this.$emit('click')
+                    }
                 }
                 lastMessage.timeout = setTimeout(() => {
                     this.messagesToShow = this.messagesToShow.filter(
