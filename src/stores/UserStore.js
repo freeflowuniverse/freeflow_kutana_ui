@@ -67,6 +67,17 @@ export default {
                     pinned,
                 });
         },
+        setSpeakerVolume({commit, getters}, {id, volume}) {
+            // find user
+            const user = getters.allUsers.find(u => u.id == id)
+            if(!user) {
+                return
+            }
+            // update value
+            user.speakingVolume = volume
+            // save value
+            commit('addRemoteUser', user)
+        }
     },
     getters: {
         localUser: state => state.localUser,
