@@ -7,9 +7,9 @@ import 'highlight.js/scss/solarized-dark.scss';
 
 Vue.use(VueDOMPurifyHTML, {
     default: {
-        ALLOWED_TAGS: ['pre', 'code', 'span', 'a'],
-        ADD_ATTR: ['target'],
-        FORBID_TAGS: ['style']
+        USE_PROFILES:  {
+            html: true
+        }
     }
 });
 
@@ -19,6 +19,12 @@ renderer.link = (href, title, text) => {
     const html = linkRenderer.call(renderer, href, title, text);
     return html.replace(/^<a /, '<a target="_blank" ');
 };
+
+renderer.html = (html => {
+    return html.replace(/[\u00A0-\u9999<>&](?!#)/gim, function(i) {
+        return '&#' + i.charCodeAt(0) + ';';
+    });
+})
 
 marked.setOptions({
     renderer,
