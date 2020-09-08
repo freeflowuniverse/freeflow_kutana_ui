@@ -182,9 +182,9 @@ export default {
                 }
                 if(this.selectedUserStillExists) {
                     this.setLocationOfSelectedUser(this.selectedUser, null);
-                } else {
-                    this.setLocationOfSelectedUser(this.users[0], null);
+                    return;
                 }
+                this.setLocationOfSelectedUser(this.users[0], null);
             });
         },
     },
