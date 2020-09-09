@@ -16,7 +16,6 @@
             v-bind:key="user.uuid"
             v-for="(user) of users"
             :ref="`user-${user.id}`"
-            @click.native="changeSelection(user)"
         />
         <div class="controlstripWrapper">
             <slot name="controlStrip"></slot>
@@ -86,13 +85,6 @@ export default {
     },
     methods: {
         ...mapMutations(['updateRemoteUser']),
-        ...mapActions(['selectUser']),
-        changeSelection(user) {
-            if (this.view != 'presentation') {
-                return;
-            }
-            this.selectUser({ id: user.id, pinned: true });
-        },
         calculateOrientation() {
             this.windowOrientation =
                 this.$refs.usergrid?.clientWidth * 3 >

@@ -2,7 +2,7 @@
     <div :data-cam="user.cam" :data-screen="user.screen" class="user-grid-item">
         <div class="border" :style="borderStyle"></div>
         <div class="controls elevation-1">
-            <v-btn small icon dark v-if="extendedControls">
+            <v-btn @click="selectThisUser" small icon dark v-if="extendedControls">
                 <v-icon
                     small
                     :class="{rotated: selectedUser && selectedUser.id == user.id && selectedUser.pinned}"
@@ -46,7 +46,7 @@
 <script>
 import { AvatarGenerator } from 'random-avatar-generator';
 import JanusVideo from './JanusVideo';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import UserPresenter from '@/components/UserPresenter';
 
 export default {
@@ -138,6 +138,13 @@ export default {
         },
     },
     methods: {
+         ...mapActions(['selectUser']),
+        selectThisUser() {
+            if (!this.extendedControls) {
+                return;
+            }
+            this.selectUser({ id: this.user.id, pinned: true });
+        },
         hashString(str) {
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
@@ -211,6 +218,7 @@ export default {
         transform: rotate(45deg);
     }
     .border {
+        pointer-events: none;
         position: absolute;
         width: 100%;
         height: 100%;
