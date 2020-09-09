@@ -3,6 +3,7 @@ export default {
         localScreenUser: null,
         remoteScreenUsers: [],
         screenUserControl: null,
+        isChangingScreenShare: false
     },
     mutations: {
         setLocalScreenUser(state, screenUser) {
@@ -28,6 +29,9 @@ export default {
         },
         deleteRemoteScreenUser(state, screenUser) {
             state.remoteScreenUsers = state.remoteScreenUsers.filter(u => u.id !== screenUser.id);
+        },
+        setChangingScreenShare(state, isActive) {
+            state.isChangingScreenShare = isActive;
         }
     },
     actions: {
@@ -36,6 +40,18 @@ export default {
         },
         findScreenUserByName({getters}, name) {
             return getters.allScreenUsers.find(screenUser => screenUser.name === name);
+        },
+        startScreenSharing({ dispatch, getters }) {
+            dispatch('sendSignal', {
+                sender: getters.localScreenUser.username,
+                type: "screenshare_started"
+            });
+        },
+        stopScreenSharing({ dispatch, getters }) {
+            dispatch('sendSignal', {
+                sender: getters.localScreenUser.username,
+                type: "screenshare_stopped"
+            });
         }
     },
     getters: {
@@ -48,5 +64,6 @@ export default {
             return [state.localScreenUser, ...state.remoteScreenUsers];
         },
         screenUserControl: state => state.screenUserControl,
+        isChangingScreenShare: state => state.isChangingScreenShare
     }
 };

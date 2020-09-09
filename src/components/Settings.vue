@@ -32,10 +32,8 @@
                     <h2 class="subtitle-1 pt-5 red--text">Experimental feature</h2>
                     <v-switch
                         inset
-                        :disabled="presenter && presenter.id !== localUser.id"
-                        v-model="presentationMode"
-                        @change="togglePresenterMode"
-                        label="Enable Presentation mode"
+                        v-model="isPresentingMode"
+                        label="Presenting mode"
                     ></v-switch>
                     <v-switch
                         inset
@@ -111,6 +109,7 @@ export default {
             'account',
             'viewStyle',
             'presenter',
+            'presentingModeActive'
         ]),
         show: {
             get() {
@@ -119,6 +118,14 @@ export default {
             set(value) {
                 this.$emit('input', value);
             },
+        },
+        isPresentingMode: {
+          get() {
+            return this.presentingModeActive;
+          },
+          set(value) {
+            return this.setPresenterMode(value);
+          }
         },
         currentViewStyle: {
           get() {
@@ -164,7 +171,8 @@ export default {
             'changePresenterSettings'
         ]),
         ...mapMutations([
-            'setPresenterMode'
+            'setPresenterMode',
+            'setWallpaperDataUrl'
         ]),
         logoutAndGoToLanding() {
             this.$router.push({
@@ -186,7 +194,8 @@ export default {
         async changeWallpaper(file) {
             this.selectedBackground = file;
             this.wallpaperFile = null;
-            await this.changeCameraBackground(null);
+            await this.changeCameraBackground();
+            this.setWallpaperDataUrl(file);
         },
         updatePresenterBackground() {
           if (!this.presentationMode) {
@@ -210,19 +219,8 @@ export default {
             const backgroundStream = await this.backgroundRemovalService.startBackgroundRemoval();
             await this.userControl.publishTrack(backgroundStream.getVideoTracks()[0]);
         },
-        async togglePresenterMode(isPresenterActive) {
-          this.setPresenterMode(isPresenterActive);
-          if (!isPresenterActive) {
-             this.stopPresenting();
-             if (this.localScreenUser) {
-               this.userControl.stopScreenShare();
-             }
-             return;
-          }
-          this.startPresenting(this.getWallpaperImage);
-        },
     },
-    watch: {
+  watch: {
         wallpaperDataUrl(val) {
           if (!val) {
             return;
