@@ -17,7 +17,7 @@
                     v-model="message"
                     outlined
             />
-            <v-btn @click="forwardMessage" icon>
+            <v-btn @click="forwardMessage" :disabled="!canSend" icon>
                 <v-icon>send</v-icon>
             </v-btn>
             </v-row>
@@ -40,10 +40,16 @@
         },
         computed: {
             ...mapGetters(["account", "localUser"]),
+            canSend() {
+                return this.message && this.message.trim()
+            }
         },
         methods: {
             ...mapActions(["sendMessage", "setSnackbarMessage"]),
             forwardMessage() {
+                if (!this.canSend) {
+                    return
+                }
                 this.sendIt(this.message);
             },
             clearMessage() {
