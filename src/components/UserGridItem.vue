@@ -29,7 +29,6 @@
                 :stream="user.screenShareStream"
                 class="screen"
                 v-if="user.screen"
-                :fullscreen="fullscreen"
             ></JanusVideo>
             <JanusVideo
                 :cover="true"
@@ -38,7 +37,6 @@
                 class="main"
                 :class="{mine: localUser.id === user.id}"
                 v-if="user.cam"
-                :fullscreen="fullscreen"
             ></JanusVideo>
         </template>
     </div>
@@ -46,7 +44,7 @@
 <script>
 import { AvatarGenerator } from 'random-avatar-generator';
 import JanusVideo from './JanusVideo';
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapActions, mapMutations } from 'vuex';
 import UserPresenter from '@/components/UserPresenter';
 
 export default {
@@ -101,6 +99,7 @@ export default {
             'localUser',
             'presenter',
             'selectedUser',
+            'fullScreenUser'
         ]),
         borderStyle() {
             const primaryColor = getComputedStyle(document.querySelector('#app')).getPropertyValue('--primary-color');
@@ -139,6 +138,7 @@ export default {
     },
     methods: {
          ...mapActions(['selectUser']),
+         ...mapMutations(['setFullscreenUser']),
         selectThisUser() {
             if (!this.extendedControls) {
                 return;
@@ -154,7 +154,11 @@ export default {
             return Math.abs(hash);
         },
         toggleFullscreen() {
-            this.fullscreen = !this.fullscreen;
+            if(this.fullScreenUser) {
+                this.setFullscreenUser(null)
+                return
+            }
+            this.setFullscreenUser(this.user)
         },
     },
 };

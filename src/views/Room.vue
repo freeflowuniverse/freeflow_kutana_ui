@@ -172,6 +172,7 @@ export default {
             'presentationMessage',
             'localStream',
             'presenter',
+            'fullScreenUser',
         ]),
         currentViewStyle: {
             get() {
@@ -182,6 +183,7 @@ export default {
             if (!(this.allUsers.length && this.allScreenUsers.length)) {
                 return [];
             }
+
             const users = reject(
                 this.allUsers.map(u => {
                     const screenUser = this.allScreenUsers.find(su => {
@@ -201,15 +203,33 @@ export default {
                 }),
                 isNull
             );
-            return uniqBy(users, 'uuid').reverse();
+
+            const uniqueUsers = uniqBy(users, 'uuid').reverse();
+            const actualFullScreenUser = uniqueUsers.find(
+                u => u.id == this.fullScreenUser?.id
+            );
+            if (!actualFullScreenUser) {
+                return uniqueUsers;
+            }
+
+            const fullScreenUsers = [actualFullScreenUser];
+            if (
+                this.view == 'chat' &&
+                this.fullScreenUser.id != this.localUser.id
+            ) {
+                fullScreenUsers.push(
+                    uniqueUsers.find(u => u.id == this.localUser.id)
+                );
+            }
+            return fullScreenUsers;
         },
     },
     watch: {
         allUsers: {
             immediate: true,
             handler(val) {
-                this.showInvitation = !!(val && val.length <= 1)
-            }
+                this.showInvitation = !!(val && val.length <= 1);
+            },
         },
         localUser(val) {
             if (!val) {

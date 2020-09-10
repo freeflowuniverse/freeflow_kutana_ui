@@ -8,7 +8,6 @@
         :data-ismobile="isMobile ? 'true' : 'false'"
         class="grid"
     >
-        <!-- Todo: determin presenter -->
         <UserGridItem
             :extended-controls="view == 'presentation'"
             :user="user"
