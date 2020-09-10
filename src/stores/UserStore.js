@@ -62,9 +62,10 @@ export default {
                     pinned = !pinned;
                 }
             if (
+                pinned ||
                 !getters.selectedUser ||
                 (getters.selectedUser && !getters.selectedUser.pinned) ||
-                (getters.selectedUser && getters.selectedUser.pinned && !pinned)
+                (getters.selectedUser.id === id)
             )
                 commit('selectUser', {
                     id,
