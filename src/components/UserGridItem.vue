@@ -10,7 +10,6 @@
             <v-btn small icon dark @click="toggleFullscreen">
                 <v-icon small>{{fullScreenUser? 'fullscreen_exit' : 'fullscreen'}}</v-icon>
             </v-btn>
-            {{user.id}} ||||| {{selectedUser.id}}
         </div>
         <template v-if="isPresenter">
             <UserPresenter
