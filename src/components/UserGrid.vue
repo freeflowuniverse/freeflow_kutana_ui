@@ -76,11 +76,11 @@ export default {
             'localUser',
         ]),
         selectedUserStillExists() {
-            if(!this.users || !this.users.length || !this.selectedUser) {
-                return false
+            if (!this.users || !this.users.length || !this.selectedUser) {
+                return false;
             }
-            return this.users.some(u => u.id == this.selectedUser.id)
-        }
+            return this.users.some(u => u.id == this.selectedUser.id);
+        },
     },
     methods: {
         ...mapMutations(['updateRemoteUser']),
@@ -169,9 +169,9 @@ export default {
                     ] = null;
                 }
                 if (this.view != 'presentation') {
-                    return
+                    return;
                 }
-                if(this.selectedUserStillExists) {
+                if (this.selectedUserStillExists) {
                     this.setLocationOfSelectedUser(this.selectedUser, null);
                     return;
                 }

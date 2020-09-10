@@ -9,7 +9,7 @@
                 >fas fa-thumbtack</v-icon>
             </v-btn>
             <v-btn small icon dark @click="toggleFullscreen">
-                <v-icon small>fas fa-expand</v-icon>
+                <v-icon small>fas {{fullScreenUser? 'fa-compress' : 'fa-expand'}}</v-icon>
             </v-btn>
         </div>
         <template v-if="isPresenter">

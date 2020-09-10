@@ -11,6 +11,9 @@
         <v-dialog v-model="showInvitation">
             <InviteUsers @closeInvitations="closeInvitations" />
         </v-dialog>
+         <v-btn style="z-index: 1;" fixed top left icon class="primary" v-if="fullScreenUser" @click="setFullscreenUser(null)">
+            <v-icon small color="white">fas fa-compress</v-icon>
+        </v-btn>
         <UserGrid :users="users" :showChat="view === 'chat'" :view="currentViewStyle">
             <template v-slot:chat>
                 <ChatGrid
@@ -138,7 +141,7 @@ export default {
             'changeViewStyle',
             'setPresenterMode',
         ]),
-        ...mapMutations(['setUserControl', 'setPresentationMessage']),
+        ...mapMutations(['setUserControl', 'setPresentationMessage', 'setFullscreenUser']),
         hashString(str) {
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
