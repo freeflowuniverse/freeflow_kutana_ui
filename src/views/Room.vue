@@ -255,6 +255,7 @@ export default {
     }
 }
 .controlStrip {
+    pointer-events: all;
     z-index: 213;
 }
 </style>

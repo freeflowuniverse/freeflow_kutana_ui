@@ -254,6 +254,7 @@ export default {
         display: flex;
         align-items: flex-end;
         z-index: 213;
+        pointer-events: none;
     }
     &[data-view='presentation'] {
         .user {
