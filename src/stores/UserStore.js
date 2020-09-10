@@ -4,6 +4,7 @@ export default {
         remoteUsers: [],
         userControl: null,
         selectedUser: null,
+        fullScreenUser: null
     },
     mutations: {
         setLocalUser(state, user) {
@@ -40,6 +41,9 @@ export default {
         deleteRemoteUser(state, user) {
             state.remoteUsers = state.remoteUsers.filter(u => u.id !== user.id);
         },
+        setFullscreenUser(state, user) {
+            state.fullScreenUser = user
+        }
     },
     actions: {
         findUserById({ getters }, id) {
@@ -92,5 +96,6 @@ export default {
         selectedUser: state => {
             return state.selectedUser;
         },
+        fullScreenUser: (state) => { return state.fullScreenUser }
     },
 };

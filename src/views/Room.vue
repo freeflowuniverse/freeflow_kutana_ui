@@ -11,6 +11,9 @@
         <v-dialog v-model="showInvitation">
             <InviteUsers @closeInvitations="closeInvitations" />
         </v-dialog>
+         <v-btn style="z-index: 1;" fixed top left icon class="primary" v-if="fullScreenUser" @click="setFullscreenUser(null)">
+            <v-icon small color="white">fas fa-compress</v-icon>
+        </v-btn>
         <UserGrid :users="users" :showChat="view === 'chat'" :view="currentViewStyle">
             <template v-slot:chat>
                 <ChatGrid
@@ -138,7 +141,7 @@ export default {
             'changeViewStyle',
             'setPresenterMode',
         ]),
-        ...mapMutations(['setUserControl', 'setPresentationMessage']),
+        ...mapMutations(['setUserControl', 'setPresentationMessage', 'setFullscreenUser']),
         hashString(str) {
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
@@ -172,6 +175,7 @@ export default {
             'presentationMessage',
             'localStream',
             'presenter',
+            'fullScreenUser',
         ]),
         currentViewStyle: {
             get() {
@@ -182,6 +186,7 @@ export default {
             if (!(this.allUsers.length && this.allScreenUsers.length)) {
                 return [];
             }
+
             const users = reject(
                 this.allUsers.map(u => {
                     const screenUser = this.allScreenUsers.find(su => {
@@ -201,15 +206,33 @@ export default {
                 }),
                 isNull
             );
-            return uniqBy(users, 'uuid').reverse();
+
+            const uniqueUsers = uniqBy(users, 'uuid').reverse();
+            const actualFullScreenUser = uniqueUsers.find(
+                u => u.id == this.fullScreenUser?.id
+            );
+            if (!actualFullScreenUser) {
+                return uniqueUsers;
+            }
+
+            const fullScreenUsers = [actualFullScreenUser];
+            if (
+                this.view == 'chat' &&
+                this.fullScreenUser.id != this.localUser.id
+            ) {
+                fullScreenUsers.push(
+                    uniqueUsers.find(u => u.id == this.localUser.id)
+                );
+            }
+            return fullScreenUsers;
         },
     },
     watch: {
         allUsers: {
             immediate: true,
             handler(val) {
-                this.showInvitation = !!(val && val.length <= 1)
-            }
+                this.showInvitation = !!(val && val.length <= 1);
+            },
         },
         localUser(val) {
             if (!val) {
@@ -235,6 +258,7 @@ export default {
     }
 }
 .controlStrip {
+    pointer-events: all;
     z-index: 213;
 }
 </style>

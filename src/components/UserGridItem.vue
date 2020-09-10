@@ -2,14 +2,14 @@
     <div :data-cam="user.cam" :data-screen="user.screen" class="user-grid-item">
         <div class="border" :style="borderStyle"></div>
         <div class="controls elevation-1">
-            <v-btn small icon dark v-if="extendedControls">
+            <v-btn @click="selectThisUser" small icon dark v-if="extendedControls">
                 <v-icon
                     small
                     :class="{rotated: selectedUser && selectedUser.id == user.id && selectedUser.pinned}"
                 >fas fa-thumbtack</v-icon>
             </v-btn>
             <v-btn small icon dark @click="toggleFullscreen">
-                <v-icon small>fas fa-expand</v-icon>
+                <v-icon small>fas {{fullScreenUser? 'fa-compress' : 'fa-expand'}}</v-icon>
             </v-btn>
         </div>
         <template v-if="isPresenter">
@@ -29,7 +29,6 @@
                 :stream="user.screenShareStream"
                 class="screen"
                 v-if="user.screen"
-                :fullscreen="fullscreen"
             ></JanusVideo>
             <JanusVideo
                 :cover="true"
@@ -38,7 +37,6 @@
                 class="main"
                 :class="{mine: localUser.id === user.id}"
                 v-if="user.cam"
-                :fullscreen="fullscreen"
             ></JanusVideo>
         </template>
     </div>
@@ -46,7 +44,7 @@
 <script>
 import { AvatarGenerator } from 'random-avatar-generator';
 import JanusVideo from './JanusVideo';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions, mapMutations } from 'vuex';
 import UserPresenter from '@/components/UserPresenter';
 
 export default {
@@ -101,6 +99,7 @@ export default {
             'localUser',
             'presenter',
             'selectedUser',
+            'fullScreenUser'
         ]),
         borderStyle() {
             const primaryColor = getComputedStyle(document.querySelector('#app')).getPropertyValue('--primary-color');
@@ -138,6 +137,14 @@ export default {
         },
     },
     methods: {
+         ...mapActions(['selectUser']),
+         ...mapMutations(['setFullscreenUser']),
+        selectThisUser() {
+            if (!this.extendedControls) {
+                return;
+            }
+            this.selectUser({ id: this.user.id, pinned: true });
+        },
         hashString(str) {
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
@@ -147,7 +154,11 @@ export default {
             return Math.abs(hash);
         },
         toggleFullscreen() {
-            this.fullscreen = !this.fullscreen;
+            if(this.fullScreenUser) {
+                this.setFullscreenUser(null)
+                return
+            }
+            this.setFullscreenUser(this.user)
         },
     },
 };
@@ -211,6 +222,7 @@ export default {
         transform: rotate(45deg);
     }
     .border {
+        pointer-events: none;
         position: absolute;
         width: 100%;
         height: 100%;

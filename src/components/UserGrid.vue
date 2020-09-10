@@ -8,7 +8,6 @@
         :data-ismobile="isMobile ? 'true' : 'false'"
         class="grid"
     >
-        <!-- Todo: determin presenter -->
         <UserGridItem
             :extended-controls="view == 'presentation'"
             :user="user"
@@ -16,7 +15,6 @@
             v-bind:key="user.uuid"
             v-for="(user) of users"
             :ref="`user-${user.id}`"
-            @click.native="changeSelection(user)"
         />
         <div class="controlstripWrapper">
             <slot name="controlStrip"></slot>
@@ -78,21 +76,14 @@ export default {
             'localUser',
         ]),
         selectedUserStillExists() {
-            if(!this.users || !this.users.length || !this.selectedUser) {
-                return false
+            if (!this.users || !this.users.length || !this.selectedUser) {
+                return false;
             }
-            return this.users.some(u => u.id == this.selectedUser.id)
-        }
+            return this.users.some(u => u.id == this.selectedUser.id);
+        },
     },
     methods: {
         ...mapMutations(['updateRemoteUser']),
-        ...mapActions(['selectUser']),
-        changeSelection(user) {
-            if (this.view != 'presentation') {
-                return;
-            }
-            this.selectUser({ id: user.id, pinned: true });
-        },
         calculateOrientation() {
             this.windowOrientation =
                 this.$refs.usergrid?.clientWidth * 3 >
@@ -178,9 +169,9 @@ export default {
                     ] = null;
                 }
                 if (this.view != 'presentation') {
-                    return
+                    return;
                 }
-                if(this.selectedUserStillExists) {
+                if (this.selectedUserStillExists) {
                     this.setLocationOfSelectedUser(this.selectedUser, null);
                     return;
                 }
@@ -263,6 +254,7 @@ export default {
         display: flex;
         align-items: flex-end;
         z-index: 213;
+        pointer-events: none;
     }
     &[data-view='presentation'] {
         .user {

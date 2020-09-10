@@ -1,28 +1,10 @@
 <template>
     <div
         :class="classes"
-        @fullscreenchange="fullScreenChanged"
         class="janus-video"
         ref="videoAndMore"
-        @click="showFullscreen"
     >
-        <v-btn
-            :absolute="!isFullScreen"
-            :fixed="isFullScreen"
-            @click="toggleFullscreen"
-            class="fullscreen semiBlack mt-3"
-            fab
-            right
-            small
-            text
-            v-if="isFullScreen"
-        >
-            <v-icon color="white">fullscreen_exit</v-icon>
-        </v-btn>
         <video
-            :class="{
-                    fullscreen: isFullScreen
-                }"
             :src-object.prop.camel="stream"
             autoplay
             muted
@@ -51,14 +33,9 @@ export default {
             required: false,
             default: false,
         },
-        fullscreen: {
-            type: Boolean,
-            default: false,
-        },
     },
     data() {
         return {
-            isFullScreen: false,
             show: false,
             timeout: null,
         };
@@ -73,48 +50,6 @@ export default {
             };
         },
     },
-    methods: {
-        fullScreenChanged() {
-            this.isFullScreen = !this.isFullScreen;
-        },
-        toggleFullscreen() {
-            if (this.isFullScreen) {
-                document.exitFullscreen();
-                return;
-            }
-            const elem = this.$refs.videoAndMore;
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-                return;
-            }
-            if (elem.mozRequestFullScreen) {
-                /* Firefox */
-                elem.mozRequestFullScreen();
-                return;
-            }
-            if (elem.webkitRequestFullscreen) {
-                /* Chrome, Safari & Opera */
-                elem.webkitRequestFullscreen();
-                return;
-            }
-            if (elem.msRequestFullscreen) {
-                /* IE/Edge */
-                elem.msRequestFullscreen();
-            }
-        },
-        showFullscreen() {
-            this.show = true;
-            clearTimeout(this.timeout);
-            this.timeout = window.setTimeout(() => {
-                this.show = false;
-            }, 4000);
-        },
-    },
-    watch: {
-        fullscreen() {
-            this.toggleFullscreen();
-        },
-    },
 };
 </script>
 
@@ -124,10 +59,6 @@ export default {
     height: 100%;
     position: relative;
     background: #000000;
-}
-
-video.fullScreen {
-    object-fit: contain;
 }
 
 video {
