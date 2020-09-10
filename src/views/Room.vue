@@ -254,7 +254,7 @@ export default {
         position: fixed;
         bottom: 0px;
         right: 0;
-        z-index: 2;
+        z-index: 1000;
     }
 }
 .controlStrip {
