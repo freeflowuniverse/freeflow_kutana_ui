@@ -190,12 +190,14 @@ export default {
             this.selectedBackground = null;
             this.wallpaperFile = wallpaper;
             await this.changeCameraBackground(this.wallpaperFile);
+            this.backgroundRemove = true
         },
         async changeWallpaper(file) {
             this.selectedBackground = file;
             this.wallpaperFile = null;
             await this.changeCameraBackground();
             this.setWallpaperDataUrl(file);
+            this.backgroundRemove = true
         },
         updatePresenterBackground() {
           if (!this.presentationMode) {
