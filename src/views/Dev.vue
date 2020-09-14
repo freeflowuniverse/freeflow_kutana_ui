@@ -28,8 +28,7 @@
 <script>
     import {initializeJanus} from "../services/JanusService";
     import config from "../../public/config";
-    import { mapActions, mapGetters } from "vuex";
-    import store from "../plugins/vuex";
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -87,14 +86,13 @@
                         return;
                     }
 
-                    track.onended = async (event) => {
+                    track.onended = async () => {
                         if (!this.isVideoAuthorised) {
                             return;
                         }
 
                         const stream = await navigator.mediaDevices.getUserMedia({video: true})
                         await this.videoRoomPlugin.publishTrack(stream.getTracks()[0]);
-
                     }
                 });
             }

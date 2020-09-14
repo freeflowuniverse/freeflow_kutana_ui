@@ -92,7 +92,10 @@ export class VideoRoomPlugin {
                         id: userId,
                         volume: average,
                     });
-                    setTimeout(() => (this.inThrottleForSpeakerVolume = false), 500);
+                    setTimeout(
+                        () => (this.inThrottleForSpeakerVolume = false),
+                        500
+                    );
                 }
                 if (
                     store.getters.viewStyle === 'presentation' &&
@@ -107,7 +110,10 @@ export class VideoRoomPlugin {
                             id: userId,
                             pinned: false,
                         });
-                        setTimeout(() => (this.inThrottleForSelectedUser = false), 1000);
+                        setTimeout(
+                            () => (this.inThrottleForSelectedUser = false),
+                            1000
+                        );
                     }
                 }
             };
@@ -340,6 +346,24 @@ export class VideoRoomPlugin {
         );
     }
 
+    /** @typedef {{
+     * cam: boolean,
+     * mic:boolean,
+     * extra: object,
+     * id: number,
+     * room: number,
+     * screen: boolean,
+     * username:String,
+     * uuid:number, stream:MediaStream
+     * }} User
+     *
+     * @param {MediaStream} stream
+     * @param {number} id
+     * @param {String} username
+     * @param {object} extra
+     *
+     * @return User
+     * */
     buildUser(stream, id, username = this.myUsername, extra = {}) {
         return {
             id: id,
