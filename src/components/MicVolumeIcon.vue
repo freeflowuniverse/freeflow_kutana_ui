@@ -18,30 +18,7 @@
             track: { type: MediaStreamTrack, required: true },
         },
         mounted() {
-            // const audioContext = new AudioContext();
-            // const mediaStreamSource = audioContext.createMediaStreamSource(
-            //     new MediaStream([this.track])
-            // );
-            // const processor = audioContext.createScriptProcessor(2048, 1, 1);
-            //
-            // mediaStreamSource.connect(audioContext.destination);
-            // mediaStreamSource.connect(processor);
-            // processor.connect(audioContext.destination);
-            //
-            // processor.onaudioprocess = e => {
-            //     const inputData = e.inputBuffer.getChannelData(0);
-            //     const inputDataLength = inputData.length;
-            //     let total = 0;
-            //
-            //     for (let i = 0; i < inputDataLength; i++) {
-            //         total += Math.abs(inputData[i++]);
-            //     }
-            //
-            //     const rms = Math.sqrt(total / inputDataLength);
-            //     this.progress = rms * 500;
-            // };
-
-            this.audioContext = new AudioContext();
+          this.audioContext = new(window.AudioContext || window.webkitAudioContext);
             this.analyser = this.audioContext.createAnalyser();
             this.microphone = this.audioContext.createMediaStreamSource(
                 new MediaStream([this.track])

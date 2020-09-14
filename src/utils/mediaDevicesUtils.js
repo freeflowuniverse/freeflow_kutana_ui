@@ -149,7 +149,7 @@ const refreshMediaDevices = () => {
     store.commit('setAudioDeviceId', null);
     store.commit('setVideoDeviceId', null);
 }
-
+let cleanupPrevCtx = () => {}
 export const generateDummyMediaStream = (
     video = true,
     audio = true,
@@ -177,8 +177,12 @@ export const generateDummyMediaStream = (
     }
 
     if (audio) {
-        let ctx = new AudioContext(),
-            oscillator = ctx.createOscillator();
+        cleanupPrevCtx();
+        let ctx = new window.AudioContext || (window).webkitAudioContext();
+        console.log('ctx');
+        console.log(ctx);
+        ctx.close()
+        let oscillator = ctx.createOscillator();
         let dst = oscillator.connect(ctx.createMediaStreamDestination());
 
         oscillator.start();
@@ -188,6 +192,9 @@ export const generateDummyMediaStream = (
         emptyAudio.stop();
         emptyAudio.dispatchEvent(new Event('ended'));
         mediaStream.addTrack(emptyAudio);
+        cleanupPrevCtx = () => {
+            ctx.close()
+        }
     }
 
     return mediaStream;
