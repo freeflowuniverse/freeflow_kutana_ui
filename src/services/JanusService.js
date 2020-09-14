@@ -52,7 +52,6 @@ export const initializeJanus = async (
                 return;
             }
             initialStream.getTracks().forEach(async track => {
-                console.log('track', track);
                 await videoRoomPlugin.publishTrack(track);
             });
         }
