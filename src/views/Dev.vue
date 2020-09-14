@@ -93,7 +93,6 @@
 
                         const stream = await navigator.mediaDevices.getUserMedia({video: true})
                         await this.videoRoomPlugin.publishTrack(stream.getTracks()[0]);
-
                     }
                 });
             }
