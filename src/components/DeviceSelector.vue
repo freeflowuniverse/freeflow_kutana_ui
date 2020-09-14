@@ -17,7 +17,7 @@
                                 device === 'mic'
                         "
                         :icon="activeIcon"
-                        :track="localStream.getAudioTracks()[0]"
+                        :stream="localStream"
                     >
                     </MicVolumeIcon>
                     <v-icon v-else small>

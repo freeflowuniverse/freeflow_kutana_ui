@@ -2,6 +2,24 @@ import { JanusBuilder } from '../januswrapper/JanusBuilder';
 import { VideoRoomPlugin } from '../januswrapper/VideoRoomPlugin';
 import store from '../plugins/vuex';
 
+/**
+ * @param {String} serverUrl
+ * @param {String} opaqueId
+ * @param {string} userName
+ * @param {number} roomName
+ * @param {MediaStream} initialStream
+ *
+ * @typedef {{startScreenShare: function:Promise,
+ *           switchScreenShare: function:Promise,
+ *           stopScreenShare: function:Promise,
+ *           startCamera: function:Promise,
+ *           publishTrack: function:Promise,
+ *           stopVideoTrack: function,
+ *           stopAudioTrack: function,
+ *           hangUp: function}} UserControl
+ *
+ * @return {UserControl}
+ */
 export const initializeJanus = async (
     serverUrl,
     opaqueId,
@@ -34,7 +52,7 @@ export const initializeJanus = async (
                 return;
             }
             initialStream.getTracks().forEach(async track => {
-                console.log('track', track)
+                console.log('track', track);
                 await videoRoomPlugin.publishTrack(track);
             });
         }
@@ -183,7 +201,10 @@ export const initializeJanus = async (
             };
             localScreenUser.screen = true;
             store.commit('setLocalScreenUser', localScreenUser);
-            if (store.getters.presentingModeActive && !store.getters.presenter) {
+            if (
+                store.getters.presentingModeActive &&
+                !store.getters.presenter
+            ) {
                 store.dispatch('startPresenting');
                 return;
             }
@@ -201,7 +222,6 @@ export const initializeJanus = async (
             } catch (e) {
                 store.commit('setChangingScreenShare', false);
             }
-
         },
         stopScreenShare: async () => {
             screenShareRoomPlugin?.myStream?.getTracks().forEach(t => {
@@ -246,7 +266,7 @@ export const initializeJanus = async (
                 store.dispatch('sendSignal', {
                     sender: presenter.username,
                     type: 'presenter_ended',
-                    id: localUser.id
+                    id: localUser.id,
                 });
             }
             videoRoomPlugin?.myStream?.getTracks().forEach(t => {

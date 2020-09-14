@@ -11,40 +11,31 @@
 </template>
 
 <script>
+    import { mapGetters } from 'vuex';
+
     export default {
         name: 'micVolumeIcon',
         props: {
             icon: { type: String, required: true },
-            track: { type: MediaStreamTrack, required: true },
+            stream: { type: MediaStream, required: true },
+        },
+        data() {
+            return {
+                progress: 50,
+                /** @type AudioContext */
+                audioContext: null,
+                /** @type AnalyserNode */
+                analyser: null,
+                /** @type MediaStreamAudioSourceNode */
+                microphone: null,
+            };
         },
         mounted() {
-            // const audioContext = new AudioContext();
-            // const mediaStreamSource = audioContext.createMediaStreamSource(
-            //     new MediaStream([this.track])
-            // );
-            // const processor = audioContext.createScriptProcessor(2048, 1, 1);
-            //
-            // mediaStreamSource.connect(audioContext.destination);
-            // mediaStreamSource.connect(processor);
-            // processor.connect(audioContext.destination);
-            //
-            // processor.onaudioprocess = e => {
-            //     const inputData = e.inputBuffer.getChannelData(0);
-            //     const inputDataLength = inputData.length;
-            //     let total = 0;
-            //
-            //     for (let i = 0; i < inputDataLength; i++) {
-            //         total += Math.abs(inputData[i++]);
-            //     }
-            //
-            //     const rms = Math.sqrt(total / inputDataLength);
-            //     this.progress = rms * 500;
-            // };
-
+            console.log('mounted');
             this.audioContext = new AudioContext();
             this.analyser = this.audioContext.createAnalyser();
             this.microphone = this.audioContext.createMediaStreamSource(
-                new MediaStream([this.track])
+                this.localUser?.stream || this.stream
             );
             let javascriptNode = this.audioContext.createScriptProcessor(
                 2048,
@@ -73,21 +64,11 @@
             };
         },
         destroyed() {
-            this.audioContext.close();
-            this.analyser.disconnect();
-            this.microphone.disconnect();
+            this.audioContext?.close();
+            this.analyser?.disconnect();
+            this.microphone?.disconnect();
         },
-        data() {
-            return {
-                progress: 50,
-                /** @type AudioContext */
-                audioContext: null,
-                /** @type AnalyserNode */
-                analyser: null,
-                /** @type MediaStreamAudioSourceNode */
-                microphone: null,
-            };
-        },
+        computed: {...mapGetters(['localUser'])},
     };
 </script>
 
