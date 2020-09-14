@@ -209,6 +209,7 @@
 
     .user-grid-item {
         position: relative;
+        overflow: hidden;
 
         &[data-cam='true'][data-screen='true'] {
             .main {
