@@ -1,5 +1,25 @@
 <template>
     <div class="settings">
+        <v-dialog v-model="verifyLougout" max-width="500">
+            <v-card>
+                <v-toolbar color="primary" dark>
+                    <v-toolbar-title>Are you sure?</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="closeVerifyLougout(false)" dark icon>
+                        <v-icon>close</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-card-text class="pt-5">
+                    <p>Are you sure you want to logout?</p>
+                    <p>You'll also be removed from this room.</p>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn  @click="closeVerifyLougout(false)" text small>No</v-btn>
+                    <v-btn  @click="closeVerifyLougout(true)" text small color="red">Yes</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <v-dialog max-width="650" v-model="show" scrollable>
             <v-card>
                 <v-toolbar color="primary" dark>
@@ -13,7 +33,10 @@
                     <h2 class="subtitle-1 pt-5">View</h2>
                     <v-row>
                         <v-col>
-                            <v-card @click="$emit('change-view', 'grid')" :class="{selected: currentViewStyle === 'grid'}">
+                            <v-card
+                                @click="$emit('change-view', 'grid')"
+                                :class="{selected: currentViewStyle === 'grid'}"
+                            >
                                 <v-col align="center" justify="center" class="py-5">
                                     <v-icon x-large>view_module</v-icon>
                                     <p>Grid view</p>
@@ -21,7 +44,10 @@
                             </v-card>
                         </v-col>
                         <v-col>
-                            <v-card @click="$emit('change-view', 'presentation')" :class="{selected: currentViewStyle === 'presentation'}">
+                            <v-card
+                                @click="$emit('change-view', 'presentation')"
+                                :class="{selected: currentViewStyle === 'presentation'}"
+                            >
                                 <v-col align="center" justify="center" class="py-5">
                                     <v-icon x-large style="transform: rotateY(180deg);">view_quilt</v-icon>
                                     <p>Presentation view</p>
@@ -30,11 +56,7 @@
                         </v-col>
                     </v-row>
                     <h2 class="subtitle-1 pt-5 red--text">Experimental feature</h2>
-                    <v-switch
-                        inset
-                        v-model="isPresentingMode"
-                        label="Presenting mode"
-                    ></v-switch>
+                    <v-switch inset v-model="isPresentingMode" label="Presenting mode"></v-switch>
                     <v-switch
                         inset
                         :disabled="!videoActive"
@@ -73,14 +95,14 @@
                         </v-col>
                     </v-row>
                     <v-divider class="my-5"></v-divider>
-                    <v-col align="center" justify="center">
-                        <p class="text-center mb-0">
+                    <span class="caption mb-0 version">{{ version }}</span>
+                    <v-col>
+                        <p class="mb-0" align="center">
                             Currently logged in as
                             <strong>{{account.name}}</strong>
+                            <v-btn small color="error" text @click="verifyLougout = true">Log out</v-btn>
                         </p>
-                        <v-btn color="error" text @click="logoutAndGoToLanding">Log out</v-btn>
                     </v-col>
-                    <p class="text-center caption mb-0">{{ version }}</p>
                 </v-card-text>
             </v-card>
         </v-dialog>
@@ -109,7 +131,7 @@ export default {
             'account',
             'viewStyle',
             'presenter',
-            'presentingModeActive'
+            'presentingModeActive',
         ]),
         show: {
             get() {
@@ -120,17 +142,17 @@ export default {
             },
         },
         isPresentingMode: {
-          get() {
-            return this.presentingModeActive;
-          },
-          set(value) {
-            return this.setPresenterMode(value);
-          }
+            get() {
+                return this.presentingModeActive;
+            },
+            set(value) {
+                return this.setPresenterMode(value);
+            },
         },
         currentViewStyle: {
-          get() {
-            return this.presenter ? 'presentation' : this.viewStyle;
-          }
+            get() {
+                return this.presenter ? 'presentation' : this.viewStyle;
+            },
         },
         getWallpaperImage() {
             if (this.wallpaperDataUrl) {
@@ -156,6 +178,7 @@ export default {
                 '/img/office.jpeg',
                 '/img/bricks.jpeg',
             ],
+            verifyLougout: false,
         };
     },
     methods: {
@@ -168,18 +191,16 @@ export default {
             'logout',
             'stopPresenting',
             'startPresenting',
-            'changePresenterSettings'
+            'changePresenterSettings',
         ]),
-        ...mapMutations([
-            'setPresenterMode',
-            'setWallpaperDataUrl'
-        ]),
-        logoutAndGoToLanding() {
-            this.$router.push({
-                name: 'home',
-                params: { token: this.$route.params.token },
-            });
+        ...mapMutations(['setPresenterMode', 'setWallpaperDataUrl']),
+        async logoutAndGoToLanding() {
+            this.userControl.hangUp();
             this.logout();
+            await this.$router.push({
+                name: 'home',
+            });
+            location.reload();
         },
         async useUploadedBackground(e) {
             const files = e.target.files;
@@ -200,34 +221,42 @@ export default {
             this.backgroundRemove = true
         },
         updatePresenterBackground() {
-          if (!this.presentationMode) {
-            return;
-          }
-          this.changePresenterSettings(this.getWallpaperImage);
+            if (!this.presentationMode) {
+                return;
+            }
+            this.changePresenterSettings(this.getWallpaperImage);
         },
         async toggleBackgroundRemoval(isBackgroundRemovalActive) {
             const stream = await this.getVideoStream();
             if (this.backgroundRemovalService) {
-              this.backgroundRemovalService.stopBackgroundRemoval();
+                this.backgroundRemovalService.stopBackgroundRemoval();
             }
             if (!isBackgroundRemovalActive) {
-              await this.userControl.publishTrack(stream.getVideoTracks()[0]);
-              return;
+                await this.userControl.publishTrack(stream.getVideoTracks()[0]);
+                return;
             }
             this.backgroundRemovalService = new BackGroundRemovalService(
-              stream.getVideoTracks()[0],
-              this.getWallpaperImage
+                stream.getVideoTracks()[0],
+                this.getWallpaperImage
             );
             const backgroundStream = await this.backgroundRemovalService.startBackgroundRemoval();
-            await this.userControl.publishTrack(backgroundStream.getVideoTracks()[0]);
+            await this.userControl.publishTrack(
+                backgroundStream.getVideoTracks()[0]
+            );
+        },
+        closeVerifyLougout(save) {
+            if (save) {
+                this.logoutAndGoToLanding()
+            }
+            this.verifyLougout = false;
         },
     },
-  watch: {
+    watch: {
         wallpaperDataUrl(val) {
-          if (!val) {
-            return;
-          }
-          this.updatePresenterBackground();
+            if (!val) {
+                return;
+            }
+            this.updatePresenterBackground();
         },
         backgroundRemove: async function (newBackgroundRemove) {
             await this.toggleBackgroundRemoval(newBackgroundRemove);
@@ -251,9 +280,14 @@ export default {
     user-select: none;
 }
 .version {
-    position: absolute;
-    right: 1rem;
-    bottom: 0;
+    position: relative;
+    left: 50%;
+    top: -2.75em;
+    margin-left: -3em ;
+    margin-top: -2em;
+    width: auto;
+    background: white;
+    padding: 5px;
 }
 .selected::after {
     content: '';
