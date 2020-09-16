@@ -17,6 +17,7 @@
                         "
                         :icon="activeIcon"
                         :stream="localStream"
+                        :key="localStream && localStream.getAudioTracks() && localStream.getAudioTracks()[0] ? localStream.getAudioTracks()[0].id : 'nosound'"
                     ></MicVolumeIcon>
                     <v-icon v-else>{{ isActive ? activeIcon : inactiveIcon }}</v-icon>
                 </v-btn>
@@ -88,7 +89,7 @@ export default {
         },
     },
     computed: {
-        ...mapGetters(['localStream']),
+        ...mapGetters(['localStream','localUser']),
         indexOfSelectedDevice() {
             if (!this.devices || !this.devices.length) {
                 return;

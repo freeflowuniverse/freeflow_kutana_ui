@@ -105,7 +105,7 @@ export default {
         //@todo get from prejoin room
         // const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
         const stream = this.localStream;
-        store.commit('setLocalStream', null);
+        store.commit('setLocalStream', stream);
 
         //@todo fixme
         const userName =
