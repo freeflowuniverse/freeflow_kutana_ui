@@ -9,7 +9,8 @@ Vue.use(VueDOMPurifyHTML, {
     default: {
         USE_PROFILES:  {
             html: true
-        }
+        },
+        ADD_ATTR:['target', 'noreferrer']
     }
 });
 
