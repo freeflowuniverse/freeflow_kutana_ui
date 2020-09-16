@@ -41,6 +41,8 @@ export const initializeJanus = async (
     videoRoomPlugin.addEventListener('ownUserJoined', user => {
         console.log('ownUserJoined');
 
+        store.commit('setLocalStream', user?.stream);
+
         if (initialJoin) {
             console.log('initialJoin');
             initialJoin = false;
