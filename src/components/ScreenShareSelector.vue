@@ -6,7 +6,7 @@
           <v-icon small>{{ isActive ? 'stop_screen_share' : 'screen_share' }}</v-icon>
         </v-btn>
       </template>
-      <span>{{ isActive ? 'Start' : 'stop' }} Screen sharing</span>
+      <span>{{ isActive ? 'Stop' : 'Start' }} screen sharing</span>
     </v-tooltip>
     <v-menu top left offset-y v-if="isActive">
       <template v-slot:activator="{ on: menu }">
