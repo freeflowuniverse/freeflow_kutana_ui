@@ -228,9 +228,12 @@ export default {
         },
     },
     watch: {
-        allUsers: {
+        users: {
             immediate: true,
-            handler(val) {
+            handler(val, oldVal) {
+                if(val?.length == oldVal?.length) {
+                    return
+                }
                 this.showInvitation = !!(val && val.length <= 1);
             },
         },

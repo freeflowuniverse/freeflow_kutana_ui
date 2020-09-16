@@ -1,21 +1,33 @@
 <template>
     <div class="micVolumeIcon">
-        <v-icon small>{{ icon }}</v-icon>
+        <v-icon>{{ icon }}</v-icon>
         <v-icon
             :style="`clip-path: inset(${100 - progress}% 0px 0 0px);`"
             color="#4cd137"
-            small
             >{{ icon }}
         </v-icon>
     </div>
 </template>
 
 <script>
+    import { mapGetters } from 'vuex';
+
     export default {
         name: 'micVolumeIcon',
         props: {
             icon: { type: String, required: true },
-            track: { type: MediaStreamTrack, required: true },
+            stream: { type: MediaStream, required: true },
+        },
+        data() {
+            return {
+                progress: 50,
+                /** @type AudioContext */
+                audioContext: null,
+                /** @type AnalyserNode */
+                analyser: null,
+                /** @type MediaStreamAudioSourceNode */
+                microphone: null,
+            };
         },
         mounted() {
             // @todo: move this away from window
@@ -27,7 +39,7 @@
             this.audioContext = window.micVolumeIconAudioContext;
             this.analyser = this.audioContext.createAnalyser();
             this.microphone = this.audioContext.createMediaStreamSource(
-                new MediaStream([this.track])
+                this.localUser?.stream || this.stream
             );
             let javascriptNode = this.audioContext.createScriptProcessor(
                 2048,
@@ -56,6 +68,7 @@
             };
         },
         destroyed() {
+<<<<<<< HEAD
             console.log('destroy');
             this.analyser.disconnect();
             this.microphone.disconnect();
@@ -70,7 +83,13 @@
                 /** @type MediaStreamAudioSourceNode */
                 microphone: null,
             };
+=======
+            this.audioContext?.close();
+            this.analyser?.disconnect();
+            this.microphone?.disconnect();
+>>>>>>> development
         },
+        computed: {...mapGetters(['localUser'])},
     };
 </script>
 
@@ -81,8 +100,7 @@
 
     .micVolumeIcon {
         display: inline-block;
-        height: 16px;
-        line-height: 16px;
+        height: 25px;
         position: relative;
         vertical-align: middle;
         width: 2.5em;
