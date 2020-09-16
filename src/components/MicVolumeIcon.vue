@@ -30,8 +30,13 @@
             };
         },
         mounted() {
-            console.log('mounted');
-            this.audioContext = new AudioContext();
+            // @todo: move this away from window
+            if (!window.micVolumeIconAudioContext) {
+                console.log('generating new AudioContext');
+                window.micVolumeIconAudioContext = new (window.AudioContext ||
+                    window.webkitAudioContext)();
+            }
+            this.audioContext = window.micVolumeIconAudioContext;
             this.analyser = this.audioContext.createAnalyser();
             this.microphone = this.audioContext.createMediaStreamSource(
                 this.localUser?.stream || this.stream
@@ -63,9 +68,10 @@
             };
         },
         destroyed() {
+            console.log('destroy');
+            this.analyser.disconnect();
+            this.microphone.disconnect();
             this.audioContext?.close();
-            this.analyser?.disconnect();
-            this.microphone?.disconnect();
         },
         computed: {...mapGetters(['localUser'])},
     };

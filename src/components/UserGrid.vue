@@ -5,28 +5,31 @@
         :data-orientation="windowOrientation"
         :data-showchat="showChat ? 'true' : 'false'"
         :data-useramount="
-            view === 'presentation' ? users.length + 1 : users.length
+            isPresentingView && !fullScreenUser && users.length >= 4 ? users.length + 1 : users.length
         "
         :data-view="view"
         class="grid"
     >
         <UserGridItem
             v-bind:key="
-                users.find(u => u.id === selectedUser.id).uuid + 'testse'
+                users.find(u => u.id === selectedUser.id).uuid + '_selected'
             "
-            :extended-controls="view == 'presentation'"
-            v-if="view === 'presentation' && selectedUser"
+            :extended-controls="isPresentingView"
+            v-if="isPresentingView && !fullScreenUser && selectedUser"
             :user="users.find(u => u.id === selectedUser.id)"
             class="user selected"
         />
         <UserGridItem
-            v-for="user of users"
+            v-for="user of users.filter(u => !isSelected(u.id) || users.length >= 4)"
             :ref="`user-${user.id}`"
             v-bind:key="user.uuid"
-            :selected="isSelected(user.id)"
-            :extended-controls="view == 'presentation'"
+            :selected="isPresentingView && isSelected(user.id) && !(fullScreenUser && fullScreenUser.id === user.id) && users.length >= 4"
+            :extended-controls="isPresentingView && !fullScreenUser"
             :user="user"
             class="user"
+            :class="{
+              fullscreen: fullScreenUser && fullScreenUser.id === user.id
+            }"
         />
         <div class="controlstripWrapper">
             <slot name="controlStrip"></slot>
@@ -38,7 +41,8 @@
 </template>
 <script>
 import UserGridItem from './UserGridItem';
-import { mapGetters, mapMutations } from 'vuex';
+import { mapMutations, mapGetters, mapActions } from 'vuex';
+import ResizeObserver from 'resize-observer-polyfill';
 
 export default {
     components: {
@@ -86,12 +90,16 @@ export default {
             'selectedUser',
             'presenter',
             'localUser',
+            'fullScreenUser',
         ]),
         selectedUserStillExists() {
             if (!this.users || !this.users.length || !this.selectedUser) {
                 return false;
             }
             return this.users.some(u => u.id == this.selectedUser.id);
+        },
+        isPresentingView(){
+          return this.view === 'presentation';
         },
     },
     methods: {
@@ -177,7 +185,7 @@ export default {
         refreshPresentationView() {
             this.$nextTick(() => {
                 for (const user of this.users) {
-                    if (this.$refs[`user-${user.id}`]) {
+                    if (this.$refs[`user-${user.id}`]?.$el) {
                         this.$refs[`user-${user.id}`][0].$el.style[
                             'grid-area'
                         ] = null;
@@ -298,7 +306,7 @@ export default {
             }
         }
 
-        .selected {
+        .selected, .fullscreen {
             grid-area: presenter !important;
         }
 
