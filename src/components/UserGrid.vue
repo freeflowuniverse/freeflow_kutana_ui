@@ -5,7 +5,7 @@
         :data-orientation="windowOrientation"
         :data-showchat="showChat ? 'true' : 'false'"
         :data-useramount="
-            view === 'presentation' ? users.length + 1 : users.length
+            isPresentingView ? users.length + 1 : users.length
         "
         :data-view="view"
         class="grid"
@@ -14,8 +14,8 @@
             v-bind:key="
                 users.find(u => u.id === selectedUser.id).uuid + '_selected'
             "
-            :extended-controls="view == 'presentation'"
-            v-if="view === 'presentation' && selectedUser"
+            :extended-controls="isPresentingView"
+            v-if="isPresentingView && selectedUser"
             :user="users.find(u => u.id === selectedUser.id)"
             class="user selected"
         />
@@ -23,8 +23,8 @@
             v-for="user of users"
             :ref="`user-${user.id}`"
             v-bind:key="user.uuid"
-            :selected="isSelected(user.id)"
-            :extended-controls="view == 'presentation'"
+            :selected="isPresentingView && isSelected(user.id)"
+            :extended-controls="isPresentingView"
             :user="user"
             class="user"
         />
@@ -92,6 +92,9 @@ export default {
                 return false;
             }
             return this.users.some(u => u.id == this.selectedUser.id);
+        },
+        isPresentingView(){
+          return this.view === 'presentation';
         },
     },
     methods: {
