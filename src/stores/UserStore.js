@@ -92,7 +92,7 @@ export default {
     getters: {
         /** @returns {User} */
         localUser: state => state.localUser,
-        /** @returns {User} */
+        /** @returns {User[]} */
         remoteUsers: state => state.remoteUsers,
         /** @returns {User[]} */
         allUsers: state => {
@@ -105,7 +105,7 @@ export default {
         userControl: state => state.userControl,
         /** @returns {User} */
         selectedUser: state => {
-            return state.selectedUser;
+            return state.selectedUser || state.remoteUsers[0] || state.localUser;
         },
         /** @returns {User} */
         fullScreenUser: state => {
