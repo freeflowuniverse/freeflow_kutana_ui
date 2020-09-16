@@ -20,7 +20,7 @@
             class="user selected"
         />
         <UserGridItem
-            v-for="user of users.filter(u => !isSelected(u.id) || users.length >= 4)"
+            v-for="user of users.filter(u => !isSelected(u.id) || users.length >= 4 || !isPresentingView)"
             :ref="`user-${user.id}`"
             v-bind:key="user.uuid"
             :selected="isPresentingView && isSelected(user.id) && !(fullScreenUser && fullScreenUser.id === user.id) && users.length >= 4"

@@ -71,7 +71,6 @@
             console.log('destroy');
             this.analyser.disconnect();
             this.microphone.disconnect();
-            this.audioContext?.close();
         },
         computed: {...mapGetters(['localUser'])},
     };
