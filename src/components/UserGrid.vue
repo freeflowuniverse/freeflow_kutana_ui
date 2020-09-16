@@ -5,7 +5,7 @@
         :data-orientation="windowOrientation"
         :data-showchat="showChat ? 'true' : 'false'"
         :data-useramount="
-            isPresentingView && !fullScreenUser ? users.length + 1 : users.length
+            isPresentingView && !fullScreenUser && users.length >= 4 ? users.length + 1 : users.length
         "
         :data-view="view"
         class="grid"
@@ -15,15 +15,15 @@
                 users.find(u => u.id === selectedUser.id).uuid + '_selected'
             "
             :extended-controls="isPresentingView"
-            v-if="isPresentingView  && !fullScreenUser && selectedUser"
+            v-if="isPresentingView && !fullScreenUser && selectedUser"
             :user="users.find(u => u.id === selectedUser.id)"
             class="user selected"
         />
         <UserGridItem
-            v-for="user of users"
+            v-for="user of users.filter(u => !isSelected(u.id) || users.length >= 4)"
             :ref="`user-${user.id}`"
             v-bind:key="user.uuid"
-            :selected="isPresentingView && isSelected(user.id) && !(fullScreenUser && fullScreenUser.id === user.id)"
+            :selected="isPresentingView && isSelected(user.id) && !(fullScreenUser && fullScreenUser.id === user.id) && users.length >= 4"
             :extended-controls="isPresentingView && !fullScreenUser"
             :user="user"
             class="user"
