@@ -5,7 +5,7 @@
         :data-orientation="windowOrientation"
         :data-showchat="showChat ? 'true' : 'false'"
         :data-useramount="
-            view == 'presentation' ? users.length + 1 : users.length
+            view === 'presentation' ? users.length + 1 : users.length
         "
         :data-view="view"
         class="grid"
@@ -15,7 +15,7 @@
                 users.find(u => u.id === selectedUser.id).uuid + 'testse'
             "
             :extended-controls="view == 'presentation'"
-            v-if="selectedUser"
+            v-if="view === 'presentation' && selectedUser"
             :user="users.find(u => u.id === selectedUser.id)"
             class="user selected"
         />
