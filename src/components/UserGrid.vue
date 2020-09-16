@@ -184,7 +184,7 @@ export default {
         refreshPresentationView() {
             this.$nextTick(() => {
                 for (const user of this.users) {
-                    if (this.$refs[`user-${user.id}`]) {
+                    if (this.$refs[`user-${user.id}`]?.$el) {
                         this.$refs[`user-${user.id}`][0].$el.style[
                             'grid-area'
                         ] = null;
