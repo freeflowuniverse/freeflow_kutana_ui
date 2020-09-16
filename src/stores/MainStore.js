@@ -25,7 +25,7 @@ export default {
         },
     },
     getters: {
-        viewStyle: state => state.viewStyle === "Default" ? 'grid' : state.viewStyle,
+        viewStyle: state => state.viewStyle && state.viewStyle === "grid" ? 'grid' : 'presentation',
         isMobile: () => {
             //https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
             let check = false;
