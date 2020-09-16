@@ -5,7 +5,7 @@ export default {
     },
     mutations: {
         setPresenter(state, presenter) {
-            state.presenter = { ...presenter };
+            state.presenter = presenter;
         },
         removePresenter(state) {
             state.presenter = null;
@@ -37,7 +37,10 @@ export default {
                 id: getters.localUser.id
             });
         },
-        setPresenter({ commit, dispatch }, { user: presenter, backgroundImage }) {
+        setPresenter({ commit, dispatch }, { presenter, backgroundImage }) {
+            if(!presenter) {
+                return
+            }
             presenter.presenting = true;
             presenter.backgroundImage = backgroundImage;
             commit('setPresenter', presenter);

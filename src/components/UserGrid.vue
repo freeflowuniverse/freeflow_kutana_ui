@@ -38,7 +38,8 @@
 </template>
 <script>
 import UserGridItem from './UserGridItem';
-import { mapGetters, mapMutations } from 'vuex';
+import { mapMutations, mapGetters, mapActions } from 'vuex';
+import ResizeObserver from 'resize-observer-polyfill';
 
 export default {
     components: {
