@@ -12,15 +12,15 @@
     >
         <UserGridItem
             v-bind:key="
-                users.find(u => u.id === selectedUser.id).uuid + '_selected'
+                selectedUser.uuid + '_selected'
             "
             :extended-controls="isPresentingView"
-            v-if="isPresentingView && !fullScreenUser && selectedUser"
+            v-if="isPresentingView && !fullScreenUser"
             :user="users.find(u => u.id === selectedUser.id)"
             class="user selected"
         />
         <UserGridItem
-            v-for="user of users.filter(u => !isSelected(u.id) || users.length >= 4 || !isPresentingView)"
+            v-for="user of filteredUsers"
             :ref="`user-${user.id}`"
             v-bind:key="user.uuid"
             :selected="isPresentingView && isSelected(user.id) && !(fullScreenUser && fullScreenUser.id === user.id) && users.length >= 4"
@@ -101,6 +101,9 @@ export default {
         isPresentingView(){
           return this.view === 'presentation';
         },
+        filteredUsers() {
+          return this.users.filter(u => !this.isSelected(u.id) || this.users.length >= 4 || !this.isPresentingView)
+        }
     },
     methods: {
         ...mapMutations(['updateRemoteUser']),

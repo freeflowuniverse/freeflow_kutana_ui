@@ -105,7 +105,8 @@ export default {
         userControl: state => state.userControl,
         /** @returns {User} */
         selectedUser: state => {
-            return state.selectedUser || state.remoteUsers[0] || state.localUser;
+            const allUsers = [state.localUser, ...state.remoteUsers];
+            return allUsers.find(u => u?.id === state?.selectedUser?.id) || state.remoteUsers[0] || state.localUser;
         },
         /** @returns {User} */
         fullScreenUser: state => {
