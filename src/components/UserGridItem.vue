@@ -214,7 +214,7 @@
         &[data-cam='true'][data-screen='true'] {
             .main {
                 position: absolute;
-                top: 0;
+                bottom: 0;
                 left: 0;
                 width: 10vw;
                 height: 10vh;
