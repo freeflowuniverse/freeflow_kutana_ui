@@ -215,6 +215,14 @@ export default {
         },
         view() {
             this.refreshPresentationView();
+            this.$nextTick().then(() => {
+                console.log(`this.$refs.chatSlot`, this.$refs.chatSlot)
+                if (!this.$refs.chatSlot || !this.$refs['chatSlot'].querySelector('.v-card__text.inner')) {
+                    return;
+                }
+                const el = this.$refs['chatSlot'].querySelector('.v-card__text.inner')
+                el.scrollTop = el.scrollHeight;
+            })
         },
         showChat() {
             this.calculateOrientation();
