@@ -1,5 +1,15 @@
 <template>
-    <v-btn-toggle rounded class="primary mr-1" dark>
+  <v-btn-toggle rounded class="primary mr-1" dark>
+    <v-tooltip top>
+      <template v-slot:activator="{ on: tooltip }">
+        <v-btn small class="primary" @click="$emit('toggle')" v-on="{ ...tooltip}">
+          <v-icon small>{{ isActive ? 'stop_screen_share' : 'screen_share' }}</v-icon>
+        </v-btn>
+      </template>
+      <span>{{ isActive ? 'Stop' : 'Start' }} screen sharing</span>
+    </v-tooltip>
+    <v-menu top left offset-y v-if="isActive">
+      <template v-slot:activator="{ on: menu }">
         <v-tooltip top>
             <template v-slot:activator="{ on: tooltip }">
                 <v-btn class="primary" @click="$emit('toggle')" v-on="{ ...tooltip}">

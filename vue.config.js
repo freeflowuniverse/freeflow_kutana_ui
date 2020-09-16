@@ -57,11 +57,17 @@ module.exports = {
         },
     },
 
+    // pwa: {
+    //   workboxPluginMode: 'InjectManifest'
+    // }
     css: {
         sourceMap: true,
     },
 
-    // pwa: {
-    //   workboxPluginMode: 'InjectManifest'
-    // }
+    pwa: {
+      name: 'FreeFlowConnect',
+      manifestOptions: {
+        background_color: '#FFFFFF'
+      }
+    }
 };
