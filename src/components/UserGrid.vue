@@ -27,6 +27,7 @@
 <script>
 import UserGridItem from './UserGridItem';
 import { mapMutations, mapGetters, mapActions } from 'vuex';
+import ResizeObserver from 'resize-observer-polyfill';
 
 export default {
     components: {
