@@ -12,7 +12,7 @@
     >
         <UserGridItem
             v-bind:key="
-                users.find(u => u.id === selectedUser.id).uuid + 'testse'
+                users.find(u => u.id === selectedUser.id).uuid + '_selected'
             "
             :extended-controls="view == 'presentation'"
             v-if="view === 'presentation' && selectedUser"
