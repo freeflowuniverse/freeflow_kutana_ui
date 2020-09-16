@@ -35,8 +35,8 @@
 
         <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
-                <v-btn @click="hangUp" class="red mx-2" v-bind="attrs" v-on="on" dark icon>
-                    <v-icon small>call_end</v-icon>
+                <v-btn @click="hangUp" large class="red mx-2" v-bind="attrs" v-on="on" dark icon>
+                    <v-icon>call_end</v-icon>
                 </v-btn>
             </template>
             <span>Disconnect</span>
@@ -44,6 +44,7 @@
         <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn
+                    large
                     @click="$emit('toggleChat')"
                     class="primary mx-2"
                     v-bind="attrs"
@@ -51,15 +52,23 @@
                     dark
                     icon
                 >
-                    <v-icon small>chat_bubble</v-icon>
+                    <v-icon>chat_bubble</v-icon>
                 </v-btn>
             </template>
             <span>Toggle Chat</span>
         </v-tooltip>
         <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
-                <v-btn @click="$emit('openInvitations')" class="primary mx-2" v-bind="attrs" v-on="on" dark icon>
-                    <v-icon small>group_add</v-icon>
+                <v-btn
+                    large
+                    @click="$emit('openInvitations')"
+                    class="primary mx-2"
+                    v-bind="attrs"
+                    v-on="on"
+                    dark
+                    icon
+                >
+                    <v-icon>group_add</v-icon>
                 </v-btn>
             </template>
             <span>Invite Users</span>
@@ -67,6 +76,7 @@
         <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn
+                    large
                     @click="$emit('openSettings', $event)"
                     class="btn-settings primary mx-2"
                     v-bind="attrs"
@@ -74,7 +84,7 @@
                     dark
                     icon
                 >
-                    <v-icon small>settings</v-icon>
+                    <v-icon>settings</v-icon>
                 </v-btn>
             </template>
             <span>Toggle Settings</span>
@@ -116,7 +126,7 @@ export default {
             'videoActive',
             'mediaDevices',
             'audioDeviceId',
-            'videoDeviceId'
+            'videoDeviceId',
         ]),
         hasAudioError() {
             return this.mediaDeviceErrors.hasOwnProperty('audio');
@@ -142,10 +152,10 @@ export default {
     },
     methods: {
         ...mapActions([
-          'getAudioStream',
-          'getVideoStream',
-          'updateAudioDevice',
-          'updateVideoDevice'
+            'getAudioStream',
+            'getVideoStream',
+            'updateAudioDevice',
+            'updateVideoDevice',
         ]),
         ...mapMutations([
             'setLocalUser',
@@ -184,13 +194,13 @@ export default {
                 this.setLoading(false);
             }, 100);
         },
-       changeScreen() {
-          this.userControl.switchScreenShare();
+        changeScreen() {
+            this.userControl.switchScreenShare();
         },
         toggleScreen() {
             if (this.localScreenUser.screen) {
-              this.userControl.stopScreenShare();
-              return;
+                this.userControl.stopScreenShare();
+                return;
             }
             this.userControl.startScreenShare();
             setTimeout(() => {

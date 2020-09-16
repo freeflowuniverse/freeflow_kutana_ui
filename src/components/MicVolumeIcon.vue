@@ -1,10 +1,9 @@
 <template>
     <div class="micVolumeIcon">
-        <v-icon small>{{ icon }}</v-icon>
+        <v-icon>{{ icon }}</v-icon>
         <v-icon
             :style="`clip-path: inset(${100 - progress}% 0px 0 0px);`"
             color="#4cd137"
-            small
             >{{ icon }}
         </v-icon>
     </div>
@@ -79,8 +78,7 @@
 
     .micVolumeIcon {
         display: inline-block;
-        height: 16px;
-        line-height: 16px;
+        height: 25px;
         position: relative;
         vertical-align: middle;
         width: 2.5em;
