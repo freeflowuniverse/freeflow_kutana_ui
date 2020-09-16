@@ -178,7 +178,7 @@ export const generateDummyMediaStream = (
 
     if (audio) {
         cleanupPrevCtx();
-        let ctx = new window.AudioContext || (window).webkitAudioContext();
+        let ctx = new (window.AudioContext || window.webkitAudioContext)();
         console.log('ctx');
         console.log(ctx);
         ctx.close()
