@@ -58,14 +58,14 @@ export default {
             if (getters.localUser.id === message.id) {
                 let localUser = getters.localUser;
                 dispatch('setPresenter', {
-                    user: localUser,
+                    presenter: localUser,
                     backgroundImage: message.backgroundImage,
                 });
                 return;
             }
             let presenter = await dispatch('findUserById', message.id);
             dispatch('setPresenter', {
-                user: presenter,
+                presenter: presenter,
                 backgroundImage: message.backgroundImage,
             });
         },
