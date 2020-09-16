@@ -5,7 +5,7 @@
         :data-orientation="windowOrientation"
         :data-showchat="showChat ? 'true' : 'false'"
         :data-useramount="
-            isPresentingView ? users.length + 1 : users.length
+            isPresentingView && !fullScreenUser ? users.length + 1 : users.length
         "
         :data-view="view"
         class="grid"
@@ -15,7 +15,7 @@
                 users.find(u => u.id === selectedUser.id).uuid + '_selected'
             "
             :extended-controls="isPresentingView"
-            v-if="isPresentingView && selectedUser"
+            v-if="isPresentingView  && !fullScreenUser && selectedUser"
             :user="users.find(u => u.id === selectedUser.id)"
             class="user selected"
         />
@@ -23,10 +23,13 @@
             v-for="user of users"
             :ref="`user-${user.id}`"
             v-bind:key="user.uuid"
-            :selected="isPresentingView && isSelected(user.id)"
-            :extended-controls="isPresentingView"
+            :selected="isPresentingView && isSelected(user.id) && !(fullScreenUser && fullScreenUser.id === user.id)"
+            :extended-controls="isPresentingView && !fullScreenUser"
             :user="user"
             class="user"
+            :class="{
+              fullscreen: fullScreenUser && fullScreenUser.id === user.id
+            }"
         />
         <div class="controlstripWrapper">
             <slot name="controlStrip"></slot>
@@ -86,6 +89,7 @@ export default {
             'selectedUser',
             'presenter',
             'localUser',
+            'fullScreenUser',
         ]),
         selectedUserStillExists() {
             if (!this.users || !this.users.length || !this.selectedUser) {
@@ -301,7 +305,7 @@ export default {
             }
         }
 
-        .selected {
+        .selected, .fullscreen {
             grid-area: presenter !important;
         }
 
