@@ -55,7 +55,6 @@ export class VideoRoomPlugin {
         if (!window.audioContext) {
             var _AudioContext =
                 window.AudioContext || window.webkitAudioContext;
-            console.log('generating new AudioContext');
             window.audioContext = new _AudioContext();
         }
 
