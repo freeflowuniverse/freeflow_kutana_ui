@@ -18,7 +18,13 @@
             track: { type: MediaStreamTrack, required: true },
         },
         mounted() {
-          this.audioContext = new(window.AudioContext || window.webkitAudioContext);
+            // @todo: move this away from window
+            if (!window.micVolumeIconAudioContext) {
+                console.log('generating new AudioContext');
+                window.micVolumeIconAudioContext = new (window.AudioContext ||
+                    window.webkitAudioContext)();
+            }
+            this.audioContext = window.micVolumeIconAudioContext;
             this.analyser = this.audioContext.createAnalyser();
             this.microphone = this.audioContext.createMediaStreamSource(
                 new MediaStream([this.track])
@@ -50,7 +56,7 @@
             };
         },
         destroyed() {
-            this.audioContext.close();
+            console.log('destroy');
             this.analyser.disconnect();
             this.microphone.disconnect();
         },
