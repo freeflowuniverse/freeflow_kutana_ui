@@ -58,24 +58,20 @@ export default {
             return getters.allUsers.find(user => user.name === name);
         },
         selectUser({ getters, commit }, { id, pinned }) {
-            // If same user toggle pin
-            if (
-                getters.selectedUser &&
-                getters.selectedUser.id === id &&
-                getters.selectedUser.pinned
-            ) {
-                pinned = !pinned;
-            }
             if (
                 pinned ||
                 !getters.selectedUser ||
                 (getters.selectedUser && !getters.selectedUser.pinned) ||
                 (getters.selectedUser.id === id)
-            )
+            ) {
                 commit('selectUser', {
                     id,
                     pinned,
                 });
+            }
+        },
+        unSelectUser({commit}) {
+            commit('selectUser', {});
         },
         setSpeakerVolume({ commit, getters }, { id, volume }) {
             // find user
@@ -86,7 +82,7 @@ export default {
             // update value
             user.speakingVolume = volume;
             // save value
-            commit('addRemoteUser', user);
+            // commit('addRemoteUser', user);
         },
     },
     getters: {
@@ -106,7 +102,8 @@ export default {
         /** @returns {User} */
         selectedUser: state => {
             const allUsers = [state.localUser, ...state.remoteUsers];
-            return allUsers.find(u => u?.id === state?.selectedUser?.id) || state.remoteUsers[0] || state.localUser;
+            let selectedUSer = allUsers.find(u => u?.id === state?.selectedUser?.id) || state.remoteUsers[0] || state.localUser;
+            return {...selectedUSer, pinned: !!state?.selectedUser?.pinned}
         },
         /** @returns {User} */
         fullScreenUser: state => {
