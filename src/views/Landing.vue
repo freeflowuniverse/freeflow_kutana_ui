@@ -1,10 +1,6 @@
 <template>
     <section class="landing">
-        <v-row class="title mx-0">
-            <v-col align="center">
-                <h1 class="ttl">FreeFlowConnect</h1>
-            </v-col>
-        </v-row>
+      <h1>FreeFlowConnect</h1>
         <v-row class="io mb-2" justify="center" align="center">
             <DeviceSelector
                 device="cam"
@@ -30,7 +26,7 @@
             />
         </v-row>
         <v-row class="actions pa-2" justify="center" align="center">
-            <v-col cols="4">
+            <v-col cols="12" md="4">
                 <v-form @submit.prevent="joinRoom" v-model="valid">
                     <v-text-field
                         :readonly="!!$route.query && !!$route.query.roomName"
@@ -299,6 +295,13 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+h1{
+  position: fixed;
+  top: 0;
+  z-index: 999999999;
+  padding: 20px 25%;
+  color: #00000061;
+}
 .landing {
     display: grid;
     grid-template-rows: [start] 1fr [titleend] 12fr [iostart] 1fr [ioend actionsstart] 1fr [end];
