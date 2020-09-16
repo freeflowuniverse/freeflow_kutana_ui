@@ -68,26 +68,10 @@
             };
         },
         destroyed() {
-<<<<<<< HEAD
             console.log('destroy');
             this.analyser.disconnect();
             this.microphone.disconnect();
-        },
-        data() {
-            return {
-                progress: 50,
-                /** @type AudioContext */
-                audioContext: null,
-                /** @type AnalyserNode */
-                analyser: null,
-                /** @type MediaStreamAudioSourceNode */
-                microphone: null,
-            };
-=======
             this.audioContext?.close();
-            this.analyser?.disconnect();
-            this.microphone?.disconnect();
->>>>>>> development
         },
         computed: {...mapGetters(['localUser'])},
     };
