@@ -9,7 +9,8 @@ Vue.use(VueDOMPurifyHTML, {
     default: {
         USE_PROFILES:  {
             html: true
-        }
+        },
+        ADD_ATTR:['target', 'noreferrer']
     }
 });
 
@@ -17,7 +18,7 @@ const renderer = new marked.Renderer();
 const linkRenderer = renderer.link;
 renderer.link = (href, title, text) => {
     const html = linkRenderer.call(renderer, href, title, text);
-    return html.replace(/^<a /, '<a target="_blank" ');
+    return html.replace(/^<a /, '<a target="_blank" rel="noopener" noreferrer ');
 };
 
 renderer.html = (html => {
