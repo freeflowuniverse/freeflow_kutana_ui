@@ -22,12 +22,12 @@ export default {
             state.userControl = userControl;
         },
         addRemoteUser(state, user) {
-            if (state.localUser && state.localUser.id === user.id) {
+            if (state.localUser && state.localUser.uuid === user.uuid) {
                 return;
             }
 
             const userIndex = state.remoteUsers.findIndex(
-                u => u.id === user.id
+                u => u.uuid === user.uuid
             );
 
             if (userIndex === -1) {
@@ -62,7 +62,7 @@ export default {
                 pinned ||
                 !getters.selectedUser ||
                 (getters.selectedUser && !getters.selectedUser.pinned) ||
-                (getters.selectedUser.id === id)
+                getters.selectedUser.id === id
             ) {
                 commit('selectUser', {
                     id,
@@ -70,7 +70,7 @@ export default {
                 });
             }
         },
-        unSelectUser({commit}) {
+        unSelectUser({ commit }) {
             commit('selectUser', {});
         },
         setSpeakerVolume({ commit, getters }, { id, volume }) {
@@ -102,8 +102,11 @@ export default {
         /** @returns {User} */
         selectedUser: state => {
             const allUsers = [state.localUser, ...state.remoteUsers];
-            let selectedUSer = allUsers.find(u => u?.id === state?.selectedUser?.id) || state.remoteUsers[0] || state.localUser;
-            return {...selectedUSer, pinned: !!state?.selectedUser?.pinned}
+            let selectedUSer =
+                allUsers.find(u => u?.id === state?.selectedUser?.id) ||
+                state.remoteUsers[0] ||
+                state.localUser;
+            return { ...selectedUSer, pinned: !!state?.selectedUser?.pinned };
         },
         /** @returns {User} */
         fullScreenUser: state => {

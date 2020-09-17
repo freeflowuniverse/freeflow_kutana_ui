@@ -51,7 +51,9 @@ export class VideoRoomPlugin {
         };
     }
 
+    // @todo: change this
     determineSpeaker(stream, userId) {
+        return;
         if (!window.audioContext) {
             var _AudioContext =
                 window.AudioContext || window.webkitAudioContext;
@@ -70,7 +72,7 @@ export class VideoRoomPlugin {
             );
 
             analyser.smoothingTimeConstant = 0.8;
-            analyser.fftSize = 1024;
+            analyser.fftSize = 32;
 
             microphone.connect(analyser);
             analyser.connect(javascriptNode);
@@ -514,7 +516,6 @@ export class VideoRoomPlugin {
                 }
             },
             onremotestream: stream => {
-                console.log({ stream, pluginHandle });
                 this.determineSpeaker(stream, id);
                 this.emitEvent(
                     'userJoined',
