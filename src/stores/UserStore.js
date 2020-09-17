@@ -82,7 +82,7 @@ export default {
             // update value
             user.speakingVolume = volume;
             // save value
-            // commit('addRemoteUser', user);
+            commit('addRemoteUser', user);
         },
     },
     getters: {
