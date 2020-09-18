@@ -300,6 +300,7 @@ export class VideoRoomPlugin {
             await this.publishOwnFeed(video, audio);
             peerConnection = this.pluginHandle.webrtcStuff.pc;
         }
+
         let senders = peerConnection.getSenders();
 
         let rtcpSender = senders.find(
@@ -340,6 +341,25 @@ export class VideoRoomPlugin {
     }
 
     onLocalStream(stream) {
+        const peerConnection = this.pluginHandle.webrtcStuff.pc;
+
+        const dataChannel = peerConnection.createDataChannel('signal');
+
+        // Opening Local DataChannel
+        dataChannel.onopen = () => {
+            console.log("Local Datachannel is open!");
+        };
+        // Closing Local DataChannel
+        dataChannel.onclose = () => {
+            console.log("Local DataChannel is closed!");
+        };
+        // Receiving Local Datachannel messages
+        dataChannel.ondatachannel = event => {
+            console.log("Local DataChannel Message", event.data);
+        };
+
+        store.commit('setDataChannel', dataChannel);
+
         this.emitEvent(
             'ownUserJoined',
             this.buildUser(stream, this.myId, this.myUsername)
@@ -515,6 +535,30 @@ export class VideoRoomPlugin {
             },
             onremotestream: stream => {
                 console.log({ stream, pluginHandle });
+                const peerConnection = pluginHandle.webrtcStuff.pc;
+
+                peerConnection.ondatachannel = event => {
+                    const channel = event.channel;
+                    channel.onmessage = event => {
+                        const data = JSON.parse(event.data);
+                        console.log("Remote Datachannel message", data);
+                        switch (data.type) {
+                            case 'toggle_video':
+
+                                break;
+
+                            case 'toggle_audio':
+
+                                break;
+                        }
+                    };
+                    channel.onopen = () => {
+                        console.log("Opening Remote Channel!");
+                    };
+                    channel.onclose = () => {
+                        console.log("Closing Remote Channel!");
+                    };
+                };
                 this.determineSpeaker(stream, id);
                 this.emitEvent(
                     'userJoined',
