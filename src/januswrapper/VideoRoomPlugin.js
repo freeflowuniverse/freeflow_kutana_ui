@@ -343,21 +343,48 @@ export class VideoRoomPlugin {
     }
 
     onLocalStream(stream) {
+        console.error('onLocalStream');
         const peerConnection = this.pluginHandle.webrtcStuff.pc;
 
         const dataChannel = peerConnection.createDataChannel('signal');
 
+        let syncInterval;
         // Opening Local DataChannel
         dataChannel.onopen = () => {
-            console.log("Local Datachannel is open!");
+            console.log('Local Datachannel is open!');
+            if (this.syncInterval) {
+                clearInterval(this.syncInterval);
+            }
+
+            let localUser;
+            let localScreenUser;
+            syncInterval = setInterval(() => {
+                localUser = store.getters.localUser;
+                localScreenUser = store.getters.localScreenUser;
+                dataChannel.send(
+                    JSON.stringify({
+                        t: 's',
+                        c: localUser.cam,
+                        m: localUser.mic,
+                        u: localUser.uuid,
+                        s: localScreenUser.screen,
+                    })
+                );
+            }, 100);
         };
         // Closing Local DataChannel
         dataChannel.onclose = () => {
-            console.log("Local DataChannel is closed!");
+            if (syncInterval) {
+                clearInterval(syncInterval);
+            }
+            console.log('Local DataChannel is closed!');
         };
         // Receiving Local Datachannel messages
         dataChannel.ondatachannel = event => {
-            console.log("Local DataChannel Message", event.data);
+            console.log('Local DataChannel Message', event.data);
+            if (event.data.t === 's') {
+                console.log(event.data.u, event.data.c);
+            }
         };
 
         store.commit('setDataChannel', dataChannel);
@@ -543,22 +570,33 @@ export class VideoRoomPlugin {
                     const channel = event.channel;
                     channel.onmessage = event => {
                         const data = JSON.parse(event.data);
-                        console.log("Remote Datachannel message", data);
-                        switch (data.type) {
-                            case 'toggle_video':
-
-                                break;
-
-                            case 'toggle_audio':
-
-                                break;
+                        if (data.t !== 's') {
+                            return;
                         }
+                        console.log(data.c);
+                        const remoteUserIndex = store.state.UserStore.remoteUsers.findIndex(
+                            u => u.uuid === data.u
+                        );
+
+                        if (remoteUserIndex === -1) {
+                            return;
+                        }
+                        store.state.UserStore.remoteUsers[remoteUserIndex].cam =
+                            data.c;
+                        store.state.UserStore.remoteUsers[remoteUserIndex].mic =
+                            data.m;
+                        const remoteScreenUserIndex = store.state.ScreenShareStore.remoteScreenUsers.findIndex(
+                            u => u.uuid === data.u
+                        );
+                        store.state.ScreenShareStore.remoteScreenUsers[
+                            remoteScreenUserIndex
+                        ].mic = data.m;
                     };
                     channel.onopen = () => {
-                        console.log("Opening Remote Channel!");
+                        console.log('Opening Remote Channel!');
                     };
                     channel.onclose = () => {
-                        console.log("Closing Remote Channel!");
+                        console.log('Closing Remote Channel!');
                     };
                 };
                 this.determineSpeaker(stream, id);

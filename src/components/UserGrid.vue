@@ -159,6 +159,7 @@
                 });
             },
             checkActiveVideoStreams() {
+                return;
                 this.pollingVideoStreams = setInterval(() => {
                     for (const user of this.remoteUsers) {
                         const remoteUser = user;
