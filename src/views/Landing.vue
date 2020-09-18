@@ -1,6 +1,6 @@
 <template>
     <section class="landing">
-      <h1>FreeFlowConnect</h1>
+      <h1 class="ffctitle">FreeFlowConnect</h1>
         <v-row class="io mb-2" justify="center" align="center">
             <DeviceSelector
                 device="cam"
@@ -54,7 +54,7 @@
                 </v-form>
             </v-col>
             <transition name="fade">
-                <v-divider vertical v-if="!inviteUrl"></v-divider>
+                <v-divider vertical v-if="!inviteUrl && $vuetify.breakpoint.mdAndUp"></v-divider>
             </transition>
             <transition name="shrink-x">
                 <v-col cols="4" align="center" v-if="!inviteUrl">
@@ -295,23 +295,18 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-h1{
-  position: fixed;
-  top: 0;
-  z-index: 999999999;
-  padding: 20px 25%;
-  color: #00000061;
-}
 .landing {
     display: grid;
     grid-template-rows: [start] 1fr [titleend] 12fr [iostart] 1fr [ioend actionsstart] 1fr [end];
     height: 100%;
     width: 100vw;
-    .title {
+    .ffctitle {
         grid-row-start: start;
         grid-row-end: titleend;
         grid-column-end: 1;
         z-index: 2;
+        text-align: center;
+        margin-top: 10px;
     }
     .mine {
         grid-row-start: start;

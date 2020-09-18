@@ -1,6 +1,7 @@
 <template>
     <v-row justify="center" ref="controlstrip" class="mb-5">
         <DeviceSelector
+            :small="isMobile"
             :loading="isCamLoading"
             device="cam"
             activeIcon="videocam"
@@ -14,6 +15,7 @@
             class="mr-3"
         />
         <DeviceSelector
+            :small="isMobile"
             :loading="isMicLoading"
             device="mic"
             activeIcon="mic"
@@ -26,17 +28,27 @@
             @change="changeAudioInputTo"
             class="mr-3"
         />
-
         <ScreenShareSelector
+            :small="isMobile"
             :isActive="localScreenUser.screen"
             @toggle="toggleScreen"
             @change="changeScreen"
+            v-if="!isMobile"
         />
 
         <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
-                <v-btn @click="hangUp" large class="red mx-2" v-bind="attrs" v-on="on" dark icon>
-                    <v-icon>call_end</v-icon>
+                <v-btn
+                    :small="isMobile"
+                    :large="!isMobile"
+                    @click="hangUp"
+                    class="red mx-2"
+                    v-bind="attrs"
+                    v-on="on"
+                    dark
+                    icon
+                >
+                    <v-icon :small="isMobile">call_end</v-icon>
                 </v-btn>
             </template>
             <span>Disconnect</span>
@@ -44,7 +56,8 @@
         <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn
-                    large
+                    :small="isMobile"
+                    :large="!isMobile"
                     @click="$emit('toggleChat')"
                     class="primary mx-2"
                     v-bind="attrs"
@@ -52,7 +65,7 @@
                     dark
                     icon
                 >
-                    <v-icon>chat_bubble</v-icon>
+                    <v-icon :small="isMobile">chat_bubble</v-icon>
                 </v-btn>
             </template>
             <span>Toggle Chat</span>
@@ -60,7 +73,8 @@
         <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn
-                    large
+                    :small="isMobile"
+                    :large="!isMobile"
                     @click="$emit('openInvitations')"
                     class="primary mx-2"
                     v-bind="attrs"
@@ -68,7 +82,7 @@
                     dark
                     icon
                 >
-                    <v-icon>group_add</v-icon>
+                    <v-icon :small="isMobile">group_add</v-icon>
                 </v-btn>
             </template>
             <span>Invite Users</span>
@@ -76,7 +90,8 @@
         <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn
-                    large
+                    :small="isMobile"
+                    :large="!isMobile"
                     @click="$emit('openSettings', $event)"
                     class="btn-settings primary mx-2"
                     v-bind="attrs"
@@ -84,7 +99,7 @@
                     dark
                     icon
                 >
-                    <v-icon>settings</v-icon>
+                    <v-icon :small="isMobile">settings</v-icon>
                 </v-btn>
             </template>
             <span>Toggle Settings</span>

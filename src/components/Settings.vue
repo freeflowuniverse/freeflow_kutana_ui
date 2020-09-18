@@ -15,8 +15,8 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn  @click="closeVerifyLougout(false)" text small>No</v-btn>
-                    <v-btn  @click="closeVerifyLougout(true)" text small color="red">Yes</v-btn>
+                    <v-btn @click="closeVerifyLougout(false)" text small>No</v-btn>
+                    <v-btn @click="closeVerifyLougout(true)" text small color="red">Yes</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -55,17 +55,26 @@
                             </v-card>
                         </v-col>
                     </v-row>
-                    <h2 class="subtitle-1 pt-5 red--text">Experimental feature</h2>
-                    <v-switch inset v-model="isPresentingMode" label="Presenting mode"></v-switch>
+                    <h2
+                        v-if="removeBackgroundSupported"
+                        class="subtitle-1 pt-5 red--text"
+                    >Experimental feature</h2>
                     <v-switch
+                        v-if="removeBackgroundSupported"
+                        inset
+                        v-model="isPresentingMode"
+                        label="Presenting mode"
+                    ></v-switch>
+                    <v-switch
+                        v-if="removeBackgroundSupported"
                         inset
                         :disabled="!videoActive"
                         v-model="backgroundRemove"
                         @change="toggleBackgroundRemoval"
                         label="Replace background"
                     ></v-switch>
-                    <h2 class="subtitle-1">Choose background</h2>
-                    <v-row>
+                    <h2 class="subtitle-1" v-if="removeBackgroundSupported">Choose background</h2>
+                    <v-row v-if="removeBackgroundSupported">
                         <v-col cols="3" v-for="(bg, index) in defaultBackgrounds" :key="index">
                             <v-card
                                 @click="changeWallpaper(bg)"
@@ -132,6 +141,7 @@ export default {
             'viewStyle',
             'presenter',
             'presentingModeActive',
+            'removeBackgroundSupported',
         ]),
         show: {
             get() {
@@ -211,14 +221,14 @@ export default {
             this.selectedBackground = null;
             this.wallpaperFile = wallpaper;
             await this.changeCameraBackground(this.wallpaperFile);
-            this.backgroundRemove = true
+            this.backgroundRemove = true;
         },
         async changeWallpaper(file) {
             this.selectedBackground = file;
             this.wallpaperFile = null;
             await this.changeCameraBackground();
             this.setWallpaperDataUrl(file);
-            this.backgroundRemove = true
+            this.backgroundRemove = true;
         },
         updatePresenterBackground() {
             if (!this.presentationMode) {
@@ -246,7 +256,7 @@ export default {
         },
         closeVerifyLougout(save) {
             if (save) {
-                this.logoutAndGoToLanding()
+                this.logoutAndGoToLanding();
             }
             this.verifyLougout = false;
         },
@@ -283,7 +293,7 @@ export default {
     position: relative;
     left: 50%;
     top: -2.75em;
-    margin-left: -3em ;
+    margin-left: -3em;
     margin-top: -2em;
     width: auto;
     background: white;

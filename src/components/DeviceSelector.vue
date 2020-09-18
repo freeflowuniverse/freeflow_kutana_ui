@@ -3,23 +3,26 @@
         <v-tooltip top>
             <template v-slot:activator="{ on: tooltip }">
                 <v-btn
+                    icon
+                    :small="small"
                     v-on="{ ...tooltip }"
                     :disabled="disabled"
                     class="primary"
                     @click="$emit('toggle')"
                 >
                     <MicVolumeIcon
+                        :small="small"
                         v-if="
-                            localStream &&
-                                localStream.getAudioTracks()[0] &&
-                                isActive &&
-                                device === 'mic'
+                        localStream &&
+                        localStream.getAudioTracks()[0] &&
+                        isActive &&
+                        device === 'mic'
                         "
                         :icon="activeIcon"
                         :stream="localStream"
                         :key="localStream && localStream.getAudioTracks() && localStream.getAudioTracks()[0] ? localStream.getAudioTracks()[0].id : 'nosound'"
                     ></MicVolumeIcon>
-                    <v-icon v-else>{{ isActive ? activeIcon : inactiveIcon }}</v-icon>
+                    <v-icon :small="small" v-else>{{ isActive ? activeIcon : inactiveIcon }}</v-icon>
                 </v-btn>
             </template>
             <span>Turn {{ device }} {{ isActive ? 'off' : 'on' }}</span>
@@ -28,8 +31,13 @@
             <template v-slot:activator="{ on: menu }">
                 <v-tooltip top>
                     <template v-slot:activator="{ on: tooltip }">
-                        <v-btn v-on="{ ...tooltip, ...menu }" class="small">
-                            <v-icon>expand_less</v-icon>
+                        <v-btn
+                            icon
+                            class="primary darken-2 small"
+                            :small="small"
+                            v-on="{ ...tooltip, ...menu }"
+                        >
+                            <v-icon :small="small">expand_less</v-icon>
                         </v-btn>
                     </template>
                     <span>Change {{ device }} input</span>
@@ -74,6 +82,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        small: {
+            type: Boolean,
+            default: false,
+        },
         activeIcon: {
             type: String,
         },
@@ -89,7 +101,7 @@ export default {
         },
     },
     computed: {
-        ...mapGetters(['localStream','localUser']),
+        ...mapGetters(['localStream', 'localUser']),
         indexOfSelectedDevice() {
             if (!this.devices || !this.devices.length) {
                 return;
@@ -103,7 +115,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .v-btn {
-    padding: 17px 5px !important;
+    // padding: 17px 5px !important;
 }
 
 .v-btn.small {

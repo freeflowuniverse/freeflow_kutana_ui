@@ -11,7 +11,16 @@
         <v-dialog v-model="showInvitation">
             <InviteUsers @closeInvitations="closeInvitations" />
         </v-dialog>
-         <v-btn style="z-index: 1;" fixed top left icon class="primary" v-if="fullScreenUser" @click="setFullscreenUser(null)">
+        <v-btn
+            style="z-index: 1;"
+            fixed
+            top
+            left
+            icon
+            class="primary"
+            v-if="fullScreenUser"
+            @click="setFullscreenUser(null)"
+        >
             <v-icon small color="white">fullscreen_exit</v-icon>
         </v-btn>
         <UserGrid :users="users" :showChat="view === 'chat'" :view="currentViewStyle">
@@ -28,7 +37,7 @@
                         class="mx-0"
                         @toggleChat="view === 'chat' ? (view = 'no-chat') : (view = 'chat')"
                         @openSettings="showSettings = true"
-                        @openInvitations="showInvitation = true"
+                        @openInvitations="openInvitations"
                     ></ControlStrip>
                 </v-row>
             </template>
@@ -141,7 +150,11 @@ export default {
             'changeViewStyle',
             'setPresenterMode',
         ]),
-        ...mapMutations(['setUserControl', 'setPresentationMessage', 'setFullscreenUser']),
+        ...mapMutations([
+            'setUserControl',
+            'setPresentationMessage',
+            'setFullscreenUser',
+        ]),
         hashString(str) {
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
@@ -159,6 +172,18 @@ export default {
         },
         closeInvitations() {
             this.showInvitation = false;
+        },
+        openInvitations() {
+            if (navigator.canShare) {
+                navigator
+                    .share({
+                        title: 'Join me on FFC',
+                        text: `Have a call with me on FreeFlowconnect on ${window.location.href}`,
+                    })
+                    .catch(() => (this.showInvitation = true));
+            } else {
+                this.showInvitation = true;
+            }
         },
     },
     computed: {
@@ -231,8 +256,8 @@ export default {
         users: {
             immediate: true,
             handler(val, oldVal) {
-                if(val?.length == oldVal?.length) {
-                    return
+                if (val?.length == oldVal?.length) {
+                    return;
                 }
                 this.showInvitation = !!(val && val.length <= 1);
             },
