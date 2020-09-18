@@ -9,7 +9,7 @@
                 small
                 @click="selectThisUser"
             >
-                <span :class="{ rotated: isSelectedUser }">
+                <span :class="{ rotated: isSelectedUser && isPinned }">
                     <svg
                         aria-hidden="true"
                         class="svg-inline--fa fa-thumbtack fa-w-12"
@@ -173,15 +173,22 @@
             isSelectedUser() {
                 return this.user?.id == this.selectedUser?.id;
             },
+            isPinned() {
+                return !!this.selectedUser?.pinned
+            }
         },
         methods: {
-            ...mapActions(['selectUser']),
+            ...mapActions(['selectUser', 'unSelectUser']),
             ...mapMutations(['setFullscreenUser']),
             selectThisUser() {
                 if (!this.extendedControls) {
                     return;
                 }
-                this.selectUser({ id: this.user.id, pinned: true });
+                if (this.isSelectedUser && this.isPinned) {
+                    this.unSelectUser()
+                } else {
+                    this.selectUser({ id: this.user.id, pinned: true});
+                }
             },
             hashString(str) {
                 let hash = 0;

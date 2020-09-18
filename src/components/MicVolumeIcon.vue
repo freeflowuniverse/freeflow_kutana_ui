@@ -48,7 +48,7 @@
             );
 
             this.analyser.smoothingTimeConstant = 0.8;
-            this.analyser.fftSize = 1024;
+            this.analyser.fftSize = 32;
 
             this.microphone.connect(this.analyser);
             this.analyser.connect(javascriptNode);
@@ -72,7 +72,7 @@
             this.analyser.disconnect();
             this.microphone.disconnect();
         },
-        computed: {...mapGetters(['localUser'])},
+        computed: { ...mapGetters(['localUser']) },
     };
 </script>
 

@@ -92,8 +92,6 @@ export const initializeJanus = async (
     });
 
     videoRoomPlugin.addEventListener('userJoined', user => {
-        console.log({ user });
-
         if (user === store.getters.localUser) {
             return;
         }
@@ -279,5 +277,14 @@ export const initializeJanus = async (
             videoRoomPlugin.pluginHandle.hangup();
             screenShareRoomPlugin.pluginHandle.hangup();
         },
+        /*
+        videoRoomPlugin.pluginHandle.send({
+                    message: {
+                "request" : "listparticipants",
+                "room" : videoRoomPlugin.myroom
+            },
+                    success: (e) => {console.log(e)},
+                })
+         */
     };
 };
