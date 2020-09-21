@@ -142,6 +142,7 @@ export default {
             'mediaDevices',
             'audioDeviceId',
             'videoDeviceId',
+            'dataChannel'
         ]),
         hasAudioError() {
             return this.mediaDeviceErrors.hasOwnProperty('audio');
@@ -195,6 +196,7 @@ export default {
             this.setLoading(true);
             this.toggleVideoActive();
             await updateCurrentStream();
+            this.dataChannel.send(JSON.stringify({ type: "toggle_video", state: this.videoActive, user: this.localUser.id }));
             //Arbitrary time
             setTimeout(() => {
                 this.setLoading(false);
@@ -204,6 +206,7 @@ export default {
             this.setLoading(true);
             this.toggleAudioActive();
             await updateCurrentStream();
+            this.dataChannel.send(JSON.stringify({ type: "toggle_audio", state: this.audioActive, user: this.localUser.id }));
             //Arbitrary time
             setTimeout(() => {
                 this.setLoading(false);

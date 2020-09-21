@@ -3,6 +3,7 @@ export default {
         viewStyle: localStorage.getItem('view-style') || 'grid',
         snackbarMessage: '',
         localStream: null,
+        dataChannel: null
     },
     mutations: {
         setSnackbarMessage(state, message) {
@@ -15,6 +16,9 @@ export default {
         setLocalStream(state, stream) {
             state.localStream = stream;
         },
+        setDataChannel(state, datachannel) {
+            state.dataChannel = datachannel;
+        }
     },
     actions: {
         setSnackbarMessage(context, message) {
@@ -37,5 +41,6 @@ export default {
         },
         snackbarMessage: state => state.snackbarMessage,
         localStream: state => state.localStream,
+        dataChannel: state => state.dataChannel
     },
 };
