@@ -48,8 +48,8 @@ export default {
             1
         );
 
-        this.analyser.smoothingTimeConstant = 0.8;
-        this.analyser.fftSize = 1024;
+            this.analyser.smoothingTimeConstant = 0.8;
+            this.analyser.fftSize = 32;
 
         this.microphone.connect(this.analyser);
         this.analyser.connect(javascriptNode);
@@ -64,17 +64,17 @@ export default {
                 values += array[i];
             }
 
-            // @todo: find better progress
-            this.progress = Math.pow(values / length, 1.3);
-        };
-    },
-    destroyed() {
-        console.log('destroy');
-        this.analyser.disconnect();
-        this.microphone.disconnect();
-    },
-    computed: { ...mapGetters(['localUser']) },
-};
+                // @todo: find better progress
+                this.progress = Math.pow(values / length, 1.3);
+            };
+        },
+        destroyed() {
+            console.log('destroy');
+            this.analyser.disconnect();
+            this.microphone.disconnect();
+        },
+        computed: { ...mapGetters(['localUser']) },
+    };
 </script>
 
 <style lang="scss" scoped>
