@@ -38,5 +38,6 @@ export default {
     },
     getters: {
         wallpaperDataUrl: state => state.wallpaperDataUrl,
+        removeBackgroundSupported: () => /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor),
     },
 };

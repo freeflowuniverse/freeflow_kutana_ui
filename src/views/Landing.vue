@@ -1,10 +1,6 @@
 <template>
     <section class="landing">
-        <v-row class="title mx-0">
-            <v-col align="center">
-                <h1 class="ttl">FreeFlowConnect</h1>
-            </v-col>
-        </v-row>
+      <h1 class="ffctitle">FreeFlowConnect</h1>
         <v-row class="io mb-2" justify="center" align="center">
             <DeviceSelector
                 device="cam"
@@ -30,7 +26,7 @@
             />
         </v-row>
         <v-row class="actions pa-2" justify="center" align="center">
-            <v-col cols="4">
+            <v-col cols="12" md="4">
                 <v-form @submit.prevent="joinRoom" v-model="valid">
                     <v-text-field
                         :readonly="!!$route.query && !!$route.query.roomName"
@@ -58,7 +54,7 @@
                 </v-form>
             </v-col>
             <transition name="fade">
-                <v-divider vertical v-if="!inviteUrl"></v-divider>
+                <v-divider vertical v-if="!inviteUrl && $vuetify.breakpoint.mdAndUp"></v-divider>
             </transition>
             <transition name="shrink-x">
                 <v-col cols="4" align="center" v-if="!inviteUrl">
@@ -304,11 +300,13 @@ export default {
     grid-template-rows: [start] 1fr [titleend] 12fr [iostart] 1fr [ioend actionsstart] 1fr [end];
     height: 100%;
     width: 100vw;
-    .title {
+    .ffctitle {
         grid-row-start: start;
         grid-row-end: titleend;
         grid-column-end: 1;
         z-index: 2;
+        text-align: center;
+        margin-top: 10px;
     }
     .mine {
         grid-row-start: start;
