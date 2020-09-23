@@ -36,7 +36,6 @@ export const initializeJanus = async (
         await videoRoomPlugin.joinRoom(roomCreationResult.room, userName);
     });
 
-    const isVideoAuthorised = false;
 
     videoRoomPlugin.addEventListener('ownUserJoined', user => {
         console.log('ownUserJoined');
