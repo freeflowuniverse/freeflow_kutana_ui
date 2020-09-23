@@ -1,6 +1,6 @@
 <template>
     <section class="landing">
-      <h1 class="ffctitle">FreeFlowConnect</h1>
+      <h1 class="ffctitle">FreeFlowConnect {{myBackground}}</h1>
         <v-row class="io mb-2" justify="center" align="center">
             <DeviceSelector
                 device="cam"
@@ -123,6 +123,7 @@ export default {
         };
     },
     mounted() {
+        this.getBackgroundOfMine();
         if (this.$route.query.callback) {
             this.checkResponse(window.location.href);
         }
@@ -136,7 +137,6 @@ export default {
         this.refreshMediaDevices().then(() => {
             updateCurrentStream();
         });
-        this.getBackgroundOfMine();
     },
     computed: {
         ...mapGetters([
@@ -154,7 +154,7 @@ export default {
         ]),
         avatar() {
             return `https://avatars.dicebear.com/api/human/${this.hashString(
-                this.account.name
+                (this.account?.name || 'FreeFlowConnect')
             )}.svg`;
         },
         videoInputDevices() {
@@ -192,6 +192,7 @@ export default {
             'checkResponse',
         ]),
         continueLogin() {
+            this.getBackgroundOfMine()
             this.showLogin = false;
         },
         changeAudioInputTo(audioInputDeviceId) {
@@ -242,8 +243,8 @@ export default {
         },
         getBackgroundOfMine() {
             this.$nextTick(() => {
-                this.myBackground = `background: url(${this.avatar}); background-position: center; background-repeat: no-repeat; background-color: rgba(0,0,0,0.4);`;
-            });
+                this.myBackground = `background: url('${this.avatar}') rgba(0,0,0,0.4) center no-repeat;`;
+            })
         },
         threebotConnectLogin() {
             this.generateLoginUrl(this.$route.query);
