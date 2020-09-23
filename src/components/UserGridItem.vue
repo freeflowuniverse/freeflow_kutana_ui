@@ -28,6 +28,11 @@
                     </svg>
                 </span>
             </v-btn>
+            <v-btn v-if="user.uuid !== localUser.uuid" dark icon small @click="toggleMute">
+                <v-icon small
+                >{{ muted ? 'mic_off' : 'mic' }}
+                </v-icon>
+            </v-btn>
             <v-btn dark icon small @click="toggleFullscreen">
                 <v-icon small
                     >{{ fullScreenUser ? 'fullscreen_exit' : 'fullscreen' }}
@@ -129,6 +134,7 @@
                 'presenter',
                 'selectedUser',
                 'fullScreenUser',
+                'mutedUsers',
             ]),
             borderStyle() {
                 const primaryColor = getComputedStyle(
@@ -175,11 +181,15 @@
             },
             isPinned() {
                 return !!this.selectedUser?.pinned
+            },
+            muted(){
+                return this.mutedUsers.find(mu => mu.uuid === this.user.uuid)
+                return this.mutedUsers.has( this.user.uuid)
             }
         },
         methods: {
             ...mapActions(['selectUser', 'unSelectUser']),
-            ...mapMutations(['setFullscreenUser']),
+            ...mapMutations(['setFullscreenUser', 'modifyMutedUsers']),
             selectThisUser() {
                 if (!this.extendedControls) {
                     return;
@@ -205,6 +215,9 @@
                 }
                 this.setFullscreenUser(this.user);
             },
+            toggleMute() {
+                this.modifyMutedUsers({ tinyUser: {uuid : this.user.uuid, id: this.user.id}, muted: !this.muted});
+            }
         },
     };
 </script>

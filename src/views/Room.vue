@@ -45,9 +45,8 @@
 
         <div class="userSound">
             <audio
-                v-for="user of remoteUsers"
+                v-for="user of remoteUsers.filter(ru => !mutedUsers.find(mu => mu.uuid === ru.uuid))"
                 :key="user.id"
-                :muted="user.muted"
                 :src-object.prop.camel="user.stream"
                 autoplay
             ></audio>
@@ -205,6 +204,7 @@ export default {
             'localStream',
             'presenter',
             'fullScreenUser',
+            'mutedUsers'
         ]),
         currentViewStyle: {
             get() {
