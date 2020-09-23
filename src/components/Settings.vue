@@ -30,31 +30,6 @@
                     </v-btn>
                 </v-toolbar>
                 <v-card-text>
-                    <h2 class="subtitle-1 pt-5">View</h2>
-                    <v-row>
-                        <v-col>
-                            <v-card
-                                @click="$emit('change-view', 'grid')"
-                                :class="{selected: currentViewStyle === 'grid'}"
-                            >
-                                <v-col align="center" justify="center" class="py-5">
-                                    <v-icon x-large>view_module</v-icon>
-                                    <p>Grid view</p>
-                                </v-col>
-                            </v-card>
-                        </v-col>
-                        <v-col>
-                            <v-card
-                                @click="$emit('change-view', 'presentation')"
-                                :class="{selected: currentViewStyle === 'presentation'}"
-                            >
-                                <v-col align="center" justify="center" class="py-5">
-                                    <v-icon x-large style="transform: rotateY(180deg);">view_quilt</v-icon>
-                                    <p>Presentation view</p>
-                                </v-col>
-                            </v-card>
-                        </v-col>
-                    </v-row>
                     <h2
                         v-if="removeBackgroundSupported"
                         class="subtitle-1 pt-5 red--text"
@@ -138,7 +113,6 @@ export default {
             'wallpaperDataUrl',
             'videoActive',
             'account',
-            'viewStyle',
             'presenter',
             'presentingModeActive',
             'removeBackgroundSupported',
@@ -157,11 +131,6 @@ export default {
             },
             set(value) {
                 return this.setPresenterMode(value);
-            },
-        },
-        currentViewStyle: {
-            get() {
-                return this.presenter ? 'presentation' : this.viewStyle;
             },
         },
         getWallpaperImage() {

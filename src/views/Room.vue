@@ -23,6 +23,32 @@
         >
             <v-icon color="white" small>fullscreen_exit</v-icon>
         </v-btn>
+        <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    v-if="!fullScreenUser"
+                    class="primary"
+                    v-bind="attrs"
+                    v-on="on"
+                    fixed
+                    icon
+                    right
+                    style="z-index: 1;"
+                    top
+                    @click="changeViewStyle(currentViewStyle === 'presentation' ? 'grid'  : 'presentation')"
+                >
+                    <v-icon
+                        v-if="currentViewStyle === 'presentation'"
+                        color="white"
+                        small
+                        style="transform: rotateY(180deg);"
+                    >view_quilt</v-icon>
+                    <v-icon v-else color="white" small>view_module</v-icon>
+                </v-btn>
+            </template>
+            <span>Change to {{currentViewStyle === 'presentation' ? 'grid'  : 'presentation'}} view</span>
+        </v-tooltip>
+
         <UserGrid :showChat="view === 'chat'" :view="currentViewStyle">
             <template v-slot:chat>
                 <ChatGrid
@@ -174,9 +200,7 @@ export default {
             this.showInvitation = false;
         },
         async openInvitations() {
-            if (
-                navigator.canShare
-            ) {
+            if (navigator.canShare) {
                 try {
                     await navigator.share({
                         title: 'Have a cal on FreeFlowConnect',
