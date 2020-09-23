@@ -62,12 +62,6 @@
                     <v-switch
                         v-if="removeBackgroundSupported"
                         inset
-                        v-model="isPresentingMode"
-                        label="Presenting mode"
-                    ></v-switch>
-                    <v-switch
-                        v-if="removeBackgroundSupported"
-                        inset
                         :disabled="!videoActive"
                         v-model="backgroundRemove"
                         @change="toggleBackgroundRemoval"
