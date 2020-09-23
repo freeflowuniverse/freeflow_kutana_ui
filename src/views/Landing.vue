@@ -109,7 +109,7 @@ export default {
     data() {
         return {
             /* eslint-disable */
-            reg: new RegExp('(?:https://.*/room/)?([a-zA-Z0-9]*)(.*)'),
+            reg: new RegExp('(?:https://.*/room/)?([a-z0-9]*)(.*)'),
             /* eslint-enable */
             valid: false,
             inviteUrlRules: [
@@ -131,7 +131,7 @@ export default {
         }
 
         if (this.$route.query && this.$route.query.roomName) {
-            this.inviteUrl = this.$route.query.roomName;
+            this.inviteUrl = this.$route.query.roomName.toLowerCase();
         }
         this.refreshMediaDevices().then(() => {
             updateCurrentStream();
@@ -263,13 +263,13 @@ export default {
     watch: {
         inviteUrl(val) {
             if (val && this.reg.test(val) && val.length > 15) {
-                this.inviteUrl = val.match(this.reg)[1];
+                this.inviteUrl = (val.match(this.reg)[1]).toLowerCase();
             }
         },
         teamName(val) {
             if (val) {
                 updateCurrentStream();
-                this.$router.push({ name: 'room', params: { token: val } });
+                this.$router.push({ name: 'room', params: { token: val.toLowerCase() } });
             }
         },
         loginUrl(val) {

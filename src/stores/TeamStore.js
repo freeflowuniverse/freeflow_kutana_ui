@@ -12,7 +12,7 @@ export default {
             state.isAccepted = accepted;
         },
         setTeamName(state, teamName) {
-            if (teamName.length < 15) teamName = teamName.toLowerCase();
+            teamName = teamName.toLowerCase();
             window.localStorage.setItem('teamName', teamName);
             state.teamName = teamName;
         },
@@ -26,19 +26,6 @@ export default {
                 let data = result.data;
                 commit('setMessages', data.messages);
             });
-        },
-        requestAccess({ commit, dispatch, getters }, token) {
-            commit('setTeamName', token);
-            dispatch('sendSignal', {
-                sender: getters.account.name,
-                createdAt: moment(),
-                content: token,
-                type: 'access_requested',
-            });
-        },
-        accessGranted({ commit, dispatch }) {
-            commit('setAccepted', true);
-            dispatch('join');
         },
         joinScreenShare({ dispatch, getters }, message) {
             if (!getters.allUsers) {
