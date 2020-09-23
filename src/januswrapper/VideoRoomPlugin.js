@@ -406,6 +406,11 @@ export class VideoRoomPlugin {
      * uuid:number, stream:MediaStream
      * }} User
      *
+     * @typedef {{
+     * id: number,
+     * uuid:number
+     * }} TinyUser
+     *
      * @param {MediaStream} stream
      * @param {number} id
      * @param {String} username

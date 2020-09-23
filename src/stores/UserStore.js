@@ -10,6 +10,8 @@ export default {
         selectedUser: null,
         /** @type {User} */
         fullScreenUser: null,
+        /** @type {TinyUser[]} */
+        mutedUsers: [],
     },
     mutations: {
         setLocalUser(state, user) {
@@ -27,7 +29,7 @@ export default {
             }
 
             const userIndex = state.remoteUsers.findIndex(
-                u => u.uuid === user.uuid
+                u => u.uuid === user.uuid,
             );
 
             if (userIndex === -1) {
@@ -37,9 +39,25 @@ export default {
 
             state.remoteUsers.splice(userIndex, 1, user);
         },
+        /**
+         * @param state
+         * @param {TinyUser} tinyUser
+         * @param {boolean} muted
+         */
+        modifyMutedUsers(state, { tinyUser, muted }) {
+            if (!muted) {
+                state.mutedUsers = state.mutedUsers.filter(mu => mu.uuid !== tinyUser.uuid);
+                return;
+            }
+            let mutedUsers = state.mutedUsers;
+            mutedUsers.push(tinyUser);
+            state.mutedUsers = mutedUsers.filter((value, index, self) => {
+                return self.indexOf(value) === index;
+            });
+        },
         updateRemoteUser(state, user) {
             const userIndex = state.remoteUsers.findIndex(
-                u => u.id === user.id
+                u => u.id === user.id,
             );
             state.remoteUsers.splice(userIndex, 1, user);
         },
@@ -109,8 +127,8 @@ export default {
             return { ...selectedUSer, pinned: !!state?.selectedUser?.pinned };
         },
         /** @returns {User} */
-        fullScreenUser: state => {
-            return state.fullScreenUser;
-        },
+        fullScreenUser: state => state.fullScreenUser,
+        /** @returns {TinyUser[]} */
+        mutedUsers: state => state.mutedUsers,
     },
 };
