@@ -19,6 +19,5 @@ router.beforeEach((to, from, next) => {
         });
         return;
     }
-
     next();
 });
