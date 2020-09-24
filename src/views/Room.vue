@@ -166,6 +166,7 @@ export default {
         setTimeout(() => {
             this.showInvitation = this.remoteUsers.length < 1;
         }, 200);
+        this.sendKeepAlive()
     },
     beforeDestroy() {
         this.$ga.event('after-call-events', 'callEnded', 'beforeDestroy')
@@ -215,6 +216,13 @@ export default {
                 this.showInvitation = false;
             }
         },
+        sendKeepAlive() {
+            let minutesActive = 0
+            setInterval(() => {
+                this.$ga.event('in-call-stats', 'meetingDuration', window.location.href , minutesActive)
+                minutesActive ++
+            }, 1000)
+        }
     },
     computed: {
         ...mapGetters([
@@ -249,9 +257,11 @@ export default {
                 this.setPresentationMessage(null);
             }
         },
-        remoteUsers(val) {
+        remoteUsers(val, oldval) {
             this.showInvitation = val.length < 1;
-            this.$ga.event('in-call-stats', 'userAmount', window.location.href ,val.length)
+            if(val !== oldval) {
+                this.$ga.event('in-call-stats', 'userAmount', window.location.href ,val.length)
+            }
         },
     },
 };
