@@ -167,6 +167,9 @@ export default {
             this.showInvitation = this.remoteUsers.length < 1;
         }, 200);
     },
+    beforeDestroy() {
+        this.$ga.event('after-call-events', 'callEnded', 'beforeDestroy')
+    },
     methods: {
         ...mapActions([
             'setSnackbarMessage',
@@ -248,6 +251,7 @@ export default {
         },
         remoteUsers(val) {
             this.showInvitation = val.length < 1;
+            this.$ga.event('in-call-stats', 'userAmount', window.location.href ,val.length)
         },
     },
 };

@@ -236,7 +236,7 @@ export default {
                 return;
             }
             if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
-                this.$ga.event('call', 'joining-room', this.inviteUrl)
+                this.$ga.event('before-call-events', 'joining-room', this.inviteUrl)
                 updateCurrentStream();
                 this.$router.push({
                     name: 'room',
@@ -278,7 +278,7 @@ export default {
             if (val) {
                 updateCurrentStream();
                 this.$router.push({ name: 'room', params: { token: val.toLowerCase() } });
-                this.$ga.event('call', 'create-room', val)
+                this.$ga.event('before-call-events', 'create-room', val)
             }
         },
         loginUrl(val) {

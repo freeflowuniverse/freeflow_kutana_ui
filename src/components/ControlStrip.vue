@@ -233,7 +233,7 @@ export default {
             }, 100);
         },
         async hangUp() {
-            this.$ga.event('in-call-events', 'endCall')
+            this.$ga.event('after-call-events', 'endCall', 'button')
             this.userControl.hangUp();
             await this.$router.push({ name: 'home' });
             location.reload();
