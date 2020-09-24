@@ -6,13 +6,17 @@
             v-model="showSnackbar"
             :color="snackbarMessage.type"
         >{{snackbarMessage.text}}</v-snackbar>
+        <SupportedDialog />
     </v-app>
 </template>
 <script>
 import { mapGetters } from 'vuex';
 import { initMediaDeviceDetection } from './utils/mediaDevicesUtils';
-
+import SupportedDialog from './components/SupportedDialog'
 export default {
+    components: {
+        SupportedDialog
+    },
     data() {
         return {
             showSnackbar: false,
