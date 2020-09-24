@@ -14,6 +14,6 @@ export default {
     }
   },
   getters: {
-    messages: state => state.messages
+    messages: state => state.messages.slice(Math.max(state.messages.length - 200, 0))
   },
 }
