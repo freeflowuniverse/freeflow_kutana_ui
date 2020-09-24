@@ -210,10 +210,10 @@ export default {
                         text: `Join my call on FreeFlowConnect ${window.location.href}`,
                     });
                 } catch (err) {
-                    this.showInvitation = false;
+                    this.showInvitation = true;
                 }
             } else {
-                this.showInvitation = false;
+                this.showInvitation = true;
             }
         },
         sendKeepAlive() {

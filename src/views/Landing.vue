@@ -241,7 +241,7 @@ export default {
                 this.$router.push({
                     name: 'room',
                     params: {
-                        token: this.inviteUrl,
+                        token: this.inviteUrl.toLowerCase(),
                     },
                 });
             }
