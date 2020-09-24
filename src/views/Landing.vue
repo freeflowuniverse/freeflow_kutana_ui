@@ -196,11 +196,13 @@ export default {
             this.showLogin = false;
         },
         changeAudioInputTo(audioInputDeviceId) {
+            this.$ga.event('before-call-events', 'changeAudioInput')
             this.audioDevice = audioInputDeviceId;
             this.updateAudioDevice(audioInputDeviceId);
             updateCurrentStream();
         },
         changeVideoTo(videoDeviceId) {
+            this.$ga.event('before-call-events', 'changeVideo')
             this.videoDevice = videoDeviceId;
             this.updateVideoDevice(videoDeviceId);
             updateCurrentStream();
@@ -212,10 +214,12 @@ export default {
             'toggleVideoActive',
         ]),
         toggleCam() {
+            this.$ga.event('before-call-events', 'toggleCam')
             this.toggleVideoActive();
             updateCurrentStream();
         },
         toggleMic() {
+            this.$ga.event('before-call-events', 'toggleMic')
             this.toggleAudioActive();
             updateCurrentStream();
         },
@@ -232,6 +236,7 @@ export default {
                 return;
             }
             if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
+                this.$ga.event('call', 'joining-room', this.inviteUrl)
                 updateCurrentStream();
                 this.$router.push({
                     name: 'room',
@@ -247,9 +252,11 @@ export default {
             })
         },
         threebotConnectLogin() {
+            this.$ga.event('auth', 'threebot-login')
             this.generateLoginUrl(this.$route.query);
         },
         guestLogin() {
+            this.$ga.event('auth', 'guest-login')
             this.isLoginInAsGuest = true;
         },
         hashString(str) {
@@ -270,6 +277,7 @@ export default {
         teamName(val) {
             if (val) {
                 updateCurrentStream();
+                this.$ga.event('call', 'create-room', val)
                 this.$router.push({ name: 'room', params: { token: val } });
             }
         },

@@ -205,6 +205,7 @@ export default {
         ]),
         ...mapMutations(['setPresenterMode', 'setWallpaperDataUrl']),
         async logoutAndGoToLanding() {
+            this.$ga.event('in-call-events', 'Logout')
             this.userControl.hangUp();
             this.logout();
             await this.$router.push({
@@ -213,6 +214,7 @@ export default {
             location.reload();
         },
         async useUploadedBackground(e) {
+            this.$ga.event('in-call-events', 'useUploadedBackground')
             const files = e.target.files;
             const wallpaper = files[0];
             if (!wallpaper) {
@@ -224,6 +226,7 @@ export default {
             this.backgroundRemove = true;
         },
         async changeWallpaper(file) {
+            this.$ga.event('in-call-events', 'changeWallpaper')
             this.selectedBackground = file;
             this.wallpaperFile = null;
             await this.changeCameraBackground();
@@ -237,6 +240,7 @@ export default {
             this.changePresenterSettings(this.getWallpaperImage);
         },
         async toggleBackgroundRemoval(isBackgroundRemovalActive) {
+            this.$ga.event('in-call-events', 'toggleBackgroundRemoval', isBackgroundRemovalActive)
             const stream = await this.getVideoStream();
             if (this.backgroundRemovalService) {
                 this.backgroundRemovalService.stopBackgroundRemoval();

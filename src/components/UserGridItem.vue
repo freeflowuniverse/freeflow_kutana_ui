@@ -200,9 +200,11 @@
             },
             toggleFullscreen() {
                 if (this.fullScreenUser) {
+                    this.$ga.event('in-call-events', 'toggleFullScreen', false)
                     this.setFullscreenUser(null);
                     return;
                 }
+                this.$ga.event('in-call-events', 'toggleFullScreen', true)
                 this.setFullscreenUser(this.user);
             },
         },

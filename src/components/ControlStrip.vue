@@ -179,11 +179,13 @@ export default {
             'toggleVideoActive',
         ]),
         changeAudioInputTo(audioInputDeviceId) {
+            this.$ga.event('in-call-events', 'changeMic')
             this.audioDevice = audioInputDeviceId;
             this.updateAudioDevice(audioInputDeviceId);
             updateCurrentStream();
         },
         changeVideoTo(videoDeviceId) {
+            this.$ga.event('in-call-events', 'changeCam')
             this.videoDevice = videoDeviceId;
             this.updateVideoDevice(videoDeviceId);
             updateCurrentStream();
@@ -201,6 +203,7 @@ export default {
             setTimeout(() => {
                 this.setLoading(false);
             }, 100);
+            this.$ga.event('in-call-events', 'toggleCam', this.videoActive)
         },
         async toggleMic() {
             this.setLoading(true);
@@ -211,21 +214,26 @@ export default {
             setTimeout(() => {
                 this.setLoading(false);
             }, 100);
+            this.$ga.event('in-call-events', 'toggleAudio', this.audioActive)
         },
         changeScreen() {
+                this.$ga.event('in-call-events', 'changeScreen', false)
             this.userControl.switchScreenShare();
         },
         toggleScreen() {
             if (this.localScreenUser.screen) {
+                this.$ga.event('in-call-events', 'toggleScreenShare', false)
                 this.userControl.stopScreenShare();
                 return;
             }
+            this.$ga.event('in-call-events', 'toggleScreenShare', true)
             this.userControl.startScreenShare();
             setTimeout(() => {
                 this.$forceUpdate();
             }, 100);
         },
         async hangUp() {
+            this.$ga.event('in-call-events', 'endCall')
             this.userControl.hangUp();
             await this.$router.push({ name: 'home' });
             location.reload();

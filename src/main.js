@@ -6,6 +6,7 @@ import router from './plugins/router';
 import store from './plugins/vuex';
 import './plugins/socketio';
 import './plugins/markdown';
+import './plugins/analytics'
 import './middleware/auth';
 import './filters';
 import './registerServiceWorker';
