@@ -1,6 +1,6 @@
 <template>
     <section class="landing">
-      <h1 class="ffctitle">FreeFlowConnect {{myBackground}}</h1>
+      <h1 class="ffctitle">FreeFlowConnect</h1>
         <v-row class="io mb-2" justify="center" align="center">
             <DeviceSelector
                 device="cam"
