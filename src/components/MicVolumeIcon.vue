@@ -33,7 +33,7 @@ export default {
     mounted() {
         // @todo: move this away from window
         if (!window.micVolumeIconAudioContext) {
-            console.log('generating new AudioContext');
+            // console.log('generating new AudioContext');
             window.micVolumeIconAudioContext = new (window.AudioContext ||
                 window.webkitAudioContext)();
         }
@@ -69,7 +69,7 @@ export default {
             };
         },
         destroyed() {
-            console.log('destroy');
+            // console.log('destroy');
             this.analyser.disconnect();
             this.microphone.disconnect();
         },

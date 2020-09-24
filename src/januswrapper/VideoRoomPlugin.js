@@ -175,7 +175,7 @@ export class VideoRoomPlugin {
     }
 
     async onMessage(msg, jsep) {
-        console.log({ msg, jsep });
+        // console.log({ msg, jsep });
         if (jsep) {
             this.pluginHandle.handleRemoteJsep({
                 jsep: jsep,
@@ -200,7 +200,7 @@ export class VideoRoomPlugin {
             );
 
             // @todo: remove this
-            console.log({ debugString: this.debugString, msg });
+            // console.log({ debugString: this.debugString, msg });
             if (msg.publishers) {
                 msg.publishers.forEach(element => {
                     this.emitEvent(
@@ -343,7 +343,7 @@ export class VideoRoomPlugin {
     }
 
     onLocalStream(stream) {
-        console.error('onLocalStream');
+        // console.error('onLocalStream');
         const peerConnection = this.pluginHandle.webrtcStuff.pc;
 
         const dataChannel = peerConnection.createDataChannel('signal');
@@ -351,7 +351,7 @@ export class VideoRoomPlugin {
         let syncInterval;
         // Opening Local DataChannel
         dataChannel.onopen = () => {
-            console.log('Local Datachannel is open!');
+            // console.log('Local Datachannel is open!');
             if (this.syncInterval) {
                 clearInterval(this.syncInterval);
             }
@@ -377,13 +377,13 @@ export class VideoRoomPlugin {
             if (syncInterval) {
                 clearInterval(syncInterval);
             }
-            console.log('Local DataChannel is closed!');
+            // console.log('Local DataChannel is closed!');
         };
         // Receiving Local Datachannel messages
         dataChannel.ondatachannel = event => {
-            console.log('Local DataChannel Message', event.data);
+            // console.log('Local DataChannel Message', event.data);
             if (event.data.t === 's') {
-                console.log(event.data.u, event.data.c);
+                // console.log(event.data.u, event.data.c);
             }
         };
 
@@ -568,7 +568,7 @@ export class VideoRoomPlugin {
                 }
             },
             onremotestream: stream => {
-                console.log({ stream, pluginHandle });
+                // console.log({ stream, pluginHandle });
                 const peerConnection = pluginHandle.webrtcStuff.pc;
 
                 peerConnection.ondatachannel = event => {
@@ -578,7 +578,7 @@ export class VideoRoomPlugin {
                         if (data.t !== 's') {
                             return;
                         }
-                        console.log(data.c);
+                        // console.log(data.c);
                         const remoteUserIndex = store.state.UserStore.remoteUsers.findIndex(
                             u => u.uuid === data.u
                         );
@@ -598,10 +598,10 @@ export class VideoRoomPlugin {
                         ].mic = data.m;
                     };
                     channel.onopen = () => {
-                        console.log('Opening Remote Channel!');
+                        // console.log('Opening Remote Channel!');
                     };
                     channel.onclose = () => {
-                        console.log('Closing Remote Channel!');
+                        // console.log('Closing Remote Channel!');
                     };
                 };
                 this.determineSpeaker(stream, id);
@@ -615,7 +615,7 @@ export class VideoRoomPlugin {
                 );
             },
             oncleanup: () => {
-                console.log('[oncleanup]: ', pluginHandle.rfid);
+                // console.log('[oncleanup]: ', pluginHandle.rfid);
                 this.emitEvent(
                     'cleanupUser',
                     this.buildUser(

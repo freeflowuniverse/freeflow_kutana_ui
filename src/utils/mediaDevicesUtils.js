@@ -11,13 +11,13 @@ export const updateCurrentStream = async () => {
     const userControl = store.getters.userControl;
 
     if (userControl) {
-        console.log('updating published stream');
+        // console.log('updating published stream');
         await updateVideoStream();
         await updateAudioStream();
         return;
     }
 
-    console.log('updating local stream');
+    // console.log('updating local stream');
     const localStream = await getLocalStream();
     store.commit('setLocalStream', localStream);
 };
@@ -45,7 +45,7 @@ const getLocalStream = async () => {
 const updateVideoStream = async () => {
     const userControl = store.getters.userControl;
 
-    console.log('updating video stream');
+    // console.log('updating video stream');
     if (
         !store.getters.videoActive &&
         store.getters.localUser.stream.getVideoTracks().length > 0
@@ -75,7 +75,7 @@ const updateVideoStream = async () => {
 const updateAudioStream = async () => {
     const userControl = store.getters.userControl;
 
-    console.log('updating audio stream');
+    // console.log('updating audio stream');
     if (
         !store.getters.audioActive &&
         store.getters.localUser.stream.getAudioTracks().length > 0
@@ -183,7 +183,7 @@ export const generateDummyMediaStream = (
 
     if (audio) {
         if (!dummyStreamAudioContext) {
-            console.log('generating new AudioContext');
+            // console.log('generating new AudioContext');
             dummyStreamAudioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
         let oscillator = dummyStreamAudioContext.createOscillator();

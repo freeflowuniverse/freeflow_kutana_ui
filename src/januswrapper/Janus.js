@@ -19,7 +19,7 @@ export class Janus {
     }
 
     janusGatewayInitializationDestroyed() {
-        console.log("Destroyed")
+        // console.log("Destroyed")
     }
 
     attachPlugin(plugin) {

@@ -38,12 +38,12 @@ export const initializeJanus = async (
 
 
     videoRoomPlugin.addEventListener('ownUserJoined', user => {
-        console.log('ownUserJoined');
+        // console.log('ownUserJoined');
 
         store.commit('setLocalStream', user?.stream);
 
         if (initialJoin) {
-            console.log('initialJoin');
+            // console.log('initialJoin');
             initialJoin = false;
             if (!initialStream) {
                 // publish dummy tracks if there is no localStream

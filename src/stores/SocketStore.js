@@ -39,26 +39,26 @@ export default {
       commit("addMessage", message);
     },
     SOCKET_signal({ dispatch, commit, getters }, message) {
-      console.log(`GOT SIGNAL`, message);
+      // console.log(`GOT SIGNAL`, message);
       switch (message.type) {
         case "access_granted":
           dispatch("accessGranted");
           break;
         case "screenshare_started":
-          console.log("[Signal] Joining screen share ... ");
+          // console.log("[Signal] Joining screen share ... ");
           commit('setSnackbarMessage', {
             text: `${message.sender} started screen sharing`,
           });
           dispatch("joinScreenShare", message);
           break;
         case "screenshare_stopped":
-          console.log("[Signal] Stopped screen share ... ");
+          // console.log("[Signal] Stopped screen share ... ");
           commit('setSnackbarMessage', {
             text: `${message.sender} stopped screen sharing`,
           });
           break;
         case "presenter_started":
-          console.log("[Signal] Presenter Mode Started ... ");
+          // console.log("[Signal] Presenter Mode Started ... ");
           commit("setSnackbarMessage", {
             text: `${message.sender} started presenting`,
           });
@@ -72,14 +72,14 @@ export default {
           dispatch('setPresenterMode', message);
           break;
         case "presenter_ended":
-          console.log("[Signal] Presenter Mode Stopped ... ");
+          // console.log("[Signal] Presenter Mode Stopped ... ");
           commit('setSnackbarMessage', {
             text: `${message.sender} stopped presenting`,
           });
           dispatch('stopPresenterMode', message)
           break;
         default:
-          console.log(`NOT DISPATCHING`);
+          // console.log(`NOT DISPATCHING`);
           break;
       }
     },

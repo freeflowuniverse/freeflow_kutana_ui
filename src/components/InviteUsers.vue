@@ -48,7 +48,7 @@ export default {
                     type: 'warning',
                     text: `Failed to copy link to clipboard`,
                 });
-                console.error(e);
+                // console.error(e);
             }
         },
     },

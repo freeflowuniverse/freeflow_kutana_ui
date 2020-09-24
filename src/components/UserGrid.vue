@@ -92,7 +92,7 @@
                     a => a?.uuid
                 );
                 users = reject(users, o => o.length < 2);
-                console.log(users);
+                // console.log(users);
                 users = users.map(o => ({
                     ...o[0],
                     screen: o[1].screen,
@@ -190,7 +190,7 @@
         watch: {
             view() {
                 this.$nextTick().then(() => {
-                    console.log(`this.$refs.chatSlot`, this.$refs.chatSlot);
+                    // console.log(`this.$refs.chatSlot`, this.$refs.chatSlot);
                     if (
                         !this.$refs.chatSlot ||
                         !this.$refs['chatSlot'].querySelector(
