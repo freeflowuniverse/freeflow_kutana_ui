@@ -36,7 +36,6 @@ export const initializeJanus = async (
         await videoRoomPlugin.joinRoom(roomCreationResult.room, userName);
     });
 
-
     videoRoomPlugin.addEventListener('ownUserJoined', user => {
         // console.log('ownUserJoined');
 
@@ -186,27 +185,34 @@ export const initializeJanus = async (
 
     return {
         startScreenShare: async () => {
-            const stream = await navigator.mediaDevices.getDisplayMedia();
-            const videoTrack = stream.getVideoTracks()[0];
-            await screenShareRoomPlugin.publishTrack(videoTrack);
-            const localScreenUser = store.getters.localScreenUser;
-            stream.oninactive = async () => {
-                if (store.getters.isChangingScreenShare) {
-                    store.commit('setChangingScreenShare', false);
+            try {
+                const stream = await navigator.mediaDevices.getDisplayMedia();
+                const videoTrack = stream.getVideoTracks()[0];
+                await screenShareRoomPlugin.publishTrack(videoTrack);
+                const localScreenUser = store.getters.localScreenUser;
+                stream.oninactive = async () => {
+                    if (store.getters.isChangingScreenShare) {
+                        store.commit('setChangingScreenShare', false);
+                        return;
+                    }
+                    await store.getters.userControl.stopScreenShare();
+                };
+                localScreenUser.screen = true;
+                store.commit('setLocalScreenUser', localScreenUser);
+                if (
+                    store.getters.presentingModeActive &&
+                    !store.getters.presenter
+                ) {
+                    store.dispatch('startPresenting');
                     return;
                 }
-                await store.getters.userControl.stopScreenShare();
-            };
-            localScreenUser.screen = true;
-            store.commit('setLocalScreenUser', localScreenUser);
-            if (
-                store.getters.presentingModeActive &&
-                !store.getters.presenter
-            ) {
-                store.dispatch('startPresenting');
-                return;
+                store.dispatch('startScreenSharing');
+            } catch (error) {
+                store.commit('setSnackbarMessage', {
+                    text: error.message,
+                    type: 'error',
+                });
             }
-            store.dispatch('startScreenSharing');
         },
         switchScreenShare: async () => {
             store.commit('setChangingScreenShare', true);
