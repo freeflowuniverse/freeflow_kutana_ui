@@ -12,6 +12,8 @@ export default {
         fullScreenUser: null,
         /** @type {TinyUser[]} */
         mutedUsers: [],
+        /** @type {TinyUser[]} */
+        mutedVideoUsers: [],
     },
     mutations: {
         setLocalUser(state, user) {
@@ -52,6 +54,22 @@ export default {
             let mutedUsers = state.mutedUsers;
             mutedUsers.push(tinyUser);
             state.mutedUsers = mutedUsers.filter((value, index, self) => {
+                return self.indexOf(value) === index;
+            });
+        },
+        /**
+         * @param state
+         * @param {TinyUser} tinyUser
+         * @param {boolean} muted
+         */
+        modifyMutedVideoUsers(state, { tinyUser, muted }) {
+            if (!muted) {
+                state.mutedVideoUsers = state.mutedVideoUsers.filter(mvu => mvu.uuid !== tinyUser.uuid);
+                return;
+            }
+            let mutedVideoUsers = state.mutedVideoUsers;
+            mutedVideoUsers.push(tinyUser);
+            state.mutedVideoUsers = mutedVideoUsers.filter((value, index, self) => {
                 return self.indexOf(value) === index;
             });
         },
@@ -130,5 +148,7 @@ export default {
         fullScreenUser: state => state.fullScreenUser,
         /** @returns {TinyUser[]} */
         mutedUsers: state => state.mutedUsers,
+        /** @returns {TinyUser[]} */
+        mutedVideoUsers: state => state.mutedVideoUsers,
     },
 };

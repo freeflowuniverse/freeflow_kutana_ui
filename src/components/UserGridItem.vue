@@ -33,9 +33,14 @@
                 >{{ muted ? 'mic_off' : 'mic' }}
                 </v-icon>
             </v-btn>
+            <v-btn v-if="user.uuid !== localUser.uuid" dark icon small @click="toggleMuteVideo">
+                <v-icon small
+                >{{ mutedVideo ? 'videocam_off' : 'videocam' }}
+                </v-icon>
+            </v-btn>
             <v-btn dark icon small @click="toggleFullscreen">
                 <v-icon small
-                    >{{ fullScreenUser ? 'fullscreen_exit' : 'fullscreen' }}
+                >{{ fullScreenUser ? 'fullscreen_exit' : 'fullscreen' }}
                 </v-icon>
             </v-btn>
         </div>
@@ -51,18 +56,18 @@
             <div :class="{ blurred: selected }" class="avatar">
                 <img :alt="user.username" :src="avatar" />
                 <span v-if="userLabel" class="video-label">{{
-                    userLabel
-                }}</span>
+                        userLabel
+                    }}</span>
             </div>
             <JanusVideo
-                v-if="user.screen"
+                v-if="!mutedVideo && user.screen"
                 :class="{ blurred: selected }"
                 :cover="false"
                 :stream="user.screenShareStream"
                 class="screen"
             ></JanusVideo>
             <JanusVideo
-                v-if="user.cam"
+                v-if="!mutedVideo && user.cam"
                 :class="{ mine: localUser.id === user.id, blurred: selected }"
                 :cover="true"
                 :label="userLabel"
@@ -135,20 +140,21 @@
                 'selectedUser',
                 'fullScreenUser',
                 'mutedUsers',
+                'mutedVideoUsers',
             ]),
             borderStyle() {
                 const primaryColor = getComputedStyle(
-                    document.querySelector('#app')
+                    document.querySelector('#app'),
                 ).getPropertyValue('--primary-color');
                 const colorRegex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
-                    primaryColor
+                    primaryColor,
                 );
                 const color = colorRegex
                     ? {
-                          r: parseInt(colorRegex[1], 16),
-                          g: parseInt(colorRegex[2], 16),
-                          b: parseInt(colorRegex[3], 16),
-                      }
+                        r: parseInt(colorRegex[1], 16),
+                        g: parseInt(colorRegex[2], 16),
+                        b: parseInt(colorRegex[3], 16),
+                    }
                     : null;
 
                 let volume = 0;
@@ -168,7 +174,7 @@
             avatar() {
                 const generator = new AvatarGenerator();
                 return `https://avatars.dicebear.com/api/human/${this.hashString(
-                    this.$props.user.username
+                    this.$props.user.username,
                 )}.svg`;
             },
             userLabel() {
@@ -180,24 +186,26 @@
                 return this.user?.id == this.selectedUser?.id;
             },
             isPinned() {
-                return !!this.selectedUser?.pinned
+                return !!this.selectedUser?.pinned;
             },
-            muted(){
-                return this.mutedUsers.find(mu => mu.uuid === this.user.uuid)
-                return this.mutedUsers.has( this.user.uuid)
-            }
+            muted() {
+                return this.mutedUsers.find(mu => mu.uuid === this.user.uuid);
+            },
+            mutedVideo() {
+                return this.mutedVideoUsers.find(mvu => mvu.uuid === this.user.uuid);
+            },
         },
         methods: {
             ...mapActions(['selectUser', 'unSelectUser']),
-            ...mapMutations(['setFullscreenUser', 'modifyMutedUsers']),
+            ...mapMutations(['setFullscreenUser', 'modifyMutedUsers', 'modifyMutedVideoUsers']),
             selectThisUser() {
                 if (!this.extendedControls) {
                     return;
                 }
                 if (this.isSelectedUser && this.isPinned) {
-                    this.unSelectUser()
+                    this.unSelectUser();
                 } else {
-                    this.selectUser({ id: this.user.id, pinned: true});
+                    this.selectUser({ id: this.user.id, pinned: true });
                 }
             },
             hashString(str) {
@@ -216,8 +224,14 @@
                 this.setFullscreenUser(this.user);
             },
             toggleMute() {
-                this.modifyMutedUsers({ tinyUser: {uuid : this.user.uuid, id: this.user.id}, muted: !this.muted});
-            }
+                this.modifyMutedUsers({ tinyUser: { uuid: this.user.uuid, id: this.user.id }, muted: !this.muted });
+            },
+            toggleMuteVideo() {
+                this.modifyMutedVideoUsers({
+                    tinyUser: { uuid: this.user.uuid, id: this.user.id },
+                    muted: !this.mutedVideo,
+                });
+            },
         },
     };
 </script>
