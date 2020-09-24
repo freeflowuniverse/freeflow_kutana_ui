@@ -87,7 +87,7 @@ export default {
 }
 .v-icon:last-child {
     position: absolute;
-    left: 0;
+    left: 1px;
 }
 
 // .micVolumeIcon {
