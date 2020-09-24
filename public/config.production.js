@@ -6,5 +6,6 @@ export default {
     botFrontEnd: "https://login.threefold.me/",
     botBackend: "https://login.threefold.me/",
     debugJanus: false,
-    janusServer: "https://janus.jimber.org/janus"
+    janusServer: "https://janus.jimber.org/janus",
+    gaId: "UA-150836145-1"
 }
