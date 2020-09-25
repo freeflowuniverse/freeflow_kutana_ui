@@ -110,7 +110,7 @@
         </v-dialog>
         <v-dialog :value="displayPermissionDialog" width="600" persistent>
             <v-card>
-                <v-card-title> FreeflowConnect </v-card-title>
+                <v-card-title> FreeFlowConnect </v-card-title>
                 <v-card-text>
                     For others to see and hear you, your browser will request
                     access to your cam and mic. <br />
@@ -121,6 +121,26 @@
                     <v-btn text @click="requestPermission"
                         >Request permissions</v-btn
                     >
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog :value="displaySecondPermissionDialog" width="600" persistent>
+            <v-card>
+                <v-card-title>
+                    FreeFlowConnect can't access your devices</v-card-title
+                >
+                <v-card-text>
+                    FreeFlowConnect still can't access your devices. You can
+                    still continue without or enable them in the in your browser
+                    settings and then retrying.
+                    {{this.shouldRequest}}
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn text @click="closeDialogAndRefreshLocalStream"
+                        >Continue</v-btn
+                    >
+                    <v-btn text @click="requestPermission">Retry</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -152,6 +172,7 @@ export default {
             showLogin: false,
             displayPermissionDialog: false,
             shouldRequest: { audio: false, video: false },
+            displaySecondPermissionDialog: false,
         };
     },
     async mounted() {
@@ -448,12 +469,25 @@ export default {
             });
         },
         requestPermission() {
-            navigator.mediaDevices.getUserMedia(this.shouldRequest).then(() => {
+            this.checkIfPermissionsWereRequested().then(() => {
                 this.displayPermissionDialog = false;
-                this.refreshMediaDevices().then(() => {
-                    updateCurrentStream();
-                });
+                if (this.shouldRequest.audio || this.shouldRequest.video) {
+                    this.displaySecondPermissionDialog = true;
+                } else {
+                    navigator.mediaDevices
+                    .getUserMedia({audio: !this.shouldRequest.audio, video: !this.shouldRequest.video})
+                    .then(() => {
+                        this.refreshMediaDevices().then(() => {
+                            this.closeDialogAndRefreshLocalStream();
+                        });
+                    });
+                }
             });
+        },
+        closeDialogAndRefreshLocalStream() {
+            this.displayPermissionDialog = false;
+            this.displaySecondPermissionDialog = false;
+            updateCurrentStream();
         },
     },
     watch: {
@@ -512,6 +546,19 @@ export default {
         grid-row-start: start;
         grid-row-end: end;
         grid-column-end: 1;
+        // TODO: DO something with this
+        // &::after {
+        //     content: '';
+        //     position: absolute;
+        //     left: 50%;
+        //     top: 50%;
+        //     width: 300px;
+        //     height: 400px;
+        //     border: dashed var(--primary-color) 10px;
+        //     transform: translate(-50%, -50%);
+        //     border-radius: 75% 75% 100% 100%;
+        //     opacity: 0.5;
+        // }
         video {
             width: 100%;
             height: 100%;
