@@ -55,7 +55,7 @@
                 <ChatGrid
                     :selectedUser="localUser"
                     v-on:back="view = 'no-chat'"
-                    class="chat"
+                    class="chatGrid"
                 ></ChatGrid>
             </template>
             <template v-slot:controlStrip>
@@ -284,7 +284,7 @@ export default {
     pointer-events: all;
     z-index: 213;
 }
-[data-view='no-chat'] .chat{
+[data-view='no-chat'] .chatGrid{
     display: none;
 }
 </style>
