@@ -5,7 +5,7 @@
             v-for="message in messagesToShow"
             :key="message.createdAt"
         >
-            <span class="from secondary--text font-weight-bold">{{message.sender}}</span>
+            <span class="from secondary--text font-weight-bold">{{message.sender | truncate(5)}}</span>
             : {{message.content | truncate(10)}}
         </div>
     </section>

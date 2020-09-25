@@ -4,7 +4,7 @@
           <v-card-title>Freeflow Connect</v-card-title>
           <v-card-text>
             <p>Choose your guest name</p>
-            <v-text-field id="guestName" :rules="guestNameRules" v-model="guestName" label="Guest" single-line autofocus></v-text-field>
+            <v-text-field id="guestName" :rules="guestNameRules" v-model="guestName" label="Guest" single-line autofocus counter="20"></v-text-field>
           </v-card-text>
           <v-card-actions>
             <v-spacer />
