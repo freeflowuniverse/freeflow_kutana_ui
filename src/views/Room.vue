@@ -7,6 +7,7 @@
         }"
         class="room"
         @click="showControl"
+        :data-view="view"
     >
         <v-dialog v-model="showInvitation">
             <InviteUsers @closeInvitations="closeInvitations" />
@@ -54,6 +55,7 @@
                 <ChatGrid
                     :selectedUser="localUser"
                     v-on:back="view = 'no-chat'"
+                    class="chat"
                 ></ChatGrid>
             </template>
             <template v-slot:controlStrip>
@@ -281,5 +283,8 @@ export default {
 .controlStrip {
     pointer-events: all;
     z-index: 213;
+}
+[data-view='no-chat'] .chat{
+    display: none;
 }
 </style>
