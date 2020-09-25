@@ -52,7 +52,6 @@
         <UserGrid :showChat="view === 'chat'" :view="currentViewStyle">
             <template v-slot:chat>
                 <ChatGrid
-                    v-if="view === 'chat'"
                     :selectedUser="localUser"
                     v-on:back="view = 'no-chat'"
                 ></ChatGrid>
