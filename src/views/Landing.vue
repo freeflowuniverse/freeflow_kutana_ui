@@ -175,7 +175,7 @@ export default {
             displaySecondPermissionDialog: false,
         };
     },
-    async mounted() {
+    mounted() {
         this.getBackgroundOfMine();
         this.checkIfPermissionsWereRequested().then(() => {
             if (this.$route.query.callback) {
