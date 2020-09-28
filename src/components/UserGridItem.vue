@@ -64,6 +64,7 @@
                 :class="{ blurred: selected }"
                 :cover="false"
                 :stream="user.screenShareStream"
+                :overlay="localUser.id === user.id"
                 class="screen"
             ></JanusVideo>
             <JanusVideo
