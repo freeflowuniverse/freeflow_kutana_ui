@@ -84,10 +84,10 @@
 
                 let users = groupBy(
                     [
-                        this.localUser,
-                        this.localScreenUser,
                         ...this.remoteUsers,
                         ...this.remoteScreenUsers,
+                        this.localUser,
+                        this.localScreenUser,
                     ],
                     a => a?.uuid
                 );
