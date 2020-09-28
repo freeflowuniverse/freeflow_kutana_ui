@@ -125,7 +125,7 @@ export default {
             try {
                 await router.push({
                     name: 'home',
-                    query: { roomName: this.$route.params.token },
+                    params: { roomName: this.$route.params.token },
                 });
             } catch (e) {}
             return;
