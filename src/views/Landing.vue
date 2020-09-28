@@ -1,6 +1,6 @@
 <template>
     <section class="landing">
-      <h1 class="ffctitle">FreeFlowConnect</h1>
+        <h1 class="ffctitle">FreeFlowConnect</h1>
         <v-row class="io mb-2" justify="center" align="center">
             <DeviceSelector
                 device="cam"
@@ -48,17 +48,23 @@
                                 text
                                 type="submit"
                                 color="primary"
-                            >Join room</v-btn>
+                                >Join room</v-btn
+                            >
                         </template>
                     </v-text-field>
                 </v-form>
             </v-col>
             <transition name="fade">
-                <v-divider vertical v-if="!inviteUrl && $vuetify.breakpoint.mdAndUp"></v-divider>
+                <v-divider
+                    vertical
+                    v-if="!inviteUrl && $vuetify.breakpoint.mdAndUp"
+                ></v-divider>
             </transition>
             <transition name="shrink-x">
                 <v-col cols="4" align="center" v-if="!inviteUrl">
-                    <v-btn @click="create" text color="primary">Create room</v-btn>
+                    <v-btn @click="create" text color="primary"
+                        >Create room</v-btn
+                    >
                 </v-col>
             </transition>
         </v-row>
@@ -70,40 +76,60 @@
                 ref="localStream"
                 v-if="
                     videoActive &&
-                        localStream &&
-                        localStream.getVideoTracks().length > 0
+                    localStream &&
+                    localStream.getVideoTracks().length > 0
                 "
             ></video>
         </div>
         <v-dialog :value="showLogin" width="600" persistent>
             <v-card v-if="!isLoginInAsGuest" :loading="$route.query.callback">
                 <v-card-title>Freeflow Connect</v-card-title>
-                <v-card-text v-if="$route.query.callback">Validating auth...</v-card-text>
+                <v-card-text v-if="$route.query.callback"
+                    >Validating auth...</v-card-text
+                >
                 <span v-else>
-                    <v-card-text>Please login using 3Bot Connect or continue as guest.</v-card-text>
+                    <v-card-text>
+                        Please login using 3Bot Connect or continue as guest.
+                        <br />
+                        <v-text-field
+                            id="guestName"
+                            :rules="guestNameRules"
+                            v-model="guestName"
+                            label="Guest"
+                            single-line
+                            autofocus
+                            counter="20"
+                            hint="You can use any name you want"
+                            @focus="$event.target.select()"
+                        >
+                            <template v-slot:append>
+                                <v-btn @click="continueLogin" text
+                                    >Continue as guest</v-btn
+                                >
+                            </template>
+                        </v-text-field>
+                    </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn id="guestLoginBtn" @click="guestLogin" text>Continue as Guest</v-btn>
                         <v-btn
                             id="threebotConnectLoginBtn"
                             @click="threebotConnectLogin"
                             text
-                        >Use 3Bot Connect</v-btn>
+                            >Use 3Bot Connect</v-btn
+                        >
                     </v-card-actions>
                 </span>
             </v-card>
-            <GuestLogin v-else @continuelogin="continueLogin" />
         </v-dialog>
     </section>
 </template>
 <script>
 import { mapActions, mapMutations, mapGetters } from 'vuex';
 import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
-import GuestLogin from '../components/GuestLogin';
 import DeviceSelector from '../components/DeviceSelector';
+import random from '../plugins/random';
 export default {
     components: {
-        GuestLogin,
         DeviceSelector,
     },
     data() {
@@ -120,6 +146,17 @@ export default {
             myBackground: '',
             isLoginInAsGuest: false,
             showLogin: false,
+            guestName: `GUEST-${random.stringGenerator(5).toUpperCase()}`,
+            guestNameRules: [
+                name =>
+                    name.length >= 3 || 'Name should be at least 3 characters',
+                name =>
+                    name.length <= 20 ||
+                    'Name should be no longer than 20 characters',
+                name =>
+                    name.match(/^[a-z0-9\-]+$/i) !== null ||
+                    'Please use letters and numbers only (or a dash)',
+            ],
         };
     },
     mounted() {
@@ -154,7 +191,7 @@ export default {
         ]),
         avatar() {
             return `https://avatars.dicebear.com/api/human/${this.hashString(
-                (this.account?.name || 'FreeFlowConnect')
+                this.account?.name || 'FreeFlowConnect'
             )}.svg`;
         },
         videoInputDevices() {
@@ -190,19 +227,22 @@ export default {
             'updateAudioDevice',
             'generateLoginUrl',
             'checkResponse',
+            'loginAsGuest',
         ]),
         continueLogin() {
-            this.getBackgroundOfMine()
+            this.$ga.event('auth', 'guest-login');
+            this.loginAsGuest(this.guestName);
+            this.getBackgroundOfMine();
             this.showLogin = false;
         },
         changeAudioInputTo(audioInputDeviceId) {
-            this.$ga.event('before-call-events', 'changeAudioInput')
+            this.$ga.event('before-call-events', 'changeAudioInput');
             this.audioDevice = audioInputDeviceId;
             this.updateAudioDevice(audioInputDeviceId);
             updateCurrentStream();
         },
         changeVideoTo(videoDeviceId) {
-            this.$ga.event('before-call-events', 'changeVideo')
+            this.$ga.event('before-call-events', 'changeVideo');
             this.videoDevice = videoDeviceId;
             this.updateVideoDevice(videoDeviceId);
             updateCurrentStream();
@@ -214,12 +254,12 @@ export default {
             'toggleVideoActive',
         ]),
         toggleCam() {
-            this.$ga.event('before-call-events', 'toggleCam')
+            this.$ga.event('before-call-events', 'toggleCam');
             this.toggleVideoActive();
             updateCurrentStream();
         },
         toggleMic() {
-            this.$ga.event('before-call-events', 'toggleMic')
+            this.$ga.event('before-call-events', 'toggleMic');
             this.toggleAudioActive();
             updateCurrentStream();
         },
@@ -236,7 +276,11 @@ export default {
                 return;
             }
             if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
-                this.$ga.event('before-call-events', 'joining-room', this.inviteUrl)
+                this.$ga.event(
+                    'before-call-events',
+                    'joining-room',
+                    this.inviteUrl
+                );
                 updateCurrentStream();
                 this.$router.push({
                     name: 'room',
@@ -249,15 +293,11 @@ export default {
         getBackgroundOfMine() {
             this.$nextTick(() => {
                 this.myBackground = `background: url('${this.avatar}') rgba(0,0,0,0.4) center no-repeat;`;
-            })
+            });
         },
         threebotConnectLogin() {
-            this.$ga.event('auth', 'threebot-login')
+            this.$ga.event('auth', 'threebot-login');
             this.generateLoginUrl(this.$route.query);
-        },
-        guestLogin() {
-            this.$ga.event('auth', 'guest-login')
-            this.isLoginInAsGuest = true;
         },
         hashString(str) {
             let hash = 0;
@@ -271,14 +311,17 @@ export default {
     watch: {
         inviteUrl(val) {
             if (val && this.reg.test(val) && val.length > 15) {
-                this.inviteUrl = (val.match(this.reg)[1]).toLowerCase();
+                this.inviteUrl = val.match(this.reg)[1].toLowerCase();
             }
         },
         teamName(val) {
             if (val) {
                 updateCurrentStream();
-                this.$router.push({ name: 'room', params: { token: val.toLowerCase() } });
-                this.$ga.event('before-call-events', 'create-room', val)
+                this.$router.push({
+                    name: 'room',
+                    params: { token: val.toLowerCase() },
+                });
+                this.$ga.event('before-call-events', 'create-room', val);
             }
         },
         loginUrl(val) {
