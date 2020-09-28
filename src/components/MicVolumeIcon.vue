@@ -5,7 +5,8 @@
             :small="small"
             :style="`clip-path: inset(${100 - progress}% 0px 0 0px);`"
             color="#4cd137"
-        >{{ icon }}</v-icon>
+            >{{ icon }}</v-icon
+        >
     </div>
 </template>
 
@@ -48,8 +49,8 @@ export default {
             1
         );
 
-            this.analyser.smoothingTimeConstant = 0.8;
-            this.analyser.fftSize = 32;
+        this.analyser.smoothingTimeConstant = 0.8;
+        this.analyser.fftSize = 32;
 
         this.microphone.connect(this.analyser);
         this.analyser.connect(javascriptNode);
@@ -63,18 +64,17 @@ export default {
             for (let i = 0; i < length; i++) {
                 values += array[i];
             }
-
-                // @todo: find better progress
-                this.progress = Math.pow(values / length, 1.3);
-            };
-        },
-        destroyed() {
-            // console.log('destroy');
-            this.analyser.disconnect();
-            this.microphone.disconnect();
-        },
-        computed: { ...mapGetters(['localUser']) },
-    };
+            const avg = values / length;
+            this.progress = avg > 20 && avg < 100 ? avg : avg < 20 ? 0 : 100;
+        };
+    },
+    destroyed() {
+        // console.log('destroy');
+        this.analyser.disconnect();
+        this.microphone.disconnect();
+    },
+    computed: { ...mapGetters(['localUser']) },
+};
 </script>
 
 <style lang="scss" scoped>
