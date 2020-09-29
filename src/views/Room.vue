@@ -13,7 +13,7 @@
             <InviteUsers @closeInvitations="closeInvitations" />
         </v-dialog>
         <v-btn
-            v-if="fullScreenUser"
+            v-if="!!fullScreenUser"
             class="primary"
             fixed
             icon
@@ -24,10 +24,9 @@
         >
             <v-icon color="white" small>fullscreen_exit</v-icon>
         </v-btn>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="!fullScreenUser">
             <template v-slot:activator="{ on, attrs }">
                 <v-btn
-                    v-if="!fullScreenUser"
                     class="primary"
                     v-bind="attrs"
                     v-on="on"
