@@ -88,15 +88,29 @@
                     >Validating auth...</v-card-text
                 >
                 <span v-else>
-                    <v-card-text
-                        >Please login using 3Bot Connect or continue as
-                        guest.</v-card-text
-                    >
+                    <v-card-text>
+                        Please login using 3Bot Connect or continue as guest.
+                        <br />
+                        <v-text-field
+                            id="guestName"
+                            :rules="guestNameRules"
+                            v-model="guestName"
+                            label="Guest"
+                            single-line
+                            autofocus
+                            counter="20"
+                            hint="You can use any name you want"
+                            @focus="$event.target.select()"
+                        >
+                            <template v-slot:append>
+                                <v-btn @click="continueLogin" text
+                                    >Continue as guest</v-btn
+                                >
+                            </template>
+                        </v-text-field>
+                    </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn id="guestLoginBtn" @click="guestLogin" text
-                            >Continue as Guest</v-btn
-                        >
                         <v-btn
                             id="threebotConnectLoginBtn"
                             @click="threebotConnectLogin"
@@ -106,7 +120,6 @@
                     </v-card-actions>
                 </span>
             </v-card>
-            <GuestLogin v-else @continuelogin="continueLogin" />
         </v-dialog>
         <v-dialog :value="displayPermissionDialog" width="600" persistent>
             <v-card>
@@ -149,11 +162,10 @@
 <script>
 import { mapActions, mapMutations, mapGetters } from 'vuex';
 import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
-import GuestLogin from '../components/GuestLogin';
 import DeviceSelector from '../components/DeviceSelector';
+import random from '../plugins/random';
 export default {
     components: {
-        GuestLogin,
         DeviceSelector,
     },
     data() {
@@ -170,6 +182,17 @@ export default {
             myBackground: '',
             isLoginInAsGuest: false,
             showLogin: false,
+            guestName: `GUEST-${random.stringGenerator(5).toUpperCase()}`,
+            guestNameRules: [
+                name =>
+                    name.length >= 3 || 'Name should be at least 3 characters',
+                name =>
+                    name.length <= 20 ||
+                    'Name should be no longer than 20 characters',
+                name =>
+                    name.match(/^[a-z0-9\-]+$/i) !== null ||
+                    'Please use letters and numbers only (or a dash)',
+            ],
             displayPermissionDialog: false,
             shouldRequest: { audio: false, video: false },
             displaySecondPermissionDialog: false,
@@ -250,8 +273,11 @@ export default {
             'updateAudioDevice',
             'generateLoginUrl',
             'checkResponse',
+            'loginAsGuest',
         ]),
         continueLogin() {
+            this.$ga.event('auth', 'guest-login');
+            this.loginAsGuest(this.guestName);
             this.getBackgroundOfMine();
             this.showLogin = false;
         },
@@ -318,10 +344,6 @@ export default {
         threebotConnectLogin() {
             this.$ga.event('auth', 'threebot-login');
             this.generateLoginUrl(this.$route.query);
-        },
-        guestLogin() {
-            this.$ga.event('auth', 'guest-login');
-            this.isLoginInAsGuest = true;
         },
         hashString(str) {
             let hash = 0;
