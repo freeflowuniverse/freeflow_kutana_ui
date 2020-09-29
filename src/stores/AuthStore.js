@@ -1,7 +1,7 @@
 import threeBotService from '../services/3botService';
 import cryptoService from '../services/cryptoService';
 import config from '../../public/config';
-import random from '../plugins/random';
+import random from '@/plugins/random';
 import { v4 as uuidv4 } from 'uuid';
 export default {
     state: {

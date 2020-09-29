@@ -32,50 +32,50 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
-export default {
-    name: 'InviteUsers',
-    methods: {
-        ...mapActions(['setSnackbarMessage']),
-        async copyUrl() {
-            try {
-                await navigator.clipboard.writeText(this.inviteLink);
-                this.setSnackbarMessage({
-                    text: `Link copied to clipboard`,
-                });
-            } catch (e) {
-                this.setSnackbarMessage({
-                    type: 'warning',
-                    text: `Failed to copy link to clipboard`,
-                });
-                // console.error(e);
-            }
+    import { mapActions, mapGetters } from 'vuex';
+    export default {
+        name: 'InviteUsers',
+        methods: {
+            ...mapActions(['setSnackbarMessage']),
+            async copyUrl() {
+                try {
+                    await navigator.clipboard.writeText(this.inviteLink);
+                    this.setSnackbarMessage({
+                        text: `Link copied to clipboard`,
+                    });
+                } catch (e) {
+                    this.setSnackbarMessage({
+                        type: 'warning',
+                        text: `Failed to copy link to clipboard`,
+                    });
+                    // console.error(e);
+                }
+            },
         },
-    },
-    computed: {
-        ...mapGetters(['remoteUsers']),
-        inviteMessage() {
-            return this.remoteUsers.length <= 0
-                ? 'No users yet'
-                : 'Invite more users';
+        computed: {
+            ...mapGetters(['remoteUsers']),
+            inviteMessage() {
+                return this.remoteUsers.length <= 0
+                    ? 'No users yet'
+                    : 'Invite more users';
+            },
+            inviteLink() {
+                let baseUrl = window.location.href;
+                if (baseUrl.charAt(baseUrl.length - 1) !== '/') {
+                    baseUrl += '/';
+                }
+                return `${baseUrl}`;
+            },
         },
-        inviteLink() {
-            let baseUrl = window.location.href;
-            if (baseUrl.charAt(baseUrl.length - 1) !== '/') {
-                baseUrl += '/';
-            }
-            return `${baseUrl}`;
-        },
-    },
-};
+    };
 </script>
 
 <style scoped>
-.no-users {
-    position: fixed;
-    width: 35rem;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
+    .no-users {
+        position: fixed;
+        width: 35rem;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
 </style>

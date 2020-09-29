@@ -76,8 +76,8 @@
                 ref="localStream"
                 v-if="
                     videoActive &&
-                    localStream &&
-                    localStream.getVideoTracks().length > 0
+                        localStream &&
+                        localStream.getVideoTracks().length > 0
                 "
             ></video>
         </div>
@@ -146,7 +146,7 @@
                     FreeFlowConnect still can't access your devices. You can
                     still continue without or enable them in the in your browser
                     settings and then retrying.
-                    {{this.shouldRequest}}
+                    {{ this.shouldRequest }}
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -160,445 +160,457 @@
     </section>
 </template>
 <script>
-import { mapActions, mapMutations, mapGetters } from 'vuex';
-import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
-import DeviceSelector from '../components/DeviceSelector';
-import random from '../plugins/random';
-export default {
-    components: {
-        DeviceSelector,
-    },
-    data() {
-        return {
-            /* eslint-disable */
-            reg: new RegExp('(?:https://.*/room/)?([a-z0-9]*)(.*)'),
-            /* eslint-enable */
-            valid: false,
-            inviteUrlRules: [
-                url => !!url || 'Invite url is required',
-                url => this.reg.test(url) || 'Invite url or room ID  invalid',
-            ],
-            inviteUrl: null,
-            myBackground: '',
-            isLoginInAsGuest: false,
-            showLogin: false,
-            guestName: `GUEST-${random.stringGenerator(5).toUpperCase()}`,
-            guestNameRules: [
-                name =>
-                    name.length >= 3 || 'Name should be at least 3 characters',
-                name =>
-                    name.length <= 20 ||
-                    'Name should be no longer than 20 characters',
-                name =>
-                    name.match(/^[a-z0-9\-]+$/i) !== null ||
-                    'Please use letters and numbers only (or a dash)',
-            ],
-            displayPermissionDialog: false,
-            shouldRequest: { audio: false, video: false },
-            displaySecondPermissionDialog: false,
-        };
-    },
-    mounted() {
-        this.getBackgroundOfMine();
-        this.checkIfPermissionsWereRequested().then(() => {
-            if (this.$route.query.callback) {
-                this.checkResponse(window.location.href);
-            }
-            if (!this.account) {
-                this.showLogin = true;
-            }
-
-            if (this.$route.query && this.$route.query.roomName) {
-                this.inviteUrl = this.$route.query.roomName.toLowerCase();
-            }
-
-            if (this.shouldRequest.audio || this.shouldRequest.video) {
-                this.displayPermissionDialog = true;
-            } else {
-                this.refreshMediaDevices().then(() => {
-                    updateCurrentStream();
-                });
-            }
-        });
-    },
-    computed: {
-        ...mapGetters([
-            'loginUrl',
-            'audioActive',
-            'videoActive',
-            'account',
-            'teamName',
-            'userControl',
-            'mediaDevices',
-            'mediaDeviceErrors',
-            'localStream',
-            'videoDeviceId',
-            'audioDeviceId',
-        ]),
-        avatar() {
-            return `https://avatars.dicebear.com/api/human/${this.hashString(
-                this.account?.name || 'FreeFlowConnect'
-            )}.svg`;
+    import { mapActions, mapMutations, mapGetters } from 'vuex';
+    import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
+    import DeviceSelector from '@/components/DeviceSelector';
+    import random from '@/plugins/random';
+    export default {
+        components: {
+            DeviceSelector,
         },
-        videoInputDevices() {
-            return this.mediaDevices.filter(
-                d => d.kind === 'videoinput' && d.label
-            );
+        data() {
+            return {
+                /* eslint-disable */
+                reg: new RegExp('(?:https://.*/room/)?([a-z0-9]*)(.*)'),
+                /* eslint-enable */
+                valid: false,
+                inviteUrlRules: [
+                    url => !!url || 'Invite url is required',
+                    url =>
+                        this.reg.test(url) || 'Invite url or room ID  invalid',
+                ],
+                inviteUrl: null,
+                myBackground: '',
+                isLoginInAsGuest: false,
+                showLogin: false,
+                guestName: `GUEST-${random.stringGenerator(5).toUpperCase()}`,
+                guestNameRules: [
+                    name =>
+                        name.length >= 3 ||
+                        'Name should be at least 3 characters',
+                    name =>
+                        name.length <= 20 ||
+                        'Name should be no longer than 20 characters',
+                    name =>
+                        name.match(/^[a-z0-9\-]+$/i) !== null ||
+                        'Please use letters and numbers only (or a dash)',
+                ],
+                displayPermissionDialog: false,
+                shouldRequest: { audio: false, video: false },
+                displaySecondPermissionDialog: false,
+            };
         },
-        audioInputDevices() {
-            return this.mediaDevices.filter(
-                d => d.kind === 'audioinput' && d.label
-            );
-        },
-        audioOutputDevices() {
-            return this.mediaDevices.filter(
-                d => d.kind === 'audiooutput' && d.label
-            );
-        },
-        hasAudioError() {
-            return this.mediaDeviceErrors.hasOwnProperty('audio');
-        },
-        hasVideoError() {
-            return this.mediaDeviceErrors.hasOwnProperty('video');
-        },
-    },
-    methods: {
-        ...mapActions([
-            'createTeam',
-            'join',
-            'getVideoStream',
-            'getAudioStream',
-            'refreshMediaDevices',
-            'updateVideoDevice',
-            'updateAudioDevice',
-            'generateLoginUrl',
-            'checkResponse',
-            'loginAsGuest',
-        ]),
-        continueLogin() {
-            this.$ga.event('auth', 'guest-login');
-            this.loginAsGuest(this.guestName);
+        mounted() {
             this.getBackgroundOfMine();
-            this.showLogin = false;
-        },
-        changeAudioInputTo(audioInputDeviceId) {
-            this.$ga.event('before-call-events', 'changeAudioInput');
-            this.audioDevice = audioInputDeviceId;
-            this.updateAudioDevice(audioInputDeviceId);
-            updateCurrentStream();
-        },
-        changeVideoTo(videoDeviceId) {
-            this.$ga.event('before-call-events', 'changeVideo');
-            this.videoDevice = videoDeviceId;
-            this.updateVideoDevice(videoDeviceId);
-            updateCurrentStream();
-        },
-        ...mapMutations([
-            'setLocalStream',
-            'clearMediaDeviceError',
-            'toggleAudioActive',
-            'toggleVideoActive',
-        ]),
-        toggleCam() {
-            this.$ga.event('before-call-events', 'toggleCam');
-            this.toggleVideoActive();
-            updateCurrentStream();
-        },
-        toggleMic() {
-            this.$ga.event('before-call-events', 'toggleMic');
-            this.toggleAudioActive();
-            updateCurrentStream();
-        },
-        create() {
-            if (!this.account) {
-                this.showLogin = true;
-                return;
-            }
-            this.createTeam();
-        },
-        joinRoom() {
-            if (!this.account) {
-                this.showLogin = true;
-                return;
-            }
-            if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
-                this.$ga.event(
-                    'before-call-events',
-                    'joining-room',
-                    this.inviteUrl
-                );
-                updateCurrentStream();
-                this.$router.push({
-                    name: 'room',
-                    params: {
-                        token: this.inviteUrl.toLowerCase(),
-                    },
-                });
-            }
-        },
-        getBackgroundOfMine() {
-            this.$nextTick(() => {
-                this.myBackground = `background: url('${this.avatar}') rgba(0,0,0,0.4) center no-repeat;`;
-            });
-        },
-        threebotConnectLogin() {
-            this.$ga.event('auth', 'threebot-login');
-            this.generateLoginUrl(this.$route.query);
-        },
-        hashString(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
-                hash = hash & hash;
-            }
-            return Math.abs(hash);
-        },
-        checkIfPermissionsWereRequested() {
-            return new Promise(resolve => {
-                if (
-                    navigator.mediaDevices &&
-                    navigator.mediaDevices.enumerateDevices
-                ) {
-                    // Firefox 38+ seems having support of enumerateDevicesx
-                    navigator.enumerateDevices = function (callback) {
-                        navigator.mediaDevices
-                            .enumerateDevices()
-                            .then(callback);
-                    };
-                }
-
-                let MediaDevices = [];
-                let isHTTPs = location.protocol === 'https:';
-                let canEnumerate = false;
-
-                if (
-                    typeof MediaStreamTrack !== 'undefined' &&
-                    'getSources' in MediaStreamTrack
-                ) {
-                    canEnumerate = true;
-                } else if (
-                    navigator.mediaDevices &&
-                    !!navigator.mediaDevices.enumerateDevices
-                ) {
-                    canEnumerate = true;
-                }
-
-                let hasMicrophone = false;
-                let hasWebcam = false;
-
-                let isMicrophoneAlreadyCaptured = false;
-                let isWebcamAlreadyCaptured = false;
-
-                if (!canEnumerate) {
-                    return;
-                }
-
-                if (
-                    !navigator.enumerateDevices &&
-                    window.MediaStreamTrack &&
-                    window.MediaStreamTrack.getSources
-                ) {
-                    navigator.enumerateDevices = window.MediaStreamTrack.getSources.bind(
-                        window.MediaStreamTrack
-                    );
-                }
-
-                if (!navigator.enumerateDevices && navigator.enumerateDevices) {
-                    navigator.enumerateDevices = navigator.enumerateDevices.bind(
-                        navigator
-                    );
-                }
-
-                if (!navigator.enumerateDevices) {
-                    return;
-                }
-
-                MediaDevices = [];
-                navigator.enumerateDevices(devices => {
-                    for (const _device of devices) {
-                        let device = {};
-                        for (let d in _device) {
-                            device[d] = _device[d];
-                        }
-
-                        if (device.kind === 'audio') {
-                            device.kind = 'audioinput';
-                        }
-
-                        if (device.kind === 'video') {
-                            device.kind = 'videoinput';
-                        }
-
-                        let skip;
-                        MediaDevices.forEach(function (d) {
-                            if (d.id === device.id && d.kind === device.kind) {
-                                skip = true;
-                            }
-                        });
-
-                        if (skip) {
-                            return;
-                        }
-
-                        if (!device.deviceId) {
-                            device.deviceId = device.id;
-                        }
-
-                        if (!device.id) {
-                            device.id = device.deviceId;
-                        }
-
-                        if (!device.label) {
-                            device.label = 'Please invoke getUserMedia once.';
-                            if (!isHTTPs) {
-                                device.label =
-                                    'HTTPs is required to get label of this ' +
-                                    device.kind +
-                                    ' device.';
-                            }
-                        } else {
-                            if (
-                                device.kind === 'videoinput' &&
-                                !isWebcamAlreadyCaptured
-                            ) {
-                                isWebcamAlreadyCaptured = true;
-                            }
-
-                            if (
-                                device.kind === 'audioinput' &&
-                                !isMicrophoneAlreadyCaptured
-                            ) {
-                                isMicrophoneAlreadyCaptured = true;
-                            }
-                        }
-
-                        if (device.kind === 'audioinput') {
-                            hasMicrophone = true;
-                        }
-
-                        if (device.kind === 'videoinput') {
-                            hasWebcam = true;
-                        }
-                        MediaDevices.push(device);
-                    }
-                    this.shouldRequest.audio =
-                        hasMicrophone && !isMicrophoneAlreadyCaptured;
-                    this.shouldRequest.video =
-                        hasWebcam && !isWebcamAlreadyCaptured;
-
-                    resolve();
-                });
-            });
-        },
-        requestPermission() {
             this.checkIfPermissionsWereRequested().then(() => {
-                this.displayPermissionDialog = false;
+                if (this.$route.query.callback) {
+                    this.checkResponse(window.location.href);
+                }
+                if (!this.account) {
+                    this.showLogin = true;
+                }
+
+                if (this.$route.query && this.$route.query.roomName) {
+                    this.inviteUrl = this.$route.query.roomName.toLowerCase();
+                }
+
                 if (this.shouldRequest.audio || this.shouldRequest.video) {
-                    this.displaySecondPermissionDialog = true;
+                    this.displayPermissionDialog = true;
                 } else {
-                    navigator.mediaDevices
-                    .getUserMedia({audio: !this.shouldRequest.audio, video: !this.shouldRequest.video})
-                    .then(() => {
-                        this.refreshMediaDevices().then(() => {
-                            this.closeDialogAndRefreshLocalStream();
-                        });
+                    this.refreshMediaDevices().then(() => {
+                        updateCurrentStream();
                     });
                 }
             });
         },
-        closeDialogAndRefreshLocalStream() {
-            this.displayPermissionDialog = false;
-            this.displaySecondPermissionDialog = false;
-            updateCurrentStream();
+        computed: {
+            ...mapGetters([
+                'loginUrl',
+                'audioActive',
+                'videoActive',
+                'account',
+                'teamName',
+                'userControl',
+                'mediaDevices',
+                'mediaDeviceErrors',
+                'localStream',
+                'videoDeviceId',
+                'audioDeviceId',
+            ]),
+            avatar() {
+                return `https://avatars.dicebear.com/api/human/${this.hashString(
+                    this.account?.name || 'FreeFlowConnect'
+                )}.svg`;
+            },
+            videoInputDevices() {
+                return this.mediaDevices.filter(
+                    d => d.kind === 'videoinput' && d.label
+                );
+            },
+            audioInputDevices() {
+                return this.mediaDevices.filter(
+                    d => d.kind === 'audioinput' && d.label
+                );
+            },
+            audioOutputDevices() {
+                return this.mediaDevices.filter(
+                    d => d.kind === 'audiooutput' && d.label
+                );
+            },
+            hasAudioError() {
+                return this.mediaDeviceErrors.audio !== undefined;
+            },
+            hasVideoError() {
+                return this.mediaDeviceErrors.video !== undefined;
+            },
         },
-    },
-    watch: {
-        inviteUrl(val) {
-            if (val && this.reg.test(val) && val.length > 15) {
-                this.inviteUrl = val.match(this.reg)[1].toLowerCase();
-            }
-        },
-        teamName(val) {
-            if (val) {
-                updateCurrentStream();
-                this.$router.push({
-                    name: 'room',
-                    params: { token: val.toLowerCase() },
-                });
-                this.$ga.event('before-call-events', 'create-room', val);
-            }
-        },
-        loginUrl(val) {
-            if (val) {
-                window.location.replace(val);
-            }
-        },
-        account(val) {
-            if (val && this.$route.query.callback) {
-                let query = Object.assign({}, this.$route.query);
-                let redirect = query.redirect;
-                delete query.callback;
-                delete query.signedAttempt;
-                delete query.redirect;
-                this.$router.replace({ query });
-                if (redirect != undefined) {
-                    this.$router.push(redirect);
-                }
+        methods: {
+            ...mapActions([
+                'createTeam',
+                'join',
+                'getVideoStream',
+                'getAudioStream',
+                'refreshMediaDevices',
+                'updateVideoDevice',
+                'updateAudioDevice',
+                'generateLoginUrl',
+                'checkResponse',
+                'loginAsGuest',
+            ]),
+            continueLogin() {
+                this.$ga.event('auth', 'guest-login');
+                this.loginAsGuest(this.guestName);
+                this.getBackgroundOfMine();
                 this.showLogin = false;
-            }
+            },
+            changeAudioInputTo(audioInputDeviceId) {
+                this.$ga.event('before-call-events', 'changeAudioInput');
+                this.audioDevice = audioInputDeviceId;
+                this.updateAudioDevice(audioInputDeviceId);
+                updateCurrentStream();
+            },
+            changeVideoTo(videoDeviceId) {
+                this.$ga.event('before-call-events', 'changeVideo');
+                this.videoDevice = videoDeviceId;
+                this.updateVideoDevice(videoDeviceId);
+                updateCurrentStream();
+            },
+            ...mapMutations([
+                'setLocalStream',
+                'clearMediaDeviceError',
+                'toggleAudioActive',
+                'toggleVideoActive',
+            ]),
+            toggleCam() {
+                this.$ga.event('before-call-events', 'toggleCam');
+                this.toggleVideoActive();
+                updateCurrentStream();
+            },
+            toggleMic() {
+                this.$ga.event('before-call-events', 'toggleMic');
+                this.toggleAudioActive();
+                updateCurrentStream();
+            },
+            create() {
+                if (!this.account) {
+                    this.showLogin = true;
+                    return;
+                }
+                this.createTeam();
+            },
+            joinRoom() {
+                if (!this.account) {
+                    this.showLogin = true;
+                    return;
+                }
+                if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
+                    this.$ga.event(
+                        'before-call-events',
+                        'joining-room',
+                        this.inviteUrl
+                    );
+                    updateCurrentStream();
+                    this.$router.push({
+                        name: 'room',
+                        params: {
+                            token: this.inviteUrl.toLowerCase(),
+                        },
+                    });
+                }
+            },
+            getBackgroundOfMine() {
+                this.$nextTick(() => {
+                    this.myBackground = `background: url('${this.avatar}') rgba(0,0,0,0.4) center no-repeat;`;
+                });
+            },
+            threebotConnectLogin() {
+                this.$ga.event('auth', 'threebot-login');
+                this.generateLoginUrl(this.$route.query);
+            },
+            hashString(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
+                    hash = hash & hash;
+                }
+                return Math.abs(hash);
+            },
+            checkIfPermissionsWereRequested() {
+                return new Promise(resolve => {
+                    if (
+                        navigator.mediaDevices &&
+                        navigator.mediaDevices.enumerateDevices
+                    ) {
+                        // Firefox 38+ seems having support of enumerateDevicesx
+                        navigator.enumerateDevices = function(callback) {
+                            navigator.mediaDevices
+                                .enumerateDevices()
+                                .then(callback);
+                        };
+                    }
+
+                    let MediaDevices = [];
+                    let isHTTPs = location.protocol === 'https:';
+                    let canEnumerate = false;
+
+                    if (
+                        typeof MediaStreamTrack !== 'undefined' &&
+                        'getSources' in MediaStreamTrack
+                    ) {
+                        canEnumerate = true;
+                    } else if (
+                        navigator.mediaDevices &&
+                        !!navigator.mediaDevices.enumerateDevices
+                    ) {
+                        canEnumerate = true;
+                    }
+
+                    let hasMicrophone = false;
+                    let hasWebcam = false;
+
+                    let isMicrophoneAlreadyCaptured = false;
+                    let isWebcamAlreadyCaptured = false;
+
+                    if (!canEnumerate) {
+                        return;
+                    }
+
+                    if (
+                        !navigator.enumerateDevices &&
+                        window.MediaStreamTrack &&
+                        window.MediaStreamTrack.getSources
+                    ) {
+                        navigator.enumerateDevices = window.MediaStreamTrack.getSources.bind(
+                            window.MediaStreamTrack
+                        );
+                    }
+
+                    if (
+                        !navigator.enumerateDevices &&
+                        navigator.enumerateDevices
+                    ) {
+                        navigator.enumerateDevices = navigator.enumerateDevices.bind(
+                            navigator
+                        );
+                    }
+
+                    if (!navigator.enumerateDevices) {
+                        return;
+                    }
+
+                    MediaDevices = [];
+                    navigator.enumerateDevices(devices => {
+                        for (const _device of devices) {
+                            let device = {};
+                            for (let d in _device) {
+                                device[d] = _device[d];
+                            }
+
+                            if (device.kind === 'audio') {
+                                device.kind = 'audioinput';
+                            }
+
+                            if (device.kind === 'video') {
+                                device.kind = 'videoinput';
+                            }
+
+                            let skip;
+                            MediaDevices.forEach(function(d) {
+                                if (
+                                    d.id === device.id &&
+                                    d.kind === device.kind
+                                ) {
+                                    skip = true;
+                                }
+                            });
+
+                            if (skip) {
+                                return;
+                            }
+
+                            if (!device.deviceId) {
+                                device.deviceId = device.id;
+                            }
+
+                            if (!device.id) {
+                                device.id = device.deviceId;
+                            }
+
+                            if (!device.label) {
+                                device.label =
+                                    'Please invoke getUserMedia once.';
+                                if (!isHTTPs) {
+                                    device.label =
+                                        'HTTPs is required to get label of this ' +
+                                        device.kind +
+                                        ' device.';
+                                }
+                            } else {
+                                if (
+                                    device.kind === 'videoinput' &&
+                                    !isWebcamAlreadyCaptured
+                                ) {
+                                    isWebcamAlreadyCaptured = true;
+                                }
+
+                                if (
+                                    device.kind === 'audioinput' &&
+                                    !isMicrophoneAlreadyCaptured
+                                ) {
+                                    isMicrophoneAlreadyCaptured = true;
+                                }
+                            }
+
+                            if (device.kind === 'audioinput') {
+                                hasMicrophone = true;
+                            }
+
+                            if (device.kind === 'videoinput') {
+                                hasWebcam = true;
+                            }
+                            MediaDevices.push(device);
+                        }
+                        this.shouldRequest.audio =
+                            hasMicrophone && !isMicrophoneAlreadyCaptured;
+                        this.shouldRequest.video =
+                            hasWebcam && !isWebcamAlreadyCaptured;
+
+                        resolve();
+                    });
+                });
+            },
+            requestPermission() {
+                this.checkIfPermissionsWereRequested().then(() => {
+                    this.displayPermissionDialog = false;
+                    if (this.shouldRequest.audio || this.shouldRequest.video) {
+                        this.displaySecondPermissionDialog = true;
+                    } else {
+                        navigator.mediaDevices
+                            .getUserMedia({
+                                audio: !this.shouldRequest.audio,
+                                video: !this.shouldRequest.video,
+                            })
+                            .then(() => {
+                                this.refreshMediaDevices().then(() => {
+                                    this.closeDialogAndRefreshLocalStream();
+                                });
+                            });
+                    }
+                });
+            },
+            closeDialogAndRefreshLocalStream() {
+                this.displayPermissionDialog = false;
+                this.displaySecondPermissionDialog = false;
+                updateCurrentStream();
+            },
         },
-    },
-};
+        watch: {
+            inviteUrl(val) {
+                if (val && this.reg.test(val) && val.length > 15) {
+                    this.inviteUrl = val.match(this.reg)[1].toLowerCase();
+                }
+            },
+            teamName(val) {
+                if (val) {
+                    updateCurrentStream();
+                    this.$router.push({
+                        name: 'room',
+                        params: { token: val.toLowerCase() },
+                    });
+                    this.$ga.event('before-call-events', 'create-room', val);
+                }
+            },
+            loginUrl(val) {
+                if (val) {
+                    window.location.replace(val);
+                }
+            },
+            account(val) {
+                if (val && this.$route.query.callback) {
+                    let query = Object.assign({}, this.$route.query);
+                    let redirect = query.redirect;
+                    delete query.callback;
+                    delete query.signedAttempt;
+                    delete query.redirect;
+                    this.$router.replace({ query });
+                    if (redirect !== undefined) {
+                        this.$router.push(redirect);
+                    }
+                    this.showLogin = false;
+                }
+            },
+        },
+    };
 </script>
 <style lang="scss" scoped>
-.landing {
-    display: grid;
-    grid-template-rows: [start] 1fr [titleend] 12fr [iostart] 1fr [ioend actionsstart] 1fr [end];
-    height: 100%;
-    width: 100vw;
-    .ffctitle {
-        grid-row-start: start;
-        grid-row-end: titleend;
-        grid-column-end: 1;
-        z-index: 2;
-        text-align: center;
-        margin-top: 10px;
-    }
-    .mine {
-        grid-row-start: start;
-        grid-row-end: end;
-        grid-column-end: 1;
-        // TODO: DO something with this
-        // &::after {
-        //     content: '';
-        //     position: absolute;
-        //     left: 50%;
-        //     top: 50%;
-        //     width: 300px;
-        //     height: 400px;
-        //     border: dashed var(--primary-color) 10px;
-        //     transform: translate(-50%, -50%);
-        //     border-radius: 75% 75% 100% 100%;
-        //     opacity: 0.5;
-        // }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+    .landing {
+        display: grid;
+        grid-template-rows: [start] 1fr [titleend] 12fr [iostart] 1fr [ioend actionsstart] 1fr [end];
+        height: 100%;
+        width: 100vw;
+        .ffctitle {
+            grid-row-start: start;
+            grid-row-end: titleend;
+            grid-column-end: 1;
+            z-index: 2;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .mine {
+            grid-row-start: start;
+            grid-row-end: end;
+            grid-column-end: 1;
+            // TODO: DO something with this
+            // &::after {
+            //     content: '';
+            //     position: absolute;
+            //     left: 50%;
+            //     top: 50%;
+            //     width: 300px;
+            //     height: 400px;
+            //     border: dashed var(--primary-color) 10px;
+            //     transform: translate(-50%, -50%);
+            //     border-radius: 75% 75% 100% 100%;
+            //     opacity: 0.5;
+            // }
+            video {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+        .io {
+            grid-row-start: iostart;
+            grid-row-end: ioend;
+            grid-column-end: 1;
+            z-index: 2;
+        }
+        .actions {
+            grid-row-start: actionsstart;
+            grid-row-end: end;
+            grid-column-end: 1;
+            z-index: 2;
+            background: #ffffff90;
         }
     }
-    .io {
-        grid-row-start: iostart;
-        grid-row-end: ioend;
-        grid-column-end: 1;
-        z-index: 2;
-    }
-    .actions {
-        grid-row-start: actionsstart;
-        grid-row-end: end;
-        grid-column-end: 1;
-        z-index: 2;
-        background: #ffffff90;
-    }
-}
 </style>

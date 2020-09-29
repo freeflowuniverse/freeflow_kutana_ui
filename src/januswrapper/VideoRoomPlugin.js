@@ -1,4 +1,4 @@
-import store from '../plugins/vuex';
+import store from '@/plugins/vuex';
 import { generateDummyMediaStream } from '@/utils/mediaDevicesUtils';
 
 export class VideoRoomPlugin {

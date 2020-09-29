@@ -6,29 +6,30 @@ let bodypixNet;
 let canvas;
 let context;
 
-self.addEventListener('message', async (event) =>{
-    if(!bodypixNet){
+self.addEventListener('message', async event => {
+    if (!bodypixNet) {
         await tf.setBackend('webgl');
         await tf.ready();
         bodypixNet = await bodyPix.load({
             architecture: 'MobileNetV1',
             outputStride: 16,
             multiplier: 0.75,
-            quantBytes: 2
-
+            quantBytes: 2,
         });
-
     }
 
-    if(!canvas){
+    if (!canvas) {
         canvas = event.data.canvas;
         context = canvas.getContext('2d');
     }
 
-    context.drawImage(event.data.image, 0 , 0)
+    context.drawImage(event.data.image, 0, 0);
 
-    let personSegmentation = await bodypixNet.segmentPerson(context.getImageData(0,0,640,480), true);
+    let personSegmentation = await bodypixNet.segmentPerson(
+        context.getImageData(0, 0, 640, 480),
+        true
+    );
 
     // console.log(personSegmentation)
-    self.postMessage(personSegmentation)
-})
+    self.postMessage(personSegmentation);
+});

@@ -31,7 +31,7 @@ export default {
             }
 
             const userIndex = state.remoteUsers.findIndex(
-                u => u.uuid === user.uuid,
+                u => u.uuid === user.uuid
             );
 
             if (userIndex === -1) {
@@ -48,7 +48,9 @@ export default {
          */
         modifyMutedUsers(state, { tinyUser, muted }) {
             if (!muted) {
-                state.mutedUsers = state.mutedUsers.filter(mu => mu.uuid !== tinyUser.uuid);
+                state.mutedUsers = state.mutedUsers.filter(
+                    mu => mu.uuid !== tinyUser.uuid
+                );
                 return;
             }
             let mutedUsers = state.mutedUsers;
@@ -64,18 +66,22 @@ export default {
          */
         modifyMutedVideoUsers(state, { tinyUser, muted }) {
             if (!muted) {
-                state.mutedVideoUsers = state.mutedVideoUsers.filter(mvu => mvu.uuid !== tinyUser.uuid);
+                state.mutedVideoUsers = state.mutedVideoUsers.filter(
+                    mvu => mvu.uuid !== tinyUser.uuid
+                );
                 return;
             }
             let mutedVideoUsers = state.mutedVideoUsers;
             mutedVideoUsers.push(tinyUser);
-            state.mutedVideoUsers = mutedVideoUsers.filter((value, index, self) => {
-                return self.indexOf(value) === index;
-            });
+            state.mutedVideoUsers = mutedVideoUsers.filter(
+                (value, index, self) => {
+                    return self.indexOf(value) === index;
+                }
+            );
         },
         updateRemoteUser(state, user) {
             const userIndex = state.remoteUsers.findIndex(
-                u => u.id === user.id,
+                u => u.id === user.id
             );
             state.remoteUsers.splice(userIndex, 1, user);
         },

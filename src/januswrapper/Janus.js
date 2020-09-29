@@ -1,4 +1,4 @@
-import { Janus as JanusGateway } from "janus-gateway";
+import { Janus as JanusGateway } from 'janus-gateway';
 
 export class Janus {
     constructor(server) {
@@ -8,14 +8,14 @@ export class Janus {
 
     async initializeJanusGateway() {
         return new Promise((resolve, reject) => {
-//             console.log("Attempting to connect to: " + this.server)
+            //             console.log("Attempting to connect to: " + this.server)
             this.janusGateway = new JanusGateway({
                 server: this.server,
                 success: resolve,
                 error: reject,
-                destroyed: this.janusGatewayInitializationDestroyed
+                destroyed: this.janusGatewayInitializationDestroyed,
             });
-        })
+        });
     }
 
     janusGatewayInitializationDestroyed() {
@@ -23,12 +23,10 @@ export class Janus {
     }
 
     attachPlugin(plugin) {
-        plugin.addEventListener("attachSubscriberPlugin", (subscriberAttach) => {
+        plugin.addEventListener('attachSubscriberPlugin', subscriberAttach => {
             this.janusGateway.attach(subscriberAttach);
         });
 
         this.janusGateway.attach(plugin.attach());
     }
-
-
 }

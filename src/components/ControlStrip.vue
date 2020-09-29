@@ -107,142 +107,161 @@
     </v-row>
 </template>
 <script>
-import { mapActions, mapMutations, mapGetters } from 'vuex';
-import { updateCurrentStream } from '../utils/mediaDevicesUtils';
-import DeviceSelector from './DeviceSelector';
-import ScreenShareSelector from '@/components/ScreenShareSelector';
+    import { mapActions, mapMutations, mapGetters } from 'vuex';
+    import { updateCurrentStream } from '../utils/mediaDevicesUtils';
+    import DeviceSelector from './DeviceSelector';
+    import ScreenShareSelector from '@/components/ScreenShareSelector';
 
-export default {
-    components: {
-        ScreenShareSelector,
-        DeviceSelector,
-    },
-    data: () => {
-        return {
-            isMicLoading: false,
-            isCamLoading: false,
-            videoDevice: null,
-            audioDevice: null,
-        };
-    },
-    beforeDestroy() {
-        this.hangUp()
-    },
-    mounted() {
-        this.videoDevice = this.videoDeviceId;
-        this.audioDevice = this.audioDeviceId;
-    },
-    computed: {
-        ...mapGetters([
-            'userControl',
-            'localUser',
-            'localScreenUser',
-            'isMobile',
-            'videoDeviceId',
-            'mediaDeviceErrors',
-            'audioActive',
-            'videoActive',
-            'mediaDevices',
-            'audioDeviceId',
-            'videoDeviceId',
-            'dataChannel'
-        ]),
-        hasAudioError() {
-            return this.mediaDeviceErrors.hasOwnProperty('audio');
+    export default {
+        components: {
+            ScreenShareSelector,
+            DeviceSelector,
         },
-        hasVideoError() {
-            return this.mediaDeviceErrors.hasOwnProperty('video');
+        data: () => {
+            return {
+                isMicLoading: false,
+                isCamLoading: false,
+                videoDevice: null,
+                audioDevice: null,
+            };
         },
-        videoInputDevices() {
-            return this.mediaDevices.filter(
-                d => d.kind === 'videoinput' && d.label
-            );
+        beforeDestroy() {
+            this.hangUp();
         },
-        audioInputDevices() {
-            return this.mediaDevices.filter(
-                d => d.kind === 'audioinput' && d.label
-            );
+        mounted() {
+            this.videoDevice = this.videoDeviceId;
+            this.audioDevice = this.audioDeviceId;
         },
-        audioOutputDevices() {
-            return this.mediaDevices.filter(
-                d => d.kind === 'audiooutput' && d.label
-            );
+        computed: {
+            ...mapGetters([
+                'userControl',
+                'localUser',
+                'localScreenUser',
+                'isMobile',
+                'videoDeviceId',
+                'mediaDeviceErrors',
+                'audioActive',
+                'videoActive',
+                'mediaDevices',
+                'audioDeviceId',
+                'videoDeviceId',
+                'dataChannel',
+            ]),
+            hasAudioError() {
+                return this.mediaDeviceErrors.audio !== undefined;
+            },
+            hasVideoError() {
+                return this.mediaDeviceErrors.video !== undefined;
+            },
+            videoInputDevices() {
+                return this.mediaDevices.filter(
+                    d => d.kind === 'videoinput' && d.label
+                );
+            },
+            audioInputDevices() {
+                return this.mediaDevices.filter(
+                    d => d.kind === 'audioinput' && d.label
+                );
+            },
+            audioOutputDevices() {
+                return this.mediaDevices.filter(
+                    d => d.kind === 'audiooutput' && d.label
+                );
+            },
         },
-    },
-    methods: {
-        ...mapActions([
-            'getAudioStream',
-            'getVideoStream',
-            'updateAudioDevice',
-            'updateVideoDevice',
-        ]),
-        ...mapMutations([
-            'setLocalUser',
-            'toggleAudioActive',
-            'toggleVideoActive',
-        ]),
-        changeAudioInputTo(audioInputDeviceId) {
-            this.$ga.event('in-call-events', 'changeMic')
-            this.audioDevice = audioInputDeviceId;
-            this.updateAudioDevice(audioInputDeviceId);
-            updateCurrentStream();
+        methods: {
+            ...mapActions([
+                'getAudioStream',
+                'getVideoStream',
+                'updateAudioDevice',
+                'updateVideoDevice',
+            ]),
+            ...mapMutations([
+                'setLocalUser',
+                'toggleAudioActive',
+                'toggleVideoActive',
+            ]),
+            changeAudioInputTo(audioInputDeviceId) {
+                this.$ga.event('in-call-events', 'changeMic');
+                this.audioDevice = audioInputDeviceId;
+                this.updateAudioDevice(audioInputDeviceId);
+                updateCurrentStream();
+            },
+            changeVideoTo(videoDeviceId) {
+                this.$ga.event('in-call-events', 'changeCam');
+                this.videoDevice = videoDeviceId;
+                this.updateVideoDevice(videoDeviceId);
+                updateCurrentStream();
+            },
+            setLoading(isLoading) {
+                this.isMicLoading = isLoading;
+                this.isCamLoading = isLoading;
+            },
+            async toggleCam() {
+                this.setLoading(true);
+                this.toggleVideoActive();
+                await updateCurrentStream();
+                this.dataChannel.send(
+                    JSON.stringify({
+                        type: 'toggle_video',
+                        state: this.videoActive,
+                        user: this.localUser.id,
+                    })
+                );
+                //Arbitrary time
+                setTimeout(() => {
+                    this.setLoading(false);
+                }, 100);
+                this.$ga.event('in-call-events', 'toggleCam', this.videoActive);
+            },
+            async toggleMic() {
+                this.setLoading(true);
+                this.toggleAudioActive();
+                await updateCurrentStream();
+                this.dataChannel.send(
+                    JSON.stringify({
+                        type: 'toggle_audio',
+                        state: this.audioActive,
+                        user: this.localUser.id,
+                    })
+                );
+                //Arbitrary time
+                setTimeout(() => {
+                    this.setLoading(false);
+                }, 100);
+                this.$ga.event(
+                    'in-call-events',
+                    'toggleAudio',
+                    this.audioActive
+                );
+            },
+            changeScreen() {
+                this.$ga.event('in-call-events', 'changeScreen', false);
+                this.userControl.switchScreenShare();
+            },
+            toggleScreen() {
+                if (this.localScreenUser.screen) {
+                    this.$ga.event(
+                        'in-call-events',
+                        'toggleScreenShare',
+                        false
+                    );
+                    this.userControl.stopScreenShare();
+                    return;
+                }
+                this.$ga.event('in-call-events', 'toggleScreenShare', true);
+                this.userControl.startScreenShare();
+                setTimeout(() => {
+                    this.$forceUpdate();
+                }, 100);
+            },
+            async hangUp() {
+                this.$ga.event('after-call-events', 'endCall', 'button');
+                this.userControl.hangUp();
+                await this.$router.push({ name: 'home' });
+                location.reload();
+            },
         },
-        changeVideoTo(videoDeviceId) {
-            this.$ga.event('in-call-events', 'changeCam')
-            this.videoDevice = videoDeviceId;
-            this.updateVideoDevice(videoDeviceId);
-            updateCurrentStream();
-        },
-        setLoading(isLoading) {
-            this.isMicLoading = isLoading;
-            this.isCamLoading = isLoading;
-        },
-        async toggleCam() {
-            this.setLoading(true);
-            this.toggleVideoActive();
-            await updateCurrentStream();
-            this.dataChannel.send(JSON.stringify({ type: "toggle_video", state: this.videoActive, user: this.localUser.id }));
-            //Arbitrary time
-            setTimeout(() => {
-                this.setLoading(false);
-            }, 100);
-            this.$ga.event('in-call-events', 'toggleCam', this.videoActive)
-        },
-        async toggleMic() {
-            this.setLoading(true);
-            this.toggleAudioActive();
-            await updateCurrentStream();
-            this.dataChannel.send(JSON.stringify({ type: "toggle_audio", state: this.audioActive, user: this.localUser.id }));
-            //Arbitrary time
-            setTimeout(() => {
-                this.setLoading(false);
-            }, 100);
-            this.$ga.event('in-call-events', 'toggleAudio', this.audioActive)
-        },
-        changeScreen() {
-                this.$ga.event('in-call-events', 'changeScreen', false)
-            this.userControl.switchScreenShare();
-        },
-        toggleScreen() {
-            if (this.localScreenUser.screen) {
-                this.$ga.event('in-call-events', 'toggleScreenShare', false)
-                this.userControl.stopScreenShare();
-                return;
-            }
-            this.$ga.event('in-call-events', 'toggleScreenShare', true)
-            this.userControl.startScreenShare();
-            setTimeout(() => {
-                this.$forceUpdate();
-            }, 100);
-        },
-        async hangUp() {
-            this.$ga.event('after-call-events', 'endCall', 'button')
-            this.userControl.hangUp();
-            await this.$router.push({ name: 'home' });
-            location.reload();
-        },
-    },
-};
+    };
 </script>
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

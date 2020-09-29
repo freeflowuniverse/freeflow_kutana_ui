@@ -1,10 +1,5 @@
 <template>
-    <div
-        :class="classes"
-        class="janus-video"
-        ref="videoAndMore"
-    >
-
+    <div :class="classes" class="janus-video" ref="videoAndMore">
         <video
             :src-object.prop.camel="stream"
             autoplay
@@ -15,8 +10,10 @@
         <div v-if="overlay" class="overlay">
             <div class="overlay-container">
                 <p>
-                    We're showing this overlay to reduce the "infinity mirror effect". <br>
-                    All other participants can see your screen without this notification.
+                    We're showing this overlay to reduce the "infinity mirror
+                    effect". <br />
+                    All other participants can see your screen without this
+                    notification.
                 </p>
             </div>
         </div>

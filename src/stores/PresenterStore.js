@@ -1,7 +1,7 @@
 export default {
     state: {
         presentingModeActive: false,
-        presenter: null
+        presenter: null,
     },
     mutations: {
         setPresenter(state, presenter) {
@@ -20,26 +20,26 @@ export default {
                 sender: getters.localUser.username,
                 type: 'presenter_started',
                 backgroundImage: getters.wallpaperDataUrl,
-                id: getters.localUser.id
+                id: getters.localUser.id,
             });
         },
         stopPresenting({ dispatch, getters }) {
             dispatch('sendSignal', {
                 sender: getters.localUser.username,
                 type: 'presenter_ended',
-                id: getters.localUser.id
+                id: getters.localUser.id,
             });
         },
         changePresenterSettings({ dispatch, getters }, background) {
             dispatch('sendSignal', {
                 type: 'presenter_change_settings',
                 backgroundImage: background,
-                id: getters.localUser.id
+                id: getters.localUser.id,
             });
         },
         setPresenter({ commit, dispatch }, { presenter, backgroundImage }) {
-            if(!presenter) {
-                return
+            if (!presenter) {
+                return;
             }
             presenter.presenting = true;
             presenter.backgroundImage = backgroundImage;
@@ -49,10 +49,10 @@ export default {
         removePresenter({ commit }, presenter) {
             commit('selectUser', { id: presenter.id, pinned: false });
             commit('removePresenter');
-        }
+        },
     },
     getters: {
         presentingModeActive: state => state.presentingModeActive,
-        presenter: state => state.presenter
-    }
-}
+        presenter: state => state.presenter,
+    },
+};

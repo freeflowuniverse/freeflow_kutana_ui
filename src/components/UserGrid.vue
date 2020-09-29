@@ -160,6 +160,7 @@
             },
             checkActiveVideoStreams() {
                 return;
+                // eslint-disable-next-line no-unreachable
                 this.pollingVideoStreams = setInterval(() => {
                     for (const user of this.remoteUsers) {
                         const remoteUser = user;

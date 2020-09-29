@@ -28,19 +28,29 @@
                     </svg>
                 </span>
             </v-btn>
-            <v-btn v-if="user.uuid !== localUser.uuid" dark icon small @click="toggleMute">
-                <v-icon small
-                >{{ muted ? 'mic_off' : 'mic' }}
-                </v-icon>
+            <v-btn
+                v-if="user.uuid !== localUser.uuid"
+                dark
+                icon
+                small
+                @click="toggleMute"
+            >
+                <v-icon small>{{ muted ? 'mic_off' : 'mic' }} </v-icon>
             </v-btn>
-            <v-btn v-if="user.uuid !== localUser.uuid" dark icon small @click="toggleMuteVideo">
+            <v-btn
+                v-if="user.uuid !== localUser.uuid"
+                dark
+                icon
+                small
+                @click="toggleMuteVideo"
+            >
                 <v-icon small
-                >{{ mutedVideo ? 'videocam_off' : 'videocam' }}
+                    >{{ mutedVideo ? 'videocam_off' : 'videocam' }}
                 </v-icon>
             </v-btn>
             <v-btn dark icon small @click="toggleFullscreen">
                 <v-icon small
-                >{{ fullScreenUser ? 'fullscreen_exit' : 'fullscreen' }}
+                    >{{ fullScreenUser ? 'fullscreen_exit' : 'fullscreen' }}
                 </v-icon>
             </v-btn>
         </div>
@@ -56,8 +66,8 @@
             <div :class="{ blurred: selected }" class="avatar">
                 <img :alt="user.username" :src="avatar" />
                 <span v-if="userLabel" class="video-label">{{
-                        userLabel
-                    }}</span>
+                    userLabel
+                }}</span>
             </div>
             <JanusVideo
                 v-if="!mutedVideo && user.screen"
@@ -79,7 +89,6 @@
     </div>
 </template>
 <script>
-    import { AvatarGenerator } from 'random-avatar-generator';
     import JanusVideo from './JanusVideo';
     import { mapActions, mapGetters, mapMutations } from 'vuex';
     import UserPresenter from '@/components/UserPresenter';
@@ -145,17 +154,17 @@
             ]),
             borderStyle() {
                 const primaryColor = getComputedStyle(
-                    document.querySelector('#app'),
+                    document.querySelector('#app')
                 ).getPropertyValue('--primary-color');
                 const colorRegex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
-                    primaryColor,
+                    primaryColor
                 );
                 const color = colorRegex
                     ? {
-                        r: parseInt(colorRegex[1], 16),
-                        g: parseInt(colorRegex[2], 16),
-                        b: parseInt(colorRegex[3], 16),
-                    }
+                          r: parseInt(colorRegex[1], 16),
+                          g: parseInt(colorRegex[2], 16),
+                          b: parseInt(colorRegex[3], 16),
+                      }
                     : null;
 
                 let volume = 0;
@@ -173,9 +182,8 @@
                 return this.presenter && this.presenter.id === this.user.id;
             },
             avatar() {
-                const generator = new AvatarGenerator();
                 return `https://avatars.dicebear.com/api/human/${this.hashString(
-                    this.$props.user.username,
+                    this.$props.user.username
                 )}.svg`;
             },
             userLabel() {
@@ -193,12 +201,18 @@
                 return this.mutedUsers.find(mu => mu.uuid === this.user.uuid);
             },
             mutedVideo() {
-                return this.mutedVideoUsers.find(mvu => mvu.uuid === this.user.uuid);
+                return this.mutedVideoUsers.find(
+                    mvu => mvu.uuid === this.user.uuid
+                );
             },
         },
         methods: {
             ...mapActions(['selectUser', 'unSelectUser']),
-            ...mapMutations(['setFullscreenUser', 'modifyMutedUsers', 'modifyMutedVideoUsers']),
+            ...mapMutations([
+                'setFullscreenUser',
+                'modifyMutedUsers',
+                'modifyMutedVideoUsers',
+            ]),
             selectThisUser() {
                 if (!this.extendedControls) {
                     return;
@@ -219,15 +233,18 @@
             },
             toggleFullscreen() {
                 if (this.fullScreenUser) {
-                    this.$ga.event('in-call-events', 'toggleFullScreen', false)
+                    this.$ga.event('in-call-events', 'toggleFullScreen', false);
                     this.setFullscreenUser(null);
                     return;
                 }
-                this.$ga.event('in-call-events', 'toggleFullScreen', true)
+                this.$ga.event('in-call-events', 'toggleFullScreen', true);
                 this.setFullscreenUser(this.user);
             },
             toggleMute() {
-                this.modifyMutedUsers({ tinyUser: { uuid: this.user.uuid, id: this.user.id }, muted: !this.muted });
+                this.modifyMutedUsers({
+                    tinyUser: { uuid: this.user.uuid, id: this.user.id },
+                    muted: !this.muted,
+                });
             },
             toggleMuteVideo() {
                 this.modifyMutedVideoUsers({

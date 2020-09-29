@@ -1,5 +1,4 @@
 const webpack = require('webpack');
-const fs = require('fs');
 
 module.exports = {
     transpileDependencies: ['vuetify'],
@@ -65,9 +64,9 @@ module.exports = {
     },
 
     pwa: {
-      name: 'FreeFlowConnect',
-      manifestOptions: {
-        background_color: '#FFFFFF'
-      }
-    }
+        name: 'FreeFlowConnect',
+        manifestOptions: {
+            background_color: '#FFFFFF',
+        },
+    },
 };

@@ -2,9 +2,13 @@
     <section class="theChatInput pa-4">
         <v-form @submit.prevent="forwardMessage" class="form px-2">
             <v-row align="center">
-
-            <input @change="fileUploaded" ref="fileUpper" style="display:none" type="file"/>
-            <v-textarea
+                <input
+                    @change="fileUploaded"
+                    ref="fileUpper"
+                    style="display:none"
+                    type="file"
+                />
+                <v-textarea
                     @keydown.enter.prevent
                     @keydown.enter.shift.exact="message += '\n'"
                     @keyup.enter.exact="forwardMessage"
@@ -16,10 +20,10 @@
                     rows="1"
                     v-model="message"
                     outlined
-            />
-            <v-btn @click="forwardMessage" :disabled="!canSend" icon>
-                <v-icon>send</v-icon>
-            </v-btn>
+                />
+                <v-btn @click="forwardMessage" :disabled="!canSend" icon>
+                    <v-icon>send</v-icon>
+                </v-btn>
             </v-row>
         </v-form>
     </section>
@@ -41,14 +45,14 @@
         computed: {
             ...mapGetters(["account", "localUser"]),
             canSend() {
-                return this.message && this.message.trim()
+                return this.message && this.message.trim();
             }
         },
         methods: {
             ...mapActions(["sendMessage", "setSnackbarMessage"]),
             forwardMessage() {
                 if (!this.canSend) {
-                    return
+                    return;
                 }
                 this.sendIt(this.message);
             },
@@ -95,5 +99,4 @@
     };
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

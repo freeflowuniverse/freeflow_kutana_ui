@@ -11,42 +11,60 @@
         </div>
 
         <div v-if="localUser">
-            <video :src-object.prop.camel="localUser.stream" autoplay muted playsinline></video>
-<!--            <audio :src-object.prop.camel="localUser.stream" autoplay muted></audio>-->
+            <video
+                :src-object.prop.camel="localUser.stream"
+                autoplay
+                muted
+                playsinline
+            ></video>
+            <!--            <audio :src-object.prop.camel="localUser.stream" autoplay muted></audio>-->
         </div>
 
         <div v-if="remoteUsers">
             <div :key="user.id" v-for="user of remoteUsers">
-                <video :src-object.prop.camel="user.stream" autoplay muted playsinline></video>
-<!--                <audio :src-object.prop.camel="user.stream" autoplay></audio>-->
+                <video
+                    :src-object.prop.camel="user.stream"
+                    autoplay
+                    muted
+                    playsinline
+                ></video>
+                <!--                <audio :src-object.prop.camel="user.stream" autoplay></audio>-->
             </div>
         </div>
-
     </div>
 </template>
 
 <script>
-    import {initializeJanus} from "../services/JanusService";
-    import config from "../../public/config";
-    import { mapGetters } from "vuex";
+    import { initializeJanus } from '../services/JanusService';
+    import config from '../../public/config';
+    import { mapGetters } from 'vuex';
 
     export default {
         data() {
             return {
-                janusFunctions: null
+                janusFunctions: null,
             };
         },
         computed: {
-            ...mapGetters(["localUser", "remoteUsers"]),
+            ...mapGetters(['localUser', 'remoteUsers']),
         },
         async mounted() {
-            const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true,
+            });
 
-            const userName = localStorage.getItem("account").name;
-            const teamName = localStorage.getItem("teamName");
-            const opaqueId = "123";
+            const userName = localStorage.getItem('account').name;
+            const teamName = localStorage.getItem('teamName');
+            const opaqueId = '123';
 
-            this.janusFunctions = await initializeJanus(config.janusServer, opaqueId, userName || 'test', this.hashString(teamName), stream);
+            this.janusFunctions = await initializeJanus(
+                config.janusServer,
+                opaqueId,
+                userName || 'test',
+                this.hashString(teamName),
+                stream
+            );
         },
 
         methods: {
@@ -65,24 +83,29 @@
                 await this.janusFunctions.startCamera();
             },
             async startMicrophone() {
-                const stream = await navigator.mediaDevices.getUserMedia({video: false, audio: true})
-                await this.videoRoomPlugin.publishTrack(stream.getAudioTracks()[0]);
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: false,
+                    audio: true,
+                });
+                await this.videoRoomPlugin.publishTrack(
+                    stream.getAudioTracks()[0]
+                );
             },
             stopScreenshare() {
                 this.localUser.stream.getVideoTracks()[0].stop();
             },
             stopCamera() {
                 this.localUser.stream.getVideoTracks()[0].stop();
-                this.isVideoAuthorised = false
+                this.isVideoAuthorised = false;
             },
             stopMicrophone() {
                 this.ownUserStream.getAudioTracks()[0].stop();
             },
             updateLocalPreferences(userStream) {
-                userStream.getTracks().forEach((track) => {
+                userStream.getTracks().forEach(track => {
                     const kind = track.kind;
 
-                    if (kind !== "video") {
+                    if (kind !== 'video') {
                         return;
                     }
 
@@ -91,11 +114,15 @@
                             return;
                         }
 
-                        const stream = await navigator.mediaDevices.getUserMedia({video: true})
-                        await this.videoRoomPlugin.publishTrack(stream.getTracks()[0]);
-                    }
+                        const stream = await navigator.mediaDevices.getUserMedia(
+                            { video: true }
+                        );
+                        await this.videoRoomPlugin.publishTrack(
+                            stream.getTracks()[0]
+                        );
+                    };
                 });
-            }
-        }
+            },
+        },
     };
 </script>

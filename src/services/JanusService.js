@@ -1,6 +1,6 @@
 import { JanusBuilder } from '../januswrapper/JanusBuilder';
 import { VideoRoomPlugin } from '../januswrapper/VideoRoomPlugin';
-import store from '../plugins/vuex';
+import store from '@/plugins/vuex';
 
 /**
  * @param {String} serverUrl
@@ -181,7 +181,7 @@ export const initializeJanus = async (
         .build();
 
     // @todo: remove this, is used in muiltiple places tho
-    window.janusshizzle = { screenShareRoomPlugin, videoRoomPlugin };
+    window.janusshizzle = { screenShareRoomPlugin, videoRoomPlugin, janus };
 
     return {
         startScreenShare: async () => {

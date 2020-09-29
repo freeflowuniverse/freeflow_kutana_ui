@@ -12,7 +12,7 @@ export default {
         },
         stopActiveBackgroundTrack(state) {
             state.backgroundTrack.stop();
-        }
+        },
     },
     actions: {
         changeCameraBackground({ commit }, wallpaperFile) {
@@ -24,7 +24,7 @@ export default {
             fileReader.readAsDataURL(wallpaperFile);
             fileReader.onload = function() {
                 commit('setWallpaperDataUrl', fileReader.result);
-            }
+            };
         },
         setBackgroundTrack({ commit }, backgroundTrack) {
             commit('setBackgroundTrack', backgroundTrack);
@@ -34,10 +34,12 @@ export default {
                 return;
             }
             commit('stopActiveBackgroundTrack');
-        }
+        },
     },
     getters: {
         wallpaperDataUrl: state => state.wallpaperDataUrl,
-        removeBackgroundSupported: () => /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor),
+        removeBackgroundSupported: () =>
+            /Chrome/.test(navigator.userAgent) &&
+            /Google Inc/.test(navigator.vendor),
     },
 };

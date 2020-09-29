@@ -1,12 +1,11 @@
 import '@tensorflow/tfjs-backend-webgl';
 import * as bodyPix from '@tensorflow-models/body-pix';
-import store from '../plugins/vuex';
+import store from '@/plugins/vuex';
 
 let bodyPixNet;
 let renderBackground;
 
 class BackGroundRemovalService {
-
     constructor(videoTrack, background = null) {
         this.videoTrack = videoTrack;
         this.imageCapture = new ImageCapture(this.videoTrack);
@@ -29,44 +28,46 @@ class BackGroundRemovalService {
     }
 
     createCanvas() {
-        if (!document.getElementById("bufferCanvas")) {
-            this.bufferCanvas = document.createElement("canvas");
+        if (!document.getElementById('bufferCanvas')) {
+            this.bufferCanvas = document.createElement('canvas');
             this.bufferCanvas.id = 'bufferCanvas';
 
-            this.bufferCanvas.width = this.width
-            this.bufferCanvas.height = this.height
+            this.bufferCanvas.width = this.width;
+            this.bufferCanvas.height = this.height;
 
             this.bufferCanvas.style.display = 'none';
 
             document.body.appendChild(this.bufferCanvas);
         }
 
-        if (!document.getElementById("presenterCanvas")) {
-            this.presenterCanvas = document.createElement("canvas");
+        if (!document.getElementById('presenterCanvas')) {
+            this.presenterCanvas = document.createElement('canvas');
             this.presenterCanvas.id = 'presenterCanvas';
 
-            this.presenterCanvas.width = this.width
-            this.presenterCanvas.height = this.height
+            this.presenterCanvas.width = this.width;
+            this.presenterCanvas.height = this.height;
 
             this.presenterCanvas.style.display = 'none';
 
             document.body.appendChild(this.presenterCanvas);
         }
 
-        this.bufferCanvas = document.getElementById("bufferCanvas");
-        this.presenterCanvas = document.getElementById("presenterCanvas");
+        this.bufferCanvas = document.getElementById('bufferCanvas');
+        this.presenterCanvas = document.getElementById('presenterCanvas');
 
-        this.bufferContext = this.bufferCanvas.getContext("2d");
-        this.presenterContext = this.presenterCanvas.getContext("2d");
+        this.bufferContext = this.bufferCanvas.getContext('2d');
+        this.presenterContext = this.presenterCanvas.getContext('2d');
     }
 
     async getFrameFromVideo() {
         let image = new Image();
         try {
-            const capture = await this.imageCapture.grabFrame()
-            image = await createImageBitmap(capture)
-        } catch {}
-        return image
+            const capture = await this.imageCapture.grabFrame();
+            image = await createImageBitmap(capture);
+        } catch {
+            return image;
+        }
+        return image;
     }
 
     async startBackgroundRemoval() {
@@ -90,9 +91,18 @@ class BackGroundRemovalService {
             }
 
             const frame = await this.getFrameFromVideo();
-            this.bufferContext.drawImage(frame, 0, 0, this.bufferCanvas.width, this.bufferCanvas.height);
+            this.bufferContext.drawImage(
+                frame,
+                0,
+                0,
+                this.bufferCanvas.width,
+                this.bufferCanvas.height
+            );
 
-            const personSegmentation = await bodyPixNet.segmentPerson(this.bufferCanvas, true);
+            const personSegmentation = await bodyPixNet.segmentPerson(
+                this.bufferCanvas,
+                true
+            );
 
             const foregroundColor = { r: 0, g: 0, b: 0, a: 255 };
             const backgroundColor = { r: 255, g: 0, b: 0, a: 0 };
@@ -114,11 +124,12 @@ class BackGroundRemovalService {
                 maskBlurAmount
             );
 
-            this.presenterContext.globalCompositeOperation = "source-in";
+            this.presenterContext.globalCompositeOperation = 'source-in';
             this.presenterContext.drawImage(frame, 0, 0);
 
             if (this.backgroundImage && !store.getters.presentingModeActive) {
-                this.presenterContext.globalCompositeOperation = 'destination-over';
+                this.presenterContext.globalCompositeOperation =
+                    'destination-over';
                 drawImageScaled(this.backgroundImage, this.presenterContext);
             }
         }, 200);

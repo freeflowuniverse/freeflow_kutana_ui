@@ -26,12 +26,19 @@
                 >
                     <span
                         class="grey--text text--lighten-1 font-weight-light overline"
-                    >{{ message.createdAt | parseToTime }}</span>
+                        >{{ message.createdAt | parseToTime }}</span
+                    >
                     <v-divider class="mb-1"></v-divider>
                 </div>
                 <div :key="index">
                     <TheChatMessage
-                        :dense="!showDivider(message, index) && message && messages[index - 1] && message.senderId === messages[index - 1].senderId"
+                        :dense="
+                            !showDivider(message, index) &&
+                                message &&
+                                messages[index - 1] &&
+                                message.senderId ===
+                                    messages[index - 1].senderId
+                        "
                         :message="message"
                     />
                 </div>
@@ -43,62 +50,62 @@
     </v-card>
 </template>
 <script>
-import moment from 'moment';
-import TheChatMessage from './TheChatMessage';
-import { mapGetters } from 'vuex';
-import autoScroll from '../directives/autoScroll';
-import TheChatInput from './TheChatInput';
+    import moment from 'moment';
+    import TheChatMessage from './TheChatMessage';
+    import { mapGetters } from 'vuex';
+    import autoScroll from '../directives/autoScroll';
+    import TheChatInput from './TheChatInput';
 
-export default {
-    directives: {
-        autoScroll,
-    },
-    components: {
-        TheChatMessage,
-        TheChatInput,
-    },
-    props: {
-        selectedUser: {
-            required: true,
+    export default {
+        directives: {
+            autoScroll,
         },
-    },
-    computed: {
-        ...mapGetters(['messages', 'isMobile']),
-    },
-    methods: {
-        showDivider(message, index) {
-            const previousMessage = this.messages[index - 1];
-            if (!previousMessage) {
-                return true;
-            }
-            const time = moment(message.createdAt);
+        components: {
+            TheChatMessage,
+            TheChatInput,
+        },
+        props: {
+            selectedUser: {
+                required: true,
+            },
+        },
+        computed: {
+            ...mapGetters(['messages', 'isMobile']),
+        },
+        methods: {
+            showDivider(message, index) {
+                const previousMessage = this.messages[index - 1];
+                if (!previousMessage) {
+                    return true;
+                }
+                const time = moment(message.createdAt);
 
-            return time.diff(previousMessage.createdAt, 'm') > 5;
+                return time.diff(previousMessage.createdAt, 'm') > 5;
+            },
         },
-    },
-};
+    };
 </script>
 <style lang="scss" scoped>
-.chatGrid {
-    height: 100%;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    grid-template-areas: 'header' 'inner' 'input';
-    border-radius: 0px !important;
-    .header {
-        grid-area: header;
-    }
-    .inner {
-        grid-area: inner;
-        position: absolute;
+    .chatGrid {
         height: 100%;
-        overflow: auto;
-    }
-    .input {
-        grid-area: input;
-        .theChatInput {
-            width: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas: 'header' 'inner' 'input';
+        border-radius: 0px !important;
+        .header {
+            grid-area: header;
+        }
+        .inner {
+            grid-area: inner;
+            position: absolute;
+            height: 100%;
+            overflow: auto;
+        }
+        .input {
+            grid-area: input;
+            .theChatInput {
+                width: 100%;
+            }
         }
     }
-}
 </style>

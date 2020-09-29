@@ -1,5 +1,5 @@
-import router from '../plugins/router';
-import store from '../plugins/vuex';
+import router from '@/plugins/router';
+import store from '@/plugins/vuex';
 
 router.beforeEach((to, from, next) => {
     const account = JSON.parse(localStorage.getItem('account'));

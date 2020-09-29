@@ -1,5 +1,4 @@
-import random from '../plugins/random';
-import moment from 'moment';
+import random from '@/plugins/random';
 import ffcService from '../services/ffcService';
 
 export default {

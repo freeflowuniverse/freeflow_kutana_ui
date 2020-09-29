@@ -3,7 +3,7 @@ export default {
         localScreenUser: null,
         remoteScreenUsers: [],
         screenUserControl: null,
-        isChangingScreenShare: false
+        isChangingScreenShare: false,
     },
     mutations: {
         setLocalScreenUser(state, screenUser) {
@@ -13,12 +13,16 @@ export default {
             state.screenUserControl = screenUserControl;
         },
         addRemoteScreenUser(state, screenUser) {
-
-            if (state.localScreenUser && state.localScreenUser.id === screenUser.id) {
+            if (
+                state.localScreenUser &&
+                state.localScreenUser.id === screenUser.id
+            ) {
                 return;
             }
 
-            const screenUserIndex = state.remoteScreenUsers.findIndex(u => u.id === screenUser.id);
+            const screenUserIndex = state.remoteScreenUsers.findIndex(
+                u => u.id === screenUser.id
+            );
 
             if (screenUserIndex === -1) {
                 state.remoteScreenUsers.push(screenUser);
@@ -28,42 +32,48 @@ export default {
             state.remoteScreenUsers.splice(screenUserIndex, 1, screenUser);
         },
         deleteRemoteScreenUser(state, screenUser) {
-            state.remoteScreenUsers = state.remoteScreenUsers.filter(u => u.id !== screenUser.id);
+            state.remoteScreenUsers = state.remoteScreenUsers.filter(
+                u => u.id !== screenUser.id
+            );
         },
         setChangingScreenShare(state, isActive) {
             state.isChangingScreenShare = isActive;
-        }
+        },
     },
     actions: {
-        findScreenUserById({getters}, id) {
-            return getters.allScreenUsers.find(screenUser => screenUser.id === id);
+        findScreenUserById({ getters }, id) {
+            return getters.allScreenUsers.find(
+                screenUser => screenUser.id === id
+            );
         },
-        findScreenUserByName({getters}, name) {
-            return getters.allScreenUsers.find(screenUser => screenUser.name === name);
+        findScreenUserByName({ getters }, name) {
+            return getters.allScreenUsers.find(
+                screenUser => screenUser.name === name
+            );
         },
         startScreenSharing({ dispatch, getters }) {
             dispatch('sendSignal', {
                 sender: getters.localScreenUser.username,
-                type: "screenshare_started"
+                type: 'screenshare_started',
             });
         },
         stopScreenSharing({ dispatch, getters }) {
             dispatch('sendSignal', {
                 sender: getters.localScreenUser.username,
-                type: "screenshare_stopped"
+                type: 'screenshare_stopped',
             });
-        }
+        },
     },
     getters: {
         localScreenUser: state => state.localScreenUser,
         remoteScreenUsers: state => state.remoteScreenUsers,
         allScreenUsers: state => {
-            if (!state.localScreenUser ){
-                return state.remoteScreenUsers
+            if (!state.localScreenUser) {
+                return state.remoteScreenUsers;
             }
             return [state.localScreenUser, ...state.remoteScreenUsers];
         },
         screenUserControl: state => state.screenUserControl,
-        isChangingScreenShare: state => state.isChangingScreenShare
-    }
+        isChangingScreenShare: state => state.isChangingScreenShare,
+    },
 };

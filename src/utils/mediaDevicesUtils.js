@@ -184,10 +184,13 @@ export const generateDummyMediaStream = (
     if (audio) {
         if (!dummyStreamAudioContext) {
             // console.log('generating new AudioContext');
-            dummyStreamAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            dummyStreamAudioContext = new (window.AudioContext ||
+                window.webkitAudioContext)();
         }
         let oscillator = dummyStreamAudioContext.createOscillator();
-        let dst = oscillator.connect(dummyStreamAudioContext.createMediaStreamDestination());
+        let dst = oscillator.connect(
+            dummyStreamAudioContext.createMediaStreamDestination()
+        );
 
         oscillator.start();
         let emptyAudio = Object.assign(dst.stream.getAudioTracks()[0], {

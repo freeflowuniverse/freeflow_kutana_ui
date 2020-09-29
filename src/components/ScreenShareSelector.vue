@@ -2,8 +2,14 @@
     <v-btn-toggle rounded class="primary mr-1" dark>
         <v-tooltip top>
             <template v-slot:activator="{ on: tooltip }">
-                <v-btn class="primary" @click="$emit('toggle')" v-on="{ ...tooltip}">
-                    <v-icon>{{ isActive ? 'stop_screen_share' : 'screen_share' }}</v-icon>
+                <v-btn
+                    class="primary"
+                    @click="$emit('toggle')"
+                    v-on="{ ...tooltip }"
+                >
+                    <v-icon>{{
+                        isActive ? 'stop_screen_share' : 'screen_share'
+                    }}</v-icon>
                 </v-btn>
             </template>
             <span>{{ isActive ? 'Stop' : 'Start' }} screen sharing</span>
@@ -31,21 +37,21 @@
     </v-btn-toggle>
 </template>
 <script>
-export default {
-    name: 'ScreenShareSelector',
-    props: {
-        isActive: {
-            type: Boolean,
-            default: false,
+    export default {
+        name: 'ScreenShareSelector',
+        props: {
+            isActive: {
+                type: Boolean,
+                default: false,
+            },
         },
-    },
-};
+    };
 </script>
 <style lang="scss" scoped>
-.v-btn {
-    padding: 17px 5px !important;
-}
-.v-btn.small {
-    min-width: 0 !important;
-}
+    .v-btn {
+        padding: 17px 5px !important;
+    }
+    .v-btn.small {
+        min-width: 0 !important;
+    }
 </style>

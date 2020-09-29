@@ -1,8 +1,7 @@
-import { Janus as JanusGateway } from "janus-gateway";
-import { Janus } from "./Janus";
+import { Janus as JanusGateway } from 'janus-gateway';
+import { Janus } from './Janus';
 
 export class JanusBuilder {
-
     constructor(server, debug) {
         this.server = server;
         this.debug = debug;
@@ -34,13 +33,13 @@ export class JanusBuilder {
                 debug: this.debug,
                 callback: function() {
                     if (!JanusGateway.isWebrtcSupported()) {
-                        reject("No WebRTC support... ");
+                        reject('No WebRTC support... ');
                         return;
                     }
 
                     resolve();
-                }
+                },
             });
-        })
+        });
     }
 }

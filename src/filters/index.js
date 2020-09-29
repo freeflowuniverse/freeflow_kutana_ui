@@ -1,15 +1,14 @@
 import Vue from 'vue';
-import moment from 'moment'
+import moment from 'moment';
 
-Vue.filter('parseToTime', (time) => {
+Vue.filter('parseToTime', time => {
     return moment(time).format('h:mm');
-})
+});
 
 Vue.filter('truncate', (input, length = 5) => {
     if (input.length > length) {
-        return input.substring(0,length) + '...';
+        return input.substring(0, length) + '...';
+    } else {
+        return input;
     }
-   else {
-       return input;
-    }
-})
+});

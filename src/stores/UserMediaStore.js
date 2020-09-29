@@ -1,5 +1,8 @@
 import Vue from 'vue';
-import { disableVideoStream, disableAudioStream } from '@/utils/mediaDevicesUtils';
+import {
+    disableVideoStream,
+    disableAudioStream,
+} from '@/utils/mediaDevicesUtils';
 
 export default {
     state: {
@@ -8,7 +11,7 @@ export default {
         audioActive: true,
         videoActive: true,
         mediaDevices: [],
-        mediaDeviceErrors: {}
+        mediaDeviceErrors: {},
     },
     mutations: {
         setVideoDeviceId(state, deviceId) {
@@ -21,10 +24,10 @@ export default {
             state.mediaDevices = devices;
         },
         setMediaDeviceError(state, error) {
-            Vue.set(state.mediaDeviceErrors, error.type, error.message)
+            Vue.set(state.mediaDeviceErrors, error.type, error.message);
         },
         clearMediaDeviceError(state) {
-          state.mediaDeviceErrors = {};
+            state.mediaDeviceErrors = {};
         },
         toggleAudioActive(state) {
             state.audioActive = !state.audioActive;
@@ -79,7 +82,10 @@ export default {
                 dispatch('refreshMediaDevices');
                 return stream;
             } catch (e) {
-                commit('setMediaDeviceError', { type: 'video', message: e.message});
+                commit('setMediaDeviceError', {
+                    type: 'video',
+                    message: e.message,
+                });
             }
         },
         async getAudioStream({ commit, getters, dispatch }) {
@@ -106,7 +112,10 @@ export default {
 
                 return stream;
             } catch (e) {
-                commit('setMediaDeviceError', { type: 'audio', message: e.message});
+                commit('setMediaDeviceError', {
+                    type: 'audio',
+                    message: e.message,
+                });
             }
         },
         async findDeviceId(_, { kind, label }) {
@@ -121,6 +130,6 @@ export default {
         mediaDevices: state => state.mediaDevices,
         mediaDeviceErrors: state => state.mediaDeviceErrors,
         audioActive: state => state.audioActive,
-        videoActive: state => state.videoActive
+        videoActive: state => state.videoActive,
     },
 };
