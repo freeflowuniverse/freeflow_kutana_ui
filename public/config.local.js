@@ -3,9 +3,9 @@ export default {
     appId: window.location.host,
     scope: JSON.stringify({ doubleName: true }),
     redirect_url: `?callback=true`,
-    botFrontEnd: "https://login.staging.jimber.org/",
-    botBackend: "https://login.staging.jimber.org/",
+    botFrontEnd: 'https://login.staging.jimber.org/',
+    botBackend: 'https://login.staging.jimber.org/',
     debugJanus: false,
-    janusServer: "https://janus.staging.jimber.org/janus",
-    gaId: "UA-150836145-1"
-}
+    janusServer: 'https://janus.staging.jimber.org/janus',
+    gaId: 'UA-150836145-1',
+};
