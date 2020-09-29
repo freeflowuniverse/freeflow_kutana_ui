@@ -6,7 +6,7 @@ import config from '../../public/config';
 
 Vue.use(
     new VueSocketIO({
-        debug: true,
+        debug: false,
         secure: true,
         connection: io(config.ffcBackend),
         vuex: {
