@@ -121,6 +121,42 @@
                 </span>
             </v-card>
         </v-dialog>
+        <v-dialog :value="displayPermissionDialog" width="600" persistent>
+            <v-card>
+                <v-card-title> FreeFlowConnect </v-card-title>
+                <v-card-text>
+                    For others to see and hear you, your browser will request
+                    access to your cam and mic. <br />
+                    You can still turn them back off at any time.
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn text @click="requestPermission"
+                        >Request permissions</v-btn
+                    >
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog :value="displaySecondPermissionDialog" width="600" persistent>
+            <v-card>
+                <v-card-title>
+                    FreeFlowConnect can't access your devices</v-card-title
+                >
+                <v-card-text>
+                    FreeFlowConnect still can't access your devices. You can
+                    still continue without or enable them in the in your browser
+                    settings and then retrying.
+                    {{this.shouldRequest}}
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn text @click="closeDialogAndRefreshLocalStream"
+                        >Continue</v-btn
+                    >
+                    <v-btn text @click="requestPermission">Retry</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </section>
 </template>
 <script>
@@ -157,22 +193,32 @@ export default {
                     name.match(/^[a-z0-9\-]+$/i) !== null ||
                     'Please use letters and numbers only (or a dash)',
             ],
+            displayPermissionDialog: false,
+            shouldRequest: { audio: false, video: false },
+            displaySecondPermissionDialog: false,
         };
     },
     mounted() {
         this.getBackgroundOfMine();
-        if (this.$route.query.callback) {
-            this.checkResponse(window.location.href);
-        }
-        if (!this.account) {
-            this.showLogin = true;
-        }
+        this.checkIfPermissionsWereRequested().then(() => {
+            if (this.$route.query.callback) {
+                this.checkResponse(window.location.href);
+            }
+            if (!this.account) {
+                this.showLogin = true;
+            }
 
-        if (this.$route.query && this.$route.query.roomName) {
-            this.inviteUrl = this.$route.query.roomName.toLowerCase();
-        }
-        this.refreshMediaDevices().then(() => {
-            updateCurrentStream();
+            if (this.$route.query && this.$route.query.roomName) {
+                this.inviteUrl = this.$route.query.roomName.toLowerCase();
+            }
+
+            if (this.shouldRequest.audio || this.shouldRequest.video) {
+                this.displayPermissionDialog = true;
+            } else {
+                this.refreshMediaDevices().then(() => {
+                    updateCurrentStream();
+                });
+            }
         });
     },
     computed: {
@@ -307,6 +353,164 @@ export default {
             }
             return Math.abs(hash);
         },
+        checkIfPermissionsWereRequested() {
+            return new Promise(resolve => {
+                if (
+                    navigator.mediaDevices &&
+                    navigator.mediaDevices.enumerateDevices
+                ) {
+                    // Firefox 38+ seems having support of enumerateDevicesx
+                    navigator.enumerateDevices = function (callback) {
+                        navigator.mediaDevices
+                            .enumerateDevices()
+                            .then(callback);
+                    };
+                }
+
+                let MediaDevices = [];
+                let isHTTPs = location.protocol === 'https:';
+                let canEnumerate = false;
+
+                if (
+                    typeof MediaStreamTrack !== 'undefined' &&
+                    'getSources' in MediaStreamTrack
+                ) {
+                    canEnumerate = true;
+                } else if (
+                    navigator.mediaDevices &&
+                    !!navigator.mediaDevices.enumerateDevices
+                ) {
+                    canEnumerate = true;
+                }
+
+                let hasMicrophone = false;
+                let hasWebcam = false;
+
+                let isMicrophoneAlreadyCaptured = false;
+                let isWebcamAlreadyCaptured = false;
+
+                if (!canEnumerate) {
+                    return;
+                }
+
+                if (
+                    !navigator.enumerateDevices &&
+                    window.MediaStreamTrack &&
+                    window.MediaStreamTrack.getSources
+                ) {
+                    navigator.enumerateDevices = window.MediaStreamTrack.getSources.bind(
+                        window.MediaStreamTrack
+                    );
+                }
+
+                if (!navigator.enumerateDevices && navigator.enumerateDevices) {
+                    navigator.enumerateDevices = navigator.enumerateDevices.bind(
+                        navigator
+                    );
+                }
+
+                if (!navigator.enumerateDevices) {
+                    return;
+                }
+
+                MediaDevices = [];
+                navigator.enumerateDevices(devices => {
+                    for (const _device of devices) {
+                        let device = {};
+                        for (let d in _device) {
+                            device[d] = _device[d];
+                        }
+
+                        if (device.kind === 'audio') {
+                            device.kind = 'audioinput';
+                        }
+
+                        if (device.kind === 'video') {
+                            device.kind = 'videoinput';
+                        }
+
+                        let skip;
+                        MediaDevices.forEach(function (d) {
+                            if (d.id === device.id && d.kind === device.kind) {
+                                skip = true;
+                            }
+                        });
+
+                        if (skip) {
+                            return;
+                        }
+
+                        if (!device.deviceId) {
+                            device.deviceId = device.id;
+                        }
+
+                        if (!device.id) {
+                            device.id = device.deviceId;
+                        }
+
+                        if (!device.label) {
+                            device.label = 'Please invoke getUserMedia once.';
+                            if (!isHTTPs) {
+                                device.label =
+                                    'HTTPs is required to get label of this ' +
+                                    device.kind +
+                                    ' device.';
+                            }
+                        } else {
+                            if (
+                                device.kind === 'videoinput' &&
+                                !isWebcamAlreadyCaptured
+                            ) {
+                                isWebcamAlreadyCaptured = true;
+                            }
+
+                            if (
+                                device.kind === 'audioinput' &&
+                                !isMicrophoneAlreadyCaptured
+                            ) {
+                                isMicrophoneAlreadyCaptured = true;
+                            }
+                        }
+
+                        if (device.kind === 'audioinput') {
+                            hasMicrophone = true;
+                        }
+
+                        if (device.kind === 'videoinput') {
+                            hasWebcam = true;
+                        }
+                        MediaDevices.push(device);
+                    }
+                    this.shouldRequest.audio =
+                        hasMicrophone && !isMicrophoneAlreadyCaptured;
+                    this.shouldRequest.video =
+                        hasWebcam && !isWebcamAlreadyCaptured;
+
+                    resolve();
+                });
+            });
+        },
+        requestPermission() {
+            this.checkIfPermissionsWereRequested().then(() => {
+                this.displayPermissionDialog = false;
+                if (this.shouldRequest.audio || this.shouldRequest.video) {
+                    this.displaySecondPermissionDialog = true;
+                } else {
+                    navigator.mediaDevices
+                    .getUserMedia({audio: !this.shouldRequest.audio, video: !this.shouldRequest.video})
+                    .then(() => {
+                        this.refreshMediaDevices().then(() => {
+                            this.closeDialogAndRefreshLocalStream();
+                        });
+                    });
+                }
+            });
+        },
+        closeDialogAndRefreshLocalStream() {
+            this.displayPermissionDialog = false;
+            this.displaySecondPermissionDialog = false;
+            updateCurrentStream();
+        },
     },
     watch: {
         inviteUrl(val) {
@@ -364,6 +568,19 @@ export default {
         grid-row-start: start;
         grid-row-end: end;
         grid-column-end: 1;
+        // TODO: DO something with this
+        // &::after {
+        //     content: '';
+        //     position: absolute;
+        //     left: 50%;
+        //     top: 50%;
+        //     width: 300px;
+        //     height: 400px;
+        //     border: dashed var(--primary-color) 10px;
+        //     transform: translate(-50%, -50%);
+        //     border-radius: 75% 75% 100% 100%;
+        //     opacity: 0.5;
+        // }
         video {
             width: 100%;
             height: 100%;

@@ -53,9 +53,8 @@ export class VideoRoomPlugin {
 
     // @todo: change this
     determineSpeaker(stream, userId) {
-        return;
         if (!window.audioContext) {
-            var _AudioContext =
+            let _AudioContext =
                 window.AudioContext || window.webkitAudioContext;
             window.audioContext = new _AudioContext();
         }
@@ -114,7 +113,7 @@ export class VideoRoomPlugin {
                         });
                         setTimeout(
                             () => (this.inThrottleForSelectedUser = false),
-                            1000
+                            1500
                         );
                     }
                 }
