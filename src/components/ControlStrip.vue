@@ -125,6 +125,9 @@ export default {
             audioDevice: null,
         };
     },
+    beforeDestroy() {
+        this.hangUp()
+    },
     mounted() {
         this.videoDevice = this.videoDeviceId;
         this.audioDevice = this.audioDeviceId;
