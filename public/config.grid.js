@@ -1,5 +1,5 @@
 export default {
-    ffcBackend: `https://${window.location.hostname}/api`,
+    ffcBackend: `https://${window.location.hostname}/`,
     appId: window.location.host,
     scope: JSON.stringify({ doubleName: true }),
     redirect_url: `?callback=true`,
