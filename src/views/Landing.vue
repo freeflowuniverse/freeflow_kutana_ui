@@ -275,7 +275,7 @@
                     if (this.shouldRequest.audio || this.shouldRequest.video) {
                         this.displayPermissionDialog = true;
                         return;
-                    } 
+                    }
                     this.refreshMediaDevices().then(() => {
                         updateCurrentStream();
                     });
@@ -575,54 +575,54 @@
     };
 </script>
 <style lang="scss" scoped>
-.landing {
-    display: grid;
-    grid-template-rows: [start] 1fr [titleend] 12fr [iostart] 1fr [ioend actionsstart] 1fr [end];
-    height: 100%;
-    width: 100vw;
-    .ffctitle {
-        grid-row-start: start;
-        grid-row-end: titleend;
-        grid-column-end: 1;
-        z-index: 2;
-        text-align: center;
-        margin-top: 10px;
-    }
-    .mine {
-        grid-row-start: start;
-        grid-row-end: end;
-        grid-column-end: 1;
-        // TODO: DO something with this
-        // &::after {
-        //     content: '';
-        //     position: absolute;
-        //     left: 50%;
-        //     top: 50%;
-        //     width: 300px;
-        //     height: 400px;
-        //     border: dashed var(--primary-color) 10px;
-        //     transform: translate(-50%, -50%);
-        //     border-radius: 75% 75% 100% 100%;
-        //     opacity: 0.5;
-        // }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+    .landing {
+        display: grid;
+        grid-template-rows: [start] 1fr [titleend] 12fr [iostart] 1fr [ioend actionsstart] 1fr [end];
+        height: 100%;
+        width: 100vw;
+        .ffctitle {
+            grid-row-start: start;
+            grid-row-end: titleend;
+            grid-column-end: 1;
+            z-index: 2;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .mine {
+            grid-row-start: start;
+            grid-row-end: end;
+            grid-column-end: 1;
+            // TODO: DO something with this
+            // &::after {
+            //     content: '';
+            //     position: absolute;
+            //     left: 50%;
+            //     top: 50%;
+            //     width: 300px;
+            //     height: 400px;
+            //     border: dashed var(--primary-color) 10px;
+            //     transform: translate(-50%, -50%);
+            //     border-radius: 75% 75% 100% 100%;
+            //     opacity: 0.5;
+            // }
+            video {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+        .io {
+            grid-row-start: iostart;
+            grid-row-end: ioend;
+            grid-column-end: 1;
+            z-index: 2;
+        }
+        .actions {
+            grid-row-start: actionsstart;
+            grid-row-end: end;
+            grid-column-end: 1;
+            z-index: 2;
+            background: #ffffff90;
         }
     }
-    .io {
-        grid-row-start: iostart;
-        grid-row-end: ioend;
-        grid-column-end: 1;
-        z-index: 2;
-    }
-    .actions {
-        grid-row-start: actionsstart;
-        grid-row-end: end;
-        grid-column-end: 1;
-        z-index: 2;
-        background: #ffffff90;
-    }
-}
 </style>
