@@ -146,7 +146,6 @@
                     FreeFlowConnect still can't access your devices. You can
                     still continue without or enable them in the in your browser
                     settings and then retrying.
-                    {{ this.shouldRequest }}
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -165,6 +164,7 @@
     import DeviceSelector from '@/components/DeviceSelector';
     import random from '@/plugins/random';
     export default {
+        // TODO First choose name then request permission then join/create
         components: {
             DeviceSelector,
         },
@@ -201,27 +201,7 @@
             };
         },
         mounted() {
-            this.getBackgroundOfMine();
-            this.checkIfPermissionsWereRequested().then(() => {
-                if (this.$route.query.callback) {
-                    this.checkResponse(window.location.href);
-                }
-                if (!this.account) {
-                    this.showLogin = true;
-                }
-
-                if (this.$route.query && this.$route.query.roomName) {
-                    this.inviteUrl = this.$route.query.roomName.toLowerCase();
-                }
-
-                if (this.shouldRequest.audio || this.shouldRequest.video) {
-                    this.displayPermissionDialog = true;
-                } else {
-                    this.refreshMediaDevices().then(() => {
-                        updateCurrentStream();
-                    });
-                }
-            });
+            this.init();
         },
         computed: {
             ...mapGetters([
@@ -277,11 +257,36 @@
                 'checkResponse',
                 'loginAsGuest',
             ]),
+            init() {
+                this.getBackgroundOfMine();
+                if (!this.account) {
+                    this.showLogin = true;
+                    return;
+                }
+
+                this.checkIfPermissionsWereRequested().then(() => {
+                    if (this.$route.query.callback) {
+                        this.checkResponse(window.location.href);
+                    }
+                    if (this.$route.query && this.$route.query.roomName) {
+                        this.inviteUrl = this.$route.query.roomName.toLowerCase();
+                    }
+
+                    if (this.shouldRequest.audio || this.shouldRequest.video) {
+                        this.displayPermissionDialog = true;
+                        return;
+                    }
+                    this.refreshMediaDevices().then(() => {
+                        updateCurrentStream();
+                    });
+                });
+            },
             continueLogin() {
                 this.$ga.event('auth', 'guest-login');
                 this.loginAsGuest(this.guestName);
                 this.getBackgroundOfMine();
                 this.showLogin = false;
+                this.init();
             },
             changeAudioInputTo(audioInputDeviceId) {
                 this.$ga.event('before-call-events', 'changeAudioInput');
@@ -356,6 +361,7 @@
                 return Math.abs(hash);
             },
             checkIfPermissionsWereRequested() {
+                console.log(`Checking permission`);
                 return new Promise(resolve => {
                     if (
                         navigator.mediaDevices &&
@@ -499,24 +505,29 @@
                     });
                 });
             },
-            requestPermission() {
-                this.checkIfPermissionsWereRequested().then(() => {
-                    this.displayPermissionDialog = false;
+            async requestPermission() {
+                this.displayPermissionDialog = false;
+                this.displaySecondPermissionDialog = false;
+                // This is just so the user will see something has changed
+                await new Promise(resolve => setTimeout(resolve, 100));
+                if (!this.shouldRequest.audio && !this.shouldRequest.video) {
+                    return;
+                }
+                try {
+                    await navigator.mediaDevices.getUserMedia({
+                        audio: this.shouldRequest.audio,
+                        video: this.shouldRequest.video,
+                    });
+                    await this.checkIfPermissionsWereRequested();
                     if (this.shouldRequest.audio || this.shouldRequest.video) {
-                        this.displaySecondPermissionDialog = true;
-                    } else {
-                        navigator.mediaDevices
-                            .getUserMedia({
-                                audio: !this.shouldRequest.audio,
-                                video: !this.shouldRequest.video,
-                            })
-                            .then(() => {
-                                this.refreshMediaDevices().then(() => {
-                                    this.closeDialogAndRefreshLocalStream();
-                                });
-                            });
+                        // Permissions are still not ok
+                        throw new Error('Permissions not ok');
                     }
-                });
+                    await this.refreshMediaDevices();
+                    this.closeDialogAndRefreshLocalStream();
+                } catch (e) {
+                    this.displaySecondPermissionDialog = true;
+                }
             },
             closeDialogAndRefreshLocalStream() {
                 this.displayPermissionDialog = false;
@@ -557,6 +568,7 @@
                         this.$router.push(redirect);
                     }
                     this.showLogin = false;
+                    this.init();
                 }
             },
         },
