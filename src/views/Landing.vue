@@ -146,7 +146,6 @@
                     FreeFlowConnect still can't access your devices. You can
                     still continue without or enable them in the in your browser
                     settings and then retrying.
-                    {{ this.shouldRequest }}
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -165,6 +164,7 @@
     import DeviceSelector from '@/components/DeviceSelector';
     import random from '@/plugins/random';
     export default {
+        // TODO First choose name then request permission then join/create
         components: {
             DeviceSelector,
         },
@@ -201,27 +201,7 @@
             };
         },
         mounted() {
-            this.getBackgroundOfMine();
-            this.checkIfPermissionsWereRequested().then(() => {
-                if (this.$route.query.callback) {
-                    this.checkResponse(window.location.href);
-                }
-                if (!this.account) {
-                    this.showLogin = true;
-                }
-
-                if (this.$route.query && this.$route.query.roomName) {
-                    this.inviteUrl = this.$route.query.roomName.toLowerCase();
-                }
-
-                if (this.shouldRequest.audio || this.shouldRequest.video) {
-                    this.displayPermissionDialog = true;
-                } else {
-                    this.refreshMediaDevices().then(() => {
-                        updateCurrentStream();
-                    });
-                }
-            });
+            this.init();
         },
         computed: {
             ...mapGetters([
@@ -277,11 +257,36 @@
                 'checkResponse',
                 'loginAsGuest',
             ]),
+            init() {
+                this.getBackgroundOfMine();
+                if (!this.account) {
+                    this.showLogin = true;
+                    return;
+                }
+
+                this.checkIfPermissionsWereRequested().then(() => {
+                    if (this.$route.query.callback) {
+                        this.checkResponse(window.location.href);
+                    }
+                    if (this.$route.query && this.$route.query.roomName) {
+                        this.inviteUrl = this.$route.query.roomName.toLowerCase();
+                    }
+
+                    if (this.shouldRequest.audio || this.shouldRequest.video) {
+                        this.displayPermissionDialog = true;
+                        return;
+                    } 
+                    this.refreshMediaDevices().then(() => {
+                        updateCurrentStream();
+                    });
+                });
+            },
             continueLogin() {
                 this.$ga.event('auth', 'guest-login');
                 this.loginAsGuest(this.guestName);
                 this.getBackgroundOfMine();
                 this.showLogin = false;
+                this.init();
             },
             changeAudioInputTo(audioInputDeviceId) {
                 this.$ga.event('before-call-events', 'changeAudioInput');
@@ -356,6 +361,7 @@
                 return Math.abs(hash);
             },
             checkIfPermissionsWereRequested() {
+                console.log(`Checking permission`);
                 return new Promise(resolve => {
                     if (
                         navigator.mediaDevices &&
@@ -499,24 +505,29 @@
                     });
                 });
             },
-            requestPermission() {
-                this.checkIfPermissionsWereRequested().then(() => {
-                    this.displayPermissionDialog = false;
+            async requestPermission() {
+                this.displayPermissionDialog = false;
+                this.displaySecondPermissionDialog = false;
+                // This is just so the user will see something has changed
+                await new Promise(resolve => setTimeout(resolve, 100));
+                if (!this.shouldRequest.audio && !this.shouldRequest.video) {
+                    return;
+                }
+                try {
+                    await navigator.mediaDevices.getUserMedia({
+                        audio: this.shouldRequest.audio,
+                        video: this.shouldRequest.video,
+                    });
+                    await this.checkIfPermissionsWereRequested();
                     if (this.shouldRequest.audio || this.shouldRequest.video) {
-                        this.displaySecondPermissionDialog = true;
-                    } else {
-                        navigator.mediaDevices
-                            .getUserMedia({
-                                audio: !this.shouldRequest.audio,
-                                video: !this.shouldRequest.video,
-                            })
-                            .then(() => {
-                                this.refreshMediaDevices().then(() => {
-                                    this.closeDialogAndRefreshLocalStream();
-                                });
-                            });
+                        // Permissions are still not ok
+                        throw new Error('Permissions not ok');
                     }
-                });
+                    await this.refreshMediaDevices();
+                    this.closeDialogAndRefreshLocalStream();
+                } catch (e) {
+                    this.displaySecondPermissionDialog = true;
+                }
             },
             closeDialogAndRefreshLocalStream() {
                 this.displayPermissionDialog = false;
@@ -557,60 +568,61 @@
                         this.$router.push(redirect);
                     }
                     this.showLogin = false;
+                    this.init();
                 }
             },
         },
     };
 </script>
 <style lang="scss" scoped>
-    .landing {
-        display: grid;
-        grid-template-rows: [start] 1fr [titleend] 12fr [iostart] 1fr [ioend actionsstart] 1fr [end];
-        height: 100%;
-        width: 100vw;
-        .ffctitle {
-            grid-row-start: start;
-            grid-row-end: titleend;
-            grid-column-end: 1;
-            z-index: 2;
-            text-align: center;
-            margin-top: 10px;
-        }
-        .mine {
-            grid-row-start: start;
-            grid-row-end: end;
-            grid-column-end: 1;
-            // TODO: DO something with this
-            // &::after {
-            //     content: '';
-            //     position: absolute;
-            //     left: 50%;
-            //     top: 50%;
-            //     width: 300px;
-            //     height: 400px;
-            //     border: dashed var(--primary-color) 10px;
-            //     transform: translate(-50%, -50%);
-            //     border-radius: 75% 75% 100% 100%;
-            //     opacity: 0.5;
-            // }
-            video {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-        }
-        .io {
-            grid-row-start: iostart;
-            grid-row-end: ioend;
-            grid-column-end: 1;
-            z-index: 2;
-        }
-        .actions {
-            grid-row-start: actionsstart;
-            grid-row-end: end;
-            grid-column-end: 1;
-            z-index: 2;
-            background: #ffffff90;
+.landing {
+    display: grid;
+    grid-template-rows: [start] 1fr [titleend] 12fr [iostart] 1fr [ioend actionsstart] 1fr [end];
+    height: 100%;
+    width: 100vw;
+    .ffctitle {
+        grid-row-start: start;
+        grid-row-end: titleend;
+        grid-column-end: 1;
+        z-index: 2;
+        text-align: center;
+        margin-top: 10px;
+    }
+    .mine {
+        grid-row-start: start;
+        grid-row-end: end;
+        grid-column-end: 1;
+        // TODO: DO something with this
+        // &::after {
+        //     content: '';
+        //     position: absolute;
+        //     left: 50%;
+        //     top: 50%;
+        //     width: 300px;
+        //     height: 400px;
+        //     border: dashed var(--primary-color) 10px;
+        //     transform: translate(-50%, -50%);
+        //     border-radius: 75% 75% 100% 100%;
+        //     opacity: 0.5;
+        // }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
     }
+    .io {
+        grid-row-start: iostart;
+        grid-row-end: ioend;
+        grid-column-end: 1;
+        z-index: 2;
+    }
+    .actions {
+        grid-row-start: actionsstart;
+        grid-row-end: end;
+        grid-column-end: 1;
+        z-index: 2;
+        background: #ffffff90;
+    }
+}
 </style>
