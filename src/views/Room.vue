@@ -64,23 +64,14 @@
             >
         </v-tooltip>
 
-        <UserGrid :showChat="view === 'chat'" :view="currentViewStyle">
+        <UserGrid :showChat="chatIsOpen" :view="currentViewStyle">
             <template v-slot:chat>
-                <ChatGrid
-                    :selectedUser="localUser"
-                    v-on:back="view = 'no-chat'"
-                    class="chatGrid"
-                ></ChatGrid>
+                <ChatGrid :selectedUser="localUser" class="chatGrid"></ChatGrid>
             </template>
             <template v-slot:controlStrip>
                 <v-row class="controlStrip mx-0" justify="center">
                     <ControlStrip
                         class="mx-0"
-                        @toggleChat="
-                            view === 'chat'
-                                ? (view = 'no-chat')
-                                : (view = 'chat')
-                        "
                         @openSettings="showSettings = true"
                         @openInvitations="openInvitations"
                     ></ControlStrip>
@@ -106,7 +97,7 @@
         <ChatMessageNotification
             v-if="view !== 'chat'"
             class="notifications"
-            @click="view = view === 'chat' ? 'no-chat' : 'chat'"
+            @click="view = chatIsOpen ? 'chat' : 'no-chat'"
         />
     </div>
 </template>
@@ -274,6 +265,7 @@
                 'presenter',
                 'fullScreenUser',
                 'mutedUsers',
+                'chatIsOpen',
             ]),
             currentViewStyle: {
                 get() {
@@ -301,6 +293,9 @@
                         val.length
                     );
                 }
+            },
+            chatIsOpen(val) {
+                this.view = val ? 'chat' : 'no-chat';
             },
         },
     };

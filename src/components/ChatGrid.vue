@@ -3,17 +3,12 @@
         <v-card-title class="primary header">
             <v-row align="center" justify="center" class="white--text px-2">
                 <v-col cols="2" class="py-0">
-                    <v-btn v-if="isMobile" icon @click="$emit('back')">
+                    <v-btn icon @click="setChatOpenStatus(false)">
                         <v-icon color="white">arrow_back</v-icon>
                     </v-btn>
                 </v-col>
                 <v-col align="center" class="py-0 ttl">
                     <h3>Messages</h3>
-                </v-col>
-                <v-col cols="2" class="py-0" align="end">
-                    <v-btn v-if="!isMobile" icon @click="$emit('back')">
-                        <v-icon color="white">close</v-icon>
-                    </v-btn>
                 </v-col>
             </v-row>
         </v-card-title>
@@ -52,7 +47,7 @@
 <script>
     import moment from 'moment';
     import TheChatMessage from './TheChatMessage';
-    import { mapGetters } from 'vuex';
+    import { mapGetters, mapMutations } from 'vuex';
     import autoScroll from '../directives/autoScroll';
     import TheChatInput from './TheChatInput';
 
@@ -70,9 +65,10 @@
             },
         },
         computed: {
-            ...mapGetters(['messages', 'isMobile']),
+            ...mapGetters(['messages', 'isMobile', 'localUser']),
         },
         methods: {
+            ...mapMutations(['setChatOpenStatus']),
             showDivider(message, index) {
                 const previousMessage = this.messages[index - 1];
                 if (!previousMessage) {
@@ -81,6 +77,18 @@
                 const time = moment(message.createdAt);
 
                 return time.diff(previousMessage.createdAt, 'm') > 5;
+            },
+        },
+        watch: {
+            messages(val, oldVal) {
+                if (
+                    val.length <= oldVal.length ||
+                    val[val.length - 1].senderId == this.localUser.uuid
+                ) {
+                    return;
+                }
+                let audio = new Audio('/notification.mp3');
+                audio.play();
             },
         },
     };

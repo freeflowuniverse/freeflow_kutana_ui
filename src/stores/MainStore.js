@@ -1,6 +1,7 @@
 export default {
     state: {
         viewStyle: localStorage.getItem('view-style') || 'grid',
+        chatIsOpen: false,
         snackbarMessage: '',
         localStream: null,
         dataChannel: null,
@@ -18,6 +19,9 @@ export default {
         },
         setDataChannel(state, datachannel) {
             state.dataChannel = datachannel;
+        },
+        setChatOpenStatus(state, status) {
+            state.chatIsOpen = status;
         },
     },
     actions: {
@@ -52,5 +56,8 @@ export default {
         snackbarMessage: state => state.snackbarMessage,
         localStream: state => state.localStream,
         dataChannel: state => state.dataChannel,
+        chatIsOpen: state => {
+            return state.chatIsOpen;
+        },
     },
 };

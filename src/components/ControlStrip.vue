@@ -55,18 +55,27 @@
         </v-tooltip>
         <v-tooltip top>
             <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                    :small="isMobile"
-                    :large="!isMobile"
-                    @click="$emit('toggleChat')"
-                    class="primary mx-2"
-                    v-bind="attrs"
-                    v-on="on"
-                    dark
-                    icon
+                <v-badge
+                    overlap
+                    color="secondary"
+                    :value="unreadMessagesCounter"
                 >
-                    <v-icon :small="isMobile">chat_bubble</v-icon>
-                </v-btn>
+                    <template v-slot:badge>
+                        {{ unreadMessagesCounter }}
+                    </template>
+                    <v-btn
+                        :small="isMobile"
+                        :large="!isMobile"
+                        @click="openChat"
+                        class="primary mx-2"
+                        v-bind="attrs"
+                        v-on="on"
+                        dark
+                        icon
+                    >
+                        <v-icon :small="isMobile">chat_bubble</v-icon>
+                    </v-btn>
+                </v-badge>
             </template>
             <span>Toggle Chat</span>
         </v-tooltip>
@@ -123,6 +132,7 @@
                 isCamLoading: false,
                 videoDevice: null,
                 audioDevice: null,
+                unreadMessagesCounter: 0,
             };
         },
         beforeDestroy() {
@@ -146,6 +156,8 @@
                 'audioDeviceId',
                 'videoDeviceId',
                 'dataChannel',
+                'messages',
+                'chatIsOpen',
             ]),
             hasAudioError() {
                 return this.mediaDeviceErrors.audio !== undefined;
@@ -180,6 +192,7 @@
                 'setLocalUser',
                 'toggleAudioActive',
                 'toggleVideoActive',
+                'setChatOpenStatus',
             ]),
             changeAudioInputTo(audioInputDeviceId) {
                 this.$ga.event('in-call-events', 'changeMic');
@@ -260,6 +273,20 @@
                 this.userControl.hangUp();
                 await this.$router.push({ name: 'home' });
                 location.reload();
+            },
+            openChat() {
+                this.setChatOpenStatus(!this.chatIsOpen);
+            },
+        },
+        watch: {
+            messages(val) {
+                if (this.chatIsOpen) {
+                    return;
+                }
+                this.unreadMessagesCounter++;
+            },
+            chatIsOpen(val) {
+                this.unreadMessagesCounter = 0;
             },
         },
     };
