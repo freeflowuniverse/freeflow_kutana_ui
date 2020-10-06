@@ -1,29 +1,7 @@
 <template>
-    <section class="landing">
-        <h1 class="ffctitle">FreeFlowConnect</h1>
-        <v-row class="io mb-2" justify="center" align="center">
-            <DeviceSelector
-                device="cam"
-                activeIcon="videocam"
-                inactiveIcon="videocam_off"
-                :devices="videoInputDevices"
-                :isActive="videoActive && !hasVideoError"
-                :disabled="videoInputDevices.length <= 0 || hasVideoError"
-                :selectedDeviceId="videoDeviceId"
-                @toggle="toggleCam"
-                @change="changeVideoTo"
-            />
-            <DeviceSelector
-                device="mic"
-                activeIcon="mic"
-                inactiveIcon="mic_off"
-                :devices="audioInputDevices"
-                :isActive="audioActive && !hasAudioError"
-                :disabled="audioInputDevices.length <= 0 || hasAudioError"
-                :selectedDeviceId="audioDeviceId"
-                @toggle="toggleMic"
-                @change="changeAudioInputTo"
-            />
+    <section class="landing primary">
+        <!-- <v-row class="io mb-2" justify="center" align="center">
+            
         </v-row>
         <v-row class="actions pa-2" justify="center" align="center">
             <v-col cols="12" md="4">
@@ -67,21 +45,8 @@
                     >
                 </v-col>
             </transition>
-        </v-row>
-        <div class="mine" :style="myBackground">
-            <video
-                :src-object.prop.camel="localStream"
-                autoplay
-                muted
-                ref="localStream"
-                v-if="
-                    videoActive &&
-                        localStream &&
-                        localStream.getVideoTracks().length > 0
-                "
-            ></video>
-        </div>
-        <v-dialog :value="showLogin" width="600" persistent>
+        </v-row> -->
+        <v-dialog :value="showLogin" width="800" persistent>
             <v-card v-if="!isLoginInAsGuest" :loading="$route.query.callback">
                 <v-card-title>Freeflow Connect</v-card-title>
                 <v-card-text v-if="$route.query.callback"
@@ -89,35 +54,63 @@
                 >
                 <span v-else>
                     <v-card-text>
-                        Please login using 3Bot Connect or continue as guest.
-                        <br />
-                        <v-text-field
-                            id="guestName"
-                            :rules="guestNameRules"
-                            v-model="guestName"
-                            label="Guest"
-                            single-line
-                            autofocus
-                            counter="20"
-                            hint="You can use any name you want"
-                            @focus="$event.target.select()"
-                        >
-                            <template v-slot:append>
-                                <v-btn @click="continueLogin" text
-                                    >Continue as guest</v-btn
-                                >
-                            </template>
-                        </v-text-field>
+                        <v-col>
+                            <p>
+                                Please identify yourself using 3bot Connect or
+                                continue as guest.
+                            </p>
+                            <v-row justify="center" align="center">
+                                <v-col cols="12" md="7">
+                                    <v-form
+                                        @submit.prevent="joinRoom"
+                                        v-model="valid"
+                                    >
+                                        <v-text-field
+                                            id="guestName"
+                                            :rules="guestNameRules"
+                                            v-model="guestName"
+                                            label="Guest"
+                                            autofocus
+                                            counter="20"
+                                            hint="You can use any name you want"
+                                            @focus="$event.target.select()"
+                                        >
+                                            <template v-slot:append>
+                                                <v-btn
+                                                    @click="continueLogin"
+                                                    text
+                                                    >Continue as guest</v-btn
+                                                >
+                                            </template>
+                                        </v-text-field>
+                                    </v-form>
+                                </v-col>
+                                <transition name="fade">
+                                    <v-divider
+                                        vertical
+                                        v-if="
+                                            !inviteUrl &&
+                                                $vuetify.breakpoint.mdAndUp
+                                        "
+                                    ></v-divider>
+                                </transition>
+                                <transition name="shrink-x">
+                                    <v-col
+                                        cols="4"
+                                        align="center"
+                                        v-if="!inviteUrl"
+                                    >
+                                        <v-btn
+                                            id="threebotConnectLoginBtn"
+                                            @click="threebotConnectLogin"
+                                            text
+                                            >Use 3Bot Connect</v-btn
+                                        >
+                                    </v-col>
+                                </transition>
+                            </v-row>
+                        </v-col>
                     </v-card-text>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn
-                            id="threebotConnectLoginBtn"
-                            @click="threebotConnectLogin"
-                            text
-                            >Use 3Bot Connect</v-btn
-                        >
-                    </v-card-actions>
                 </span>
             </v-card>
         </v-dialog>
@@ -156,15 +149,113 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog :value="showJoinCreate" width="800" persistent>
+            <v-card>
+                <v-card-title>Freeflow Connect</v-card-title>
+                <v-card-text class="joinContent pa-0">
+                    <div class="mine ml-4" :style="myBackground">
+                        <video
+                            :src-object.prop.camel="localStream"
+                            autoplay
+                            muted
+                            ref="localStream"
+                            v-if="
+                                videoActive &&
+                                    localStream &&
+                                    localStream.getVideoTracks().length > 0
+                            "
+                        ></video>
+                    </div>
+                    <div class="io px-4">
+                        <DeviceSelector
+                            dropdown
+                            device="cam"
+                            activeIcon="videocam"
+                            inactiveIcon="videocam_off"
+                            :devices="videoInputDevices"
+                            :isActive="videoActive && !hasVideoError"
+                            :disabled="
+                                videoInputDevices.length <= 0 || hasVideoError
+                            "
+                            :selectedDeviceId="videoDeviceId"
+                            @toggle="toggleCam"
+                            @change="changeVideoTo"
+                        />
+                        <DeviceSelector
+                            dropdown
+                            class="my-4"
+                            device="mic"
+                            activeIcon="mic"
+                            inactiveIcon="mic_off"
+                            :devices="audioInputDevices"
+                            :isActive="audioActive && !hasAudioError"
+                            :disabled="
+                                audioInputDevices.length <= 0 || hasAudioError
+                            "
+                            :selectedDeviceId="audioDeviceId"
+                            @toggle="toggleMic"
+                            @change="changeAudioInputTo"
+                        />
+                        <v-btn
+                            rounded
+                            large
+                            class="primary"
+                            style="justify-content: start;"
+                            @click="playSound"
+                        >
+                            <v-icon>volume_up</v-icon>
+                            <span class="ml-4">
+                                Test audio output
+                            </span>
+                        </v-btn>
+                    </div>
+                    <div
+                        class="actions mt-4 px-4 py-2 grey lighten-4"
+                        :class="{ joining: inviteUrl }"
+                    >
+                        <v-form @submit.prevent="joinRoom" v-model="valid">
+                            <v-text-field
+                                :readonly="
+                                    !!$route.query && !!$route.query.roomName
+                                "
+                                :rules="inviteUrlRules"
+                                hint="Paste the room ID or link you've received"
+                                id="roomId"
+                                label="Room ID"
+                                required
+                                v-model="inviteUrl"
+                                color="primary"
+                                persistent-hint
+                            >
+                                <template v-slot:append>
+                                    <v-btn
+                                        :disabled="!valid"
+                                        id="joinBtn"
+                                        small
+                                        text
+                                        type="submit"
+                                        color="primary"
+                                        >Join room</v-btn
+                                    >
+                                </template>
+                            </v-text-field>
+                        </v-form>
+                        <div class="connect" v-if="!inviteUrl">
+                            <v-btn @click="create" text color="primary"
+                                >Create room</v-btn
+                            >
+                        </div>
+                    </div>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
     </section>
 </template>
 <script>
     import { mapActions, mapMutations, mapGetters } from 'vuex';
     import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
-    import DeviceSelector from '@/components/DeviceSelector';
-    import random from '@/plugins/random';
+    import DeviceSelector from '../components/DeviceSelector';
     export default {
-        // TODO First choose name then request permission then join/create
         components: {
             DeviceSelector,
         },
@@ -183,7 +274,7 @@
                 myBackground: '',
                 isLoginInAsGuest: false,
                 showLogin: false,
-                guestName: `GUEST-${random.stringGenerator(5).toUpperCase()}`,
+                guestName: '',
                 guestNameRules: [
                     name =>
                         name.length >= 3 ||
@@ -198,6 +289,7 @@
                 displayPermissionDialog: false,
                 shouldRequest: { audio: false, video: false },
                 displaySecondPermissionDialog: false,
+                showJoinCreate: false,
             };
         },
         mounted() {
@@ -278,6 +370,7 @@
                     }
                     this.refreshMediaDevices().then(() => {
                         updateCurrentStream();
+                        this.showJoinCreate = true;
                     });
                 });
             },
@@ -361,7 +454,6 @@
                 return Math.abs(hash);
             },
             checkIfPermissionsWereRequested() {
-                console.log(`Checking permission`);
                 return new Promise(resolve => {
                     if (
                         navigator.mediaDevices &&
@@ -534,6 +626,10 @@
                 this.displaySecondPermissionDialog = false;
                 updateCurrentStream();
             },
+            playSound() {
+                var audio = new Audio('long.wav');
+                audio.play();
+            },
         },
         watch: {
             inviteUrl(val) {
@@ -575,54 +671,38 @@
     };
 </script>
 <style lang="scss" scoped>
-    .landing {
+    .joinContent {
         display: grid;
-        grid-template-rows: [start] 1fr [titleend] 12fr [iostart] 1fr [ioend actionsstart] 1fr [end];
-        height: 100%;
-        width: 100vw;
-        .ffctitle {
-            grid-row-start: start;
-            grid-row-end: titleend;
-            grid-column-end: 1;
-            z-index: 2;
-            text-align: center;
-            margin-top: 10px;
-        }
+        grid-template: 'video io' 'actions actions';
+        grid-template-columns: 5fr 4fr;
         .mine {
-            grid-row-start: start;
-            grid-row-end: end;
-            grid-column-end: 1;
-            // TODO: DO something with this
-            // &::after {
-            //     content: '';
-            //     position: absolute;
-            //     left: 50%;
-            //     top: 50%;
-            //     width: 300px;
-            //     height: 400px;
-            //     border: dashed var(--primary-color) 10px;
-            //     transform: translate(-50%, -50%);
-            //     border-radius: 75% 75% 100% 100%;
-            //     opacity: 0.5;
-            // }
+            grid-area: video;
             video {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
+                max-width: 100%;
+                margin-bottom: -5.99px;
             }
         }
         .io {
-            grid-row-start: iostart;
-            grid-row-end: ioend;
-            grid-column-end: 1;
-            z-index: 2;
+            grid-area: io;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            > * {
+                max-width: 100%;
+            }
         }
         .actions {
-            grid-row-start: actionsstart;
-            grid-row-end: end;
-            grid-column-end: 1;
-            z-index: 2;
-            background: #ffffff90;
+            grid-area: actions;
+            display: grid;
+            grid-template-columns: 5fr 4fr;
+            border-top: 1px solid #ddd;
+            &.joining {
+                grid-template-columns: 1fr;
+            }
+            .connect {
+                display: grid;
+                place-items: center;
+            }
         }
     }
 </style>

@@ -3,11 +3,12 @@
         <v-tooltip top>
             <template v-slot:activator="{ on: tooltip }">
                 <v-btn
-                    icon
+                    :icon="!dropdown"
                     :small="small"
                     v-on="{ ...tooltip }"
                     :disabled="disabled"
                     class="primary"
+                    :class="{ 'px-5 flex': dropdown }"
                     @click="$emit('toggle')"
                 >
                     <MicVolumeIcon
@@ -31,6 +32,9 @@
                     <v-icon :small="small" v-else>{{
                         isActive ? activeIcon : inactiveIcon
                     }}</v-icon>
+                    <span class="ml-4" v-if="dropdown">
+                        {{ selectedLabel | truncate(20) }}
+                    </span>
                 </v-btn>
             </template>
             <span>Turn {{ device }} {{ isActive ? 'off' : 'on' }}</span>
@@ -110,6 +114,10 @@
                 type: Boolean,
                 default: false,
             },
+            dropdown: {
+                type: Boolean,
+                default: false,
+            },
         },
         computed: {
             ...mapGetters(['localStream', 'localUser']),
@@ -121,6 +129,9 @@
                     .map(d => d.deviceId)
                     .indexOf(this.selectedDeviceId);
             },
+            selectedLabel() {
+                return this.devices[this.indexOfSelectedDevice]?.label;
+            },
         },
     };
 </script>
@@ -131,5 +142,8 @@
 
     .v-btn.small {
         min-width: 0 !important;
+    }
+    .flex {
+        justify-content: start;
     }
 </style>

@@ -6,7 +6,7 @@ Vue.filter('parseToTime', time => {
 });
 
 Vue.filter('truncate', (input, length = 5) => {
-    if (input.length > length) {
+    if (input && input.length > length) {
         return input.substring(0, length) + '...';
     } else {
         return input;
