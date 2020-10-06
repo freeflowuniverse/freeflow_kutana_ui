@@ -22,7 +22,7 @@ export default {
         },
         setChatOpenStatus(state, status) {
             state.chatIsOpen = status;
-        }
+        },
     },
     actions: {
         setSnackbarMessage(context, message) {

@@ -279,7 +279,7 @@
             },
         },
         watch: {
-            messages(val){
+            messages(val) {
                 if (this.chatIsOpen) {
                     return;
                 }
