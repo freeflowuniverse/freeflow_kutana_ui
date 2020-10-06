@@ -131,7 +131,7 @@
             },
             selectedLabel() {
                 return this.devices[this.indexOfSelectedDevice]?.label;
-            }
+            },
         },
     };
 </script>
