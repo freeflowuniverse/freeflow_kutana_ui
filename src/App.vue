@@ -101,4 +101,7 @@
     .v-btn-toggle--rounded {
         overflow: hidden;
     }
+    .v-badge__badge{
+        left: calc(100% - 20px) !important;
+    }
 </style>
