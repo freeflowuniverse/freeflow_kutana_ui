@@ -368,10 +368,13 @@
                         this.displayPermissionDialog = true;
                         return;
                     }
-                    this.refreshMediaDevices().then(() => {
-                        updateCurrentStream();
-                        this.showJoinCreate = true;
-                    });
+                    this.continueInit();
+                });
+            },
+            continueInit() {
+                this.refreshMediaDevices().then(() => {
+                    updateCurrentStream();
+                    this.showJoinCreate = true;
                 });
             },
             continueLogin() {
@@ -617,6 +620,7 @@
                     }
                     await this.refreshMediaDevices();
                     this.closeDialogAndRefreshLocalStream();
+                    this.continueInit();
                 } catch (e) {
                     this.displaySecondPermissionDialog = true;
                 }

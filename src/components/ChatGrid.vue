@@ -81,10 +81,7 @@
         },
         watch: {
             messages(val, oldVal) {
-                if (
-                    val.length <= oldVal.length ||
-                    val[val.length - 1].senderId == this.localUser.uuid
-                ) {
+                if (val[val.length - 1].senderId == this.localUser.uuid) {
                     return;
                 }
                 let audio = new Audio('/notification.mp3');
