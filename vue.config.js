@@ -67,6 +67,12 @@ module.exports = {
         name: 'FreeFlowConnect',
         manifestOptions: {
             background_color: '#FFFFFF',
+            display: 'minimal-ui',
+            intent_filters: {
+                scope_url_scheme: 'https',
+                scope_url_host: 'meetings.jimber.org',
+                scope_url_path: '/',
+            },
         },
     },
 };
