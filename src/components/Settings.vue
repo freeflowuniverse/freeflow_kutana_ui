@@ -44,6 +44,7 @@
                     >
                         Experimental feature
                     </h2>
+                    <Recorder />
                     <v-switch
                         v-if="removeBackgroundSupported"
                         inset
@@ -117,9 +118,11 @@
     import BackGroundRemovalService from '../services/BackGroundRemovalService';
     import version from '../../public/version';
     import { mapActions, mapGetters, mapMutations } from 'vuex';
+    import Recorder from '@/components/Recorder';
 
     export default {
         name: 'Settings',
+        components: { Recorder },
         props: {
             value: Boolean,
         },
