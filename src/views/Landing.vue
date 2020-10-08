@@ -1,51 +1,18 @@
 <template>
     <section class="landing primary">
-        <!-- <v-row class="io mb-2" justify="center" align="center">
-            
-        </v-row>
-        <v-row class="actions pa-2" justify="center" align="center">
-            <v-col cols="12" md="4">
-                <v-form @submit.prevent="joinRoom" v-model="valid">
-                    <v-text-field
-                        :readonly="!!$route.query && !!$route.query.roomName"
-                        :rules="inviteUrlRules"
-                        filled
-                        hint="Paste the room ID or link you've received"
-                        id="roomId"
-                        label="Room ID"
-                        hide-details
-                        required
-                        v-model="inviteUrl"
-                        background-color="#a1a1a1c9"
-                    >
-                        <template v-slot:append>
-                            <v-btn
-                                :disabled="!valid"
-                                id="joinBtn"
-                                small
-                                text
-                                type="submit"
-                                color="primary"
-                                >Join room</v-btn
-                            >
-                        </template>
-                    </v-text-field>
-                </v-form>
-            </v-col>
-            <transition name="fade">
-                <v-divider
-                    vertical
-                    v-if="!inviteUrl && $vuetify.breakpoint.mdAndUp"
-                ></v-divider>
-            </transition>
-            <transition name="shrink-x">
-                <v-col cols="4" align="center" v-if="!inviteUrl">
-                    <v-btn @click="create" text color="primary"
-                        >Create room</v-btn
-                    >
-                </v-col>
-            </transition>
-        </v-row> -->
+        <div class="bg mine ml-4" :style="myBackground">
+            <video
+                :src-object.prop.camel="localStream"
+                autoplay
+                muted
+                ref="localStream"
+                v-if="
+                    videoActive &&
+                        localStream &&
+                        localStream.getVideoTracks().length > 0
+                "
+            ></video>
+        </div>
         <v-dialog :value="showLogin" width="800" persistent>
             <v-card v-if="!isLoginInAsGuest" :loading="$route.query.callback">
                 <v-card-title>Freeflow Connect</v-card-title>
@@ -675,6 +642,20 @@
     };
 </script>
 <style lang="scss" scoped>
+    .bg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        margin-left: 0 !important;
+        video {
+            width: 100%;
+            filter: blur(15px);
+            min-height: 120%;
+            min-width: 120%;
+        }
+    }
     .joinContent {
         display: grid;
         grid-template: 'video io' 'actions actions';
