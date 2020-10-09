@@ -136,7 +136,7 @@
                 showControls: false,
                 timeout: null,
                 showSettings: false,
-                showInvitation: false,
+                showInvitation: true,
             };
         },
         async mounted() {
@@ -269,6 +269,7 @@
                 'mutedUsers',
                 'chatIsOpen',
                 'hasLanded',
+                'amountOfUsers',
             ]),
             currentViewStyle: {
                 get() {
@@ -286,19 +287,14 @@
                     this.setPresentationMessage(null);
                 }
             },
-            remoteUsers(val, oldval) {
-                this.showInvitation = val.length < 1;
-                if (val !== oldval) {
-                    this.$ga.event(
-                        'in-call-stats',
-                        'userAmount',
-                        window.location.href,
-                        val.length
-                    );
-                }
-            },
             chatIsOpen(val) {
                 this.view = val ? 'chat' : 'no-chat';
+            },
+            amountOfUsers(val) {
+                this.showInvitation = false;
+                if (val <= 1) {
+                    this.showInvitation = true;
+                }
             },
         },
     };
