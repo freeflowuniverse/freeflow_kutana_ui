@@ -319,6 +319,10 @@
             ]),
             init() {
                 this.getBackgroundOfMine();
+                if (this.$route.query && this.$route.query.username) {
+                    this.loginAsGuest(this.$route.query.username);
+                }
+
                 if (!this.account) {
                     this.showLogin = true;
                     return;
