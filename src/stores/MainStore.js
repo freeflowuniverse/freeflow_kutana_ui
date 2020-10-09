@@ -5,6 +5,7 @@ export default {
         snackbarMessage: '',
         localStream: null,
         dataChannel: null,
+        hasLanded: false,
     },
     mutations: {
         setSnackbarMessage(state, message) {
@@ -22,6 +23,9 @@ export default {
         },
         setChatOpenStatus(state, status) {
             state.chatIsOpen = status;
+        },
+        setHasLanded(state, status) {
+            state.hasLanded = status;
         },
     },
     actions: {
@@ -58,6 +62,9 @@ export default {
         dataChannel: state => state.dataChannel,
         chatIsOpen: state => {
             return state.chatIsOpen;
+        },
+        hasLanded: state => {
+            return state.hasLanded;
         },
     },
 };

@@ -110,9 +110,7 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn text @click="closeDialogAndRefreshLocalStream"
-                        >Continue</v-btn
-                    >
+                    <v-btn text @click="continueWithoutDevices">Continue</v-btn>
                     <v-btn text @click="requestPermission">Retry</v-btn>
                 </v-card-actions>
             </v-card>
@@ -318,7 +316,9 @@
                 'checkResponse',
                 'loginAsGuest',
             ]),
+            ...mapMutations(['setHasLanded']),
             init() {
+                this.setHasLanded(true);
                 this.getBackgroundOfMine();
                 if (this.$route.query && this.$route.query.username) {
                     this.loginAsGuest(this.$route.query.username);
@@ -604,6 +604,11 @@
                 this.displayPermissionDialog = false;
                 this.displaySecondPermissionDialog = false;
                 updateCurrentStream();
+            },
+            continueWithoutDevices() {
+                this.displayPermissionDialog = false;
+                this.displaySecondPermissionDialog = false;
+                this.showJoinCreate = true;
             },
             playSound() {
                 var audio = new Audio('long.wav');
