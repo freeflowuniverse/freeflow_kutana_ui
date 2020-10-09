@@ -2,57 +2,102 @@
     <div :data-cam="user.cam" :data-screen="user.screen" class="user-grid-item">
         <div :style="borderStyle" class="border"></div>
         <div class="controls elevation-1">
-            <v-btn
-                v-if="extendedControls"
-                dark
-                icon
-                small
-                @click="selectThisUser"
-            >
-                <span :class="{ rotated: isSelectedUser && isPinned }">
-                    <svg
-                        aria-hidden="true"
-                        class="svg-inline--fa fa-thumbtack fa-w-12"
-                        data-icon="thumbtack"
-                        data-prefix="fas"
-                        focusable="false"
-                        height="11px"
-                        role="img"
-                        viewBox="0 0 384 512"
-                        xmlns="http://www.w3.org/2000/svg"
+            <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        v-if="extendedControls"
+                        dark
+                        icon
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="selectThisUser"
                     >
-                        <path
-                            d="M298.028 214.267L285.793 96H328c13.255 0 24-10.745 24-24V24c0-13.255-10.745-24-24-24H56C42.745 0 32 10.745 32 24v48c0 13.255 10.745 24 24 24h42.207L85.972 214.267C37.465 236.82 0 277.261 0 328c0 13.255 10.745 24 24 24h136v104.007c0 1.242.289 2.467.845 3.578l24 48c2.941 5.882 11.364 5.893 14.311 0l24-48a8.008 8.008 0 0 0 .845-3.578V352h136c13.255 0 24-10.745 24-24-.001-51.183-37.983-91.42-85.973-113.733z"
-                            fill="currentColor"
-                        ></path>
-                    </svg>
-                </span>
-            </v-btn>
-            <v-btn
-                v-if="user.uuid !== localUser.uuid"
-                dark
-                icon
-                small
-                @click="toggleMute"
-            >
-                <v-icon small>{{ muted ? 'mic_off' : 'mic' }} </v-icon>
-            </v-btn>
-            <v-btn
-                v-if="user.uuid !== localUser.uuid"
-                dark
-                icon
-                small
-                @click="toggleMuteVideo"
-            >
-                <v-icon small
-                    >{{ mutedVideo ? 'videocam_off' : 'videocam' }}
-                </v-icon>
-            </v-btn>
-            <v-btn dark icon small @click="toggleFullscreen">
-                <v-icon small
-                    >{{ fullScreenUser ? 'fullscreen_exit' : 'fullscreen' }}
-                </v-icon>
-            </v-btn>
+                        <span :class="{ rotated: isSelectedUser && isPinned }">
+                            <svg
+                                aria-hidden="true"
+                                class="svg-inline--fa fa-thumbtack fa-w-12"
+                                data-icon="thumbtack"
+                                data-prefix="fas"
+                                focusable="false"
+                                height="11px"
+                                role="img"
+                                viewBox="0 0 384 512"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M298.028 214.267L285.793 96H328c13.255 0 24-10.745 24-24V24c0-13.255-10.745-24-24-24H56C42.745 0 32 10.745 32 24v48c0 13.255 10.745 24 24 24h42.207L85.972 214.267C37.465 236.82 0 277.261 0 328c0 13.255 10.745 24 24 24h136v104.007c0 1.242.289 2.467.845 3.578l24 48c2.941 5.882 11.364 5.893 14.311 0l24-48a8.008 8.008 0 0 0 .845-3.578V352h136c13.255 0 24-10.745 24-24-.001-51.183-37.983-91.42-85.973-113.733z"
+                                    fill="currentColor"
+                                ></path>
+                            </svg>
+                        </span>
+                    </v-btn>
+                </template>
+                <span
+                    >{{
+                        isSelectedUser && isPinned ? 'Unpin' : 'Pin'
+                    }}
+                    users</span
+                >
+            </v-tooltip>
+
+            <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        v-if="user.uuid !== localUser.uuid"
+                        dark
+                        icon
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="toggleMute"
+                    >
+                        <v-icon small>{{ muted ? 'mic_off' : 'mic' }} </v-icon>
+                    </v-btn>
+                </template>
+                <span>{{ muted ? 'Unmute' : 'Mute' }} users</span>
+            </v-tooltip>
+
+            <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        v-if="user.uuid !== localUser.uuid"
+                        dark
+                        icon
+                        small
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="toggleMuteVideo"
+                    >
+                        <v-icon small
+                            >{{ mutedVideo ? 'videocam_off' : 'videocam' }}
+                        </v-icon>
+                    </v-btn>
+                </template>
+                <span>Turn camera {{ mutedVideo ? 'on' : 'off' }}</span>
+            </v-tooltip>
+
+            <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        dark
+                        icon
+                        small
+                        @click="toggleFullscreen"
+                        v-bind="attrs"
+                        v-on="on"
+                    >
+                        <v-icon small
+                            >{{
+                                fullScreenUser
+                                    ? 'fullscreen_exit'
+                                    : 'fullscreen'
+                            }}
+                        </v-icon>
+                    </v-btn>
+                </template>
+                <span>{{ fullScreenUser ? 'Exit' : 'Enter' }} fullscreen</span>
+            </v-tooltip>
         </div>
         <template v-if="isPresenter">
             <UserPresenter
