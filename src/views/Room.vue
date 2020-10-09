@@ -136,16 +136,11 @@
             };
         },
         async mounted() {
-            if (!this.localStream) {
-                try {
-                    await router.push({
-                        name: 'home',
-                        query: { roomName: this.$route.params.token },
-                    });
-                } catch (e) {
-                    return;
-                }
-                return;
+            if (!this.hasLanded) {
+                router.push({
+                    name: 'home',
+                    query: { roomName: this.$route.params.token },
+                });
             }
 
             this.join(this.$route.params.token);
@@ -205,6 +200,9 @@
                 'setFullscreenUser',
             ]),
             hashString(str) {
+                if(!str) {
+                    return;
+                }
                 let hash = 0;
                 for (let i = 0; i < str.length; i++) {
                     hash += Math.pow(str.charCodeAt(i) * 31, str.length - i);
@@ -266,6 +264,7 @@
                 'fullScreenUser',
                 'mutedUsers',
                 'chatIsOpen',
+                'hasLanded'
             ]),
             currentViewStyle: {
                 get() {
