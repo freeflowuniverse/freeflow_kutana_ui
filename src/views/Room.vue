@@ -136,7 +136,7 @@
                 showControls: false,
                 timeout: null,
                 showSettings: false,
-                showInvitation: false,
+                showInvitation: true,
             };
         },
         async mounted() {
@@ -285,17 +285,6 @@
                 if (this.presentationMessage) {
                     this.setPresenterMode();
                     this.setPresentationMessage(null);
-                }
-            },
-            remoteUsers(val, oldval) {
-                this.showInvitation = val.length < 1;
-                if (val !== oldval) {
-                    this.$ga.event(
-                        'in-call-stats',
-                        'userAmount',
-                        window.location.href,
-                        val.length
-                    );
                 }
             },
             chatIsOpen(val) {
