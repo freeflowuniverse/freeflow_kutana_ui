@@ -29,7 +29,7 @@
                             <v-row justify="center" align="center">
                                 <v-col cols="12" md="7">
                                     <v-form
-                                        @submit.prevent="joinRoom"
+                                        @submit.prevent="continueLogin"
                                         v-model="valid"
                                     >
                                         <v-text-field
@@ -44,6 +44,7 @@
                                         >
                                             <template v-slot:append>
                                                 <v-btn
+                                                    :disabled="!valid"
                                                     @click="continueLogin"
                                                     text
                                                     >Continue as guest</v-btn
@@ -345,6 +346,9 @@
                 });
             },
             continueLogin() {
+                if(!this.valid) {
+                    return;
+                }
                 this.$ga.event('auth', 'guest-login');
                 this.loginAsGuest(this.guestName);
                 this.getBackgroundOfMine();
@@ -650,6 +654,7 @@
         top: 0;
         margin-left: 0 !important;
         video {
+            object-fit: cover;
             width: 100%;
             filter: blur(15px);
             min-height: 120%;
