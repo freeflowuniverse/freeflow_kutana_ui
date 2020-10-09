@@ -56,6 +56,7 @@ export default {
                     commit('setSnackbarMessage', {
                         text: `${message.sender} stopped screen sharing`,
                     });
+                    dispatch('unSelectUser');
                     break;
                 case 'presenter_started':
                     // console.log("[Signal] Presenter Mode Started ... ");
