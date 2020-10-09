@@ -270,6 +270,7 @@
                 'fullScreenUser',
                 'mutedUsers',
                 'chatIsOpen',
+                'amountOfUsers',
             ]),
             currentViewStyle: {
                 get() {
@@ -289,6 +290,12 @@
             },
             chatIsOpen(val) {
                 this.view = val ? 'chat' : 'no-chat';
+            },
+            amountOfUsers(val) {
+                this.showInvitation = false;
+                if (val <= 1) {
+                    this.showInvitation = true;
+                }
             },
         },
     };
