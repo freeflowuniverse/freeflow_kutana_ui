@@ -346,7 +346,7 @@
                 });
             },
             continueLogin() {
-                if(!this.valid) {
+                if (!this.valid) {
                     return;
                 }
                 this.$ga.event('auth', 'guest-login');
