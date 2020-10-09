@@ -66,7 +66,11 @@
 
         <UserGrid :showChat="chatIsOpen" :view="currentViewStyle">
             <template v-slot:chat>
-                <ChatGrid :selectedUser="localUser" class="chatGrid"></ChatGrid>
+                <ChatGrid
+                    :selectedUser="localUser"
+                    class="chatGrid"
+                    v-if="chatIsOpen"
+                ></ChatGrid>
             </template>
             <template v-slot:controlStrip>
                 <v-row class="controlStrip mx-0" justify="center">
