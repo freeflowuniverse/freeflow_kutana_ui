@@ -321,13 +321,12 @@
                 this.getBackgroundOfMine();
                 if (!this.account) {
                     this.showLogin = true;
-                    return;
-                }
-
-                this.checkIfPermissionsWereRequested().then(() => {
                     if (this.$route.query.callback) {
                         this.checkResponse(window.location.href);
                     }
+                    return;
+                }
+                this.checkIfPermissionsWereRequested().then(() => {
                     if (this.$route.query && this.$route.query.roomName) {
                         this.inviteUrl = this.$route.query.roomName.toLowerCase();
                     }
@@ -628,6 +627,7 @@
                 }
             },
             account(val) {
+                alert(val);
                 if (val && this.$route.query.callback) {
                     let query = Object.assign({}, this.$route.query);
                     let redirect = query.redirect;
