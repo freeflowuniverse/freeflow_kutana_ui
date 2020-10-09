@@ -156,5 +156,12 @@ export default {
         mutedUsers: state => state.mutedUsers,
         /** @returns {TinyUser[]} */
         mutedVideoUsers: state => state.mutedVideoUsers,
+        /** @returns {int} */
+        amountOfUsers: state => {
+            if (!state.localUser) {
+                return state.remoteUsers;
+            }
+            return [state.localUser, ...state.remoteUsers].length;
+        },
     },
 };
