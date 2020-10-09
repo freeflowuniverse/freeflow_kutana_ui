@@ -109,9 +109,7 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn text @click="continueWithoutDevices"
-                        >Continue</v-btn
-                    >
+                    <v-btn text @click="continueWithoutDevices">Continue</v-btn>
                     <v-btn text @click="requestPermission">Retry</v-btn>
                 </v-card-actions>
             </v-card>
@@ -316,9 +314,7 @@
                 'checkResponse',
                 'loginAsGuest',
             ]),
-            ...mapMutations([
-                'setHasLanded'
-            ]),
+            ...mapMutations(['setHasLanded']),
             init() {
                 this.getBackgroundOfMine();
                 if (!this.account) {

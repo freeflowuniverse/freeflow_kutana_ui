@@ -200,7 +200,7 @@
                 'setFullscreenUser',
             ]),
             hashString(str) {
-                if(!str) {
+                if (!str) {
                     return;
                 }
                 let hash = 0;
@@ -264,7 +264,7 @@
                 'fullScreenUser',
                 'mutedUsers',
                 'chatIsOpen',
-                'hasLanded'
+                'hasLanded',
             ]),
             currentViewStyle: {
                 get() {

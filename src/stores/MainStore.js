@@ -63,7 +63,7 @@ export default {
         chatIsOpen: state => {
             return state.chatIsOpen;
         },
-        hasLanded: (state) => {
+        hasLanded: state => {
             return state.hasLanded;
         },
     },
