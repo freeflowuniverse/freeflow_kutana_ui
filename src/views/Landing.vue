@@ -194,6 +194,7 @@
                                 v-model="inviteUrl"
                                 color="primary"
                                 persistent-hint
+                                autocomplete="off"
                             >
                                 <template v-slot:append>
                                     <v-btn
