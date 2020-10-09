@@ -627,7 +627,6 @@
                 }
             },
             account(val) {
-                alert(val);
                 if (val && this.$route.query.callback) {
                     let query = Object.assign({}, this.$route.query);
                     let redirect = query.redirect;
