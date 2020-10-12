@@ -8,4 +8,5 @@ export default {
     debugJanus: false,
     janusServer: 'wss://janus-wss.staging.jimber.org',
     gaId: 'UA-150836145-1',
+    limitBitrateCap: false,
 };

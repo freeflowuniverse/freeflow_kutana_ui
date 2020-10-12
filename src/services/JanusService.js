@@ -1,6 +1,7 @@
 import { JanusBuilder } from '../januswrapper/JanusBuilder';
 import { VideoRoomPlugin } from '../januswrapper/VideoRoomPlugin';
 import store from '@/plugins/vuex';
+import config from '../../public/config';
 
 /**
  * @param {String} serverUrl
@@ -28,7 +29,10 @@ export const initializeJanus = async (
     initialStream
 ) => {
     const janusBuilder = new JanusBuilder(serverUrl, false);
-    const videoRoomPlugin = new VideoRoomPlugin(opaqueId, true);
+    const videoRoomPlugin = new VideoRoomPlugin(
+        opaqueId,
+        config.limitBitrateCap
+    );
     let initialJoin = true;
 
     videoRoomPlugin.addEventListener('pluginAttached', async room => {
