@@ -37,7 +37,7 @@
                     >{{
                         isSelectedUser && isPinned ? 'Unpin' : 'Pin'
                     }}
-                    users</span
+                    user</span
                 >
             </v-tooltip>
 
@@ -55,7 +55,7 @@
                         <v-icon small>{{ muted ? 'mic_off' : 'mic' }} </v-icon>
                     </v-btn>
                 </template>
-                <span>{{ muted ? 'Unmute' : 'Mute' }} users</span>
+                <span>{{ muted ? 'Unmute' : 'Mute' }} user</span>
             </v-tooltip>
 
             <v-tooltip top>
