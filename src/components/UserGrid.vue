@@ -5,7 +5,7 @@
         :data-orientation="windowOrientation"
         :data-showchat="showChat ? 'true' : 'false'"
         :data-useramount="users.length"
-        :data-view="view"
+        :data-view="view === 'recording' ? 'grid' : view"
         class="grid"
     >
         <UserGridItem
@@ -16,6 +16,8 @@
             :selected="user.selected"
             :user="user"
             class="user"
+            :cover="!recording"
+            :show-fullscreen-button="!recording"
         />
         <div class="controlstripWrapper">
             <slot name="controlStrip"></slot>
@@ -76,6 +78,7 @@
                 'localUser',
                 'localScreenUser',
                 'fullScreenUser',
+                'recording',
             ]),
             users() {
                 if (!this.localUser || !this.localScreenUser) {
@@ -99,6 +102,10 @@
                     screenShareStream: o[1].stream,
                     key: o[0].uuid,
                 }));
+
+                if (this.view === 'recording') {
+                    return users;
+                }
 
                 const actualFullScreenUser = users.find(
                     o => this.fullScreenUser?.uuid === o.key

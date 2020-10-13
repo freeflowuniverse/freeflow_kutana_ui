@@ -7,7 +7,7 @@
 </template>
 <script>
     import { init, recordCanvas } from '@/services/recordCanvasService';
-    import { mapGetters } from 'vuex';
+    import { mapGetters, mapMutations } from 'vuex';
 
     export default {
         name: 'Recorder',
@@ -19,7 +19,11 @@
                 addAudioTrackFn(stream) {},
             };
         },
+        mounted() {
+            this.$root.$on('stopRecording', this.stopRecording);
+        },
         methods: {
+            ...mapMutations(['setRecording']),
             startRecording() {
                 this.renderFN = init(this.$refs.canvas);
 
@@ -32,7 +36,6 @@
                     this.renderFN();
                 };
                 loop();
-
                 const { stop, addAudioTrack } = recordCanvas(this.$refs.canvas);
 
                 addAudioTrack(this.localStream, 'local');
@@ -42,10 +45,12 @@
 
                 this.stopFN = stop;
                 this.addAudioTrackFn = addAudioTrack;
+                this.setRecording(true);
             },
             stopRecording() {
                 this.stopFN();
                 this.recording = false;
+                this.setRecording(false);
             },
         },
         computed: {
@@ -61,6 +66,7 @@
                 });
             },
             localStream(newValue) {
+                console.log('new');
                 this.addAudioTrackFn(newValue);
             },
         },
