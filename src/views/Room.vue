@@ -36,6 +36,7 @@
                     Recording ...
                 </span>
             </v-btn>
+            <div class="recording-border"></div>
         </div>
         <v-tooltip bottom v-if="!this.recording && !fullScreenUser">
             <template v-slot:activator="{ on, attrs }">
@@ -349,5 +350,16 @@
         .v-icon {
             color: #ce432b;
         }
+    }
+
+    .recording-border {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: calc(100% - 10px);
+        height: calc(100% - 10px);
+        margin: 5px;
+        border: 5px solid #ce432b;
+        user-select: none;
     }
 </style>
