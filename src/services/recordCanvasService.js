@@ -72,7 +72,7 @@ const getVideos = () => {
 /**
  * @return {HTMLCanvasElement}
  */
-const initCanvas = () => {
+export const initCanvas = () => {
     const canvas = document.createElement('canvas');
     canvas.width = 1280;
     canvas.height = 720;
