@@ -361,5 +361,6 @@
         margin: 5px;
         border: 5px solid #ce432b;
         user-select: none;
+        pointer-events: none;
     }
 </style>
