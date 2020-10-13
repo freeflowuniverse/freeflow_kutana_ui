@@ -363,10 +363,10 @@ export class VideoRoomPlugin {
                 dataChannel.send(
                     JSON.stringify({
                         t: 's',
-                        c: localUser.cam,
-                        m: localUser.mic,
-                        u: localUser.uuid,
-                        s: localScreenUser.screen,
+                        c: localUser?.cam || false,
+                        m: localUser?.mic || false,
+                        u: localUser?.uuid || false,
+                        s: localScreenUser?.screen || false,
                     })
                 );
             }, 100);
