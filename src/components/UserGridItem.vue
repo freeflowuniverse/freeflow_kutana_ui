@@ -110,9 +110,12 @@
         <template v-else>
             <div :class="{ blurred: selected }" class="avatar">
                 <img :alt="user.username" :src="avatar" />
-                <span v-if="userLabel" class="video-label">{{
-                    userLabel
-                }}</span>
+                <span v-if="userLabel" class="video-label">
+                    <v-icon v-if="user.recording" small color="#ce432b">
+                        radio_button_checked
+                    </v-icon>
+                    {{ userLabel }}
+                </span>
             </div>
             <JanusVideo
                 v-if="!mutedVideo && user.screen"
@@ -128,6 +131,7 @@
                 :cover="cover"
                 :label="userLabel"
                 :stream="user.stream"
+                :recording="user.recording"
                 class="main"
             ></JanusVideo>
         </template>

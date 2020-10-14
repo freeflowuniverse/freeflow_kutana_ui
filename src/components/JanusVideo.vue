@@ -17,7 +17,12 @@
                 </p>
             </div>
         </div>
-        <span class="video-label" v-if="label">{{ label }}</span>
+        <span class="video-label" v-if="label">
+            <v-icon v-if="recording" small color="#ce432b">
+                radio_button_checked
+            </v-icon>
+            {{ label }}
+        </span>
     </div>
 </template>
 
@@ -35,6 +40,11 @@
                 required: false,
             },
             cover: {
+                type: Boolean,
+                required: false,
+                default: false,
+            },
+            recording: {
                 type: Boolean,
                 required: false,
                 default: false,

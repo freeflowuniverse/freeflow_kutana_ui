@@ -367,6 +367,7 @@ export class VideoRoomPlugin {
                         m: localUser?.mic || false,
                         u: localUser?.uuid || false,
                         s: localScreenUser?.screen || false,
+                        r: store?.getters?.recording || false,
                     })
                 );
             }, 100);
@@ -589,6 +590,12 @@ export class VideoRoomPlugin {
                             data.c;
                         store.state.UserStore.remoteUsers[remoteUserIndex].mic =
                             data.m;
+
+                        console.log(data.r);
+
+                        store.state.UserStore.remoteUsers[
+                            remoteUserIndex
+                        ].recording = data.r;
                         const remoteScreenUserIndex = store.state.ScreenShareStore.remoteScreenUsers.findIndex(
                             u => u.uuid === data.u
                         );
