@@ -363,10 +363,11 @@ export class VideoRoomPlugin {
                 dataChannel.send(
                     JSON.stringify({
                         t: 's',
-                        c: localUser.cam,
-                        m: localUser.mic,
-                        u: localUser.uuid,
-                        s: localScreenUser.screen,
+                        c: localUser?.cam || false,
+                        m: localUser?.mic || false,
+                        u: localUser?.uuid || false,
+                        s: localScreenUser?.screen || false,
+                        r: store?.getters?.recording || false,
                     })
                 );
             }, 100);
@@ -577,7 +578,6 @@ export class VideoRoomPlugin {
                         if (data.t !== 's') {
                             return;
                         }
-                        // console.log(data.c);
                         const remoteUserIndex = store.state.UserStore.remoteUsers.findIndex(
                             u => u.uuid === data.u
                         );
@@ -589,6 +589,9 @@ export class VideoRoomPlugin {
                             data.c;
                         store.state.UserStore.remoteUsers[remoteUserIndex].mic =
                             data.m;
+                        store.state.UserStore.remoteUsers[
+                            remoteUserIndex
+                        ].recording = data.r;
                         const remoteScreenUserIndex = store.state.ScreenShareStore.remoteScreenUsers.findIndex(
                             u => u.uuid === data.u
                         );

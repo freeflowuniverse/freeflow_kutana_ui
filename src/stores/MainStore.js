@@ -6,6 +6,7 @@ export default {
         localStream: null,
         dataChannel: null,
         hasLanded: false,
+        recording: false,
     },
     mutations: {
         setSnackbarMessage(state, message) {
@@ -26,6 +27,9 @@ export default {
         },
         setHasLanded(state, status) {
             state.hasLanded = status;
+        },
+        setRecording(state, recording) {
+            state.recording = recording;
         },
     },
     actions: {
@@ -60,6 +64,7 @@ export default {
         snackbarMessage: state => state.snackbarMessage,
         localStream: state => state.localStream,
         dataChannel: state => state.dataChannel,
+        recording: state => state.recording,
         chatIsOpen: state => {
             return state.chatIsOpen;
         },

@@ -24,7 +24,21 @@
         >
             <v-icon color="white" small>fullscreen_exit</v-icon>
         </v-btn>
-        <v-tooltip bottom v-if="!fullScreenUser">
+        <div class="recording-indicator pa-5" v-if="this.recording">
+            <v-btn
+                class="pa-5"
+                large
+                @click="$root.$emit('stopRecording')"
+                text
+            >
+                <v-icon large>radio_button_checked</v-icon>
+                <span class="pl-2">
+                    Recording ...
+                </span>
+            </v-btn>
+            <div class="recording-border"></div>
+        </div>
+        <v-tooltip bottom v-if="!this.recording && !fullScreenUser">
             <template v-slot:activator="{ on, attrs }">
                 <v-btn
                     class="primary"
@@ -270,9 +284,14 @@
                 'chatIsOpen',
                 'hasLanded',
                 'amountOfUsers',
+                'recording',
             ]),
             currentViewStyle: {
                 get() {
+                    if (this.recording) {
+                        return 'recording';
+                    }
+
                     return this.presenter ? 'presentation' : this.viewStyle;
                 },
             },
@@ -319,5 +338,29 @@
 
     [data-view='no-chat'] .chatGrid {
         display: none;
+    }
+
+    .recording-indicator {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+
+        span,
+        .v-icon {
+            color: #ce432b;
+        }
+    }
+
+    .recording-border {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: calc(100% - 10px);
+        height: calc(100% - 10px);
+        margin: 5px;
+        border: 5px solid #ce432b;
+        user-select: none;
+        pointer-events: none;
     }
 </style>

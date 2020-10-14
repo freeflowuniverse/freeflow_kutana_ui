@@ -1,11 +1,13 @@
 <template>
     <div :data-cam="user.cam" :data-screen="user.screen" class="user-grid-item">
         <div :style="borderStyle" class="border"></div>
-        <div class="controls elevation-1">
-            <v-tooltip top>
+        <div
+            class="controls elevation-1"
+            v-if="Object.values(enabledControls).some(e => e)"
+        >
+            <v-tooltip top v-if="enabledControls.pin">
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn
-                        v-if="extendedControls"
                         dark
                         icon
                         small
@@ -41,10 +43,9 @@
                 >
             </v-tooltip>
 
-            <v-tooltip top>
+            <v-tooltip top v-if="enabledControls.mute">
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn
-                        v-if="user.uuid !== localUser.uuid"
                         dark
                         icon
                         small
@@ -52,16 +53,15 @@
                         v-on="on"
                         @click="toggleMute"
                     >
-                        <v-icon small>{{ muted ? 'mic_off' : 'mic' }} </v-icon>
+                        <v-icon small>{{ muted ? 'mic_off' : 'mic' }}</v-icon>
                     </v-btn>
                 </template>
                 <span>{{ muted ? 'Unmute' : 'Mute' }} user</span>
             </v-tooltip>
 
-            <v-tooltip top>
+            <v-tooltip top v-if="enabledControls.videoMute">
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn
-                        v-if="user.uuid !== localUser.uuid"
                         dark
                         icon
                         small
@@ -77,7 +77,7 @@
                 <span>Turn camera {{ mutedVideo ? 'on' : 'off' }}</span>
             </v-tooltip>
 
-            <v-tooltip top>
+            <v-tooltip top v-if="enabledControls.fullscreen">
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn
                         dark
@@ -110,9 +110,12 @@
         <template v-else>
             <div :class="{ blurred: selected }" class="avatar">
                 <img :alt="user.username" :src="avatar" />
-                <span v-if="userLabel" class="video-label">{{
-                    userLabel
-                }}</span>
+                <span v-if="userLabel" class="video-label">
+                    <v-icon v-if="user.recording" small color="#ce432b">
+                        radio_button_checked
+                    </v-icon>
+                    {{ userLabel }}
+                </span>
             </div>
             <JanusVideo
                 v-if="!mutedVideo && user.screen"
@@ -125,9 +128,10 @@
             <JanusVideo
                 v-if="!mutedVideo && user.cam"
                 :class="{ mine: localUser.id === user.id, blurred: selected }"
-                :cover="true"
+                :cover="cover"
                 :label="userLabel"
                 :stream="user.stream"
+                :recording="user.recording"
                 class="main"
             ></JanusVideo>
         </template>
@@ -153,6 +157,14 @@
             },
             user: {
                 required: true,
+            },
+            cover: {
+                type: Boolean,
+                default: true,
+            },
+            showFullscreenButton: {
+                type: Boolean,
+                default: true,
             },
         },
         data: () => {
@@ -249,6 +261,15 @@
                 return this.mutedVideoUsers.find(
                     mvu => mvu.uuid === this.user.uuid
                 );
+            },
+            enabledControls() {
+                let isLocalUser = this.user.uuid !== this.localUser.uuid;
+                return {
+                    pin: this.extendedControls,
+                    mute: isLocalUser,
+                    videoMute: isLocalUser,
+                    fullscreen: this.showFullscreenButton,
+                };
             },
         },
         methods: {
