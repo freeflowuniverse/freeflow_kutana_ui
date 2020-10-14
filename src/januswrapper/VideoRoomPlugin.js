@@ -578,7 +578,6 @@ export class VideoRoomPlugin {
                         if (data.t !== 's') {
                             return;
                         }
-                        // console.log(data.c);
                         const remoteUserIndex = store.state.UserStore.remoteUsers.findIndex(
                             u => u.uuid === data.u
                         );
@@ -590,9 +589,6 @@ export class VideoRoomPlugin {
                             data.c;
                         store.state.UserStore.remoteUsers[remoteUserIndex].mic =
                             data.m;
-
-                        console.log(data.r);
-
                         store.state.UserStore.remoteUsers[
                             remoteUserIndex
                         ].recording = data.r;
