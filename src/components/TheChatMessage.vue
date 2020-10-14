@@ -66,72 +66,72 @@
 </template>
 
 <script type="javascript">
-import { mapGetters } from 'vuex';
-import moment from 'moment';
-import marked from 'marked';
+    import { mapGetters } from 'vuex';
+    import moment from 'moment';
+    import marked from 'marked';
 
-export default {
-    props: ['message', 'dense'],
-    components: {},
-    data() {
-        return {
-            showTime: false,
-        };
-    },
-    computed: {
-        ...mapGetters(['account']),
-        parseMarkdown() {
-            return marked(this.message.content);
+    export default {
+        props: ['message', 'dense'],
+        components: {},
+        data() {
+            return {
+                showTime: false,
+            };
         },
-        timeSent() {
-            return moment(this.message.createdAt).format('HH:mm:ss');
+        computed: {
+            ...mapGetters(['account']),
+            parseMarkdown() {
+                return marked(this.message.content);
+            },
+            timeSent() {
+                return moment(this.message.createdAt).format('HH:mm:ss');
+            },
+            mimeType() {
+                if (this.message.type === 'file') {
+                    return this.message.content.file.match(
+                        /[^:]\w+\/[\w-+\d.]+(?=;|,)/
+                    )[0];
+                }
+                return false;
+            },
+            fileSize() {
+                if (this.message.type === 'file') {
+                    // The magic numbers from this function come from https://stackoverflow.com/a/49750491/2349421
+                    let file = this.message.content.file;
+                    let lengthOfHeader = file.indexOf('base64,') + 'base64,'.length;
+                    console.log(
+                        `lengthOfHeader of ${this.message.content.name}`,
+                        lengthOfHeader
+                    );
+                    console.log(
+                        `header should be`,
+                        this.message.content.file.substring(0, lengthOfHeader)
+                    );
+                    let stringLength = file.length - lengthOfHeader;
+                    let sizeInBytes =
+                        4 * Math.ceil(stringLength / 3) * 0.5624896334383812;
+                    return `${Math.round((sizeInBytes / 1000) * 100) / 100} KB`;
+                }
+                return false;
+            },
         },
-        mimeType() {
-            if (this.message.type === 'file') {
-                return this.message.content.file.match(
-                    /[^:]\w+\/[\w-+\d.]+(?=;|,)/
-                )[0];
-            }
-            return false;
+        methods: {
+            displayTime() {
+                this.showTime = true;
+            },
         },
-        fileSize() {
-            if (this.message.type === 'file') {
-                // The magic numbers from this function come from https://stackoverflow.com/a/49750491/2349421
-                let file = this.message.content.file;
-                let lengthOfHeader = file.indexOf('base64,') + 'base64,'.length;
-                console.log(
-                    `lengthOfHeader of ${this.message.content.name}`,
-                    lengthOfHeader
-                );
-                console.log(
-                    `header should be`,
-                    this.message.content.file.substring(0, lengthOfHeader)
-                );
-                let stringLength = file.length - lengthOfHeader;
-                let sizeInBytes =
-                    4 * Math.ceil(stringLength / 3) * 0.5624896334383812;
-                return `${Math.round((sizeInBytes / 1000) * 100) / 100} KB`;
-            }
-            return false;
-        },
-    },
-    methods: {
-        displayTime() {
-            this.showTime = true;
-        },
-    },
-};
+    };
 </script>
 
 <style lang="scss" scoped>
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.5s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-    opacity: 0;
-}
-.chatMessage {
-    border-radius: 0 !important;
-}
+    .fade-enter-active,
+    .fade-leave-active {
+        transition: opacity 0.5s;
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+        opacity: 0;
+    }
+    .chatMessage {
+        border-radius: 0 !important;
+    }
 </style>

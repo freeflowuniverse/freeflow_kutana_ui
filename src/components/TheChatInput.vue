@@ -32,104 +32,104 @@
 </template>
 
 <script type="javascript">
-import { mapActions, mapGetters } from 'vuex';
-import moment from 'moment';
+    import { mapActions, mapGetters } from 'vuex';
+    import moment from 'moment';
 
-export default {
-    data() {
-        return {
-            file: null,
-            message: '',
-        };
-    },
-    mounted() {
-        document.onpaste = event => {
-            let items = (
-                event.clipboardData || event.originalEvent.clipboardData
-            ).items;
-            for (let index in items) {
-                let item = items[index];
-                console.log(`kind`, item.kind);
-                if (item.kind === 'file') {
-                    let blob = item.getAsFile();
-                    let reader = new FileReader();
-                    reader.onload = event => {
-                        this.sendIt(
-                            {
-                                file: event.target.result,
-                            },
-                            'file'
-                        );
-                    }; // data url!
-                    if (blob) {
-                        reader.readAsDataURL(blob);
-                    } else {
-                        this.setSnackbarMessage(
-                            `Can't paste file, only images. Please use the upload button`
-                        );
+    export default {
+        data() {
+            return {
+                file: null,
+                message: '',
+            };
+        },
+        mounted() {
+            document.onpaste = event => {
+                let items = (
+                    event.clipboardData || event.originalEvent.clipboardData
+                ).items;
+                for (let index in items) {
+                    let item = items[index];
+                    console.log(`kind`, item.kind);
+                    if (item.kind === 'file') {
+                        let blob = item.getAsFile();
+                        let reader = new FileReader();
+                        reader.onload = event => {
+                            this.sendIt(
+                                {
+                                    file: event.target.result,
+                                },
+                                'file'
+                            );
+                        }; // data url!
+                        if (blob) {
+                            reader.readAsDataURL(blob);
+                        } else {
+                            this.setSnackbarMessage(
+                                `Can't paste file, only images. Please use the upload button`
+                            );
+                        }
                     }
                 }
-            }
-        };
-    },
-    computed: {
-        ...mapGetters(['account', 'localUser']),
-        canSend() {
-            return this.message && this.message.trim();
+            };
         },
-    },
-    methods: {
-        ...mapActions(['sendMessage', 'setSnackbarMessage']),
-        forwardMessage() {
-            if (!this.canSend) {
-                return;
-            }
-            this.sendIt(this.message);
+        computed: {
+            ...mapGetters(['account', 'localUser']),
+            canSend() {
+                return this.message && this.message.trim();
+            },
         },
-        clearMessage() {
-            this.message = '';
-        },
-        sendIt(content, type = 'text') {
-            if (content !== '') {
-                this.sendMessage({
-                    sender: this.account.name,
-                    senderId: this.account.uuid,
-                    createdAt: moment(),
-                    content,
-                    type,
+        methods: {
+            ...mapActions(['sendMessage', 'setSnackbarMessage']),
+            forwardMessage() {
+                if (!this.canSend) {
+                    return;
+                }
+                this.sendIt(this.message);
+            },
+            clearMessage() {
+                this.message = '';
+            },
+            sendIt(content, type = 'text') {
+                if (content !== '') {
+                    this.sendMessage({
+                        sender: this.account.name,
+                        senderId: this.account.uuid,
+                        createdAt: moment(),
+                        content,
+                        type,
+                    });
+                    this.clearMessage();
+                }
+            },
+            showFileUploader() {
+                this.$refs.fileUpper.click();
+            },
+            async fileUploaded(e) {
+                if (e.srcElement.files[0].size > 1048576) {
+                    this.setSnackbarMessage({
+                        type: 'error',
+                        text: `Can't send files bigger than 1MB`,
+                    });
+                } else {
+                    this.sendIt(
+                        {
+                            name: e.srcElement.files[0].name,
+                            file: await this.toBase64(e.srcElement.files[0]),
+                        },
+                        'file'
+                    );
+                }
+            },
+            toBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
                 });
-                this.clearMessage();
-            }
+            },
         },
-        showFileUploader() {
-            this.$refs.fileUpper.click();
-        },
-        async fileUploaded(e) {
-            if (e.srcElement.files[0].size > 1048576) {
-                this.setSnackbarMessage({
-                    type: 'error',
-                    text: `Can't send files bigger than 1MB`,
-                });
-            } else {
-                this.sendIt(
-                    {
-                        name: e.srcElement.files[0].name,
-                        file: await this.toBase64(e.srcElement.files[0]),
-                    },
-                    'file'
-                );
-            }
-        },
-        toBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        },
-    },
-};
+    };
 </script>
 
 <style lang="scss" scoped></style>
