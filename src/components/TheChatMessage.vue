@@ -29,6 +29,35 @@
             >
                 <div v-dompurify-html="parseMarkdown"></div>
             </v-card-text>
+            <v-card-text v-else-if="mimeType === 'image/png'">
+                <v-img :src="message.content.file"></v-img>
+            </v-card-text>
+            <v-card-text v-else>
+                <v-sheet color="primary white--text">
+                    <v-row class="mx-0 pa-3" align="center">
+                        <v-icon large>attachment</v-icon>
+                        <v-col>
+                            <p class="my-0">
+                                <a
+                                    :href="message.content.file"
+                                    :download="message.content.name"
+                                    class="white--text"
+                                    >{{ message.content.name }}</a
+                                >
+                            </p>
+                            <p class="my-0 overline">{{ fileSize }}</p>
+                        </v-col>
+                        <v-btn
+                            text
+                            icon
+                            :href="message.content.file"
+                            :download="message.content.name"
+                        >
+                            <v-icon>get_app</v-icon>
+                        </v-btn>
+                    </v-row>
+                </v-sheet>
+            </v-card-text>
         </v-card>
         <div class="text-center grey--text font-weight-light overline" v-else>
             {{ message.content }}
@@ -37,44 +66,72 @@
 </template>
 
 <script type="javascript">
-    import { mapGetters } from "vuex";
-    import moment from "moment";
-    import marked from "marked";
+import { mapGetters } from 'vuex';
+import moment from 'moment';
+import marked from 'marked';
 
-    export default {
-      props: ["message", "dense"],
-      components: {},
-      data() {
+export default {
+    props: ['message', 'dense'],
+    components: {},
+    data() {
         return {
-          showTime: false,
+            showTime: false,
         };
-      },
-      computed: {
-        ...mapGetters(["account"]),
+    },
+    computed: {
+        ...mapGetters(['account']),
         parseMarkdown() {
-          return marked(this.message.content);
+            return marked(this.message.content);
         },
         timeSent() {
-          return moment(this.message.createdAt).format('HH:mm:ss');
-        }
-      },
-      methods: {
+            return moment(this.message.createdAt).format('HH:mm:ss');
+        },
+        mimeType() {
+            if (this.message.type === 'file') {
+                return this.message.content.file.match(
+                    /[^:]\w+\/[\w-+\d.]+(?=;|,)/
+                )[0];
+            }
+            return false;
+        },
+        fileSize() {
+            if (this.message.type === 'file') {
+                // The magic numbers from this function come from https://stackoverflow.com/a/49750491/2349421
+                let file = this.message.content.file;
+                let lengthOfHeader = file.indexOf('base64,') + 'base64,'.length;
+                console.log(
+                    `lengthOfHeader of ${this.message.content.name}`,
+                    lengthOfHeader
+                );
+                console.log(
+                    `header should be`,
+                    this.message.content.file.substring(0, lengthOfHeader)
+                );
+                let stringLength = file.length - lengthOfHeader;
+                let sizeInBytes =
+                    4 * Math.ceil(stringLength / 3) * 0.5624896334383812;
+                return `${Math.round((sizeInBytes / 1000) * 100) / 100} KB`;
+            }
+            return false;
+        },
+    },
+    methods: {
         displayTime() {
-          this.showTime = true;
-        }
-      }
-    };
+            this.showTime = true;
+        },
+    },
+};
 </script>
 
 <style lang="scss" scoped>
-    .fade-enter-active,
-    .fade-leave-active {
-        transition: opacity 0.5s;
-    }
-    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-        opacity: 0;
-    }
-    .chatMessage {
-        border-radius: 0 !important;
-    }
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
+}
+.chatMessage {
+    border-radius: 0 !important;
+}
 </style>
