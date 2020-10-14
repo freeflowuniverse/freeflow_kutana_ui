@@ -8,6 +8,16 @@
                     style="display:none"
                     type="file"
                 />
+                <twemoji-picker
+                    :emojiData="emojiDataAll"
+                    :emojiGroups="emojiGroups"
+                    :skinsSelection="false"
+                    :searchEmojisFeat="true"
+                    searchEmojiPlaceholder="Search here."
+                    searchEmojiNotFound="Emojis not found."
+                    isLoadingLabel="Loading..."
+                    @emojiUnicodeAdded="addEmoji"
+                ></twemoji-picker>
                 <v-textarea
                     prepend-icon="attach_file"
                     @click:prepend="showFileUploader"
@@ -34,8 +44,18 @@
 <script type="javascript">
     import { mapActions, mapGetters } from 'vuex';
     import moment from 'moment';
+    import {
+        TwemojiPicker,
+    } from '@kevinfaguiar/vue-twemoji-picker';
+    import EmojiAllData from '@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-all-groups.json';
+    import EmojiGroups from '@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json';
+
 
     export default {
+
+        components: {
+            'twemoji-picker': TwemojiPicker,
+        },
         data() {
             return {
                 file: null,
@@ -58,14 +78,14 @@
                                 {
                                     file: event.target.result,
                                 },
-                                'file'
+                                'file',
                             );
                         }; // data url!
                         if (blob) {
                             reader.readAsDataURL(blob);
                         } else {
                             this.setSnackbarMessage(
-                                `Can't paste file, only images. Please use the upload button`
+                                `Can't paste file, only images. Please use the upload button`,
                             );
                         }
                     }
@@ -76,6 +96,12 @@
             ...mapGetters(['account', 'localUser']),
             canSend() {
                 return this.message && this.message.trim();
+            },
+            emojiDataAll() {
+                return EmojiAllData;
+            },
+            emojiGroups() {
+                return EmojiGroups;
             },
         },
         methods: {
@@ -116,7 +142,7 @@
                             name: e.srcElement.files[0].name,
                             file: await this.toBase64(e.srcElement.files[0]),
                         },
-                        'file'
+                        'file',
                     );
                 }
             },
@@ -128,6 +154,10 @@
                     reader.onerror = error => reject(error);
                 });
             },
+            addEmoji(emoji) {
+                console.log(emoji);
+               this.message += emoji;
+            }
         },
     };
 </script>

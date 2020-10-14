@@ -10,7 +10,10 @@
     "lint": "vue-cli-service lint",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0"
   },
-  "pre-commit": [ "precommit-msg", "lint" ],
+  "pre-commit": [
+    "precommit-msg",
+    "lint"
+  ],
   "dependencies": {
     "@kevinfaguiar/vue-twemoji-picker": "^5.7.4",
     "@tensorflow-models/body-pix": "^2.0.5",
