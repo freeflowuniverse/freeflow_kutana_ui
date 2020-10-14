@@ -25,6 +25,11 @@
             <!-- </v-card-subtitle> -->
             <v-card-text
                 v-if="message.type === 'text'"
+                :class="{
+                    emoji: /^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]|\s)+$/.test(
+                        this.message.content
+                    ),
+                }"
                 class="font-weight-bold content pa-1 pl-2"
             >
                 <div v-dompurify-html="parseMarkdown"></div>
@@ -133,5 +138,9 @@
     }
     .chatMessage {
         border-radius: 0 !important;
+    }
+    .emoji {
+        font-size: 32px;
+        line-height: 32px;
     }
 </style>
