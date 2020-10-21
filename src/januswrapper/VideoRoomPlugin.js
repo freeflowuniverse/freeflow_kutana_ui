@@ -61,9 +61,16 @@ export class VideoRoomPlugin {
 
         if (window.audioContext) {
             let analyser = window.audioContext.createAnalyser();
-            let microphone = window.audioContext.createMediaStreamSource(
-                stream
-            );
+            let microphone;
+
+            try {
+                microphone = window.audioContext.createMediaStreamSource(
+                    stream
+                );
+            } catch (e) {
+                return;
+            }
+
             let javascriptNode = window.audioContext.createScriptProcessor(
                 2048,
                 1,
