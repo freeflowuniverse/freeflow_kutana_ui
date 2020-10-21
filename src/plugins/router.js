@@ -8,7 +8,9 @@ import AutoJoin from '../views/AutoJoin';
 
 Vue.use(VueRouter);
 
-export default new VueRouter({
+const roomRouteName = 'room';
+
+let router = new VueRouter({
     mode: 'history',
     routes: [
         {
@@ -31,9 +33,16 @@ export default new VueRouter({
         },
         {
             path: '/room/:token',
-            name: 'room',
+            name: roomRouteName,
             component: Room,
             meta: { requiresAuth: true, hideAccount: true },
         },
     ],
 });
+
+router.afterEach((to, from) => {
+    if (from.name === roomRouteName) {
+        location.reload();
+    }
+});
+export default router;
