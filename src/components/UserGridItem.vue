@@ -244,9 +244,7 @@
                 )}.svg`;
             },
             userLabel() {
-                return this.localUser.id !== this.user.id
-                    ? this.user.username
-                    : null;
+                return this.user?.username;
             },
             isSelectedUser() {
                 return this.user?.id == this.selectedUser?.id;
