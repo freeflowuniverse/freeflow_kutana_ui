@@ -142,5 +142,6 @@
     .emoji {
         font-size: 32px;
         line-height: 32px;
+        color: #000000 !important;
     }
 </style>
