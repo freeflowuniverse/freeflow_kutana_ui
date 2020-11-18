@@ -15,7 +15,7 @@
         </div>
         <v-dialog :value="showLogin" width="800" persistent>
             <v-card v-if="!isLoginInAsGuest" :loading="$route.query.callback">
-                <v-card-title>Freeflow Connect</v-card-title>
+                <v-card-title>{{ title }}</v-card-title>
                 <v-card-text v-if="$route.query.callback"
                     >Validating auth...</v-card-text
                 >
@@ -23,8 +23,8 @@
                     <v-card-text>
                         <v-col>
                             <p>
-                                Please identify yourself using 3bot Connect or
-                                continue as guest.
+                                Please identify yourself using Threefold Connect
+                                or continue as guest.
                             </p>
                             <v-row justify="center" align="center">
                                 <v-col cols="12" md="7">
@@ -72,7 +72,7 @@
                                             id="threebotConnectLoginBtn"
                                             @click="threebotConnectLogin"
                                             text
-                                            >Use 3Bot Connect</v-btn
+                                            >Use Threefold Connect</v-btn
                                         >
                                     </v-col>
                                 </transition>
@@ -84,7 +84,7 @@
         </v-dialog>
         <v-dialog :value="displayPermissionDialog" width="600" persistent>
             <v-card>
-                <v-card-title> FreeFlowConnect </v-card-title>
+                <v-card-title>{{ title }}</v-card-title>
                 <v-card-text>
                     For others to see and hear you, your browser will request
                     access to your cam and mic. <br />
@@ -101,11 +101,11 @@
         <v-dialog :value="displaySecondPermissionDialog" width="600" persistent>
             <v-card>
                 <v-card-title>
-                    FreeFlowConnect can't access your devices</v-card-title
+                    {{ title }} can't access your devices</v-card-title
                 >
                 <v-card-text>
-                    FreeFlowConnect still can't access your devices. You can
-                    still continue without or enable them in the in your browser
+                    {{ title }} still can't access your devices. You can still
+                    continue without or enable them in the in your browser
                     settings and then retrying.
                 </v-card-text>
                 <v-card-actions>
@@ -117,7 +117,7 @@
         </v-dialog>
         <v-dialog :value="showJoinCreate" width="800" persistent>
             <v-card>
-                <v-card-title>Freeflow Connect</v-card-title>
+                <v-card-title> {{ title }}</v-card-title>
                 <v-card-text class="joinContent pa-0">
                     <div class="mine ml-4" :style="myBackground">
                         <video
@@ -275,10 +275,11 @@
                 'localStream',
                 'videoDeviceId',
                 'audioDeviceId',
+                'title',
             ]),
             avatar() {
                 return `https://avatars.dicebear.com/api/human/${this.hashString(
-                    this.account?.name || 'FreeFlowConnect'
+                    this.account?.name || this.title
                 )}.svg`;
             },
             videoInputDevices() {

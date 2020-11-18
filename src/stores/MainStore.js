@@ -1,6 +1,8 @@
+import { getTitle } from '@/utils/misc';
+
 export default {
     state: {
-        viewStyle: localStorage.getItem('view-style') || 'grid',
+        viewStyle: 'grid',
         chatIsOpen: false,
         snackbarMessage: '',
         localStream: null,
@@ -70,6 +72,10 @@ export default {
         },
         hasLanded: state => {
             return state.hasLanded;
+        },
+        title: () => {
+            //@Todo fix when www.example.com => Example Www
+            return getTitle();
         },
     },
 };

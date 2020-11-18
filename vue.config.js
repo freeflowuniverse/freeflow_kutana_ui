@@ -64,7 +64,7 @@ module.exports = {
     },
 
     pwa: {
-        name: 'FreeFlowConnect',
+        name: 'Meetings',
         manifestOptions: {
             background_color: '#FFFFFF',
             display: 'minimal-ui',

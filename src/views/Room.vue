@@ -242,8 +242,8 @@
                 if (navigator.canShare) {
                     try {
                         await navigator.share({
-                            title: 'Have a cal on FreeFlowConnect',
-                            text: `Join my call on FreeFlowConnect ${window.location.href}`,
+                            title: `Have a cal on ${this.title}`,
+                            text: `Join my call on ${this.title} ${window.location.href}`,
                         });
                     } catch (err) {
                         this.showInvitation = true;
@@ -285,6 +285,7 @@
                 'hasLanded',
                 'amountOfUsers',
                 'recording',
+                'title',
             ]),
             currentViewStyle: {
                 get() {

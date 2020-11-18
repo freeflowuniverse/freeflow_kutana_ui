@@ -14,7 +14,10 @@ import './registerServiceWorker';
 Vue.config.productionTip = false;
 
 import AsyncComputed from 'vue-async-computed';
+import { getTitle } from '@/utils/misc';
 Vue.use(AsyncComputed);
+
+document.title = getTitle();
 
 export default new Vue({
     vuetify,
