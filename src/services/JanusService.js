@@ -2,6 +2,7 @@ import { JanusBuilder } from '../januswrapper/JanusBuilder';
 import { VideoRoomPlugin } from '../januswrapper/VideoRoomPlugin';
 import store from '@/plugins/vuex';
 import config from '../../public/config';
+import { setExitPrompt } from '@/services/exitPrompt';
 
 /**
  * @param {String} serverUrl
@@ -268,6 +269,7 @@ export const initializeJanus = async (
                 .dispatchEvent(new Event('ended'));
         },
         hangUp: () => {
+            setExitPrompt(false);
             const presenter = store.getters.presenter;
             const localUser = store.getters.localUser;
             if (presenter && presenter.id === localUser.id) {

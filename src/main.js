@@ -15,9 +15,16 @@ Vue.config.productionTip = false;
 
 import AsyncComputed from 'vue-async-computed';
 import { getTitle } from '@/utils/misc';
+import { showExitPrompt } from '@/services/exitPrompt';
 Vue.use(AsyncComputed);
 
 document.title = getTitle();
+
+window.onbeforeunload = function() {
+    if (showExitPrompt()) {
+        return 'Do you really want to leave our brilliant application?';
+    }
+};
 
 export default new Vue({
     vuetify,

@@ -133,6 +133,7 @@
     import Settings from '@/components/Settings';
     import ChatMessageNotification from '@/components/ChatMessageNotification';
     import InviteUsers from '@/components/InviteUsers';
+    import { setExitPrompt, showExitPrompt } from '@/services/exitPrompt';
 
     export default {
         name: 'Room',
@@ -160,6 +161,7 @@
                     query: { roomName: this.$route.params.token },
                 });
             }
+            setExitPrompt(true);
 
             this.join(this.$route.params.token);
             this.getTeamInfo();
@@ -202,6 +204,7 @@
             this.sendKeepAlive();
         },
         beforeDestroy() {
+            setExitPrompt(false);
             this.$ga.event('after-call-events', 'callEnded', 'beforeDestroy');
         },
         methods: {
