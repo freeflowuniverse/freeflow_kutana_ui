@@ -37,6 +37,12 @@ let router = new VueRouter({
             component: Room,
             meta: { requiresAuth: true, hideAccount: true },
         },
+        {
+            path: '/r/:token',
+            name: 'roomAlias',
+            component: Room,
+            meta: { requiresAuth: true, hideAccount: true },
+        },
     ],
 });
 
