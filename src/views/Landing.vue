@@ -222,6 +222,7 @@
     import { mapActions, mapMutations, mapGetters } from 'vuex';
     import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
     import DeviceSelector from '../components/DeviceSelector';
+    import { nanoid } from 'nanoid';
     export default {
         components: {
             DeviceSelector,
@@ -278,9 +279,9 @@
                 'title',
             ]),
             avatar() {
-                return `https://avatars.dicebear.com/api/human/${this.hashString(
-                    this.account?.name || this.title
-                )}.svg`;
+                const imageHash =
+                    this.user?.username?.replace('.3bot', '') || nanoid();
+                return `https://avatars.dicebear.com/api/initials/${imageHash}.svg`;
             },
             videoInputDevices() {
                 return this.mediaDevices.filter(

@@ -239,8 +239,9 @@
                 return this.presenter && this.presenter.id === this.user.id;
             },
             avatar() {
-                return `https://avatars.dicebear.com/api/human/${this.hashString(
-                    this.$props.user.username
+                return `https://avatars.dicebear.com/api/initials/${this.user?.username.replace(
+                    '.3bot',
+                    ''
                 )}.svg`;
             },
             userLabel() {
