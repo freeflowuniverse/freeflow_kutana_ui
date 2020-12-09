@@ -175,8 +175,15 @@
                             </span>
                         </v-btn>
                     </div>
+                    <div class="recently pa-4 grey lighten-4" v-if="rooms.length">
+                        <p>Recently viseted rooms</p>
+                        <v-chip class="mr-2 secondary" dark v-for="(room, key) in rooms" :key="key" @click="joinRecently(room)">
+                            {{room}} 
+                            <v-icon right small>launch</v-icon>
+                        </v-chip>
+                    </div>
                     <div
-                        class="actions mt-4 px-4 py-2 grey lighten-4"
+                        class="actions px-4 py-2 grey lighten-3"
                         :class="{ joining: inviteUrl }"
                     >
                         <v-form @submit.prevent="joinRoom" v-model="valid">
@@ -257,6 +264,9 @@
                 shouldRequest: { audio: false, video: false },
                 displaySecondPermissionDialog: false,
                 showJoinCreate: false,
+                rooms: window.localStorage.getItem('recentlyRooms')
+                    ? JSON.parse(window.localStorage.getItem('recentlyRooms')).reverse()
+                    : [],
             };
         },
         mounted() {
@@ -394,6 +404,10 @@
                     return;
                 }
                 this.createTeam();
+            },
+            joinRecently(room) {
+                this.inviteUrl = room;
+                this.joinRoom();
             },
             joinRoom() {
                 if (!this.account) {
@@ -673,7 +687,7 @@
     }
     .joinContent {
         display: grid;
-        grid-template: 'video io' 'actions actions';
+        grid-template: 'video io' 'recently recently' 'actions actions';
         grid-template-columns: 5fr 4fr;
         .mine {
             grid-area: video;
@@ -690,6 +704,9 @@
             > * {
                 max-width: 100%;
             }
+        }
+        .recently {
+            grid-area: recently;
         }
         .actions {
             grid-area: actions;

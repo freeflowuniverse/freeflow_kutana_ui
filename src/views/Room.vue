@@ -161,6 +161,19 @@
                     query: { roomName: this.$route.params.token },
                 });
             }
+
+            // Save roomname to local storage
+            let recently = window.localStorage.getItem('recentlyRooms')
+                    ? JSON.parse(window.localStorage.getItem('recentlyRooms')).reverse().slice(0,5)
+                    : [];
+            recently.reverse();
+            let roomIndex = recently.indexOf(this.$route.params.token);
+            if (roomIndex > -1) {
+                recently.splice(roomIndex, 1);
+            }
+            recently.push(this.$route.params.token);
+            window.localStorage.setItem('recentlyRooms', JSON.stringify(recently));
+
             setExitPrompt(true);
 
             this.join(this.$route.params.token);
