@@ -175,10 +175,19 @@
                             </span>
                         </v-btn>
                     </div>
-                    <div class="recently pa-4 grey lighten-4" v-if="rooms.length">
+                    <div
+                        class="recently pa-4 grey lighten-4"
+                        v-if="rooms.length"
+                    >
                         <p>Recently viseted rooms</p>
-                        <v-chip class="mr-2 secondary" dark v-for="(room, key) in rooms" :key="key" @click="joinRecently(room)">
-                            {{room}} 
+                        <v-chip
+                            class="mr-2 secondary"
+                            dark
+                            v-for="(room, key) in rooms"
+                            :key="key"
+                            @click="joinRecently(room)"
+                        >
+                            {{ room }}
                             <v-icon right small>launch</v-icon>
                         </v-chip>
                     </div>
@@ -265,7 +274,9 @@
                 displaySecondPermissionDialog: false,
                 showJoinCreate: false,
                 rooms: window.localStorage.getItem('recentlyRooms')
-                    ? JSON.parse(window.localStorage.getItem('recentlyRooms')).reverse()
+                    ? JSON.parse(
+                          window.localStorage.getItem('recentlyRooms')
+                      ).reverse()
                     : [],
             };
         },
