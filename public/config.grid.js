@@ -9,4 +9,5 @@ export default {
     janusServer: `${window.location.protocol}//${window.location.hostname}/janus`,
     gaId: 'UA-150836145-1',
     limitBitrateCap: true,
+    guest: false,
 };

@@ -23,8 +23,10 @@
                     <v-card-text>
                         <v-col>
                             <p>
-                                Please identify yourself using Threefold Connect
-                                or continue as guest.
+                                Please identify yourself using Threefold
+                                Connect<span v-if="guest"
+                                    >or continue as guest</span
+                                >.
                             </p>
                             <v-row justify="center" align="center">
                                 <v-col cols="12" md="7">
@@ -36,6 +38,7 @@
                                             id="guestName"
                                             :rules="guestNameRules"
                                             v-model="guestName"
+                                            v-if="guest"
                                             label="Guest"
                                             autofocus
                                             counter="20"
@@ -57,22 +60,28 @@
                                     <v-divider
                                         vertical
                                         v-if="
-                                            !inviteUrl &&
+                                            guest &&
+                                                !inviteUrl &&
                                                 $vuetify.breakpoint.mdAndUp
                                         "
                                     ></v-divider>
                                 </transition>
                                 <transition name="shrink-x">
                                     <v-col
-                                        cols="4"
-                                        align="center"
+                                        :cols="guest ? 4 : 12"
+                                        :align="guest ? 'center' : 'left'"
                                         v-if="!inviteUrl"
                                     >
                                         <v-btn
                                             id="threebotConnectLoginBtn"
                                             @click="threebotConnectLogin"
-                                            text
-                                            >Use Threefold Connect</v-btn
+                                            :text="guest"
+                                            color="primary"
+                                            >{{
+                                                guest
+                                                    ? 'Use Threefold Connect'
+                                                    : 'login'
+                                            }}</v-btn
                                         >
                                     </v-col>
                                 </transition>
@@ -223,6 +232,7 @@
     import { updateCurrentStream } from '@/utils/mediaDevicesUtils';
     import DeviceSelector from '../components/DeviceSelector';
     import { nanoid } from 'nanoid';
+    import config from '../../public/config';
     export default {
         components: {
             DeviceSelector,
@@ -258,6 +268,7 @@
                 shouldRequest: { audio: false, video: false },
                 displaySecondPermissionDialog: false,
                 showJoinCreate: false,
+                guest: config.guest,
             };
         },
         mounted() {

@@ -9,4 +9,5 @@ export default {
     janusServer: 'https://janus.jimber.org/janus',
     gaId: 'UA-150836145-1',
     limitBitrateCap: true,
+    guest: true,
 };
