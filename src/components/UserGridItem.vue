@@ -239,9 +239,9 @@
                 return this.presenter && this.presenter.id === this.user.id;
             },
             avatar() {
-                return `https://avatars.dicebear.com/api/initials/${this.user?.username.replace(
-                    '.3bot',
-                    ''
+                let imageHash = this.user?.username;
+                return `https://avatars.dicebear.com/api/initials/${encodeURI(
+                    imageHash.replace('.3bot', '').replace('*', '')
                 )}.svg`;
             },
             userLabel() {
