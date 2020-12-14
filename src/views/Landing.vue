@@ -291,8 +291,12 @@
             ]),
             avatar() {
                 const imageHash =
-                    this.user?.username?.replace('.3bot', '') || nanoid();
-                return `https://avatars.dicebear.com/api/initials/${imageHash}.svg`;
+                    JSON.parse(localStorage?.getItem('account'))?.name ||
+                    this.user?.username ||
+                    nanoid();
+                return `https://avatars.dicebear.com/api/initials/${imageHash
+                    .replace('.3bot', '')
+                    .replace('*', '')}.svg`;
             },
             videoInputDevices() {
                 return this.mediaDevices.filter(
