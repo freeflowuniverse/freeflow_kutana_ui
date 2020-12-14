@@ -294,9 +294,9 @@
                     JSON.parse(localStorage?.getItem('account'))?.name ||
                     this.user?.username ||
                     nanoid();
-                return `https://avatars.dicebear.com/api/initials/${imageHash
-                    .replace('.3bot', '')
-                    .replace('*', '')}.svg`;
+                return `https://avatars.dicebear.com/api/initials/${encodeURI(
+                    imageHash.replace('.3bot', '').replace('*', '')
+                )}.svg`;
             },
             videoInputDevices() {
                 return this.mediaDevices.filter(
