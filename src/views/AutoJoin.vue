@@ -26,12 +26,15 @@
             this.setAccount({ name: userName, uuid: uuidv4() });
         },
         mounted() {
+            this.setHasLanded(true);
+
             this.refreshMediaDevices().then(() => {
                 updateCurrentStream();
             });
+
             setTimeout(() => {
                 this.joinRoom();
-            }, 800);
+            }, 2000);
         },
         computed: {
             ...mapGetters(['account', 'localStream']),
@@ -41,13 +44,13 @@
         },
         methods: {
             ...mapActions(['refreshMediaDevices']),
-            ...mapMutations(['setAccount']),
-            joinRoom() {
+            ...mapMutations(['setAccount', 'setHasLanded']),
+            async joinRoom() {
                 if (!this.account || !this.inviteUrl) {
                     return;
                 }
                 if (this.inviteUrl && this.reg.test(this.inviteUrl)) {
-                    this.$router.push({
+                    await this.$router.push({
                         name: 'room',
                         params: {
                             token: this.inviteUrl,
