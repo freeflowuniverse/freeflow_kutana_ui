@@ -24,7 +24,7 @@
             ...mapGetters(['snackbarMessage']),
             cssProps() {
                 return {
-                    '--primary-color': this.$vuetify.theme.themes.light.primary,
+                    '--primary-color': '#1F0F5B',
                     '--accent-color': this.$vuetify.theme.themes.light.accent,
                     '--error-color': this.$vuetify.theme.themes.light.error,
                 };
