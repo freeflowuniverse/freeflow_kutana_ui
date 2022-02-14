@@ -97,21 +97,40 @@ export const initializeJanus = async (
         if (user === store.getters.localUser) {
             return;
         }
+
         const videoTrack = user?.stream?.getVideoTracks()[0];
         if (videoTrack && videoTrack.readyState === 'live') {
             user.cam = true;
         }
+
+        store.commit('addRemoteStream', {
+            userId: user.id,
+            stream: user.stream
+        });
+
+        delete user.stream;
         store.commit('addRemoteUser', user);
     });
 
     videoRoomPlugin.addEventListener('userLeft', user => {
         store.commit('deleteRemoteUser', user);
+        store.commit('deleteRemoteStream', user.id);
     });
+
     videoRoomPlugin.addEventListener('cleanupUser', async user => {
         if (await store.dispatch('findUserById', user.id)) {
+            store.commit('addRemoteStream', {
+                userId: user.id,
+                stream: user.stream
+            });
+            
+            delete user.stream;
             store.commit('addRemoteUser', user);
+
             return;
         }
+
+        store.commit('deleteRemoteStream', user.id);
         store.commit('deleteRemoteUser', user);
     });
 

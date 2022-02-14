@@ -125,12 +125,13 @@
                 :overlay="localUser.id === user.id"
                 class="screen"
             ></JanusVideo>
+
             <JanusVideo
                 v-if="!mutedVideo && user.cam"
                 :class="{ mine: localUser.id === user.id, blurred: selected }"
                 :cover="cover"
                 :label="userLabel"
-                :stream="user.stream"
+                :stream="userStream"
                 :recording="user.recording"
                 class="main"
             ></JanusVideo>
@@ -179,7 +180,7 @@
             const img = new Image();
             img.src = this.avatar;
 
-            const videoTrack = this.user.stream.getVideoTracks()[0];
+            const videoTrack = this.userStream.getVideoTracks()[0];
             if (videoTrack) {
                 videoTrack.onended = () => {
                     setTimeout(() => {
@@ -208,6 +209,7 @@
                 'fullScreenUser',
                 'mutedUsers',
                 'mutedVideoUsers',
+                'remoteStreams'
             ]),
             borderStyle() {
                 const primaryColor = getComputedStyle(
@@ -245,6 +247,9 @@
             },
             userLabel() {
                 return this.user?.username;
+            },
+            userStream() {
+                return this.remoteStreams?.get(this.user?.id) || this.user?.stream;
             },
             isSelectedUser() {
                 return this.user?.id == this.selectedUser?.id;

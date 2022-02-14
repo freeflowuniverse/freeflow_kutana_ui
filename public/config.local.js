@@ -1,12 +1,12 @@
 export default {
-    ffcBackend: 'http://localhost:5000/',
+    ffcBackend: 'https://ffc-api.jimber.org/',
     appId: window.location.host,
     scope: JSON.stringify({ doubleName: true }),
     redirect_url: `?callback=true`,
-    botFrontEnd: 'https://login.staging.jimber.org/',
-    botBackend: 'https://login.staging.jimber.org/',
+    botFrontEnd: 'https://login.threefold.me/',
+    botBackend: 'https://login.threefold.me/',
     debugJanus: false,
-    janusServer: 'wss://janus-wss.staging.jimber.org',
+    janusServer: 'https://janus.jimber.org/janus',
     gaId: 'UA-150836145-1',
-    limitBitrateCap: false,
+    limitBitrateCap: true,
 };
