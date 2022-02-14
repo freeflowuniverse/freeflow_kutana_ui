@@ -1,11 +1,6 @@
 <template>
     <div :class="classes" class="janus-video" ref="videoAndMore">
-        <video
-            autoplay
-            muted
-            playsinline
-            ref="video"
-        ></video>
+        <video autoplay muted playsinline ref="video"></video>
         <div v-if="overlay" class="overlay">
             <div class="overlay-container">
                 <p>

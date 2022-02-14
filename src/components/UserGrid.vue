@@ -94,7 +94,7 @@
                     ],
                     a => a?.uuid
                 );
-                console.log("userss", users);
+
                 users = reject(users, o => o.length < 2);
 
                 users = users.map(o => ({

@@ -105,7 +105,7 @@ export const initializeJanus = async (
 
         store.commit('addRemoteStream', {
             userId: user.id,
-            stream: user.stream
+            stream: user.stream,
         });
 
         delete user.stream;
@@ -121,9 +121,9 @@ export const initializeJanus = async (
         if (await store.dispatch('findUserById', user.id)) {
             store.commit('addRemoteStream', {
                 userId: user.id,
-                stream: user.stream
+                stream: user.stream,
             });
-            
+
             delete user.stream;
             store.commit('addRemoteUser', user);
 

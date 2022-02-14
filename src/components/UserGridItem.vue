@@ -209,7 +209,7 @@
                 'fullScreenUser',
                 'mutedUsers',
                 'mutedVideoUsers',
-                'remoteStreams'
+                'remoteStreams',
             ]),
             borderStyle() {
                 const primaryColor = getComputedStyle(
@@ -249,7 +249,9 @@
                 return this.user?.username;
             },
             userStream() {
-                return this.remoteStreams?.get(this.user?.id) || this.user?.stream;
+                return (
+                    this.remoteStreams?.get(this.user?.id) || this.user?.stream
+                );
             },
             isSelectedUser() {
                 return this.user?.id == this.selectedUser?.id;
