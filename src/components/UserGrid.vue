@@ -94,8 +94,9 @@
                     ],
                     a => a?.uuid
                 );
+
                 users = reject(users, o => o.length < 2);
-                // console.log(users);
+
                 users = users.map(o => ({
                     ...o[0],
                     screen: o[1].screen,

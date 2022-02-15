@@ -410,7 +410,8 @@ export class VideoRoomPlugin {
      * room: number,
      * screen: boolean,
      * username:String,
-     * uuid:number, stream:MediaStream
+     * uuid:number,
+     * stream:MediaStream,
      * }} User
      *
      * @typedef {{
@@ -431,9 +432,9 @@ export class VideoRoomPlugin {
             uuid: username.slice(0, 36),
             username: username.slice(37),
             room: this.myRoom,
-            stream: stream,
             cam: false,
             mic: false,
+            stream: stream,
             screen: false,
             extra,
         };
