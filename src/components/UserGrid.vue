@@ -23,17 +23,17 @@
         </div>
 
         <UserGridItem
-                v-else
-                v-for="user of users"
-                :ref="`user-${user.key}`"
-                v-bind:key="user.key"
-                :extended-controls="view === 'presentation'"
-                :selected="user.selected"
-                :user="user"
-                class="user"
-                :cover="!recording"
-                :show-fullscreen-button="!recording"
-            />
+            v-else
+            v-for="user of users"
+            :ref="`user-${user.key}`"
+            v-bind:key="user.key"
+            :extended-controls="view === 'presentation'"
+            :selected="user.selected"
+            :user="user"
+            class="user"
+            :cover="!recording"
+            :show-fullscreen-button="!recording"
+        />
 
         <div class="controlstripWrapper">
             <slot name="controlStrip"></slot>
@@ -120,14 +120,15 @@
                     key: o[0].uuid,
                 }));
 
-                for (let i=0;i<24;i++) {
+                // for testing the grid ==> multiple screens
+                /*for (let i = 0; i < 17; i++) {
                     const uuidtest = uuidv4();
 
                     let tmpUser = users[0];
                     tmpUser.key = uuidtest;
                     tmpUser.uuid = uuidtest;
                     users = [...users, tmpUser];
-                }
+                }*/
 
                 if (this.view === 'recording') {
                     return users;
@@ -420,6 +421,42 @@
                     &[data-useramount='16'] {
                         grid-template-areas: 'presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter user-11' 'presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter user-11' 'presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter user-12' 'presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter user-12' 'presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter user-12' 'presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter user-13' 'presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter user-13' 'presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter user-14' 'presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter presenter user-14' 'user-1 user-3 user-3 user-3 user-5 user-5 user-7 user-7 user-9 user-9 user-9 user-14' 'user-1 user-3 user-3 user-3 user-5 user-5 user-7 user-7 user-9 user-9 user-9 user-14' 'user-1 user-3 user-3 user-3 user-5 user-5 user-7 user-7 user-9 user-9 user-9 user-15' 'user-2 user-4 user-4 user-4 user-6 user-6 user-8 user-8 user-10 user-10 user-10 user-15';
                     }
+
+                    @for $i from 17 through 50 {
+                        grid-template-rows: [start] 5fr 1fr 2fr 3fr 2fr 3fr 3fr 2fr 1fr 2fr 2fr 1fr 5fr [end];
+
+                        &[data-useramount='#{$i}'] {
+                            .userWrapper {
+                                grid-row-start: start;
+                                grid-row-end: end;
+                                grid-column-start: start;
+                                grid-column-end: end;
+
+                                display: grid;
+                                box-sizing: border-box;
+                                grid-template-columns: repeat(
+                                    getColumns($i),
+                                    1fr
+                                );
+                                grid-auto-rows: auto;
+                                gap: 0;
+                            }
+
+                            .user:first-child {
+                                width: 200%;
+                                height: 100%;
+                                grid-area: auto;
+                                grid-column: span start / end;
+                                grid-row: span 5;
+                            }
+
+                            .user:not(:first-child) {
+                                width: 100%;
+                                height: 100%;
+                                grid-area: auto;
+                            }
+                        }
+                    }
                 }
 
                 &[data-showchat='true'] {
@@ -497,6 +534,48 @@
 
                     &[data-useramount='16'] {
                         grid-template-areas: 'presenter user-1 user-1 user-4 user-4 user-4 user-7 user-7 user-10 user-10 user-10 user-13 user-13' 'presenter user-2 user-2 user-5 user-5 user-5 user-8 user-8 user-11 user-11 user-11 user-14 user-14' 'presenter user-2 user-2 user-5 user-5 user-5 user-8 user-8 user-11 user-11 user-11 user-14 user-14' 'presenter user-3 user-3 user-6 user-6 user-6 user-9 user-9 user-12 user-12 user-12 user-15 user-15' 'presenter chat chat chat chat chat chat chat chat chat chat chat chat';
+                    }
+
+                    @for $i from 17 through 50 {
+                        grid-template-columns: [start] 138.5fr [end-content] 9fr 2fr 3fr 4fr 3.5fr 5fr 5.5fr 4fr 5fr 2fr 2fr 9fr [end];
+                        grid-template-rows: [start] 2fr 1fr 1fr 2fr 18fr [end];
+
+                        &[data-useramount='#{$i}'] {
+                            .chat {
+                                grid-row-start: start;
+                                grid-column-start: end-content;
+                            }
+
+                            .userWrapper {
+                                grid-row-start: start;
+                                grid-row-end: end;
+                                grid-column-start: start;
+                                grid-column-end: end-content;
+
+                                display: grid;
+                                box-sizing: border-box;
+                                grid-template-columns: repeat(
+                                    getColumns($i),
+                                    1fr
+                                );
+                                grid-auto-rows: auto;
+                                gap: 0;
+                            }
+
+                            .user:first-child {
+                                width: 200%;
+                                height: 100%;
+                                grid-area: auto;
+                                grid-column: span start / end-content;
+                                grid-row: span 5;
+                            }
+
+                            .user:not(:first-child) {
+                                width: 100%;
+                                height: 100%;
+                                grid-area: auto;
+                            }
+                        }
                     }
                 }
             }
@@ -582,6 +661,42 @@
 
                     &[data-useramount='16'] {
                         grid-template-areas: 'presenter presenter presenter presenter presenter presenter' 'user-1 user-5 user-5 user-9 user-9 user-10' 'user-2 user-2 user-6 user-6 user-11 user-11' 'user-2 user-2 user-6 user-6 user-11 user-11' 'user-3 user-7 user-7 user-12 user-12 user-14' 'user-3 user-7 user-7 user-12 user-12 user-14' 'user-4 user-8 user-8 user-13 user-13 user-15';
+                    }
+
+                    @for $i from 17 through 50 {
+                        grid-template-rows: [start] 5fr 1fr 2fr 3fr 2fr 3fr 3fr 2fr 1fr 2fr 2fr 1fr 5fr [end];
+
+                        &[data-useramount='#{$i}'] {
+                            .userWrapper {
+                                grid-row-start: start;
+                                grid-row-end: end;
+                                grid-column-start: start;
+                                grid-column-end: end;
+
+                                display: grid;
+                                box-sizing: border-box;
+                                grid-template-columns: repeat(
+                                    getColumns($i),
+                                    1fr
+                                );
+                                grid-auto-rows: auto;
+                                gap: 0;
+                            }
+
+                            .user:first-child {
+                                width: 200%;
+                                height: 100%;
+                                grid-area: auto;
+                                grid-column: span start / end;
+                                grid-row: span 5;
+                            }
+
+                            .user:not(:first-child) {
+                                width: 100%;
+                                height: 100%;
+                                grid-area: auto;
+                            }
+                        }
                     }
                 }
 
@@ -680,7 +795,7 @@
                         grid-template-areas: 'user-1 user-1 user-5 user-5 user-5 user-5 user-9 user-9 user-9 user-9 user-13' 'user-2 user-2 user-6 user-6 user-6 user-6 user-10 user-10 user-10 user-10 user-14' 'user-2 user-2 user-6 user-6 user-6 user-6 user-10 user-10 user-10 user-10 user-14' 'user-2 user-2 user-6 user-6 user-6 user-6 user-10 user-10 user-10 user-10 user-14' 'user-3 user-3 user-7 user-7 user-7 user-7 user-11 user-11 user-11 user-11 user-15' 'user-3 user-3 user-7 user-7 user-7 user-7 user-11 user-11 user-11 user-11 user-15' 'user-3 user-3 user-7 user-7 user-7 user-7 user-11 user-11 user-11 user-11 user-15' 'user-4 user-4 user-8 user-8 user-8 user-8 user-12 user-12 user-12 user-12 user-16';
                     }
 
-                    @for $i from 17 through 50 {   
+                    @for $i from 17 through 50 {
                         &[data-useramount='#{$i}'] {
                             .userWrapper {
                                 grid-row-start: start;
@@ -690,7 +805,10 @@
 
                                 display: grid;
                                 box-sizing: border-box;
-                                grid-template-columns: repeat(getColumns($i), 1fr);
+                                grid-template-columns: repeat(
+                                    getColumns($i),
+                                    1fr
+                                );
                                 grid-auto-rows: auto;
                                 gap: 0;
                             }
@@ -699,9 +817,8 @@
                                 width: 100%;
                                 height: 100%;
                                 grid-area: auto;
-                            }   
+                            }
                         }
-                                                          
                     }
                 }
 
@@ -778,7 +895,7 @@
                         grid-template-areas: 'user-1 user-5 user-5 user-5 user-8 user-8 user-8 user-12 user-12 user-12 localuser' 'user-2 user-5 user-5 user-5 user-9 user-9 user-9 user-13 user-13 user-13 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-13 user-13 user-13 chat' 'user-2 user-6 user-6 user-6 user-9 user-9 user-9 user-13 user-13 user-13 chat' 'user-3 user-6 user-6 user-6 user-10 user-10 user-10 user-14 user-14 user-14 chat' 'user-3 user-6 user-6 user-6 user-10 user-10 user-10 user-14 user-14 user-14 chat' 'user-3 user-7 user-7 user-7 user-10 user-10 user-10 user-14 user-14 user-14 chat' 'user-4 user-7 user-7 user-7 user-11 user-11 user-11 user-15 user-15 user-15 chat';
                     }
 
-                    @for $i from 17 through 50 {   
+                    @for $i from 17 through 50 {
                         &[data-useramount='#{$i}'] {
                             .chat {
                                 grid-row-start: start;
@@ -793,7 +910,10 @@
 
                                 display: grid;
                                 box-sizing: border-box;
-                                grid-template-columns: repeat(getColumns($i), 1fr);
+                                grid-template-columns: repeat(
+                                    getColumns($i),
+                                    1fr
+                                );
                                 grid-auto-rows: auto;
                                 gap: 0;
                             }
@@ -802,8 +922,8 @@
                                 width: 100%;
                                 height: 100%;
                                 grid-area: auto;
-                            }   
-                        }                                 
+                            }
+                        }
                     }
 
                     &[data-ismobile='true'] {
@@ -954,7 +1074,7 @@
                         grid-template-areas: 'user-1 user-5 user-5 user-5 user-9 user-9 user-9 user-13' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-14' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-14' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-14' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-15' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-15' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-15' 'user-4 user-8 user-8 user-8 user-12 user-12 user-12 user-16' 'chat chat chat chat chat chat chat chat' 'chat chat chat chat chat chat chat chat' 'chat chat chat chat chat chat chat chat' 'chat chat chat chat chat chat chat chat' 'chat chat chat chat chat chat chat chat' 'chat chat chat chat chat chat chat chat';
                     }
 
-                    @for $i from 17 through 50 {   
+                    @for $i from 17 through 50 {
                         &[data-useramount='#{$i}'] {
                             .userWrapper {
                                 grid-row-start: start;
@@ -964,7 +1084,10 @@
 
                                 display: grid;
                                 box-sizing: border-box;
-                                grid-template-columns: repeat(getColumns($i), 1fr);
+                                grid-template-columns: repeat(
+                                    getColumns($i),
+                                    1fr
+                                );
                                 grid-auto-rows: auto;
                                 gap: 0;
                             }
@@ -973,9 +1096,8 @@
                                 width: 100%;
                                 height: 100%;
                                 grid-area: auto;
-                            }   
+                            }
                         }
-                                                          
                     }
                 }
 
@@ -1048,7 +1170,7 @@
                         grid-template-areas: 'user-1 user-5 user-5 user-5 user-9 user-9 user-9 user-13' 'user-1 user-5 user-5 user-5 user-9 user-9 user-9 user-13' 'user-1 user-5 user-5 user-5 user-9 user-9 user-9 user-13' 'user-1 user-5 user-5 user-5 user-9 user-9 user-9 user-13' 'user-1 user-5 user-5 user-5 user-9 user-9 user-9 user-13' 'user-1 user-5 user-5 user-5 user-9 user-9 user-9 user-13' 'user-1 user-5 user-5 user-5 user-9 user-9 user-9 user-13' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-14' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-14' 'user-2 user-6 user-6 user-6 user-10 user-10 user-10 user-14' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-15' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-15' 'user-3 user-7 user-7 user-7 user-11 user-11 user-11 user-15' 'user-4 user-8 user-8 user-8 user-12 user-12 user-12 user-16';
                     }
 
-                    @for $i from 17 through 50 {   
+                    @for $i from 17 through 50 {
                         &[data-useramount='#{$i}'] {
                             .chat {
                                 grid-row-start: start;
@@ -1063,7 +1185,10 @@
 
                                 display: grid;
                                 box-sizing: border-box;
-                                grid-template-columns: repeat(getColumns($i), 1fr);
+                                grid-template-columns: repeat(
+                                    getColumns($i),
+                                    1fr
+                                );
                                 grid-auto-rows: auto;
                                 gap: 0;
                             }
@@ -1072,8 +1197,8 @@
                                 width: 100%;
                                 height: 100%;
                                 grid-area: auto;
-                            }   
-                        }                                 
+                            }
+                        }
                     }
                 }
             }
