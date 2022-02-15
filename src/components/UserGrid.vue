@@ -48,7 +48,7 @@
     import { mapGetters, mapMutations } from 'vuex';
     import ResizeObserver from 'resize-observer-polyfill';
     import { groupBy, reject } from 'lodash/collection';
-    import { v4 as uuidv4 } from 'uuid';
+    //import { v4 as uuidv4 } from 'uuid';
 
     export default {
         components: {
