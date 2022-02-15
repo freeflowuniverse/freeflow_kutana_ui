@@ -1,5 +1,6 @@
 import store from '@/plugins/vuex';
 import { generateDummyMediaStream } from '@/utils/mediaDevicesUtils';
+import { v4 as uuidv4 } from 'uuid';
 
 export class VideoRoomPlugin {
     constructor(opaqueId, bitrateCap = false, debugString = 'video') {
@@ -426,6 +427,9 @@ export class VideoRoomPlugin {
      * @return User
      * */
     buildUser(stream, id, username = this.myUsername, extra = {}) {
+        console.log("username", username);
+        console.log("username sliced", username.slice(0, 36));
+        
         return {
             id: id,
             uuid: username.slice(0, 36),
