@@ -4,6 +4,8 @@ export default {
         localUser: null,
         /** @type {User[]} */
         remoteUsers: [],
+        /** @type {Map<number, MediaStream>} */
+        remoteStreams: new Map(),
         /** @type {UserControl} */
         userControl: null,
         /** @type {User} */
@@ -40,6 +42,12 @@ export default {
             }
 
             state.remoteUsers.splice(userIndex, 1, user);
+        },
+        addRemoteStream(state, { userId, stream }) {
+            state.remoteStreams.set(userId, stream);
+        },
+        deleteRemoteStream(state, userId) {
+            state.remoteStreams.delete(userId);
         },
         /**
          * @param state
@@ -132,6 +140,8 @@ export default {
         localUser: state => state.localUser,
         /** @returns {User[]} */
         remoteUsers: state => state.remoteUsers,
+        /** @returns {Map<number, MediaStream} */
+        remoteStreams: state => state.remoteStreams,
         /** @returns {User[]} */
         allUsers: state => {
             if (!state.localUser) {

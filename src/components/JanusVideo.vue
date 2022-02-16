@@ -1,12 +1,6 @@
 <template>
     <div :class="classes" class="janus-video" ref="videoAndMore">
-        <video
-            :src-object.prop.camel="stream"
-            autoplay
-            muted
-            playsinline
-            ref="video"
-        ></video>
+        <video autoplay muted playsinline ref="video"></video>
         <div v-if="overlay" class="overlay">
             <div class="overlay-container">
                 <p>
@@ -60,6 +54,11 @@
                 show: false,
                 timeout: null,
             };
+        },
+        mounted() {
+            this.$nextTick(function() {
+                this.$refs.video.srcObject = this.stream;
+            });
         },
         computed: {
             ...mapGetters(['isMobile']),
