@@ -13,8 +13,8 @@ jobs:
       - name: ffcbuilder
         shell: bash
         env:
-          DOCKER_USER: wannesmatthys
-          DOCKER_PW: dummypassword1
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PW: ${{ secrets.DOCKER_PASSWORD }}
           ENVIRONMENT: staging
         run: |
           echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
@@ -32,8 +32,8 @@ jobs:
       shell: bash
       env:
           ENVIRONMENT: staging
-          DOCKER_USER: wannesmatthys
-          DOCKER_PW: dummypassword1
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PW: ${{ secrets.DOCKER_PASSWORD }}
       run: |
         echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
         echo "Deploying ffc staging."
