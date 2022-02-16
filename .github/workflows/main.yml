@@ -14,9 +14,9 @@ jobs:
           DOCKER_USER: wannesmatthys
           DOCKER_PW: dummypassword1
           ENVIRONMENT: staging
-          CI_COMMIT_TAG: $(git rev-parse --short "$GITHUB_SHA")
         run: |
-          echo "$CI_COMMIT_TAG"
+          COMMIT_CI_TAG=$(git rev-parse --short "$GITHUB_SHA")
+          echo ${{ env.COMMIT_CI_TAG }} >> $COMMIT_CI_TAG
           echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
           echo "Building ffc staging."
           cp ./public/config.staging.js ./public/config.js
