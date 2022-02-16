@@ -24,7 +24,7 @@ jobs:
           docker-compose push
 
   staging_deploy:
-    runs-on: ubuntu-latest
+    runs-on: internal-staging
     needs: staging_build
     steps:
     - uses: actions/checkout@v2
