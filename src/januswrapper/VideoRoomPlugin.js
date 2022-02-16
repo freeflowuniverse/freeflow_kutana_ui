@@ -448,6 +448,7 @@ export class VideoRoomPlugin {
                     room: roomName,
                 },
                 success: result => {
+                    console.log(result.exists);
                     if (result.exists) {
                         resolve(result);
                         return;
@@ -469,6 +470,10 @@ export class VideoRoomPlugin {
 
                     if (this.bitrateCap) {
                         message.bitrate = 128000 * 2;
+                    }
+                    
+                    if (window.location.host === "meetings.staging.jimber.io" || window.location.host === "jimber.meetings.org") {
+                        message.bitrate = 400000;
                     }
 
                     this.pluginHandle.send({
