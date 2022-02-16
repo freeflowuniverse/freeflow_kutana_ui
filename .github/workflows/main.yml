@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [main]
+jobs:
+  staging_build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ffcbuilder
+        env:
+         ENVIRONMENT: staging
+        run: |
+          echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
+          echo "Building ffc staging."
+          cp ./public/config.staging.js ./public/config.js
+          eval "[ -z "$CI_COMMIT_TAG" ] && export VERSION=$CI_COMMIT_SHORT_SHA || export VERSION=$CI_COMMIT_TAG "
+          sed -i "s/{{version}}/$VERSION/g" public/version.js
+          docker-compose build
+          docker-compose push
+
+  staging_deploy:
+    runs-on: ubuntu-latest
+    needs: staging_build
+    steps:
+    - name: ffcstaging
+      env:
+          ENVIRONMENT: staging
+      run: |
+        echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
+        echo "Deploying ffc staging."
+        docker rm -f ffc_frontend || true
+        docker-compose pull
+        docker-compose up -d
+  
+  # production_build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: ffcbuilder_prod
+  #       env:
+  #           ENVIRONMENT: production
+  #       run: |
+  #           echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
+  #           echo "Building ffc production."
+  #           cp ./public/config.production.js ./public/config.js
+  #           eval "[ -z "$CI_COMMIT_TAG" ] && export VERSION=$CI_COMMIT_SHORT_SHA || export VERSION=$CI_COMMIT_TAG "
+  #           sed -i "s/{{version}}/$VERSION/g" public/version.js
+  #           docker-compose build
+  #           docker-compose push
+
+  # production_deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: staging_build
+  #   steps:
+  #     - name: ffcproduction
+  #       env:
+  #           ENVIRONMENT: production
+  #       run: |
+  #           echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
+  #           echo "Deploying ffc production."
+  #           docker rm -f ffc_frontend || true
+  #           docker-compose pull
+  #           docker-compose up -d
