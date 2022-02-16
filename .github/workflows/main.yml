@@ -28,6 +28,8 @@ jobs:
     needs: staging_build
     steps:
     - uses: actions/checkout@v2
+    - name: Set env
+      run: echo "CI_COMMIT_TAG=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_ENV
     - name: ffcstaging
       shell: bash
       env:
@@ -37,6 +39,7 @@ jobs:
       run: |
         echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
         echo "Deploying ffc staging."
+        docker network create ffc_network
         docker rm -f ffc_frontend || true
         docker-compose pull
         docker-compose up -d
