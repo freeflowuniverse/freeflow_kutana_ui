@@ -13,3 +13,5 @@ services:
 networks:
   ffc_network:
     external: true
+  proxy:
+    external: true
