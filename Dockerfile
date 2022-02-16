@@ -2,6 +2,11 @@ FROM node:alpine as builder
 WORKDIR /app
 RUN apk add --no-cache  git
 RUN apk add --no-cache python3 py3-pip
+
+RUN apk add --update alpine-sdk && \
+apk add libffi-dev openssl-dev && \
+apk --no-cache --update add build-base
+
 COPY package.json package.json
 COPY yarn.lock yarn.lock
 RUN yarn install
