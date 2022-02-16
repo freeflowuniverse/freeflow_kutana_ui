@@ -1,7 +1,7 @@
 FROM node:alpine as builder
 WORKDIR /app
 RUN apk add --no-cache  git
-RUN apk add python
+RUN apk add --no-cache python3 py3-pip
 COPY package.json package.json
 COPY yarn.lock yarn.lock
 RUN yarn install
