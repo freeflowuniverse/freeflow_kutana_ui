@@ -1,4 +1,4 @@
-FROM node:alpine as builder
+FROM node:16.3.0-alpine as builder
 WORKDIR /app
 RUN apk add --no-cache  git
 RUN apk add --no-cache python3 py3-pip
