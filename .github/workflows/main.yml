@@ -14,7 +14,7 @@ jobs:
           DOCKER_USER: wannesmatthys
           DOCKER_PW: dummypassword1
           ENVIRONMENT: staging
-          COMMIT_CI_TAG: ${GITHUB_REF#refs/heads/}-$(git rev-parse --short "$GITHUB_SHA")
+          CI_COMMIT_TAG: ${GITHUB_REF#refs/heads/}-$(git rev-parse --short "$GITHUB_SHA")
         run: |
           echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
           echo "Building ffc staging."
