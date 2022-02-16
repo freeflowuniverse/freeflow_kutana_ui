@@ -14,7 +14,7 @@ jobs:
         shell: bash
         env:
           ENVIRONMENT: staging
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}  
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}  
           DOCKER_PW: ${{ secrets.DOCKER_PW }}
         run: |
           echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
@@ -34,7 +34,7 @@ jobs:
       shell: bash
       env:
           ENVIRONMENT: staging
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}  
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}  
           DOCKER_PW: ${{ secrets.DOCKER_PW }}
       run: |
         echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
