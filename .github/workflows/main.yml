@@ -11,13 +11,18 @@ jobs:
       - name: ffcbuilder
         shell: bash
         env:
-          ENVIRONMENT: staging
           DOCKER_USER: wannesmatthys
           DOCKER_PW: dummypassword1
         run: |
           echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
           echo "Building ffc staging."
           cp ./public/config.staging.js ./public/config.js
+      - name: ffcbuilder-dockerbuild
+        shell: bash
+        env:
+          CI_COMMIT_TAG: ${{ steps.vars.outputs.tag }}
+          ENVIRONMENT: staging
+        run: |
           docker-compose build
           docker-compose push
 
