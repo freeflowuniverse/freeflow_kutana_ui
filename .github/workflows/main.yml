@@ -14,8 +14,8 @@ jobs:
         shell: bash
         env:
           ENVIRONMENT: staging
-          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}  
-          DOCKER_PW: ${{ secrets.DOCKER_PW }}
+          DOCKER_USER: wannesmatthys
+          DOCKER_PW: dummypassword1
         run: |
           echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
           echo "Building ffc staging."
@@ -34,8 +34,8 @@ jobs:
       shell: bash
       env:
           ENVIRONMENT: staging
-          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}  
-          DOCKER_PW: ${{ secrets.DOCKER_PW }}
+          DOCKER_USER: wannesmatthys
+          DOCKER_PW: dummypassword1
       run: |
         echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
         echo "Deploying ffc staging."
