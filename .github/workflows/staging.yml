@@ -39,7 +39,6 @@ jobs:
       run: |
         echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
         echo "Deploying ffc staging."
-        docker network create ffc_network
         docker rm -f ffc_frontend-staging || true
         docker-compose pull
         docker-compose up -d
