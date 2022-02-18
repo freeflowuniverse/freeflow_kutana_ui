@@ -474,6 +474,13 @@ export class VideoRoomPlugin {
                         message.bitrate = 128000 * 2;
                     }
 
+                    if (
+                        window.location.host === 'meetings.staging.jimber.io' ||
+                        window.location.host === 'jimber.meetings.org'
+                    ) {
+                        message.bitrate = 400000;
+                    }
+
                     this.pluginHandle.send({
                         message,
                         success: result => {
