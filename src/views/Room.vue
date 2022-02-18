@@ -189,6 +189,11 @@
             );
             this.setUserControl(userControl);
 
+            // stop screensharing properly
+            window.onbeforeunload = () => {
+                userControl.stopScreenShare();
+            };
+
             if ('Notification' in window) {
                 if (Notification.permission !== 'denied') {
                     Notification.requestPermission().then(() =>
