@@ -428,6 +428,9 @@ export class VideoRoomPlugin {
      * @return User
      * */
     buildUser(stream, id, username = this.myUsername, extra = {}) {
+        console.log('username', username);
+        console.log('username sliced', username.slice(0, 36));
+
         return {
             id: id,
             uuid: username.slice(0, 36),
@@ -470,6 +473,13 @@ export class VideoRoomPlugin {
 
                     if (this.bitrateCap) {
                         message.bitrate = 128000 * 2;
+                    }
+
+                    if (
+                        window.location.host === 'meetings.staging.jimber.io' ||
+                        window.location.host === 'jimber.meetings.org'
+                    ) {
+                        message.bitrate = 400000;
                     }
 
                     this.pluginHandle.send({
