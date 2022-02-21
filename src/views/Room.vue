@@ -271,7 +271,7 @@
             },
             remoteStream(userId) {
                 return this.remoteStreams.get(userId);
-            }
+            },
         },
         computed: {
             ...mapGetters([

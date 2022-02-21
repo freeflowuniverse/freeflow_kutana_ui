@@ -338,7 +338,7 @@ export class VideoRoomPlugin {
             track,
             this.myStream.getTracks().find(t => t.kind !== track.kind),
         ];
-        
+
         this.myStream = new MediaStream(tracks.filter(t => t));
         this.emitEvent(
             'ownUserJoined',
