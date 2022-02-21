@@ -103,7 +103,7 @@
                     ru => !mutedUsers.find(mu => mu.uuid === ru.uuid)
                 )"
                 :key="user.id"
-                :src-object.prop.camel="user.stream"
+                :src-object.prop.camel="remoteStream(user.id)"
                 autoplay
             ></audio>
         </div>
@@ -269,10 +269,14 @@
                     minutesActive++;
                 }, 1000);
             },
+            remoteStream(userId) {
+                return this.remoteStreams.get(userId);
+            }
         },
         computed: {
             ...mapGetters([
                 'remoteUsers',
+                'remoteStreams',
                 'teamName',
                 'viewStyle',
                 'localUser',

@@ -69,6 +69,7 @@ export const initializeJanus = async (
             )
         ) {
             user.cam = store.getters.videoActive;
+            
             videoTrack.onended = async event => {
                 const localUser = store.getters.localUser;
                 localUser.cam = false;

@@ -328,16 +328,17 @@ export class VideoRoomPlugin {
 
         await rtcpSender.replaceTrack(track);
 
-        const streamTrack = this.myStream
-            .getTracks()
-            .find(t => t.kind === track.kind);
-        streamTrack.stop();
-        streamTrack.dispatchEvent(new Event('ended'));
+        //const streamTrack = this.myStream
+        //    .getTracks()
+        //    .find(t => t.kind === track.kind);
+        //streamTrack.stop();
+        //streamTrack.dispatchEvent(new Event('ended'));
 
         const tracks = [
             track,
             this.myStream.getTracks().find(t => t.kind !== track.kind),
         ];
+        
         this.myStream = new MediaStream(tracks.filter(t => t));
         this.emitEvent(
             'ownUserJoined',

@@ -69,7 +69,7 @@
                     'video-not-present': this.userCameraDisabled,
                 };
             },
-        },
+        }
     };
 </script>
 
