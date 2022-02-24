@@ -43,7 +43,7 @@ let router = new VueRouter({
             name: 'screenshare',
             component: Screenshare,
             meta: { requiresAuth: false },
-        }
+        },
     ],
 });
 

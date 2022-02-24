@@ -97,12 +97,12 @@ export const initializeJanus = async (
         if (user === store.getters.localUser) {
             return;
         }
-        
+
         const videoTrack = user?.stream?.getVideoTracks()[0];
         if (videoTrack && videoTrack.readyState === 'live') {
             user.cam = true;
         }
-
+        
         store.commit('addRemoteStream', {
             userId: user.id,
             stream: user.stream,

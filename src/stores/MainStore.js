@@ -78,6 +78,6 @@ export default {
             return getTitle();
         },
         screenshareRoom: state => state.screenshareRoom,
-        screensharer: state => state.screensharer
+        screensharer: state => state.screensharer,
     },
 };

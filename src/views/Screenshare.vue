@@ -1,12 +1,7 @@
 <template>
     <div class="pa-5">
         <div v-if="!this.isScreensharing">
-            <v-btn
-                class="pa-5"
-                large
-                @click="startScreenshare"
-                text
-            >
+            <v-btn class="pa-5" large @click="startScreenshare" text>
                 <v-icon large>screen_share</v-icon>
                 <span class="pl-2">
                     Start screensharing ...
@@ -15,13 +10,8 @@
         </div>
 
         <div v-else>
-            <p>You are currently screensharing for room {{roomName }}.</p>
-            <v-btn
-                class="pa-5"
-                large
-                @click="stopScreenShare"
-                text
-            >
+            <p>You are currently screensharing for room {{ roomName }}.</p>
+            <v-btn class="pa-5" large @click="stopScreenShare" text>
                 <v-icon large>stop_screen_share</v-icon>
                 <span class="pl-2">
                     Stop screensharing ...
@@ -48,7 +38,7 @@
         },
         data: () => {
             return {
-                userName: "RemoteScreenshare",
+                userName: 'Remote screenshare',
                 isScreensharing: false,
                 roomName: null,
             };
@@ -60,8 +50,12 @@
                 this.setAccount({ name: this.userName, uuid: uuidv4() });
                 this.join(this.roomName);
 
-                const stream = await navigator.mediaDevices.getDisplayMedia({video:true});
-                stream.getVideoTracks()[0].addEventListener('ended', this.stopScreenShare);
+                const stream = await navigator.mediaDevices.getDisplayMedia({
+                    video: true,
+                });
+                stream
+                    .getVideoTracks()[0]
+                    .addEventListener('ended', this.stopScreenShare);
 
                 store.commit('setLocalStream', stream);
 
@@ -94,7 +88,11 @@
                 return Math.abs(hash);
             },
             stopScreenShare() {
-                this.$ga.event('after-call-events', 'callEnded', 'beforeDestroy');
+                this.$ga.event(
+                    'after-call-events',
+                    'callEnded',
+                    'beforeDestroy'
+                );
                 this.userControl.hangUp();
                 location.reload();
             },
@@ -110,9 +108,9 @@
 
                 this.sendSignal({
                     type: 'screenshare_room',
-                    screensharer: val
+                    screensharer: val,
                 });
-            }
-        }
+            },
+        },
     };
 </script>

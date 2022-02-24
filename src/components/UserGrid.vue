@@ -48,7 +48,6 @@
     import { mapGetters, mapMutations } from 'vuex';
     import ResizeObserver from 'resize-observer-polyfill';
     import { groupBy, reject } from 'lodash/collection';
-    import { v4 as uuidv4 } from 'uuid';
 
     export default {
         components: {
@@ -103,14 +102,14 @@
                 }
 
                 let users = groupBy(
-                        [
-                            ...this.remoteUsers,
-                            ...this.remoteScreenUsers,
-                            this.localUser,
-                            this.localScreenUser,
-                        ],
-                        a => a?.uuid
-                    );
+                    [
+                        ...this.remoteUsers,
+                        ...this.remoteScreenUsers,
+                        this.localUser,
+                        this.localScreenUser,
+                    ],
+                    a => a?.uuid
+                );
 
                 users = reject(users, o => o.length < 2);
 
@@ -175,7 +174,11 @@
             },
         },
         methods: {
-            ...mapMutations(['updateRemoteUser', 'setFullscreenUser', 'addRemoteStream']),
+            ...mapMutations([
+                'updateRemoteUser',
+                'setFullscreenUser',
+                'addRemoteStream',
+            ]),
             calculateOrientation() {
                 this.windowOrientation =
                     this.$refs.usergrid?.clientWidth * 3 >
@@ -252,14 +255,11 @@
         $columns: 9;
         @if ($i < 20) {
             $columns: 5;
-        }
-        @else if ($i < 25) {
+        } @else if ($i < 25) {
             $columns: 6;
-        }
-        @else if ($i < 30) {
+        } @else if ($i < 30) {
             $columns: 7;
-        }
-        @else if ($i < 40) {
+        } @else if ($i < 40) {
             $columns: 8;
         }
         @return $columns;

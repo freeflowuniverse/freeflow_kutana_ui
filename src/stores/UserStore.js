@@ -134,9 +134,9 @@ export default {
             // save value
             commit('addRemoteUser', user);
         },
-        setFullscreenUser({commit}, user) {
+        setFullscreenUser({ commit }, user) {
             commit('setFullscreenUser', user);
-        }
+        },
     },
     getters: {
         /** @returns {User} */
