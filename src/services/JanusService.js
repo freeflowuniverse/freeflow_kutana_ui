@@ -102,7 +102,11 @@ export const initializeJanus = async (
         if (videoTrack && videoTrack.readyState === 'live') {
             user.cam = true;
         }
-        
+
+        if (videoTrack && user.username === "Remote screenshare") {
+            store.commit('setFullscreenUser', user);
+        }
+
         store.commit('addRemoteStream', {
             userId: user.id,
             stream: user.stream,

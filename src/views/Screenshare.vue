@@ -50,12 +50,13 @@
                 this.setAccount({ name: this.userName, uuid: uuidv4() });
                 this.join(this.roomName);
 
-                const stream = await navigator.mediaDevices.getDisplayMedia({
-                    video: true,
-                });
+                const stream = await navigator.mediaDevices.getDisplayMedia();
+
                 stream
                     .getVideoTracks()[0]
                     .addEventListener('ended', this.stopScreenShare);
+
+                stream.getVideoTracks()[0].remoteScreensharer = true;
 
                 store.commit('setLocalStream', stream);
 
