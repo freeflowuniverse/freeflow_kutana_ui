@@ -295,6 +295,8 @@
                 'amountOfUsers',
                 'recording',
                 'title',
+                'screenshareRoom',
+                'screensharer',
             ]),
             currentViewStyle: {
                 get() {

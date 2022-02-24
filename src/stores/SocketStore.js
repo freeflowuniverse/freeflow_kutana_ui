@@ -37,6 +37,8 @@ export default {
         },
         SOCKET_message({ commit }, message) {
             commit('addMessage', message);
+
+            console.log(message);
         },
         SOCKET_signal({ dispatch, commit, getters }, message) {
             // console.log(`GOT SIGNAL`, message);
@@ -78,6 +80,9 @@ export default {
                         text: `${message.sender} stopped presenting`,
                     });
                     dispatch('stopPresenterMode', message);
+                    break;
+                case 'screenshare_room':
+                    dispatch('setFullscreenUser', message.screensharer);
                     break;
                 default:
                     // console.log(`NOT DISPATCHING`);

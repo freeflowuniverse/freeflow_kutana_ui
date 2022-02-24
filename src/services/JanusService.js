@@ -42,7 +42,6 @@ export const initializeJanus = async (
 
     videoRoomPlugin.addEventListener('ownUserJoined', user => {
         // console.log('ownUserJoined');
-
         store.commit('setLocalStream', user?.stream);
 
         if (initialJoin) {
@@ -103,7 +102,7 @@ export const initializeJanus = async (
         if (videoTrack && videoTrack.readyState === 'live') {
             user.cam = true;
         }
-
+        
         store.commit('addRemoteStream', {
             userId: user.id,
             stream: user.stream,
@@ -191,6 +190,7 @@ export const initializeJanus = async (
     screenShareRoomPlugin.addEventListener('userLeft', screenUser => {
         store.commit('deleteRemoteScreenUser', screenUser);
     });
+
     screenShareRoomPlugin.addEventListener('cleanupUser', async screenUser => {
         if (await store.dispatch('findScreenUserById', screenUser.id)) {
             store.commit('addRemoteScreenUser', screenUser);

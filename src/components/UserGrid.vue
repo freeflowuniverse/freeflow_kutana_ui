@@ -8,7 +8,7 @@
         :data-view="view === 'recording' ? 'grid' : view"
         class="grid"
     >
-        <div v-if="users.length > 16" class="userWrapper">
+        <div v-if="users.length > 16 || users.length > 15" class="userWrapper">
             <UserGridItem
                 v-for="user of users"
                 :ref="`user-${user.key}`"
@@ -48,7 +48,6 @@
     import { mapGetters, mapMutations } from 'vuex';
     import ResizeObserver from 'resize-observer-polyfill';
     import { groupBy, reject } from 'lodash/collection';
-    //import { v4 as uuidv4 } from 'uuid';
 
     export default {
         components: {
@@ -175,7 +174,11 @@
             },
         },
         methods: {
-            ...mapMutations(['updateRemoteUser', 'setFullscreenUser']),
+            ...mapMutations([
+                'updateRemoteUser',
+                'setFullscreenUser',
+                'addRemoteStream',
+            ]),
             calculateOrientation() {
                 this.windowOrientation =
                     this.$refs.usergrid?.clientWidth * 3 >
@@ -252,14 +255,11 @@
         $columns: 9;
         @if ($i < 20) {
             $columns: 5;
-        }
-        @elseif ($i < 25) {
+        } @else if ($i < 25) {
             $columns: 6;
-        }
-        @elseif ($i < 30) {
+        } @else if ($i < 30) {
             $columns: 7;
-        }
-        @elseif ($i < 40) {
+        } @else if ($i < 40) {
             $columns: 8;
         }
         @return $columns;
