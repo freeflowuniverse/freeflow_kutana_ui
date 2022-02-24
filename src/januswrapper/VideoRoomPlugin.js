@@ -428,9 +428,6 @@ export class VideoRoomPlugin {
      * @return User
      * */
     buildUser(stream, id, username = this.myUsername, extra = {}) {
-        console.log('username', username);
-        console.log('username sliced', username.slice(0, 36));
-
         return {
             id: id,
             uuid: username.slice(0, 36),

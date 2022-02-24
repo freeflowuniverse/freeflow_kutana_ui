@@ -77,5 +77,7 @@ export default {
             //@Todo fix when www.example.com => Example Www
             return getTitle();
         },
+        screenshareRoom: state => state.screenshareRoom,
+        screensharer: state => state.screensharer
     },
 };

@@ -3,6 +3,7 @@ import Vue from 'vue';
 
 import Landing from '../views/Landing.vue';
 import Room from '../views/Room.vue';
+import Screenshare from '../views/Screenshare.vue';
 import Dev from '../views/Dev.vue';
 import AutoJoin from '../views/AutoJoin';
 
@@ -37,6 +38,12 @@ let router = new VueRouter({
             component: Room,
             meta: { requiresAuth: true, hideAccount: true },
         },
+        {
+            path: '/room/:token/share',
+            name: 'screenshare',
+            component: Screenshare,
+            meta: { requiresAuth: false },
+        }
     ],
 });
 
