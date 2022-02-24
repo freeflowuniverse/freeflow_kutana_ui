@@ -527,6 +527,8 @@ export class VideoRoomPlugin {
                     private_id: this.myPrivateId,
                 };
 
+                console.log("hallo");
+
                 pluginHandle.videoCodec = video;
                 pluginHandle.send({
                     message: subscribe,
