@@ -207,6 +207,9 @@ export default {
             window.localStorage.setItem('account', JSON.stringify(account));
             state.account = account;
         },
+        setAccountWithoutLccalStorage(state, account) {
+            state.account = account;
+        }
     },
     getters: {
         keys: state => state.keys,
