@@ -1,0 +1,25 @@
+
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+jobs:
+  production_build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set env
+        run: echo "CI_COMMIT_TAG=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_ENV
+      - name: ffcbuilder_prod
+        shell: bash
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PW: ${{ secrets.DOCKER_PW }}
+          ENVIRONMENT: production
+        run: |
+          echo "$DOCKER_PW" | docker login -u $DOCKER_USER --password-stdin
+          echo "Building ffc production."
+          cp ./public/config.production.js ./public/config.js
+          docker-compose build
+          docker-compose push
