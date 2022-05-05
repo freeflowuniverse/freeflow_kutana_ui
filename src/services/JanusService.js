@@ -103,7 +103,7 @@ export const initializeJanus = async (
             user.cam = true;
         }
 
-        if (videoTrack && user.username === "Remote screenshare") {
+        if (videoTrack && user.username === 'Remote screenshare') {
             store.commit('setFullscreenUser', user);
         }
 

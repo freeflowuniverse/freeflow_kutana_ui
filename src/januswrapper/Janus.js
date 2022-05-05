@@ -8,7 +8,7 @@ export class Janus {
 
     async initializeJanusGateway() {
         return new Promise((resolve, reject) => {
-            //             console.log("Attempting to connect to: " + this.server)
+            console.log('Attempting to connect to: ' + this.server);
             this.janusGateway = new JanusGateway({
                 server: this.server,
                 success: resolve,

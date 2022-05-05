@@ -1,5 +1,6 @@
 import store from '@/plugins/vuex';
 import { generateDummyMediaStream } from '@/utils/mediaDevicesUtils';
+import { initializeJanus } from '@/services/JanusService';
 
 export class VideoRoomPlugin {
     constructor(opaqueId, bitrateCap = false, debugString = 'video') {
@@ -307,6 +308,41 @@ export class VideoRoomPlugin {
         if (!peerConnection) {
             await this.publishOwnFeed(video, audio);
             peerConnection = this.pluginHandle.webrtcStuff.pc;
+
+            let initialConnectedState = true;
+            peerConnection.addEventListener(
+                'iceconnectionstatechange',
+                async e => {
+                    if (
+                        peerConnection.iceConnectionState === 'connected' &&
+                        !track.includes('screen')
+                    ) {
+                        if (!initialConnectedState) {
+                            store.getters.userControl.hangUp();
+                            window.janusshizzle.janus.janusGateway.destroy();
+
+                            const stream = await navigator.mediaDevices.getUserMedia(
+                                {
+                                    video: true,
+                                    audio: true,
+                                }
+                            );
+
+                            store.commit('setLocalStream', stream);
+                            const userControl = await initializeJanus(
+                                window.janusshizzle.janus.server,
+                                this.opaqueId,
+                                this.myUsername,
+                                this.myRoom,
+                                stream
+                            );
+
+                            store.commit('setUserControl', userControl);
+                        }
+                        initialConnectedState = false;
+                    }
+                }
+            );
         }
 
         let senders = peerConnection.getSenders();
@@ -526,8 +562,6 @@ export class VideoRoomPlugin {
                     feed: id,
                     private_id: this.myPrivateId,
                 };
-
-                console.log("hallo");
 
                 pluginHandle.videoCodec = video;
                 pluginHandle.send({

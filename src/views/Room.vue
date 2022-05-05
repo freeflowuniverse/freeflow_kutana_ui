@@ -204,6 +204,7 @@
             setTimeout(() => {
                 this.showInvitation = this.remoteUsers.length < 1;
             }, 200);
+
             this.sendKeepAlive();
         },
         beforeDestroy() {
