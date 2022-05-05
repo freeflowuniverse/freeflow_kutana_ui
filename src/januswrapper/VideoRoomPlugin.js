@@ -313,10 +313,7 @@ export class VideoRoomPlugin {
             peerConnection.addEventListener(
                 'iceconnectionstatechange',
                 async e => {
-                    if (
-                        peerConnection.iceConnectionState === 'connected' &&
-                        !track.includes('screen')
-                    ) {
+                    if (peerConnection.iceConnectionState === 'connected') {
                         if (!initialConnectedState) {
                             store.getters.userControl.hangUp();
                             window.janusshizzle.janus.janusGateway.destroy();

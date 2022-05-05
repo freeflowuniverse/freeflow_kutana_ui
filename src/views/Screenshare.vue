@@ -45,9 +45,15 @@
         },
         methods: {
             ...mapActions(['join', 'sendSignal']),
-            ...mapMutations(['setAccountWithoutLccalStorage', 'setUserControl']),
+            ...mapMutations([
+                'setAccountWithoutLccalStorage',
+                'setUserControl',
+            ]),
             async startScreenshare() {
-                this.setAccountWithoutLccalStorage({ name: this.userName, uuid: uuidv4() });
+                this.setAccountWithoutLccalStorage({
+                    name: this.userName,
+                    uuid: uuidv4(),
+                });
                 this.join(this.roomName);
 
                 const stream = await navigator.mediaDevices.getDisplayMedia();

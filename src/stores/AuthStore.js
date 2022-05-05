@@ -209,7 +209,7 @@ export default {
         },
         setAccountWithoutLccalStorage(state, account) {
             state.account = account;
-        }
+        },
     },
     getters: {
         keys: state => state.keys,
