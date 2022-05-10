@@ -179,7 +179,6 @@
             //preload image
             const img = new Image();
             img.src = this.avatar;
-
             const videoTrack = this.userStream.getVideoTracks()[0];
             if (videoTrack) {
                 videoTrack.onended = () => {
@@ -323,6 +322,7 @@
                     muted: !this.mutedVideo,
                 });
             },
+            nextPage() {},
         },
     };
 </script>

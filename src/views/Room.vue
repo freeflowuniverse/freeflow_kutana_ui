@@ -78,6 +78,46 @@
             >
         </v-tooltip>
 
+        <v-tooltip v-if="allUsers.length > MAX_USERS_ON_GRID" bottom>
+            <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    class="primary"
+                    v-bind="attrs"
+                    v-on="on"
+                    fixed
+                    icon
+                    left
+                    style="z-index: 1;"
+                    top
+                    :disabled="displayUsersStartIdx <= 0"
+                    @click="previousPage"
+                >
+                    <v-icon color="white" large>arrow_left</v-icon>
+                </v-btn>
+            </template>
+            <span>Previous page</span>
+        </v-tooltip>
+
+        <v-tooltip v-if="allUsers.length > MAX_USERS_ON_GRID" bottom>
+            <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    class="primary"
+                    v-bind="attrs"
+                    v-on="on"
+                    fixed
+                    icon
+                    left
+                    style="z-index: 1; margin-left: 2.5rem;"
+                    top
+                    :disabled="displayUsersEndIdx >= allUsers.length"
+                    @click="nextPage"
+                >
+                    <v-icon color="white" large>arrow_right</v-icon>
+                </v-btn>
+            </template>
+            <span>Next page</span>
+        </v-tooltip>
+
         <UserGrid :showChat="chatIsOpen" :view="currentViewStyle">
             <template v-slot:chat>
                 <ChatGrid
@@ -133,6 +173,7 @@
     import Settings from '@/components/Settings';
     import ChatMessageNotification from '@/components/ChatMessageNotification';
     import InviteUsers from '@/components/InviteUsers';
+    import { MAX_USERS_ON_GRID } from '@/components/UserGrid';
 
     export default {
         name: 'Room',
@@ -151,6 +192,7 @@
                 timeout: null,
                 showSettings: false,
                 showInvitation: true,
+                MAX_USERS_ON_GRID: MAX_USERS_ON_GRID,
             };
         },
         async mounted() {
@@ -222,6 +264,8 @@
                 'setUserControl',
                 'setPresentationMessage',
                 'setFullscreenUser',
+                'setDisplayUsersStartIdx',
+                'setDisplayUsersEndIdx',
             ]),
             hashString(str) {
                 if (!str) {
@@ -273,6 +317,32 @@
             remoteStream(userId) {
                 return this.remoteStreams.get(userId);
             },
+            previousPage() {
+                console.log('prev');
+                if (this.displayUsersStartIdx <= 0) {
+                    return;
+                }
+
+                this.setDisplayUsersStartIdx(
+                    this.displayUsersStartIdx - MAX_USERS_ON_GRID
+                );
+                this.setDisplayUsersEndIdx(
+                    this.displayUsersEndIdx - MAX_USERS_ON_GRID
+                );
+            },
+            nextPage() {
+                console.log('next', this.allUsers.length);
+                if (this.displayUsersEndIdx > this.allUsers.length) {
+                    return;
+                }
+
+                this.setDisplayUsersStartIdx(
+                    this.displayUsersStartIdx + MAX_USERS_ON_GRID
+                );
+                this.setDisplayUsersEndIdx(
+                    this.displayUsersEndIdx + MAX_USERS_ON_GRID
+                );
+            },
         },
         computed: {
             ...mapGetters([
@@ -298,6 +368,8 @@
                 'title',
                 'screenshareRoom',
                 'screensharer',
+                'displayUsersStartIdx',
+                'displayUsersEndIdx',
             ]),
             currentViewStyle: {
                 get() {
@@ -326,6 +398,21 @@
                 this.showInvitation = false;
                 if (val <= 1) {
                     this.showInvitation = true;
+                }
+            },
+            allUsers(val) {
+                if (this.displayUsersStartIdx >= val.length) {
+                    if (this.displayUsersStartIdx - MAX_USERS_ON_GRID < 0) {
+                        this.setDisplayUsersStartIdx(0);
+                        this.setDisplayUsersEndIdx(MAX_USERS_ON_GRID);
+                        return;
+                    }
+                    this.setDisplayUsersStartIdx(
+                        this.displayUsersStartIdx - MAX_USERS_ON_GRID
+                    );
+                    this.setDisplayUsersEndIdx(
+                        this.displayUsersEndIdx - MAX_USERS_ON_GRID
+                    );
                 }
             },
         },

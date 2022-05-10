@@ -12,6 +12,7 @@ import ScreenShareStore from '../stores/ScreenShareStore';
 import UserMediaStore from '../stores/UserMediaStore';
 import BackgroundRemovalStore from '../stores/BackgroundRemovalStore';
 import PresenterStore from '../stores/PresenterStore';
+import PaginationStore from '../stores/PaginationStore';
 
 Vue.use(Vuex);
 
@@ -28,5 +29,6 @@ export default new Vuex.Store({
         PresenterStore,
         UserMediaStore,
         BackgroundRemovalStore,
+        PaginationStore,
     },
 });

@@ -29,6 +29,7 @@ export default {
         },
         addRemoteUser(state, user) {
             if (state.localUser && state.localUser.uuid === user.uuid) {
+                console.log('returned?');
                 return;
             }
 
