@@ -257,9 +257,6 @@
             showChat() {
                 this.calculateOrientation();
             },
-            users() {
-                console.log('erover toch');
-            },
         },
     };
 </script>
