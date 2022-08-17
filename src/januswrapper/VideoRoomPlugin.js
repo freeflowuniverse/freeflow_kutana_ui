@@ -1,5 +1,5 @@
 import store from '@/plugins/vuex';
-import { generateDummyMediaStream } from '@/utils/mediaDevicesUtils';
+import { generateDummyMediaStream, updateCurrentStream } from '@/utils/mediaDevicesUtils';
 import { initializeJanus } from '@/services/JanusService';
 
 export class VideoRoomPlugin {
@@ -49,6 +49,24 @@ export class VideoRoomPlugin {
                 this.onLocalStream(stream);
             },
             onremotestream: stream => {},
+            webrtcState: () => {
+            },
+            slowLink: (sl) => {
+                console.log("slowLink", sl);
+                this.pluginHandle.send({
+                    message: {
+                        "request" : "configure",
+                        "restart": true
+                    },
+                    success: (e) => {
+                        window.janusshizzle.janus.janusGateway.reconnect();
+                    },
+                });
+            },
+            iceState: () => {
+            },
+            mediaState: () => {
+            }
         };
     }
 
@@ -179,10 +197,22 @@ export class VideoRoomPlugin {
 
     onError(error) {
         this.emitEvent('error', error);
+        // this.emitEvent('error', error);
+        // setTimeout(function() {
+        //     // @ts-ignore
+		// 	window.janusshizzle.janus.janusGateway.reconnect({
+		// 		success: function() {
+		// 			console.log("Session successfully reclaimed:", window.janusshizzle.janus.janusGateway.getSessionId());
+		// 		},
+		// 		error: function(err) {
+		// 			console.error("Failed to reconnect:", err);
+		// 			// Might have an exponential backoff, here, or simply fail
+		// 		}
+		// 	});
+		// }, 2000);
     }
 
     async onMessage(msg, jsep) {
-        // console.log({ msg, jsep });
         if (jsep) {
             this.pluginHandle.handleRemoteJsep({
                 jsep: jsep,
@@ -289,6 +319,8 @@ export class VideoRoomPlugin {
         this.myStream = generateDummyMediaStream(video, audio);
         this.pluginHandle.createOffer({
             stream: this.myStream,
+            iceRestart: true,
+            trickle: true,
             success: jsep => {
                 const publish = { request: 'configure', audio, video };
 
@@ -303,44 +335,68 @@ export class VideoRoomPlugin {
         });
     }
 
+    async reconnect()  {
+        store.getters.userControl.hangUp();
+
+        window.janusshizzle.janus.janusGateway.destroy();
+
+        const userControl = await initializeJanus(
+            window.janusshizzle.janus.server,
+            this.opaqueId,
+            this.myUsername,
+            this.myRoom,
+            generateDummyMediaStream(store.getters.localUser.cam, store.getters.localUser.mic)
+            
+        );
+
+        store.commit('setUserControl', userControl);
+
+        await updateCurrentStream();
+    };
+
     async publishTrack(track, video = true, audio = true) {
-        let peerConnection = this.pluginHandle.webrtcStuff.pc;
+        let peerConnection = this.pluginHandle?.webrtcStuff?.pc;
         if (!peerConnection) {
             await this.publishOwnFeed(video, audio);
             peerConnection = this.pluginHandle.webrtcStuff.pc;
-
-            let initialConnectedState = true;
-            peerConnection.addEventListener(
-                'iceconnectionstatechange',
-                async e => {
-                    if (peerConnection.iceConnectionState === 'connected') {
-                        if (!initialConnectedState) {
-                            store.getters.userControl.hangUp();
-                            window.janusshizzle.janus.janusGateway.destroy();
-
-                            const stream = await navigator.mediaDevices.getUserMedia(
-                                {
-                                    video: true,
-                                    audio: true,
-                                }
-                            );
-
-                            store.commit('setLocalStream', stream);
-                            const userControl = await initializeJanus(
-                                window.janusshizzle.janus.server,
-                                this.opaqueId,
-                                this.myUsername,
-                                this.myRoom,
-                                stream
-                            );
-
-                            store.commit('setUserControl', userControl);
-                        }
-                        initialConnectedState = false;
-                    }
-                }
-            );
         }
+
+        peerConnection.addEventListener("iceconnectionstatechanged", () => {
+            console.log("iceconnectionchange", peerConnection.iceConnectionState);
+        });
+
+        peerConnection.addEventListener("negotiationneeded", () => {
+            console.log("negotiation needed");
+        });
+
+        peerConnection.onicecandidateerror = async (ev) => {
+            console.log("ice candidate error");
+            peerConnection.restartIce();
+            this.pluginHandle.send({
+                message: {
+                    "request" : "configure",
+                    "restart": true
+                },
+                success: (e) => {
+                    window.janusshizzle.janus.janusGateway.reconnect();
+                },
+            });
+        };
+
+        let reconnectingAllowed = false;
+        peerConnection.addEventListener("connectionstatechange", async () => {
+            console.log("connectionstatechange", peerConnection.connectionState);
+            if (peerConnection.connectionState === "disconnected" || peerConnection.connectionState === "failed") {
+                reconnectingAllowed = true;
+                return;
+            }
+
+            if (peerConnection.connectionState === "connected" && reconnectingAllowed) {
+                await this.reconnect();
+            }
+
+            reconnectingAllowed = false;
+        });
 
         let senders = peerConnection.getSenders();
 

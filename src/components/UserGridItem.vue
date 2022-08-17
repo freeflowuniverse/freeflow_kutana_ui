@@ -131,9 +131,9 @@
                 :class="{ mine: localUser.id === user.id, blurred: selected }"
                 :cover="cover"
                 :label="userLabel"
-                :stream="userStream"
                 :recording="user.recording"
                 class="main"
+                :userId="user.id"
             ></JanusVideo>
         </template>
     </div>
@@ -142,7 +142,6 @@
     import JanusVideo from './JanusVideo';
     import { mapActions, mapGetters, mapMutations } from 'vuex';
     import UserPresenter from '@/components/UserPresenter';
-
     export default {
         name: 'UserGridItem',
         components: {
@@ -187,7 +186,6 @@
                     }, 100);
                 };
             }
-
             const screenShareTrack = this.user.screenShareStream.getVideoTracks()[0];
             if (screenShareTrack) {
                 screenShareTrack.oninactive = () => {
@@ -224,7 +222,6 @@
                           b: parseInt(colorRegex[3], 16),
                       }
                     : null;
-
                 let volume = 0;
                 if (!this.user || !this.user.speakingVolume) {
                     return;
@@ -331,11 +328,9 @@
         filter: grayscale(0.8) blur(16px);
         transform: scale(1.3);
     }
-
     .user-grid-item {
         position: relative;
         overflow: hidden;
-
         &[data-cam='true'][data-screen='true'] {
             .main {
                 position: absolute;
@@ -345,7 +340,6 @@
                 height: 10vh;
             }
         }
-
         .avatar {
             pointer-events: none;
             user-select: none;
@@ -354,19 +348,16 @@
             left: 0;
             width: 100%;
             height: 100%;
-
             img {
                 width: 100%;
                 height: 100%;
             }
         }
-
         &:hover {
             .controls {
                 opacity: 0.8;
             }
         }
-
         .controls {
             position: absolute;
             right: 0;
@@ -382,7 +373,6 @@
             border-radius: 5px 0 0 5px;
             transform: translateY(50%);
         }
-
         .video-label {
             position: absolute;
             left: 0;
@@ -391,11 +381,9 @@
             background: #000;
             color: #ffffff;
         }
-
         .rotated {
             transform: rotate(45deg);
         }
-
         .border {
             pointer-events: none;
             position: absolute;

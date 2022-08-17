@@ -163,6 +163,8 @@ export const generateDummyMediaStream = (
 ) => {
     const mediaStream = new MediaStream();
 
+    console.log("generating dummy mediastream....");
+
     if (video) {
         const target = document.createElement('canvas');
         target.dataset.dummy = true;

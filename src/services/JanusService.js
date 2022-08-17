@@ -34,13 +34,14 @@ export const initializeJanus = async (
         config.limitBitrateCap
     );
     let initialJoin = true;
-
+    
     videoRoomPlugin.addEventListener('pluginAttached', async room => {
         const roomCreationResult = await videoRoomPlugin.createRoom(roomName);
         await videoRoomPlugin.joinRoom(roomCreationResult.room, userName);
     });
 
     videoRoomPlugin.addEventListener('ownUserJoined', user => {
+        console.log("own user joined eeeeeeeeh", user);
         // console.log('ownUserJoined');
         store.commit('setLocalStream', user?.stream);
 
@@ -89,7 +90,6 @@ export const initializeJanus = async (
                 store.commit('setLocalUser', localUser);
             };
         }
-
         store.commit('setLocalUser', user);
     });
 

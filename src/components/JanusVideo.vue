@@ -22,12 +22,11 @@
 
 <script type="javascript">
     import { mapGetters } from 'vuex';
-
     export default {
         props: {
             stream: {
                 type: MediaStream,
-                required: true,
+                required: false,
             },
             label: {
                 type: String,
@@ -48,6 +47,11 @@
                 default: false,
                 required: false,
             },
+            userId: {
+                type: Number,
+                default: 0,
+                required: false
+            }
         },
         data() {
             return {
@@ -57,11 +61,16 @@
         },
         mounted() {
             this.$nextTick(function() {
-                this.$refs.video.srcObject = this.stream;
+                if (this.userId === this.localUser.id) {
+                    this.$refs.video.srcObject = this.localStream;
+                    return;
+                }
+
+                this.$refs.video.srcObject = this.remoteStreams?.get(this.userId) || this.stream;
             });
         },
         computed: {
-            ...mapGetters(['isMobile']),
+            ...mapGetters(['isMobile', 'remoteStreams', 'localUser', 'localStream']),
             classes() {
                 return {
                     cover: this.cover,
@@ -80,34 +89,28 @@
         position: relative;
         background: #000000;
     }
-
     video {
         width: 100%;
         height: 100%;
         object-fit: contain;
         position: absolute;
     }
-
     video.screenshare {
         object-fit: contain;
     }
-
     .video-not-present {
         background-color: lightslategrey;
     }
-
     .video-not-present video,
     .video-present .video-cam-off {
         display: none;
     }
-
     .cover {
         video:not(.screenshare) {
             display: block;
             object-fit: cover;
         }
     }
-
     .video-label {
         position: absolute;
         left: 0;
@@ -116,7 +119,6 @@
         background: #000;
         color: #ffffff;
     }
-
     .avatar {
         pointer-events: none;
         user-select: none;
@@ -125,13 +127,11 @@
         left: 0;
         width: 100%;
         height: 100%;
-
         img {
             width: 100%;
             height: 100%;
         }
     }
-
     .overlay {
         position: absolute;
         top: 0;

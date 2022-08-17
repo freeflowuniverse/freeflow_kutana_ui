@@ -271,8 +271,9 @@
             async hangUp() {
                 this.$ga.event('after-call-events', 'endCall', 'button');
                 this.userControl.hangUp();
-                await this.$router.push({ name: 'home' });
-                location.reload();
+                window.janusshizzle.janus.janusGateway.destroy();
+                // await this.$router.push({ name: 'home' });
+                // location.reload();
             },
             openChat() {
                 this.setChatOpenStatus(!this.chatIsOpen);

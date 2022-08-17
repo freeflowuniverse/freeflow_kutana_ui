@@ -318,7 +318,6 @@
                 return this.remoteStreams.get(userId);
             },
             previousPage() {
-                console.log('prev');
                 if (this.displayUsersStartIdx <= 0) {
                     return;
                 }
@@ -331,7 +330,6 @@
                 );
             },
             nextPage() {
-                console.log('next', this.allUsers.length);
                 if (this.displayUsersEndIdx > this.allUsers.length) {
                     return;
                 }
