@@ -43,29 +43,48 @@ export class VideoRoomPlugin {
             },
             error: this.onError,
             onmessage: async (msg, jsep) => {
+                console.log(msg, jsep);
                 await this.onMessage(msg, jsep);
             },
             onlocalstream: stream => {
                 this.onLocalStream(stream);
             },
             onremotestream: stream => {},
-            webrtcState: () => {
+            webrtcState: (state) => {
+                console.log("webrtcstate", state);
             },
             slowLink: (sl) => {
                 console.log("slowLink", sl);
-                this.pluginHandle.send({
-                    message: {
-                        "request" : "configure",
-                        "restart": true
-                    },
-                    success: (e) => {
-                        window.janusshizzle.janus.janusGateway.reconnect();
-                    },
-                });
             },
-            iceState: () => {
+            iceState: (state) => {
+                console.log("ice state changed", state);
+                if (state === "disconnected" || state === "failed") {
+
+                    this.pluginHandle.createOffer({
+                        iceRestart: true,
+                        success: async (jsep) => {
+                            await updateCurrentStream();
+                            this.pluginHandle.send({
+                                message: {request: "configure", restart: true},
+                                jsep: jsep,
+                                success: function() {
+
+                                },
+                                error: err => {
+                                    console.error(err);
+                                }
+                            });
+                        },
+                        error: function(err) {
+                            console.error(err);
+                        }
+                    });
+
+                }
+
             },
-            mediaState: () => {
+            mediaState: (state) => {
+                console.log("mediastate", state);
             }
         };
     }
@@ -370,32 +389,11 @@ export class VideoRoomPlugin {
         });
 
         peerConnection.onicecandidateerror = async (ev) => {
-            console.log("ice candidate error");
-            peerConnection.restartIce();
-            this.pluginHandle.send({
-                message: {
-                    "request" : "configure",
-                    "restart": true
-                },
-                success: (e) => {
-                    window.janusshizzle.janus.janusGateway.reconnect();
-                },
-            });
+            console.log("ice candidate error", ev);
         };
 
-        let reconnectingAllowed = false;
         peerConnection.addEventListener("connectionstatechange", async () => {
             console.log("connectionstatechange", peerConnection.connectionState);
-            if (peerConnection.connectionState === "disconnected" || peerConnection.connectionState === "failed") {
-                reconnectingAllowed = true;
-                return;
-            }
-
-            if (peerConnection.connectionState === "connected" && reconnectingAllowed) {
-                await this.reconnect();
-            }
-
-            reconnectingAllowed = false;
         });
 
         let senders = peerConnection.getSenders();

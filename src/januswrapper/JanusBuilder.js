@@ -30,7 +30,7 @@ export class JanusBuilder {
     async initJanusGateway() {
         return new Promise((resolve, reject) => {
             JanusGateway.init({
-                debug: this.debug,
+                debug: "all",
                 callback: function() {
                     if (!JanusGateway.isWebrtcSupported()) {
                         reject('No WebRTC support... ');
