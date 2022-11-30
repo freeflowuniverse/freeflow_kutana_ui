@@ -1,4 +1,4 @@
-# FreeFlowConnect frontend
+# Kutana Frontend
 
 ## Project setup
 ```
