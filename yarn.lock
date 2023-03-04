@@ -6410,9 +6410,10 @@ istanbul-reports@^2.2.6:
   dependencies:
     html-escaper "^2.0.0"
 
-"janus-gateway@git://github.com/freeflowuniverse/freeflow_kutana_mtu.git":
+"janus-gateway@https://github.com/freeflowuniverse/freeflow_kutana_mtu.git":
   version "0.7.5"
-  resolved "git://github.com/freeflowuniverse/freeflow_kutana_mtu.git#53bc22f96954050f8fa8eb7ebfa3e2c8b69f9450"
+  uid "53bc22f96954050f8fa8eb7ebfa3e2c8b69f9450"
+  resolved "https://github.com/freeflowuniverse/freeflow_kutana_mtu.git#53bc22f96954050f8fa8eb7ebfa3e2c8b69f9450"
   dependencies:
     webrtc-adapter "6.4.0"
 
@@ -7506,9 +7507,9 @@ minimatch@^3.0.4:
     brace-expansion "^1.1.7"
 
 minimist@^1.1.1, minimist@^1.2.0, minimist@^1.2.5:
-  version "1.2.5"
-  resolved "https://registry.npmjs.org/minimist/-/minimist-1.2.5.tgz"
-  integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.8.tgz#c1a464e7693302e082a075cee0c057741ac4772c"
+  integrity sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==
 
 minipass-collect@^1.0.2:
   version "1.0.2"
