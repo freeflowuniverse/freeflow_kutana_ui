@@ -32,7 +32,7 @@
     "libsodium-wrappers": "^0.7.6",
     "lodash": "^4.17.15",
     "marked": "^1.1.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "random-avatar-generator": "^2.0.0",
     "register-service-worker": "^1.7.1",
     "resize-observer-polyfill": "^1.5.1",
